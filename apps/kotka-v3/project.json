@@ -1,0 +1,90 @@
+{
+  "projectType": "application",
+  "sourceRoot": "apps/kotka-v3/src",
+  "prefix": "kotka-v3",
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:browser",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/kotka-v3",
+        "index": "apps/kotka-v3/src/index.html",
+        "main": "apps/kotka-v3/src/main.ts",
+        "polyfills": "apps/kotka-v3/src/polyfills.ts",
+        "tsConfig": "apps/kotka-v3/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": ["apps/kotka-v3/src/favicon.ico", "apps/kotka-v3/src/assets"],
+        "styles": ["apps/kotka-v3/src/styles.scss"],
+        "scripts": []
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "fileReplacements": [
+            {
+              "replace": "apps/kotka-v3/src/environments/environment.ts",
+              "with": "apps/kotka-v3/src/environments/environment.prod.ts"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "buildOptimizer": false,
+          "optimization": false,
+          "vendorChunk": true,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "browserTarget": "kotka-v3:build:production"
+        },
+        "development": {
+          "browserTarget": "kotka-v3:build:development"
+        }
+      },
+      "defaultConfiguration": "development",
+      "options": {
+        "proxyConfig": "apps/kotka-v3/proxy.conf.json"
+      }
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "browserTarget": "kotka-v3:build"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["apps/kotka-v3/**/*.ts", "apps/kotka-v3/**/*.html"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/apps/kotka-v3"],
+      "options": {
+        "jestConfig": "apps/kotka-v3/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

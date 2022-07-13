@@ -1,0 +1,10 @@
+{
+  "$schema": "./node_modules/nx/schemas/workspace-schema.json",
+  "version": 2,
+  "projects": {
+    "api": "apps/api",
+    "api-interfaces": "libs/api-interfaces",
+    "kotka-v3": "apps/kotka-v3",
+    "kotka-v3-e2e": "apps/kotka-v3-e2e"
+  }
+}
