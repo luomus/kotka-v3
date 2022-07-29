@@ -1,6 +1,6 @@
 import { getGreeting } from '../support/app.po';
 
-describe('kotka-v3', () => {
+describe('kotka', () => {
   beforeEach(() => cy.visit('/'));
 
   it('should display welcome message', () => {
@@ -8,6 +8,6 @@ describe('kotka-v3', () => {
     cy.login('my-email@something.com', 'myPassword');
 
     // Function helper example, see `../support/app.po.ts` file
-    getGreeting().contains('Welcome kotka-v3');
+    getGreeting().contains('Welcome kotka');
   });
 });

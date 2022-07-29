@@ -1,6 +1,6 @@
 /* eslint-disable */
 export default {
-  displayName: 'kotka-v3',
+  displayName: 'kotka',
   preset: '../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   globals: {
@@ -9,7 +9,7 @@ export default {
       stringifyContentPathRegex: '\\.(html|svg)$',
     },
   },
-  coverageDirectory: '../../coverage/apps/kotka-v3',
+  coverageDirectory: '../../coverage/apps/kotka',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': 'jest-preset-angular',
   },

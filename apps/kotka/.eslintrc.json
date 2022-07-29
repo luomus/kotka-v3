@@ -21,7 +21,7 @@
           "error",
           {
             "type": "element",
-            "prefix": "kotka-v3",
+            "prefix": "kotka",
             "style": "kebab-case"
           }
         ]

@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Message } from '@kotka-v3/api-interfaces';
+import { Message } from '@kotka/api-interfaces';
 
 @Component({
-  selector: 'kotka-v3-root',
+  selector: 'kotka-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
+  title = 'kotka'
   hello$ = this.http.get<Message>('/api/hello');
   constructor(private http: HttpClient) {}
 }

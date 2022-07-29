@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Message } from '@kotka-v3/api-interfaces';
+import { Message } from '@kotka/api-interfaces';
 
 @Injectable()
 export class AppService {

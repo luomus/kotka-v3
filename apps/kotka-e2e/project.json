@@ -1,17 +1,22 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/kotka-v3-e2e/src",
+  "sourceRoot": "apps/kotka-e2e/src",
   "projectType": "application",
+  "schematics": {
+    "@schematics/angular:component": {
+      "style": "scss"
+    }
+  },
   "targets": {
     "e2e": {
       "executor": "@nrwl/cypress:cypress",
       "options": {
-        "cypressConfig": "apps/kotka-v3-e2e/cypress.json",
-        "devServerTarget": "kotka-v3:serve:development"
+        "cypressConfig": "apps/kotka-e2e/cypress.json",
+        "devServerTarget": "kotka:serve:development"
       },
       "configurations": {
         "production": {
-          "devServerTarget": "kotka-v3:serve:production"
+          "devServerTarget": "kotka:serve:production"
         }
       }
     },
@@ -19,10 +24,10 @@
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["apps/kotka-v3-e2e/**/*.{js,ts}"]
+        "lintFilePatterns": ["apps/kotka-e2e/**/*.{js,ts}"]
       }
     }
   },
   "tags": [],
-  "implicitDependencies": ["kotka-v3"]
+  "implicitDependencies": ["kotka"]
 }

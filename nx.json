@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "npmScope": "kotka-v3",
+  "npmScope": "kotka",
   "affected": {
     "defaultBase": "main"
   },
@@ -42,5 +42,5 @@
       "style": "scss"
     }
   },
-  "defaultProject": "kotka-v3"
+  "defaultProject": "kotka"
 }

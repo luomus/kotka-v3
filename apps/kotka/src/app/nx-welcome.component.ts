@@ -3,7 +3,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 /* eslint-disable */
 
 @Component({
-  selector: 'kotka-v3-nx-welcome',
+  selector: 'kotka-nx-welcome',
   template: `
     <!--
      * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -433,7 +433,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
         <div id="welcome">
           <h1>
             <span> Hello there, </span>
-            Welcome kotka-v3 👋
+            Welcome kotka 👋
           </h1>
         </div>
 
