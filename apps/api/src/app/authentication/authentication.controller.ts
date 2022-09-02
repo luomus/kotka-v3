@@ -1,5 +1,4 @@
-import { Controller, Get, Next, Post, Redirect, Req, Res, UseGuards } from '@nestjs/common';
-import { request } from 'http';
+import { Controller, Get, Post, Redirect, Req, UseGuards } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { AuthenticateCookieGuard } from './authenticateCookie.guard';
 import { AuthenticatePersonTokenGuard } from './authenticatePersonToken.guard';
