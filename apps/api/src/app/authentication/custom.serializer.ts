@@ -3,11 +3,11 @@ import { PassportSerializer } from "@nestjs/passport";
 
 @Injectable()
 export class CustomSerializer extends PassportSerializer {
-  serializeUser(user: any, done: CallableFunction) {
-    done(null, user.id)
+  serializeUser(payload: any, done: CallableFunction) {
+    done(null, payload);
   }
 
   deserializeUser(payload: any, done:  CallableFunction) {
-    done(null, payload)
+    done(null, payload);
   }
 }

@@ -1,5 +1,6 @@
 import { Controller, Get, Next, Post, Redirect, Req, Res, UseGuards } from '@nestjs/common';
 import { request } from 'http';
+import { lastValueFrom } from 'rxjs';
 import { AuthenticateCookieGuard } from './authenticateCookie.guard';
 import { AuthenticatePersonTokenGuard } from './authenticatePersonToken.guard';
 import { AuthenticationService } from './authentication.service';
@@ -13,7 +14,7 @@ export class AuthenticationController {
   @Get()
   @UseGuards(AuthenticateCookieGuard)
   getAll() {
-    return 'test'
+    return 'test';
   }
 
   @Get('login')
@@ -22,24 +23,43 @@ export class AuthenticationController {
     return {
       url: this.authService.getLoginUrl(),
       code: 302
-    }
+    };
   }
 
   @Post('login')
   @UseGuards(AuthenticatePersonTokenGuard)
   loginUser(@Req() request) {
-    return request.user;
+    return request.user?.profile;
   }
 
+  @UseGuards(AuthenticateCookieGuard)
   @Get('logout')
-  logoutUser(@Req() request) {
+  async logoutUser(@Req() request) {
+    if (request.user) {
+      await lastValueFrom(this.authService.logoutUser(request.user.personToken));
+    }
+  
     request.logout((err) => {
       request.session.cookie.maxAge = 0;
     });
+
+    request.session.cookie.maxAge = 0;
   }
 
+  @UseGuards(AuthenticateCookieGuard)
   @Get('user')
-  getUser(@Req() request) {
-    return request.user;
+  async getUser(@Req() request) {
+    console.log('PING', request.user?.personToken)
+    if (request.user?.personToken) {
+      const user = await lastValueFrom(this.authService.checkLoginValidity(request.user.personToken));
+
+      console.log(user);
+
+      if (user) {
+        return request.user.profile;
+      }
+    }
+
+    return null;
   }
 }

@@ -8,6 +8,6 @@ import { AppService } from './app.service';
 @Module({
   imports: [AuthenticationModule, HttpModule],
   controllers: [AppController],
-  providers: [ AppService]
+  providers: [AppService]
 })
 export class AppModule {}
