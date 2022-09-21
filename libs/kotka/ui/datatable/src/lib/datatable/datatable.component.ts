@@ -12,10 +12,10 @@ import {
   GridApi,
   GridOptions,
   IGetRowsParams,
-  Module,
+  IDatasource,
+  Module, RowModelType
 } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
-import { IDatasource } from '@ag-grid-community/core/dist/cjs/interfaces/iDatasource';
 
 export interface SortModel {
   colId: string;
@@ -66,8 +66,8 @@ export class DatatableComponent implements OnChanges {
   };
   public components: any;
   public rowBuffer = 0;
-  public rowSelection = 'multiple';
-  public rowModelType = 'infinite';
+  public rowSelection: 'single'|'multiple'|undefined = 'multiple';
+  public rowModelType: RowModelType = 'infinite';
   public paginationPageSize = 100;
   public cacheOverflowSize = 2;
   public maxConcurrentDatasourceRequests = 1;
@@ -90,10 +90,10 @@ export class DatatableComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.loading) {
+    if (changes['loading']) {
       this.updateLoading();
     }
-    if (changes.datasource) {
+    if (changes['datasource']) {
       this.updateDatasource();
     }
   }

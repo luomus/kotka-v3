@@ -27,7 +27,7 @@ ModuleRegistry.registerModules([CsvExportModule, InfiniteRowModelModule]);
     ModalModule,
     PopoverModule,
     TypeaheadModule,
-    AgGridModule.withComponents([]),
+    AgGridModule
   ],
   exports: [
     AlertModule,
