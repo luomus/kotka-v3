@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "subject": "MFP.formPermissionSingle",
+  "additionalProperties": false,
+  "title": "",
+  "description": "",
+  "properties": {
+    "@context": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@context",
+      "title": "Context for the MFP.formPermissionSingle"
+    },
+    "id": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "id",
+      "title": "Id for the MFP.formPermissionSingle"
+    },
+    "@type": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@type",
+      "title": "Type for the MFP.formPermissionSingle"
+    },
+    "collectionID": {
+      "type": "string",
+      "range": "MY.collection",
+      "subject": "MFP.collectionID",
+      "title": "Collection id for which permission handled"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "",
+        "MFP.typeAdmin",
+        "MFP.typeEditor",
+        "MFP.typeAccessRequest"
+      ],
+      "enumNames": [
+        "",
+        "Admin",
+        "Editor",
+        "Access request"
+      ],
+      "range": "MFP.typeEnum",
+      "subject": "MFP.type",
+      "title": "Type of the permission"
+    },
+    "userID": {
+      "type": "string",
+      "range": "MA.person",
+      "subject": "MFP.userID",
+      "title": "For who this permission is for"
+    }
+  },
+  "required": [
+    "collectionID"
+  ]
+}

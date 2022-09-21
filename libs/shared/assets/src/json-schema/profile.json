@@ -1,0 +1,208 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "subject": "MA.profile",
+  "additionalProperties": false,
+  "title": "",
+  "description": "",
+  "properties": {
+    "@context": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@context",
+      "title": "Context for the MA.profile"
+    },
+    "id": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "id",
+      "title": "Id for the MA.profile"
+    },
+    "@type": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@type",
+      "title": "Type for the MA.profile"
+    },
+    "birdSongRecognitionSkillLevels": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "object",
+        "subject": "MA.birdSongRecognitionSkillLevelClass",
+        "additionalProperties": false,
+        "title": "Instances of this class are bird song recognition skill levels of a certain area",
+        "description": "",
+        "properties": {
+          "birdSongRecognitionArea": {
+            "type": "string",
+            "range": "ML.area",
+            "subject": "MA.birdSongRecognitionArea",
+            "title": "Area"
+          },
+          "birdSongRecognitionSkillLevel": {
+            "type": "string",
+            "enum": [
+              "MA.birdSongRecognitionSkillLevelEnum1",
+              "MA.birdSongRecognitionSkillLevelEnum2",
+              "MA.birdSongRecognitionSkillLevelEnum3",
+              "MA.birdSongRecognitionSkillLevelEnum4"
+            ],
+            "enumNames": [
+              "I can hardly identify any bird species",
+              "I can identify some of the species (regionally)",
+              "I can identify majority of the species regionally",
+              "I can identify majority of the species of the continent"
+            ],
+            "range": "MA.birdSongRecognitionSkillLevelEnum",
+            "subject": "MA.birdSongRecognitionSkillLevel",
+            "title": "Skill level"
+          }
+        },
+        "required": [
+          "birdSongRecognitionArea",
+          "birdSongRecognitionSkillLevel"
+        ]
+      },
+      "minItems": 0,
+      "range": "MA.birdSongRecognitionSkillLevelClass",
+      "subject": "MA.birdSongRecognitionSkillLevels",
+      "title": "Bird sing recognition skill level"
+    },
+    "birdwatchingActivityLevel": {
+      "type": "string",
+      "enum": [
+        "",
+        "MA.birdwatchingActivityLevelEnum1",
+        "MA.birdwatchingActivityLevelEnum2",
+        "MA.birdwatchingActivityLevelEnum3",
+        "MA.birdwatchingActivityLevelEnum4"
+      ],
+      "enumNames": [
+        "",
+        "I’m not a birdwatcher",
+        "I watch birds occasionally",
+        "I watch birds actively and regularly",
+        "I am bird researcher or professional birdwatcher"
+      ],
+      "range": "MA.birdwatchingActivityLevelEnum",
+      "subject": "MA.birdwatchingActivityLevel",
+      "title": "User's activity level in birdwatching"
+    },
+    "blocked": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "MA.person",
+      "subject": "MA.blocked",
+      "title": "Blocked ppl"
+    },
+    "finnishBirdSongRecognitionSkillLevel": {
+      "type": "string",
+      "enum": [
+        "",
+        "MA.finnishBirdSongRecognitionSkillLevelEnum1",
+        "MA.finnishBirdSongRecognitionSkillLevelEnum2",
+        "MA.finnishBirdSongRecognitionSkillLevelEnum3",
+        "MA.finnishBirdSongRecognitionSkillLevelEnum4"
+      ],
+      "enumNames": [
+        "",
+        "I can hardly recognize any bird sounds",
+        "I can recognize the most common songbirds in Finland",
+        "I can recognize majority of the breeding birds and most common passage migrants",
+        "I can recognize majority of the bird species seen in Finland"
+      ],
+      "range": "MA.finnishBirdSongRecognitionSkillLevelEnum",
+      "subject": "MA.finnishBirdSongRecognitionSkillLevel",
+      "title": "User's skill level in Finnish bird song recognition"
+    },
+    "friendRequests": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "MA.person",
+      "subject": "MA.friendRequests",
+      "title": "Friend requests received"
+    },
+    "friends": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "MA.person",
+      "subject": "MA.friends",
+      "title": "List of friends of the user"
+    },
+    "image": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MA.image",
+      "title": "Image for the profile"
+    },
+    "nameVisibleInKerttu": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MA.nameVisibleInKerttu",
+      "title": "Name is visible to others in Kerttu"
+    },
+    "personalCollectionIdentifier": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MA.personalCollectionIdentifier",
+      "title": "Own collection identifier"
+    },
+    "profileDescription": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MA.profileDescription",
+      "title": "Profile description"
+    },
+    "settings": {
+      "type": "object",
+      "range": "MZ.keyAny",
+      "subject": "MA.settings",
+      "title": "Settings for the user"
+    },
+    "taxonExpertise": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "MX.taxon",
+      "subject": "MA.taxonExpertise",
+      "title": "Expertise"
+    },
+    "taxonExpertiseNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MA.taxonExpertiseNotes",
+      "title": "Expertise notes"
+    },
+    "userID": {
+      "type": "string",
+      "range": "MA.person",
+      "subject": "MA.userID",
+      "title": "This users profile"
+    },
+    "profileKey": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.profileKey",
+      "title": "profileKey"
+    }
+  },
+  "required": [
+    "userID"
+  ]
+}

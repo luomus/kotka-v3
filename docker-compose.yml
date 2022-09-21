@@ -1,0 +1,28 @@
+version: '3'
+services:
+  kotka-api:
+    env_file:
+      - .env
+    build:
+      context: ./
+      dockerfile: ./tools/docker/kotka-api/dev/Dockerfile
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - 3333:3333
+    command: 'npm run start -- kotka-api --host 0.0.0.0'
+  kotka:
+    env_file:
+      - .env
+    build:
+      context: ./
+      dockerfile: ./tools/docker/kotka/dev/Dockerfile
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - 4200:4200
+    command: 'npm run start -- kotka --host 0.0.0.0'
+    links:
+     - kotka-api

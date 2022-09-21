@@ -1,0 +1,111 @@
+{
+  "settings": {
+    "number_of_shards": 3,
+    "index.mapping.ignore_malformed": true,
+    "index.max_result_window": 1000000,
+    "index.mapping.total_fields.limit": 10000,
+    "index.mapping.nested_objects.limit": 100000
+  },
+  "mappings": {
+    "properties": {
+      "@context": {
+        "type": "keyword"
+      },
+      "id": {
+        "type": "keyword"
+      },
+      "@type": {
+        "type": "keyword"
+      },
+      "agent": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "amount": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "amountEstimationUnit": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "branchID": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "date": {
+        "type": "date"
+      },
+      "eRH": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "estimatedSeedQuantity": {
+        "type": "integer"
+      },
+      "eventType": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "germinationConditions": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "germinationPercentage": {
+        "type": "integer"
+      },
+      "germinationRate": {
+        "type": "float"
+      },
+      "lifeStage": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "notes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "numberOfSeedsEmpty": {
+        "type": "integer"
+      },
+      "numberOfSeedsFull": {
+        "type": "integer"
+      },
+      "numberOfSeedsInfested": {
+        "type": "integer"
+      },
+      "numberOfSeedsMouldy": {
+        "type": "integer"
+      },
+      "numberOfSeedsPartFull": {
+        "type": "integer"
+      },
+      "numberOfSeedsTested": {
+        "type": "integer"
+      },
+      "percentageSeedsFull": {
+        "type": "integer"
+      },
+      "seedsExchangedInstitution": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "testPassed": {
+        "type": "boolean"
+      },
+      "viabilityPercentage": {
+        "type": "integer"
+      },
+      "_meta": {
+        "properties": {
+          "created": {
+            "type": "date"
+          },
+          "edited": {
+            "type": "date"
+          }
+        }
+      }
+    }
+  }
+}

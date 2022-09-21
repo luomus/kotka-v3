@@ -1,0 +1,197 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "subject": "KE.informationSystem",
+  "additionalProperties": false,
+  "title": "Information System",
+  "description": "",
+  "properties": {
+    "@context": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@context",
+      "title": "Context for the Information System"
+    },
+    "id": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "id",
+      "title": "Id for the Information System"
+    },
+    "@type": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@type",
+      "title": "Type for the Information System"
+    },
+    "URI": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "KE.URI",
+      "title": "Address (URL)"
+    },
+    "allowedDatawarehouseOverridingSourceId": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "KE.informationSystem",
+      "subject": "KE.allowedDatawarehouseOverridingSourceId",
+      "title": "allowedDatawarehouseOverridingSourceId"
+    },
+    "description": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "minProperties": 1,
+      "range": "xsd:string",
+      "subject": "KE.description",
+      "title": "Description"
+    },
+    "documentation": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "KE.documentation",
+      "title": "Documentation"
+    },
+    "isAllowedToQueryPrivateWarehouse": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "KE.isAllowedToQueryPrivateWarehouse",
+      "title": "Is this system allowed to query PRIVATE FinBiF warehouse?"
+    },
+    "isWarehouseSource": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "KE.isWarehouseSource",
+      "title": "Is a warehouse source"
+    },
+    "lajiAuthLoginRedirectURI": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "KE.lajiAuthLoginRedirectURI",
+      "title": "Laji-Auth login URI"
+    },
+    "maintainingOrganization": {
+      "type": "string",
+      "range": "MOS.organization",
+      "subject": "KE.maintainingOrganization",
+      "title": "Organization that maintains the software"
+    },
+    "name": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "minProperties": 1,
+      "range": "xsd:string",
+      "subject": "KE.name",
+      "title": "Name"
+    },
+    "personResponsible": {
+      "type": "string",
+      "range": "MA.person",
+      "subject": "KE.personResponsible",
+      "title": "Person responsible"
+    },
+    "publicity": {
+      "type": "string",
+      "enum": [
+        "KE.inUseByLuomus",
+        "KE.inPublicUse",
+        "KE.adminOnly",
+        "KE.thirdParty"
+      ],
+      "enumNames": [
+        "Internal LUOMUS use only",
+        "Public service",
+        "ICT-team only",
+        "3rd party"
+      ],
+      "range": "KE.publicities",
+      "subject": "KE.publicity",
+      "title": "Publicity"
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "KE.productionState",
+        "KE.developmentState",
+        "KE.abandonedState"
+      ],
+      "enumNames": [
+        "Production",
+        "Development",
+        "Abandoned/Retired"
+      ],
+      "range": "KE.states",
+      "subject": "KE.state",
+      "title": "State"
+    },
+    "transactionApiURL": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "KE.transactionApiURL",
+      "title": "Laji-ETL PULL/Balticdiversity transaction API Base URL"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "KE.webApplication",
+        "KE.webService",
+        "KE.softwareComponent",
+        "KE.program",
+        "KE.database",
+        "KE.hardware",
+        "KE.server",
+        "KE.mobileApp"
+      ],
+      "enumNames": [
+        "Web application",
+        "HTTP API",
+        "Component",
+        "Stand-alone program",
+        "Database",
+        "Hardware",
+        "Server",
+        "Mobile App"
+      ],
+      "range": "KE.types",
+      "subject": "KE.type",
+      "title": "Type"
+    }
+  },
+  "required": [
+    "URI",
+    "description",
+    "documentation",
+    "maintainingOrganization",
+    "name",
+    "personResponsible",
+    "publicity",
+    "state",
+    "transactionApiURL",
+    "type"
+  ]
+}

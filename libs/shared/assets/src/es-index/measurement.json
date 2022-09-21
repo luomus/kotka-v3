@@ -1,0 +1,105 @@
+{
+  "settings": {
+    "number_of_shards": 3,
+    "index.mapping.ignore_malformed": true,
+    "index.max_result_window": 1000000,
+    "index.mapping.total_fields.limit": 10000,
+    "index.mapping.nested_objects.limit": 100000
+  },
+  "mappings": {
+    "properties": {
+      "@context": {
+        "type": "keyword"
+      },
+      "id": {
+        "type": "keyword"
+      },
+      "@type": {
+        "type": "keyword"
+      },
+      "DNAConcentrationNgPerMicroliter": {
+        "type": "float"
+      },
+      "DNARatioOfAbsorbance260And280": {
+        "type": "float"
+      },
+      "DNAVolumeMicroliters": {
+        "type": "float"
+      },
+      "beakMillimeters": {
+        "type": "float"
+      },
+      "bodyCentimeters": {
+        "type": "float"
+      },
+      "bodyMillimeters": {
+        "type": "float"
+      },
+      "earLengthMillimeters": {
+        "type": "float"
+      },
+      "embryoCount": {
+        "type": "float"
+      },
+      "follicleDiameterMillimeters": {
+        "type": "float"
+      },
+      "footLengthMillimeters": {
+        "type": "float"
+      },
+      "forearmMillimeters": {
+        "type": "float"
+      },
+      "gonadMillimeters": {
+        "type": "float"
+      },
+      "isPartOf": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "tailCentimeters": {
+        "type": "float"
+      },
+      "tailMillimeters": {
+        "type": "float"
+      },
+      "tarsusLengthMillimeters": {
+        "type": "float"
+      },
+      "totalLengthCentimeters": {
+        "type": "float"
+      },
+      "totalLengthMillimeters": {
+        "type": "float"
+      },
+      "uterineScarCount": {
+        "type": "float"
+      },
+      "weightGrams": {
+        "type": "float"
+      },
+      "weightKilograms": {
+        "type": "float"
+      },
+      "wingMaxMillimeters": {
+        "type": "float"
+      },
+      "wingMillimeters": {
+        "type": "float"
+      },
+      "wingMinMillimeters": {
+        "type": "float"
+      },
+      "_meta": {
+        "properties": {
+          "created": {
+            "type": "date"
+          },
+          "edited": {
+            "type": "date"
+          }
+        }
+      }
+    }
+  }
+}

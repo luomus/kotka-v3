@@ -1,0 +1,178 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "subject": "MXA.individual",
+  "additionalProperties": false,
+  "title": "",
+  "description": "",
+  "properties": {
+    "@context": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@context",
+      "title": "Context for the MXA.individual"
+    },
+    "id": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "id",
+      "title": "Id for the MXA.individual"
+    },
+    "@type": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@type",
+      "title": "Type for the MXA.individual"
+    },
+    "dc:bibliographicCitation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "range": "xsd:string",
+      "subject": "dc:bibliographicCitation",
+      "title": "Bibliographic Citation"
+    },
+    "description": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "range": "xsd:string",
+      "subject": "MXA.description",
+      "title": "Description"
+    },
+    "descriptionURL": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "range": "xsd:string",
+      "subject": "MXA.descriptionURL",
+      "title": "URL for the description"
+    },
+    "hasPublicLocations": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MXA.hasPublicLocations",
+      "title": "Does this have public locations"
+    },
+    "nickname": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MXA.nickname",
+      "title": "Nickname for the individual"
+    },
+    "ringID": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MXA.ringID",
+      "title": "Ring ID"
+    },
+    "taxon": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MXA.taxon",
+      "title": "Name or MX code"
+    },
+    "deleted": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MZ.deleted",
+      "title": "Soft delete"
+    },
+    "intellectualRights": {
+      "type": "string",
+      "enum": [
+        "MZ.intellectualRightsCC-BY-SA-4.0",
+        "MZ.intellectualRightsCC-BY-NC-4.0",
+        "MZ.intellectualRightsCC-BY-NC-SA-4.0",
+        "MZ.intellectualRightsCC-BY-4.0",
+        "MZ.intellectualRightsCC0-4.0",
+        "MZ.intellectualRightsODBL-1.0",
+        "MZ.intellectualRightsPD",
+        "MZ.intellectualRightsARR",
+        "MZ.intellectualRightsCC-BY-2.0",
+        "MZ.intellectualRightsCC-BY-SA-2.0",
+        "MZ.intellectualRightsCC-BY-SA-2.0-DE",
+        "MZ.intellectualRightsCC-BY-NC-2.0",
+        "MZ.intellectualRightsCC-BY-NC-SA-2.0",
+        "MZ.intellectualRightsCC-BY-NC-ND-2.0",
+        "MZ.intellectualRightsCC-BY-SA-2.5",
+        "MZ.intellectualRightsCC-BY-SA-2.5-SE",
+        "MZ.intellectualRightsCC-BY-3.0",
+        "MZ.intellectualRightsCC-BY-SA-3.0",
+        "MZ.intellectualRightsCC-BY-NC-SA-3.0",
+        "MZ.intellectualRightsCC-BY-ND-4.0",
+        "MZ.intellectualRightsCC-BY-NC-ND-4.0"
+      ],
+      "enumNames": [
+        "Creative Commons Attribution Share-Alike 4.0",
+        "Creative Commons Attribution Noncommercial 4.0",
+        "Creative Commons Attribution Noncommercial Share-Alike 4.0",
+        "Creative Commons Attribution 4.0",
+        "Creative Commons Zero 4.0",
+        "Open Data Commons Open Database License (ODbL)",
+        "Public domain",
+        "All rights reserved",
+        "Creative Commons Attribution 2.0",
+        "Creative Commons Attribution Share-Alike 2.0",
+        "Creative Commons Attribution Share-Alike 2.0 Germany",
+        "Creative Commons Attribution Noncommercial 2.0",
+        "Creative Commons Attribution Noncommercial Share-Alike 2.0",
+        "Creative Commons Attribution Noncommercial Noderivs 2.0",
+        "Creative Commons Attribution Share-Alike 2.5",
+        "Creative Commons Attribution Share-Alike 2.5 Sweden",
+        "Creative Commons Attribution 3.0",
+        "Creative Commons Attribution Share-Alike 3.0",
+        "Creative Commons Attribution Noncommercial Share-Alike 3.0",
+        "Creative Commons Attribution Noderivatives 4.0",
+        "Creative Commons Attribution Noncommercial Noderivatives 4.0"
+      ],
+      "range": "MZ.intellectualRightsEnum",
+      "subject": "MZ.intellectualRights",
+      "title": "License"
+    },
+    "ownerPerson": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "xsd:string",
+      "subject": "MZ.ownerPerson",
+      "title": "Has permissions to modify"
+    }
+  },
+  "required": [
+    "intellectualRights"
+  ]
+}

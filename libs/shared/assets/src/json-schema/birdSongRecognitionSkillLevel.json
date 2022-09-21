@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "subject": "MA.birdSongRecognitionSkillLevelClass",
+  "additionalProperties": false,
+  "title": "Instances of this class are bird song recognition skill levels of a certain area",
+  "description": "",
+  "properties": {
+    "@context": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@context",
+      "title": "Context for the Instances of this class are bird song recognition skill levels of a certain area"
+    },
+    "id": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "id",
+      "title": "Id for the Instances of this class are bird song recognition skill levels of a certain area"
+    },
+    "@type": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@type",
+      "title": "Type for the Instances of this class are bird song recognition skill levels of a certain area"
+    },
+    "birdSongRecognitionArea": {
+      "type": "string",
+      "range": "ML.area",
+      "subject": "MA.birdSongRecognitionArea",
+      "title": "Area"
+    },
+    "birdSongRecognitionSkillLevel": {
+      "type": "string",
+      "enum": [
+        "MA.birdSongRecognitionSkillLevelEnum1",
+        "MA.birdSongRecognitionSkillLevelEnum2",
+        "MA.birdSongRecognitionSkillLevelEnum3",
+        "MA.birdSongRecognitionSkillLevelEnum4"
+      ],
+      "enumNames": [
+        "I can hardly identify any bird species",
+        "I can identify some of the species (regionally)",
+        "I can identify majority of the species regionally",
+        "I can identify majority of the species of the continent"
+      ],
+      "range": "MA.birdSongRecognitionSkillLevelEnum",
+      "subject": "MA.birdSongRecognitionSkillLevel",
+      "title": "Skill level"
+    }
+  },
+  "required": [
+    "birdSongRecognitionArea",
+    "birdSongRecognitionSkillLevel"
+  ]
+}

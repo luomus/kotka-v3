@@ -1,0 +1,123 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "@vocab": "http://tun.fi/",
+    "@base": "http://tun.fi/",
+    "default": "http://tun.fi/",
+    "luomus": "http://id.luomus.fi/",
+    "zmuo": "http://id.zmuo.oulu.fi/",
+    "herbo": "http://id.herb.oulu.fi/",
+    "utu": "http://mus.utu.fi/",
+    "xsd": "https://www.w3.org/TR/xmlschema-2/#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "xml": "http://www.w3.org/XML/1998/namespace#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "dwc": "http://rs.tdwg.org/dwc/terms/",
+    "dc": "http://purl.org/dc/terms/",
+    "dwctype": "http://rs.tdwg.org/dwc/dwctype/",
+    "abcd": "http://www.tdwg.org/schemas/abcd/2.06#",
+    "naturforskaren": "http://naturforskaren.se/",
+    "eol": "http://eol.org/",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "dyntaxa": "http://dyntaxa.se/Taxon/Info/",
+    "taxonid": "http://taxonid.org/",
+    "@context": {
+      "@id": "default:@context",
+      "@type": "xsd:string"
+    },
+    "id": "@id",
+    "@type": {
+      "@id": "default:@type",
+      "@type": "xsd:string"
+    },
+    "LuomusIntellectualRights": {
+      "@id": "default:MM.LuomusIntellectualRights",
+      "@type": "@id"
+    },
+    "caption": {
+      "@id": "default:MM.caption",
+      "@type": "xsd:string"
+    },
+    "captureDateTime": {
+      "@id": "default:MM.captureDateTime",
+      "@type": "xsd:string"
+    },
+    "capturerVerbatim": {
+      "@id": "default:MM.capturerVerbatim",
+      "@type": "xsd:string"
+    },
+    "documentURI": {
+      "@id": "default:MM.documentURI",
+      "@type": "xsd:string"
+    },
+    "fullURL": {
+      "@id": "default:MM.fullURL",
+      "@type": "xsd:string"
+    },
+    "keyword": {
+      "@id": "default:MM.keyword",
+      "@type": "xsd:string"
+    },
+    "largeURL": {
+      "@id": "default:MM.largeURL",
+      "@type": "xsd:string"
+    },
+    "originalFilename": {
+      "@id": "default:MM.originalFilename",
+      "@type": "xsd:string"
+    },
+    "originalURL": {
+      "@id": "default:MM.originalURL",
+      "@type": "xsd:string"
+    },
+    "sourceSystem": {
+      "@id": "default:MM.sourceSystem",
+      "@type": "@id"
+    },
+    "squareThumbnailURL": {
+      "@id": "default:MM.squareThumbnailURL",
+      "@type": "xsd:string"
+    },
+    "taxonDescriptionCaption": {
+      "@id": "default:MM.taxonDescriptionCaption",
+      "@container": "@language"
+    },
+    "taxonURI": {
+      "@id": "default:MM.taxonURI",
+      "@type": "@id"
+    },
+    "taxonVerbatim": {
+      "@id": "default:MM.taxonVerbatim",
+      "@type": "xsd:string"
+    },
+    "thumbnailURL": {
+      "@id": "default:MM.thumbnailURL",
+      "@type": "xsd:string"
+    },
+    "uploadedBy": {
+      "@id": "default:MM.uploadedBy",
+      "@type": "xsd:string"
+    },
+    "wgs84Lat": {
+      "@id": "default:MM.wgs84Lat",
+      "@type": "xsd:string"
+    },
+    "wgs84Lon": {
+      "@id": "default:MM.wgs84Lon",
+      "@type": "xsd:string"
+    },
+    "intellectualOwner": {
+      "@id": "default:MZ.intellectualOwner",
+      "@type": "xsd:string"
+    },
+    "intellectualRights": {
+      "@id": "default:MZ.intellectualRights",
+      "@type": "@id"
+    },
+    "publicityRestrictions": {
+      "@id": "default:MZ.publicityRestrictions",
+      "@type": "@id"
+    }
+  }
+}

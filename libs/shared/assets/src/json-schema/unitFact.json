@@ -1,0 +1,385 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "subject": "MY.unitFactClass",
+  "additionalProperties": false,
+  "title": "Näytteen / havainnon faktat",
+  "description": "",
+  "properties": {
+    "@context": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@context",
+      "title": "Context for the Näytteen / havainnon faktat"
+    },
+    "id": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "id",
+      "title": "Id for the Näytteen / havainnon faktat"
+    },
+    "@type": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@type",
+      "title": "Type for the Näytteen / havainnon faktat"
+    },
+    "adultIndividualCount": {
+      "type": "integer",
+      "range": "xsd:integer",
+      "subject": "MY.adultIndividualCount",
+      "title": "Adult individual count"
+    },
+    "autocompleteSelectedTaxonID": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.autocompleteSelectedTaxonID",
+      "title": "Taxon ID selected from autocomplete"
+    },
+    "glowWormMicrohabitat": {
+      "type": "string",
+      "enum": [
+        "",
+        "MY.glowWormMicrohabitatEnum1",
+        "MY.glowWormMicrohabitatEnum2",
+        "MY.glowWormMicrohabitatEnum3",
+        "MY.glowWormMicrohabitatEnum4",
+        "MY.glowWormMicrohabitatEnum5",
+        "MY.glowWormMicrohabitatEnum6",
+        "MY.glowWormMicrohabitatEnumOther"
+      ],
+      "enumNames": [
+        "",
+        "Short grass",
+        "Long grass",
+        "Under tree",
+        "In hedge",
+        "On path",
+        "On gravel or stones",
+        "Other"
+      ],
+      "range": "MY.glowWormMicrohabitatEnum",
+      "subject": "MY.glowWormMicrohabitat",
+      "title": "Micro habitat"
+    },
+    "individualCountFlock": {
+      "type": "integer",
+      "minimum": 0,
+      "range": "xsd:nonNegativeInteger",
+      "subject": "MY.individualCountFlock",
+      "title": "Parven koko"
+    },
+    "individualCountInner": {
+      "type": "integer",
+      "minimum": 0,
+      "range": "xsd:nonNegativeInteger",
+      "subject": "MY.individualCountInner",
+      "title": "Yksilömäärä sisällä"
+    },
+    "individualCountOuter": {
+      "type": "integer",
+      "minimum": 0,
+      "range": "xsd:nonNegativeInteger",
+      "subject": "MY.individualCountOuter",
+      "title": "Yksilömäärä alueen ulkopuolella"
+    },
+    "juvenileIndividualCount": {
+      "type": "integer",
+      "range": "xsd:integer",
+      "subject": "MY.juvenileIndividualCount",
+      "title": "Juvenile individual count"
+    },
+    "lineTransectObsType": {
+      "type": "string",
+      "enum": [
+        "",
+        "MY.lineTransectObsTypeSong",
+        "MY.lineTransectObsTypeOtherSound",
+        "MY.lineTransectObsTypeSeen",
+        "MY.lineTransectObsTypeSeenMale",
+        "MY.lineTransectObsTypeSeenFemale",
+        "MY.lineTransectObsTypeFlyingOverhead",
+        "MY.lineTransectObsTypeFlock",
+        "MY.lineTransectObsTypeFlockFlyingOverhead",
+        "MY.lineTransectObsTypeSeenPair",
+        "MY.lineTransectObsTypeSeenBrood",
+        "MY.lineTransectObsTypeSeenNest",
+        "MY.lineTransectObsTypeUnknown"
+      ],
+      "enumNames": [
+        "",
+        "Singing",
+        "Other noises",
+        "Seen",
+        "Male",
+        "Female",
+        "Overflight",
+        "Flock",
+        "Flock overflight",
+        "Pair",
+        "Brood",
+        "Nest",
+        "Unknown"
+      ],
+      "range": "MY.lineTransectObsTypeEnum",
+      "subject": "MY.lineTransectObsType",
+      "title": "Observations quality"
+    },
+    "lineTransectRouteFieldType": {
+      "type": "string",
+      "enum": [
+        "",
+        "MY.lineTransectRouteFieldTypeInner",
+        "MY.lineTransectRouteFieldTypeOuter"
+      ],
+      "enumNames": [
+        "",
+        "P - Inner route field",
+        "A - Outer route field"
+      ],
+      "range": "MY.lineTransectRouteFieldTypeEnum",
+      "subject": "MY.lineTransectRouteFieldType",
+      "title": "Field Area"
+    },
+    "lolifeDroppingsCount": {
+      "type": "string",
+      "enum": [
+        "",
+        "MY.lolifeDroppingsCount1",
+        "MY.lolifeDroppingsCount2",
+        "MY.lolifeDroppingsCount3"
+      ],
+      "enumNames": [
+        "",
+        "Muutama",
+        "Kymmeniä",
+        "Satoja"
+      ],
+      "range": "MY.lolifeDroppingsCountEnum",
+      "subject": "MY.lolifeDroppingsCount",
+      "title": "Droppings count"
+    },
+    "lolifeDroppingsQuality": {
+      "type": "string",
+      "enum": [
+        "",
+        "MY.lolifeDroppingsQuality1",
+        "MY.lolifeDroppingsQuality2"
+      ],
+      "enumNames": [
+        "",
+        "Vanhoja",
+        "Tuoreita"
+      ],
+      "range": "MY.lolifeDroppingsQualityEnum",
+      "subject": "MY.lolifeDroppingsQuality",
+      "title": "Papanoiden laatu"
+    },
+    "lolifeDroppingsType": {
+      "type": "string",
+      "enum": [
+        "",
+        "MY.lolifeDroppingsTypeRock",
+        "MY.lolifeDroppingsTypeTree",
+        "MY.lolifeDroppingsTypeTreeGroup",
+        "MY.lolifeDroppingsTypeOther"
+      ],
+      "enumNames": [
+        "",
+        "On top of rock",
+        "Single tree",
+        "Group of trees",
+        "Other, describe in notes"
+      ],
+      "range": "MY.lolifeDroppingsTypeEnum",
+      "subject": "MY.lolifeDroppingsType",
+      "title": "Droppings type"
+    },
+    "lolifeNestTree": {
+      "type": "string",
+      "enum": [
+        "",
+        "MX.38590",
+        "MX.37812",
+        "MX.37999",
+        "MX.37993",
+        "MX.38010",
+        "MX.38008",
+        "MY.lolifeNestTreeOther"
+      ],
+      "enumNames": [
+        "",
+        "Aspen",
+        "Spruce",
+        "Downy birch",
+        "Silver birch",
+        "Grey alder",
+        "Common alder",
+        "Other, describe in notes"
+      ],
+      "range": "MY.lolifeNestTreeEnum",
+      "subject": "MY.lolifeNestTree",
+      "title": "Tree species"
+    },
+    "pairCountInner": {
+      "type": "integer",
+      "minimum": 0,
+      "range": "xsd:nonNegativeInteger",
+      "subject": "MY.pairCountInner",
+      "title": "Parimäärä sisällä"
+    },
+    "pairCountOuter": {
+      "type": "integer",
+      "minimum": 0,
+      "range": "xsd:nonNegativeInteger",
+      "subject": "MY.pairCountOuter",
+      "title": "Parimäärä alueen ulkopuolella"
+    },
+    "pointCountFlock": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.pointCountFlock",
+      "title": "Parvien koot"
+    },
+    "runningWaterInVicinity": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MY.runningWaterInVicinity",
+      "title": "Is the plant growing next to running water?"
+    },
+    "waterbirdFemale": {
+      "type": "string",
+      "enum": [
+        "",
+        "MY.waterbirdFemaleEnumYes",
+        "MY.waterbirdFemaleEnumNo",
+        "MY.waterbirdFemaleEnumLonelyPanicking"
+      ],
+      "enumNames": [
+        "",
+        "yes",
+        "no",
+        "lonely panicking female"
+      ],
+      "range": "MY.waterbirdFemaleEnum",
+      "subject": "MY.waterbirdFemale",
+      "title": "Female observed"
+    },
+    "waterbirdJuvenileAgeClass": {
+      "type": "string",
+      "enum": [
+        "",
+        "MY.waterbirdJuvenileAgeClassIa",
+        "MY.waterbirdJuvenileAgeClassIb",
+        "MY.waterbirdJuvenileAgeClassIc",
+        "MY.waterbirdJuvenileAgeClassIIa",
+        "MY.waterbirdJuvenileAgeClassIIb",
+        "MY.waterbirdJuvenileAgeClassIIc",
+        "MY.waterbirdJuvenileAgeClassIIIa",
+        "MY.waterbirdJuvenileAgeClassUnknown"
+      ],
+      "enumNames": [
+        "",
+        "1. Aivan pienet kirkasväriset untuvapallot (Ia)",
+        "2. Pienet, hieman haalistuneet untuvikot (Ib)",
+        "3. Pienehköt, haalistuneet untuvikkopoikaset (Ic)",
+        "4. Alle puolikasvuiset poikaset (IIa)",
+        "5. Puolikasvuiset poikaset (IIb)",
+        "6. Yli puolikasvuiset poikaset viimeisin untuvin (IIc)",
+        "7. Lähes täysikasvuiset höyhenpeitteiset poikaset (IIIa)",
+        "8. Ei tiedossa (vältä tätä vaihtoehtoa)"
+      ],
+      "range": "MY.waterbirdJuvenileAgeClassEnum",
+      "subject": "MY.waterbirdJuvenileAgeClass",
+      "title": "Juvenile age class"
+    },
+    "waterbirdJuvenileCountAccurate": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MY.waterbirdJuvenileCountAccurate",
+      "title": "Count accurate?"
+    },
+    "waterbirdObserverOpinionSelectedCensus": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MY.waterbirdObserverOpinionSelectedCensus",
+      "title": "Make an interpretation based on this census"
+    },
+    "waterbirdPairCountOpinionReasoning": {
+      "type": "string",
+      "enum": [
+        "",
+        "MY.waterbirdPairCountOpinionReasoningEnum1",
+        "MY.waterbirdPairCountOpinionReasoningEnum2",
+        "MY.waterbirdPairCountOpinionReasoningEnum3",
+        "MY.waterbirdPairCountOpinionReasoningEnumOther"
+      ],
+      "enumNames": [
+        "",
+        "1) Laji ei varmasti pesi kohteella, linnut ruokailevia (esim. muuttomatkalla)",
+        "2) Alueella levähti 1. laskennan aikaan vielä runsaasti muuttajia ja tulkinta 2. laskennan perusteella",
+        "3) Lajin pesä(t) ovat jääneet jo kasvaneen järviruovikon suojiin 2. laskennassa, tulkinta tehty 1. laskennan perusteella",
+        "4) Muu perustelu - mikä (kirjoita lisätietoihin)?"
+      ],
+      "range": "MY.waterbirdPairCountOpinionReasoningEnum",
+      "subject": "MY.waterbirdPairCountOpinionReasoning",
+      "title": "Reasoning for own interpretation"
+    },
+    "individualCountBiotopeA": {
+      "type": "integer",
+      "minimum": 0,
+      "range": "xsd:nonNegativeInteger",
+      "subject": "WBC.individualCountBiotopeA",
+      "title": "Individual count dump"
+    },
+    "individualCountBiotopeB": {
+      "type": "integer",
+      "minimum": 0,
+      "range": "xsd:nonNegativeInteger",
+      "subject": "WBC.individualCountBiotopeB",
+      "title": "Individual count urban"
+    },
+    "individualCountBiotopeC": {
+      "type": "integer",
+      "minimum": 0,
+      "range": "xsd:nonNegativeInteger",
+      "subject": "WBC.individualCountBiotopeC",
+      "title": "Individual count countryside"
+    },
+    "individualCountBiotopeD": {
+      "type": "integer",
+      "minimum": 0,
+      "range": "xsd:nonNegativeInteger",
+      "subject": "WBC.individualCountBiotopeD",
+      "title": "Individual count field"
+    },
+    "individualCountBiotopeE": {
+      "type": "integer",
+      "minimum": 0,
+      "range": "xsd:nonNegativeInteger",
+      "subject": "WBC.individualCountBiotopeE",
+      "title": "Individual count forest"
+    },
+    "individualCountBiotopeF": {
+      "type": "integer",
+      "minimum": 0,
+      "range": "xsd:nonNegativeInteger",
+      "subject": "WBC.individualCountBiotopeF",
+      "title": "Individual count other biotope"
+    },
+    "individualCountBiotopeG": {
+      "type": "integer",
+      "minimum": 0,
+      "range": "xsd:nonNegativeInteger",
+      "subject": "WBC.individualCountBiotopeG",
+      "title": "Individual count cutting open"
+    },
+    "individualCountBiotopeH": {
+      "type": "integer",
+      "minimum": 0,
+      "range": "xsd:nonNegativeInteger",
+      "subject": "WBC.individualCountBiotopeH",
+      "title": "Individual count reed"
+    }
+  }
+}

@@ -1,0 +1,194 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "subject": "MI.taxonInteraction",
+  "additionalProperties": false,
+  "title": "Taxon interaction",
+  "description": "",
+  "properties": {
+    "@context": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@context",
+      "title": "Context for the Taxon interaction"
+    },
+    "id": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "id",
+      "title": "Id for the Taxon interaction"
+    },
+    "@type": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@type",
+      "title": "Type for the Taxon interaction"
+    },
+    "interactionType": {
+      "type": "string",
+      "enum": [
+        "MI.taxonInteractionNeutralism",
+        "MI.taxonInteractionAntagonism",
+        "MI.taxonInteractionCommensalism",
+        "MI.taxonInteractionCompetition",
+        "MI.taxonInteractionAmensalism",
+        "MI.taxonInteractionMutualism",
+        "MI.taxonInteractionPredation",
+        "MI.taxonInteractionParasitism",
+        "MI.taxonInteractionEctoparasitism",
+        "MI.taxonInteractionEndoparasitism"
+      ],
+      "enumNames": [
+        "Neutralism",
+        "Antagonism",
+        "Commensalism",
+        "Competition",
+        "Amensalism",
+        "Mutualism",
+        "Predation",
+        "Parasitism",
+        "Ectoparasitism",
+        "Endoparasitism"
+      ],
+      "range": "MI.taxonInteractionEnum",
+      "subject": "MI.interactionType",
+      "title": "Type of taxon interaction"
+    },
+    "objectLifeStage": {
+      "type": "string",
+      "enum": [
+        "",
+        "MY.lifeStageEgg",
+        "MY.lifeStageLarva",
+        "MY.lifeStagePupa",
+        "MY.lifeStageJuvenile",
+        "MY.lifeStageNymph",
+        "MY.lifeStageSubimago",
+        "MY.lifeStageImmature",
+        "MY.lifeStageAdult",
+        "MY.lifeStageFertile",
+        "MY.lifeStageSterile",
+        "MY.lifeStageTadpole",
+        "MY.lifeStageDead",
+        "MY.lifeStageAlive",
+        "MY.lifeStageEmbryo",
+        "MY.lifeStageSubadult",
+        "MY.lifeStageMature",
+        "MY.lifeStagePullus",
+        "MY.lifeStageHatchedEgg",
+        "MY.lifeStageHatchedPupa",
+        "MY.lifeStageGall",
+        "MY.lifeStageMarks"
+      ],
+      "enumNames": [
+        "",
+        "egg",
+        "larva",
+        "pupa",
+        "juvenile",
+        "nymph",
+        "subimago",
+        "immature",
+        "adult",
+        "fertile",
+        "sterile",
+        "tadpole",
+        "dead",
+        "alive",
+        "embryo or fetus",
+        "subadult",
+        "mature",
+        "pullus",
+        "hatched egg",
+        "hatched pupa",
+        "gall",
+        "marks (feeding marks etc.)"
+      ],
+      "range": "MY.lifeStages",
+      "subject": "MI.objectLifeStage",
+      "title": "Object taxon life stage"
+    },
+    "objectTaxon": {
+      "type": "string",
+      "range": "MX.taxon",
+      "subject": "MI.objectTaxon",
+      "title": "Object taxon"
+    },
+    "originalPublication": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "MP.publication",
+      "subject": "MI.originalPublication",
+      "title": "Original publication"
+    },
+    "subjectLifeStage": {
+      "type": "string",
+      "enum": [
+        "",
+        "MY.lifeStageEgg",
+        "MY.lifeStageLarva",
+        "MY.lifeStagePupa",
+        "MY.lifeStageJuvenile",
+        "MY.lifeStageNymph",
+        "MY.lifeStageSubimago",
+        "MY.lifeStageImmature",
+        "MY.lifeStageAdult",
+        "MY.lifeStageFertile",
+        "MY.lifeStageSterile",
+        "MY.lifeStageTadpole",
+        "MY.lifeStageDead",
+        "MY.lifeStageAlive",
+        "MY.lifeStageEmbryo",
+        "MY.lifeStageSubadult",
+        "MY.lifeStageMature",
+        "MY.lifeStagePullus",
+        "MY.lifeStageHatchedEgg",
+        "MY.lifeStageHatchedPupa",
+        "MY.lifeStageGall",
+        "MY.lifeStageMarks"
+      ],
+      "enumNames": [
+        "",
+        "egg",
+        "larva",
+        "pupa",
+        "juvenile",
+        "nymph",
+        "subimago",
+        "immature",
+        "adult",
+        "fertile",
+        "sterile",
+        "tadpole",
+        "dead",
+        "alive",
+        "embryo or fetus",
+        "subadult",
+        "mature",
+        "pullus",
+        "hatched egg",
+        "hatched pupa",
+        "gall",
+        "marks (feeding marks etc.)"
+      ],
+      "range": "MY.lifeStages",
+      "subject": "MI.subjectLifeStage",
+      "title": "Subject taxon life stage"
+    },
+    "subjectTaxon": {
+      "type": "string",
+      "range": "MX.taxon",
+      "subject": "MI.subjectTaxon",
+      "title": "Subject taxon"
+    }
+  },
+  "required": [
+    "interactionType",
+    "objectTaxon",
+    "subjectTaxon"
+  ]
+}

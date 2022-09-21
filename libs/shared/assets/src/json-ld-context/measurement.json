@@ -1,0 +1,131 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "@vocab": "http://tun.fi/",
+    "@base": "http://tun.fi/",
+    "default": "http://tun.fi/",
+    "luomus": "http://id.luomus.fi/",
+    "zmuo": "http://id.zmuo.oulu.fi/",
+    "herbo": "http://id.herb.oulu.fi/",
+    "utu": "http://mus.utu.fi/",
+    "xsd": "https://www.w3.org/TR/xmlschema-2/#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "xml": "http://www.w3.org/XML/1998/namespace#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "dwc": "http://rs.tdwg.org/dwc/terms/",
+    "dc": "http://purl.org/dc/terms/",
+    "dwctype": "http://rs.tdwg.org/dwc/dwctype/",
+    "abcd": "http://www.tdwg.org/schemas/abcd/2.06#",
+    "naturforskaren": "http://naturforskaren.se/",
+    "eol": "http://eol.org/",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "dyntaxa": "http://dyntaxa.se/Taxon/Info/",
+    "taxonid": "http://taxonid.org/",
+    "@context": {
+      "@id": "default:@context",
+      "@type": "xsd:string"
+    },
+    "id": "@id",
+    "@type": {
+      "@id": "default:@type",
+      "@type": "xsd:string"
+    },
+    "DNAConcentrationNgPerMicroliter": {
+      "@id": "default:MY.DNAConcentrationNgPerMicroliter",
+      "@type": "xsd:decimal"
+    },
+    "DNARatioOfAbsorbance260And280": {
+      "@id": "default:MY.DNARatioOfAbsorbance260And280",
+      "@type": "xsd:decimal"
+    },
+    "DNAVolumeMicroliters": {
+      "@id": "default:MY.DNAVolumeMicroliters",
+      "@type": "xsd:decimal"
+    },
+    "beakMillimeters": {
+      "@id": "default:MY.beakMillimeters",
+      "@type": "xsd:decimal"
+    },
+    "bodyCentimeters": {
+      "@id": "default:MY.bodyCentimeters",
+      "@type": "xsd:decimal"
+    },
+    "bodyMillimeters": {
+      "@id": "default:MY.bodyMillimeters",
+      "@type": "xsd:decimal"
+    },
+    "earLengthMillimeters": {
+      "@id": "default:MY.earLengthMillimeters",
+      "@type": "xsd:decimal"
+    },
+    "embryoCount": {
+      "@id": "default:MY.embryoCount",
+      "@type": "xsd:decimal"
+    },
+    "follicleDiameterMillimeters": {
+      "@id": "default:MY.follicleDiameterMillimeters",
+      "@type": "xsd:decimal"
+    },
+    "footLengthMillimeters": {
+      "@id": "default:MY.footLengthMillimeters",
+      "@type": "xsd:decimal"
+    },
+    "forearmMillimeters": {
+      "@id": "default:MY.forearmMillimeters",
+      "@type": "xsd:decimal"
+    },
+    "gonadMillimeters": {
+      "@id": "default:MY.gonadMillimeters",
+      "@type": "xsd:decimal"
+    },
+    "isPartOf": {
+      "@id": "default:MY.isPartOf",
+      "@type": "@id"
+    },
+    "tailCentimeters": {
+      "@id": "default:MY.tailCentimeters",
+      "@type": "xsd:decimal"
+    },
+    "tailMillimeters": {
+      "@id": "default:MY.tailMillimeters",
+      "@type": "xsd:decimal"
+    },
+    "tarsusLengthMillimeters": {
+      "@id": "default:MY.tarsusLengthMillimeters",
+      "@type": "xsd:decimal"
+    },
+    "totalLengthCentimeters": {
+      "@id": "default:MY.totalLengthCentimeters",
+      "@type": "xsd:decimal"
+    },
+    "totalLengthMillimeters": {
+      "@id": "default:MY.totalLengthMillimeters",
+      "@type": "xsd:decimal"
+    },
+    "uterineScarCount": {
+      "@id": "default:MY.uterineScarCount",
+      "@type": "xsd:decimal"
+    },
+    "weightGrams": {
+      "@id": "default:MY.weightGrams",
+      "@type": "xsd:decimal"
+    },
+    "weightKilograms": {
+      "@id": "default:MY.weightKilograms",
+      "@type": "xsd:decimal"
+    },
+    "wingMaxMillimeters": {
+      "@id": "default:MY.wingMaxMillimeters",
+      "@type": "xsd:decimal"
+    },
+    "wingMillimeters": {
+      "@id": "default:MY.wingMillimeters",
+      "@type": "xsd:decimal"
+    },
+    "wingMinMillimeters": {
+      "@id": "default:MY.wingMinMillimeters",
+      "@type": "xsd:decimal"
+    }
+  }
+}

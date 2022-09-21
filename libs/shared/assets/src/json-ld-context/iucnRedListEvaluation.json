@@ -1,0 +1,435 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "@vocab": "http://tun.fi/",
+    "@base": "http://tun.fi/",
+    "default": "http://tun.fi/",
+    "luomus": "http://id.luomus.fi/",
+    "zmuo": "http://id.zmuo.oulu.fi/",
+    "herbo": "http://id.herb.oulu.fi/",
+    "utu": "http://mus.utu.fi/",
+    "xsd": "https://www.w3.org/TR/xmlschema-2/#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "xml": "http://www.w3.org/XML/1998/namespace#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "dwc": "http://rs.tdwg.org/dwc/terms/",
+    "dc": "http://purl.org/dc/terms/",
+    "dwctype": "http://rs.tdwg.org/dwc/dwctype/",
+    "abcd": "http://www.tdwg.org/schemas/abcd/2.06#",
+    "naturforskaren": "http://naturforskaren.se/",
+    "eol": "http://eol.org/",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "dyntaxa": "http://dyntaxa.se/Taxon/Info/",
+    "taxonid": "http://taxonid.org/",
+    "@context": {
+      "@id": "default:@context",
+      "@type": "xsd:string"
+    },
+    "id": "@id",
+    "@type": {
+      "@id": "default:@type",
+      "@type": "xsd:string"
+    },
+    "actionNotes": {
+      "@id": "default:MKV.actionNotes",
+      "@type": "xsd:string"
+    },
+    "borderGain": {
+      "@id": "default:MKV.borderGain",
+      "@type": "xsd:boolean"
+    },
+    "borderGainNotes": {
+      "@id": "default:MKV.borderGainNotes",
+      "@type": "xsd:string"
+    },
+    "countOfOccurrencesMax": {
+      "@id": "default:MKV.countOfOccurrencesMax",
+      "@type": "xsd:int"
+    },
+    "countOfOccurrencesMin": {
+      "@id": "default:MKV.countOfOccurrencesMin",
+      "@type": "xsd:int"
+    },
+    "countOfOccurrencesNotes": {
+      "@id": "default:MKV.countOfOccurrencesNotes",
+      "@type": "xsd:string"
+    },
+    "criteriaA": {
+      "@id": "default:MKV.criteriaA",
+      "@type": "xsd:string"
+    },
+    "criteriaANotes": {
+      "@id": "default:MKV.criteriaANotes",
+      "@type": "xsd:string"
+    },
+    "criteriaB": {
+      "@id": "default:MKV.criteriaB",
+      "@type": "xsd:string"
+    },
+    "criteriaBNotes": {
+      "@id": "default:MKV.criteriaBNotes",
+      "@type": "xsd:string"
+    },
+    "criteriaC": {
+      "@id": "default:MKV.criteriaC",
+      "@type": "xsd:string"
+    },
+    "criteriaCNotes": {
+      "@id": "default:MKV.criteriaCNotes",
+      "@type": "xsd:string"
+    },
+    "criteriaD": {
+      "@id": "default:MKV.criteriaD",
+      "@type": "xsd:string"
+    },
+    "criteriaDNotes": {
+      "@id": "default:MKV.criteriaDNotes",
+      "@type": "xsd:string"
+    },
+    "criteriaE": {
+      "@id": "default:MKV.criteriaE",
+      "@type": "xsd:string"
+    },
+    "criteriaENotes": {
+      "@id": "default:MKV.criteriaENotes",
+      "@type": "xsd:string"
+    },
+    "criteriaForStatus": {
+      "@id": "default:MKV.criteriaForStatus",
+      "@type": "xsd:string"
+    },
+    "criteriaForStatusNotes": {
+      "@id": "default:MKV.criteriaForStatusNotes",
+      "@type": "xsd:string"
+    },
+    "criteriaNotes": {
+      "@id": "default:MKV.criteriaNotes",
+      "@type": "xsd:string"
+    },
+    "ddReason": {
+      "@id": "default:MKV.ddReason",
+      "@type": "@id"
+    },
+    "ddReasonNotes": {
+      "@id": "default:MKV.ddReasonNotes",
+      "@type": "xsd:string"
+    },
+    "decreaseDuringPeriod": {
+      "@id": "default:MKV.decreaseDuringPeriod",
+      "@type": "xsd:int"
+    },
+    "decreaseDuringPeriodNotes": {
+      "@id": "default:MKV.decreaseDuringPeriodNotes",
+      "@type": "xsd:string"
+    },
+    "distributionAreaMax": {
+      "@id": "default:MKV.distributionAreaMax",
+      "@type": "xsd:int"
+    },
+    "distributionAreaMin": {
+      "@id": "default:MKV.distributionAreaMin",
+      "@type": "xsd:int"
+    },
+    "distributionAreaNotes": {
+      "@id": "default:MKV.distributionAreaNotes",
+      "@type": "xsd:string"
+    },
+    "editNotes": {
+      "@id": "default:MKV.editNotes",
+      "@type": "xsd:string"
+    },
+    "endangermentReasonNotes": {
+      "@id": "default:MKV.endangermentReasonNotes",
+      "@type": "xsd:string"
+    },
+    "evaluatedTaxon": {
+      "@id": "default:MKV.evaluatedTaxon",
+      "@type": "@id"
+    },
+    "evaluationPeriodLength": {
+      "@id": "default:MKV.evaluationPeriodLength",
+      "@type": "xsd:int"
+    },
+    "evaluationPeriodLengthNotes": {
+      "@id": "default:MKV.evaluationPeriodLengthNotes",
+      "@type": "xsd:string"
+    },
+    "evaluationYear": {
+      "@id": "default:MKV.evaluationYear",
+      "@type": "xsd:gYear"
+    },
+    "externalPopulationImpactOnRedListStatus": {
+      "@id": "default:MKV.externalPopulationImpactOnRedListStatus",
+      "@type": "@id"
+    },
+    "externalPopulationImpactOnRedListStatusNotes": {
+      "@id": "default:MKV.externalPopulationImpactOnRedListStatusNotes",
+      "@type": "xsd:string"
+    },
+    "fragmentedHabitats": {
+      "@id": "default:MKV.fragmentedHabitats",
+      "@type": "xsd:boolean"
+    },
+    "fragmentedHabitatsNotes": {
+      "@id": "default:MKV.fragmentedHabitatsNotes",
+      "@type": "xsd:string"
+    },
+    "generationAge": {
+      "@id": "default:MKV.generationAge",
+      "@type": "xsd:decimal"
+    },
+    "generationAgeNotes": {
+      "@id": "default:MKV.generationAgeNotes",
+      "@type": "xsd:string"
+    },
+    "groundsForEvaluationNotes": {
+      "@id": "default:MKV.groundsForEvaluationNotes",
+      "@type": "xsd:string"
+    },
+    "habitatGeneralNotes": {
+      "@id": "default:MKV.habitatGeneralNotes",
+      "@type": "xsd:string"
+    },
+    "habitatNotes": {
+      "@id": "default:MKV.habitatNotes",
+      "@type": "xsd:string"
+    },
+    "hasEndangermentReason": {
+      "@id": "default:MKV.hasEndangermentReason",
+      "@type": "@id"
+    },
+    "hasOccurrence": {
+      "@id": "default:MKV.hasOccurrence",
+      "@type": "@id"
+    },
+    "hasThreat": {
+      "@id": "default:MKV.hasThreat",
+      "@type": "@id"
+    },
+    "individualCountMax": {
+      "@id": "default:MKV.individualCountMax",
+      "@type": "xsd:int"
+    },
+    "individualCountMin": {
+      "@id": "default:MKV.individualCountMin",
+      "@type": "xsd:int"
+    },
+    "individualCountNotes": {
+      "@id": "default:MKV.individualCountNotes",
+      "@type": "xsd:string"
+    },
+    "lastModified": {
+      "@id": "default:MKV.lastModified",
+      "@type": "xsd:date"
+    },
+    "lastModifiedBy": {
+      "@id": "default:MKV.lastModifiedBy",
+      "@type": "@id"
+    },
+    "lastSightingNotes": {
+      "@id": "default:MKV.lastSightingNotes",
+      "@type": "xsd:string"
+    },
+    "legacyPublications": {
+      "@id": "default:MKV.legacyPublications",
+      "@type": "xsd:string"
+    },
+    "locked": {
+      "@id": "default:MKV.locked",
+      "@type": "xsd:boolean"
+    },
+    "lsaRecommendation": {
+      "@id": "default:MKV.lsaRecommendation",
+      "@type": "xsd:boolean"
+    },
+    "lsaRecommendationNotes": {
+      "@id": "default:MKV.lsaRecommendationNotes",
+      "@type": "xsd:string"
+    },
+    "occurrenceAreaMax": {
+      "@id": "default:MKV.occurrenceAreaMax",
+      "@type": "xsd:int"
+    },
+    "occurrenceAreaMin": {
+      "@id": "default:MKV.occurrenceAreaMin",
+      "@type": "xsd:int"
+    },
+    "occurrenceAreaNotes": {
+      "@id": "default:MKV.occurrenceAreaNotes",
+      "@type": "xsd:string"
+    },
+    "occurrenceNotes": {
+      "@id": "default:MKV.occurrenceNotes",
+      "@type": "xsd:string"
+    },
+    "occurrenceRegionsNotes": {
+      "@id": "default:MKV.occurrenceRegionsNotes",
+      "@type": "xsd:string"
+    },
+    "occurrenceRegionsPrivateNotes": {
+      "@id": "default:MKV.occurrenceRegionsPrivateNotes",
+      "@type": "xsd:string"
+    },
+    "otherSources": {
+      "@id": "default:MKV.otherSources",
+      "@type": "xsd:string"
+    },
+    "percentageOfGlobalPopulation": {
+      "@id": "default:MKV.percentageOfGlobalPopulation",
+      "@type": "xsd:decimal"
+    },
+    "percentageOfGlobalPopulationNotes": {
+      "@id": "default:MKV.percentageOfGlobalPopulationNotes",
+      "@type": "xsd:string"
+    },
+    "populationSizePeriodBeginning": {
+      "@id": "default:MKV.populationSizePeriodBeginning",
+      "@type": "xsd:int"
+    },
+    "populationSizePeriodEnd": {
+      "@id": "default:MKV.populationSizePeriodEnd",
+      "@type": "xsd:int"
+    },
+    "populationSizePeriodNotes": {
+      "@id": "default:MKV.populationSizePeriodNotes",
+      "@type": "xsd:string"
+    },
+    "populationVaries": {
+      "@id": "default:MKV.populationVaries",
+      "@type": "xsd:boolean"
+    },
+    "populationVariesNotes": {
+      "@id": "default:MKV.populationVariesNotes",
+      "@type": "xsd:string"
+    },
+    "possiblyRE": {
+      "@id": "default:MKV.possiblyRE",
+      "@type": "@id"
+    },
+    "possiblyRENotes": {
+      "@id": "default:MKV.possiblyRENotes",
+      "@type": "xsd:string"
+    },
+    "primaryHabitat": {
+      "@id": "default:MKV.primaryHabitat",
+      "@type": "@id"
+    },
+    "publication": {
+      "@id": "default:MKV.publication",
+      "@type": "@id"
+    },
+    "reasonForStatusChange": {
+      "@id": "default:MKV.reasonForStatusChange",
+      "@type": "@id"
+    },
+    "reasonForStatusChangeNotes": {
+      "@id": "default:MKV.reasonForStatusChangeNotes",
+      "@type": "xsd:string"
+    },
+    "redListIndexCorrection": {
+      "@id": "default:MKV.redListIndexCorrection",
+      "@type": "@id"
+    },
+    "redListIndexCorrectionNotes": {
+      "@id": "default:MKV.redListIndexCorrectionNotes",
+      "@type": "xsd:string"
+    },
+    "redListStatus": {
+      "@id": "default:MKV.redListStatus",
+      "@type": "@id"
+    },
+    "redListStatusAccuracyNotes": {
+      "@id": "default:MKV.redListStatusAccuracyNotes",
+      "@type": "xsd:string"
+    },
+    "redListStatusMax": {
+      "@id": "default:MKV.redListStatusMax",
+      "@type": "@id"
+    },
+    "redListStatusMin": {
+      "@id": "default:MKV.redListStatusMin",
+      "@type": "@id"
+    },
+    "redListStatusNotes": {
+      "@id": "default:MKV.redListStatusNotes",
+      "@type": "xsd:string"
+    },
+    "regionallyThreatenedNotes": {
+      "@id": "default:MKV.regionallyThreatenedNotes",
+      "@type": "xsd:string"
+    },
+    "regionallyThreatenedPrivateNotes": {
+      "@id": "default:MKV.regionallyThreatenedPrivateNotes",
+      "@type": "xsd:string"
+    },
+    "remarks": {
+      "@id": "default:MKV.remarks",
+      "@type": "xsd:string"
+    },
+    "secondaryHabitat": {
+      "@id": "default:MKV.secondaryHabitat",
+      "@type": "@id"
+    },
+    "state": {
+      "@id": "default:MKV.state",
+      "@type": "@id"
+    },
+    "statusA": {
+      "@id": "default:MKV.statusA",
+      "@type": "@id"
+    },
+    "statusANotes": {
+      "@id": "default:MKV.statusANotes",
+      "@type": "xsd:string"
+    },
+    "statusB": {
+      "@id": "default:MKV.statusB",
+      "@type": "@id"
+    },
+    "statusBNotes": {
+      "@id": "default:MKV.statusBNotes",
+      "@type": "xsd:string"
+    },
+    "statusC": {
+      "@id": "default:MKV.statusC",
+      "@type": "@id"
+    },
+    "statusCNotes": {
+      "@id": "default:MKV.statusCNotes",
+      "@type": "xsd:string"
+    },
+    "statusD": {
+      "@id": "default:MKV.statusD",
+      "@type": "@id"
+    },
+    "statusDNotes": {
+      "@id": "default:MKV.statusDNotes",
+      "@type": "xsd:string"
+    },
+    "statusE": {
+      "@id": "default:MKV.statusE",
+      "@type": "@id"
+    },
+    "statusENotes": {
+      "@id": "default:MKV.statusENotes",
+      "@type": "xsd:string"
+    },
+    "taxonomicNotes": {
+      "@id": "default:MKV.taxonomicNotes",
+      "@type": "xsd:string"
+    },
+    "threatNotes": {
+      "@id": "default:MKV.threatNotes",
+      "@type": "xsd:string"
+    },
+    "typeOfOccurrenceInFinland": {
+      "@id": "default:MKV.typeOfOccurrenceInFinland",
+      "@type": "@id"
+    },
+    "typeOfOccurrenceInFinlandNotes": {
+      "@id": "default:MKV.typeOfOccurrenceInFinlandNotes",
+      "@type": "xsd:string"
+    }
+  }
+}

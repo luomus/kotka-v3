@@ -1,5 +1,5 @@
 {
-  "name": "kotka",
+  "name": "kotka-v3",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
@@ -12,6 +12,11 @@
   },
   "private": true,
   "dependencies": {
+    "@ag-grid-community/angular": "^28.1.1",
+    "@ag-grid-community/client-side-row-model": "^28.1.1",
+    "@ag-grid-community/core": "^28.1.1",
+    "@ag-grid-community/csv-export": "^28.1.1",
+    "@ag-grid-community/infinite-row-model": "^28.1.1",
     "@angular/animations": "~14.0.0",
     "@angular/common": "~14.0.0",
     "@angular/compiler": "~14.0.0",

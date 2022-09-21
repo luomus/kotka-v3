@@ -1,0 +1,475 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "@vocab": "http://tun.fi/",
+    "@base": "http://tun.fi/",
+    "default": "http://tun.fi/",
+    "luomus": "http://id.luomus.fi/",
+    "zmuo": "http://id.zmuo.oulu.fi/",
+    "herbo": "http://id.herb.oulu.fi/",
+    "utu": "http://mus.utu.fi/",
+    "xsd": "https://www.w3.org/TR/xmlschema-2/#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "xml": "http://www.w3.org/XML/1998/namespace#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "dwc": "http://rs.tdwg.org/dwc/terms/",
+    "dc": "http://purl.org/dc/terms/",
+    "dwctype": "http://rs.tdwg.org/dwc/dwctype/",
+    "abcd": "http://www.tdwg.org/schemas/abcd/2.06#",
+    "naturforskaren": "http://naturforskaren.se/",
+    "eol": "http://eol.org/",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "dyntaxa": "http://dyntaxa.se/Taxon/Info/",
+    "taxonid": "http://taxonid.org/",
+    "@context": {
+      "@id": "default:@context",
+      "@type": "xsd:string"
+    },
+    "id": "@id",
+    "@type": {
+      "@id": "default:@type",
+      "@type": "xsd:string"
+    },
+    "DBH": {
+      "@id": "default:MY.DBH",
+      "@type": "xsd:string"
+    },
+    "DNASampleLocation": {
+      "@id": "default:MY.DNASampleLocation",
+      "@type": "xsd:string"
+    },
+    "abundanceString": {
+      "@id": "default:MY.abundanceString",
+      "@type": "xsd:string"
+    },
+    "abundanceUnit": {
+      "@id": "default:MY.abundanceUnit",
+      "@type": "@id"
+    },
+    "additionalIDs": {
+      "@id": "default:MY.additionalIDs",
+      "@type": "xsd:string"
+    },
+    "adultIndividualCount": {
+      "@id": "default:MY.adultIndividualCount",
+      "@type": "xsd:integer"
+    },
+    "age": {
+      "@id": "default:MY.age",
+      "@type": "xsd:string"
+    },
+    "ageNotes": {
+      "@id": "default:MY.ageNotes",
+      "@type": "xsd:string"
+    },
+    "alive": {
+      "@id": "default:MY.alive",
+      "@type": "xsd:boolean"
+    },
+    "ankleInMillimeters": {
+      "@id": "default:MY.ankleInMillimeters",
+      "@type": "xsd:string"
+    },
+    "areaInSquareMeters": {
+      "@id": "default:MY.areaInSquareMeters",
+      "@type": "xsd:nonNegativeInteger"
+    },
+    "atlasCode": {
+      "@id": "default:MY.atlasCode",
+      "@type": "@id"
+    },
+    "batBehavior": {
+      "@id": "default:MY.batBehavior",
+      "@type": "@id"
+    },
+    "beakInMillimeters": {
+      "@id": "default:MY.beakInMillimeters",
+      "@type": "xsd:string"
+    },
+    "birdAge": {
+      "@id": "default:MY.birdAge",
+      "@type": "@id"
+    },
+    "birdBehavior": {
+      "@id": "default:MY.birdBehavior",
+      "@type": "xsd:string"
+    },
+    "birdPlumage": {
+      "@id": "default:MY.birdPlumage",
+      "@type": "@id"
+    },
+    "breeding": {
+      "@id": "default:MY.breeding",
+      "@type": "xsd:boolean"
+    },
+    "broodSize": {
+      "@id": "default:MY.broodSize",
+      "@type": "xsd:positiveInteger"
+    },
+    "causeOfDeath": {
+      "@id": "default:MY.causeOfDeath",
+      "@type": "xsd:string"
+    },
+    "checklistID": {
+      "@id": "default:MY.checklistID",
+      "@type": "@id"
+    },
+    "chemistry": {
+      "@id": "default:MY.chemistry",
+      "@type": "xsd:string"
+    },
+    "count": {
+      "@id": "default:MY.count",
+      "@type": "xsd:string"
+    },
+    "decayStage": {
+      "@id": "default:MY.decayStage",
+      "@type": "xsd:string"
+    },
+    "distance": {
+      "@id": "default:MY.distance",
+      "@type": "@id"
+    },
+    "earliestEpochOrLowestSeries": {
+      "@id": "default:MY.earliestEpochOrLowestSeries",
+      "@type": "@id"
+    },
+    "femaleIndividualCount": {
+      "@id": "default:MY.femaleIndividualCount",
+      "@type": "xsd:nonNegativeInteger"
+    },
+    "fruitType": {
+      "@id": "default:MY.fruitType",
+      "@type": "@id"
+    },
+    "genotype": {
+      "@id": "default:MY.genotype",
+      "@type": "xsd:string"
+    },
+    "gonadInMillimeters": {
+      "@id": "default:MY.gonadInMillimeters",
+      "@type": "xsd:string"
+    },
+    "growthMediumName": {
+      "@id": "default:MY.growthMediumName",
+      "@type": "xsd:string"
+    },
+    "growthOtherConditions": {
+      "@id": "default:MY.growthOtherConditions",
+      "@type": "xsd:string"
+    },
+    "growthTemperature": {
+      "@id": "default:MY.growthTemperature",
+      "@type": "xsd:string"
+    },
+    "hasIdentification": {
+      "@id": "default:MY.hasIdentification",
+      "@type": "@id"
+    },
+    "hasSubUnit": {
+      "@id": "default:MY.hasSubUnit",
+      "@type": "@id"
+    },
+    "hostID": {
+      "@id": "default:MY.hostID",
+      "@type": "@id"
+    },
+    "hostInformalNameString": {
+      "@id": "default:MY.hostInformalNameString",
+      "@type": "xsd:string"
+    },
+    "indirectObservationType": {
+      "@id": "default:MY.indirectObservationType",
+      "@type": "@id"
+    },
+    "individualCount": {
+      "@id": "default:MY.individualCount",
+      "@type": "xsd:nonNegativeInteger"
+    },
+    "infestation": {
+      "@id": "default:MY.infestation",
+      "@type": "xsd:string"
+    },
+    "informalNameString": {
+      "@id": "default:MY.informalNameString",
+      "@type": "xsd:string"
+    },
+    "informalTaxonGroup": {
+      "@id": "default:MY.informalTaxonGroup",
+      "@type": "@id"
+    },
+    "informalTaxonGroups": {
+      "@id": "default:MY.informalTaxonGroups",
+      "@type": "@id"
+    },
+    "infrasubspecificSubdivision": {
+      "@id": "default:MY.infrasubspecificSubdivision",
+      "@type": "xsd:string"
+    },
+    "isPartOf": {
+      "@id": "default:MY.isPartOf",
+      "@type": "@id"
+    },
+    "juvenileIndividualCount": {
+      "@id": "default:MY.juvenileIndividualCount",
+      "@type": "xsd:integer"
+    },
+    "keywords": {
+      "@id": "default:MY.keywords",
+      "@type": "xsd:string"
+    },
+    "larvaIndividualCount": {
+      "@id": "default:MY.larvaIndividualCount",
+      "@type": "xsd:nonNegativeInteger"
+    },
+    "latestEpochOrHighestSeries": {
+      "@id": "default:MY.latestEpochOrHighestSeries",
+      "@type": "@id"
+    },
+    "lengthInMillimeters": {
+      "@id": "default:MY.lengthInMillimeters",
+      "@type": "xsd:string"
+    },
+    "lifeStage": {
+      "@id": "default:MY.lifeStage",
+      "@type": "@id"
+    },
+    "lifeStageDescription": {
+      "@id": "default:MY.lifeStageDescription",
+      "@type": "xsd:string"
+    },
+    "likelyMigrant": {
+      "@id": "default:MY.likelyMigrant",
+      "@type": "xsd:boolean"
+    },
+    "macroscopy": {
+      "@id": "default:MY.macroscopy",
+      "@type": "xsd:string"
+    },
+    "maleIndividualCount": {
+      "@id": "default:MY.maleIndividualCount",
+      "@type": "xsd:nonNegativeInteger"
+    },
+    "measurement": {
+      "@id": "default:MY.measurement",
+      "@container": "@set"
+    },
+    "microbiologicalRiskGroup": {
+      "@id": "default:MY.microbiologicalRiskGroup",
+      "@type": "@id"
+    },
+    "microscopy": {
+      "@id": "default:MY.microscopy",
+      "@type": "xsd:string"
+    },
+    "movingDirection": {
+      "@id": "default:MY.movingDirection",
+      "@type": "@id"
+    },
+    "movingStatus": {
+      "@id": "default:MY.movingStatus",
+      "@type": "xsd:string"
+    },
+    "mutant": {
+      "@id": "default:MY.mutant",
+      "@type": "xsd:string"
+    },
+    "nativeStatus": {
+      "@id": "default:MY.nativeStatus",
+      "@type": "@id"
+    },
+    "nestCount": {
+      "@id": "default:MY.nestCount",
+      "@type": "xsd:nonNegativeInteger"
+    },
+    "nestNotes": {
+      "@id": "default:MY.nestNotes",
+      "@type": "xsd:string"
+    },
+    "nestType": {
+      "@id": "default:MY.nestType",
+      "@type": "@id"
+    },
+    "notes": {
+      "@id": "default:MY.notes",
+      "@type": "xsd:string"
+    },
+    "pairCount": {
+      "@id": "default:MY.pairCount",
+      "@type": "xsd:nonNegativeInteger"
+    },
+    "pairCountOpinion": {
+      "@id": "default:MY.pairCountOpinion",
+      "@type": "xsd:nonNegativeInteger"
+    },
+    "plantLifeStage": {
+      "@id": "default:MY.plantLifeStage",
+      "@type": "@id"
+    },
+    "plantStatusCode": {
+      "@id": "default:MY.plantStatusCode",
+      "@type": "@id"
+    },
+    "populationAbundance": {
+      "@id": "default:MY.populationAbundance",
+      "@type": "xsd:string"
+    },
+    "preparations": {
+      "@id": "default:MY.preparations",
+      "@type": "xsd:string"
+    },
+    "preservation": {
+      "@id": "default:MY.preservation",
+      "@type": "@id"
+    },
+    "provenance": {
+      "@id": "default:MY.provenance",
+      "@type": "@id"
+    },
+    "recordBasis": {
+      "@id": "default:MY.recordBasis",
+      "@type": "@id"
+    },
+    "recordParts": {
+      "@id": "default:MY.recordParts",
+      "@type": "@id"
+    },
+    "ring": {
+      "@id": "default:MY.ring",
+      "@type": "xsd:string"
+    },
+    "samplingMethod": {
+      "@id": "default:MY.samplingMethod",
+      "@type": "@id"
+    },
+    "samplingMethodNotes": {
+      "@id": "default:MY.samplingMethodNotes",
+      "@type": "xsd:string"
+    },
+    "seedMaturity": {
+      "@id": "default:MY.seedMaturity",
+      "@type": "@id"
+    },
+    "seedMorphology": {
+      "@id": "default:MY.seedMorphology",
+      "@type": "@id"
+    },
+    "sex": {
+      "@id": "default:MY.sex",
+      "@type": "@id"
+    },
+    "sexNotes": {
+      "@id": "default:MY.sexNotes",
+      "@type": "xsd:string"
+    },
+    "shortHandText": {
+      "@id": "default:MY.shortHandText",
+      "@type": "xsd:string"
+    },
+    "smell": {
+      "@id": "default:MY.smell",
+      "@type": "@id"
+    },
+    "smellNotes": {
+      "@id": "default:MY.smellNotes",
+      "@type": "xsd:string"
+    },
+    "stratigraphyVerbatim": {
+      "@id": "default:MY.stratigraphyVerbatim",
+      "@type": "xsd:string"
+    },
+    "substrateClassification": {
+      "@id": "default:MY.substrateClassification",
+      "@type": "@id"
+    },
+    "substrateDecayStage": {
+      "@id": "default:MY.substrateDecayStage",
+      "@type": "@id"
+    },
+    "substrateNotes": {
+      "@id": "default:MY.substrateNotes",
+      "@type": "xsd:string"
+    },
+    "substrateSpecies": {
+      "@id": "default:MY.substrateSpecies",
+      "@type": "xsd:string"
+    },
+    "substrateSpeciesID": {
+      "@id": "default:MY.substrateSpeciesID",
+      "@type": "@id"
+    },
+    "substrateSpeciesInformalNameString": {
+      "@id": "default:MY.substrateSpeciesInformalNameString",
+      "@type": "xsd:string"
+    },
+    "substrateTreeClassification": {
+      "@id": "default:MY.substrateTreeClassification",
+      "@type": "@id"
+    },
+    "tailInMillimeters": {
+      "@id": "default:MY.tailInMillimeters",
+      "@type": "xsd:string"
+    },
+    "taste": {
+      "@id": "default:MY.taste",
+      "@type": "@id"
+    },
+    "tasteNotes": {
+      "@id": "default:MY.tasteNotes",
+      "@type": "xsd:string"
+    },
+    "taxonConfidence": {
+      "@id": "default:MY.taxonConfidence",
+      "@type": "@id"
+    },
+    "twitched": {
+      "@id": "default:MY.twitched",
+      "@type": "xsd:boolean"
+    },
+    "unitFact": {
+      "@id": "default:MY.unitFact",
+      "@container": "@set"
+    },
+    "unitGathering": {
+      "@id": "default:MY.unitGathering",
+      "@container": "@set"
+    },
+    "unitType": {
+      "@id": "default:MY.unitType",
+      "@type": "xsd:string"
+    },
+    "weightInGrams": {
+      "@id": "default:MY.weightInGrams",
+      "@type": "xsd:string"
+    },
+    "wild": {
+      "@id": "default:MY.wild",
+      "@type": "@id"
+    },
+    "wingInMillimeters": {
+      "@id": "default:MY.wingInMillimeters",
+      "@type": "xsd:string"
+    },
+    "audio": {
+      "@id": "default:MZ.audio",
+      "@type": "@id"
+    },
+    "images": {
+      "@id": "default:MZ.images",
+      "@type": "@id"
+    },
+    "publicityRestrictions": {
+      "@id": "default:MZ.publicityRestrictions",
+      "@type": "@id"
+    },
+    "identifications": {
+      "@id": "default:MY.identifications",
+      "@container": "@set"
+    },
+    "typeSpecimens": {
+      "@id": "default:MY.typeSpecimens",
+      "@container": "@set"
+    }
+  }
+}

@@ -1,0 +1,1111 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "subject": "MKV.iucnRedListEvaluation",
+  "additionalProperties": false,
+  "title": "IUCN Red List Evaluation",
+  "description": "",
+  "properties": {
+    "@context": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@context",
+      "title": "Context for the IUCN Red List Evaluation"
+    },
+    "id": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "id",
+      "title": "Id for the IUCN Red List Evaluation"
+    },
+    "@type": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@type",
+      "title": "Type for the IUCN Red List Evaluation"
+    },
+    "actionNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.actionNotes",
+      "title": "Management need"
+    },
+    "borderGain": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MKV.borderGain",
+      "title": "Reinforcements across the border"
+    },
+    "borderGainNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.borderGainNotes",
+      "title": "Private notes about the reinforcements across the border"
+    },
+    "countOfOccurrencesMax": {
+      "type": "string",
+      "range": "xsd:int",
+      "subject": "MKV.countOfOccurrencesMax",
+      "title": "Number of occurrences, max."
+    },
+    "countOfOccurrencesMin": {
+      "type": "string",
+      "range": "xsd:int",
+      "subject": "MKV.countOfOccurrencesMin",
+      "title": "Number of occurrences, min."
+    },
+    "countOfOccurrencesNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.countOfOccurrencesNotes",
+      "title": "Private notes about the number of ccurrences"
+    },
+    "criteriaA": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.criteriaA",
+      "description": "<p> <b>A1</b>\tHavaittu, arvioitu, päätelty tai epäilty populaation pieneneminen äärimmäisen uhanalaisilla vähintään 90 %:lla, erittäin uhanalaisilla vähintään 70 %:lla ja vaarantuneilla vähintään 50 %:lla viimeisten kymmenen vuoden tai kolmen sukupolven aikana (valitaan pitempi jakso) tilanteessa, jossa pienenemisen syyt ovat selvästi peruttavissa JA tunnettuja JA loppuneita, perustuen johonkin seuraavista vaihtoehdoista: </p> <ul><li><b>(a)</b> suora havainto</li> <li><b>(b)</b> taksonille käyttökelpoinen runsausindeksi</li> <li><b>(c)</b> esiintymisalueen tai levinneisyysalueen pieneneminen ja/tai elinympäristön laadun huonontuminen</li> <li><b>(d)</b> todellinen tai mahdollinen hyödyntäminen</li> <li><b>(e)</b> vieraiden taksonien, risteytymisen, tautien, saasteiden, kilpailijoiden tai loisten haitalliset vaikutukset.</li></ul> <p> <b>A2</b>\tHavaittu, arvioitu, päätelty tai epäilty populaation pieneneminen äärimmäisen uhanalaisilla vähintään 80 %:lla, erittäin uhanalaisilla vähintään 50 %:lla ja vaarantuneilla vähintään 30 %:lla viimeisten kymmenen vuoden tai kolmen sukupolven aikana (valitaan pitempi jakso) tilanteessa, jossa pieneneminen ja sen syyt eivät ehkä ole loppuneet TAI niitä ei tunneta TAI ne eivät ehkä ole peruttavissa, perustuen yllä oleviin vaihtoehtoihin <b>(a)–(e)</b>. </p> <p> <b>A3</b>\tÄärimmäisen uhanalaisilla vähintään 80 %, erittäin uhanalaisilla vähintään 50 % ja vaarantuneilla vähintään 30 % populaation pieneneminen, jonka ennustetaan tai epäillään tapahtuvan tulevien kymmenen vuoden tai kolmen sukupolven aikana (valitaan pitempi jakso, korkeintaan 100 vuotta), perustuen yllä oleviin vaihtoehtoihin <b>(b)–(e)</b>. </p> <p> <b>A4</b>\tHavaittu, arvioitu, päätelty, ennustettu tai epäilty populaation pieneneminen äärimmäisen uhanalaisilla vähintään 80 %:lla, erittäin uhanalaisilla vähintään 50 %:lla ja vaarantuneilla vähintään 30 %:lla kymmenen vuoden tai kolmen sukupolven ajanjaksolla (valitaan pitempi; tulevaisuuteen maksimi 100 vuotta), johon sisältyy sekä mennyttä että tulevaa, ja pieneneminen ja sen syyt eivät ole loppuneet TAI niitä ei tunneta TAI ne eivät ehkä ole peruttavissa, perustuen yllä oleviin vaihtoehtoihin <b>(a)–(e)</b>. </p>",
+      "title": "Criterion A. Reduction of the population"
+    },
+    "criteriaANotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.criteriaANotes",
+      "title": "Yksityiset muistiinpanot kriteeristä A"
+    },
+    "criteriaB": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.criteriaB",
+      "description": "<p> Maantieteellinen alue tarkasteltuna joko\nlevinneisyysalueen (B1) tai esiintymisalueen (B2) tai\nmolempien mukaan.</p>\n\n<p>\n<b>B1</b>\tLevinneisyysalueen arvioidaan olevan äärimmäisen\nuhanalaisilla alle 100 km², erittäin uhanalaisilla alle 5 000\nkm², vaarantuneilla alle 20 000 km² ja vähintään kaksi kohdista\na–c täyttyy:\n</p>\n<p>\n<b>B1a.</b> esiintyminen on voimakkaasti pirstoutunut TAI äärimmäisen \nuhanalaisilla vain yksi tai erittäin uhanalaisilla enintään viisi tai \nvaarantuneilla enintään kymmenen esiintymispaikkaa tunnetaan\n</p>\n<p>\n<b>B1b.</b> havaittu, päätelty tai ennustettu jatkuva väheneminen\njoissakin seuraavista:\n</p>\n<ul><li><b>(i)</b> levinneisyysalue</li>\n<li><b>(ii)</b> esiintymisalue</li>\n<li><b>(iii)</b> soveliaan elinympäristön määrä ja/tai\nlaatu</li>\n<li><b>(iv)</b> esiintymien tai osapopulaatioiden määrä</li>\n<li><b>(v)</b> lisääntymiskykyisten yksilöiden määrä</li></ul>\n\n<p>\n<b>B1c.</b> erittäin suuret vaihtelut joissakin seuraavista:\n</p>\n<ul><li><b>(i)</b> levinneisyysalue</li>\n<li><b>(ii)</b> esiintymisalue</li>\n<li><b>(iii)</b> esiintymien tai osapopulaatioiden määrä</li>\n<li><b>(iv)</b> lisääntymiskykyisten yksilöiden määrä</li></ul>\n\n\n<p>\n<b>B2</b>\tEsiintymisalueen arvioidaan olevan äärimmäisen\nuhanalaisilla alle 10 km², erittäin uhanalaisilla alle 500 km²,\nvaarantuneilla alle 2 000 km² ja vähintään kaksi kohdista\na–c täyttyy:\n</p>\n<p>\n<b>B2a.</b> esiintyminen on voimakkaasti pirstoutunut TAI äärimmäisen \nuhanalaisilla vain yksi tai erittäin uhanalaisilla enintään viisi tai \nvaarantuneilla enintään kymmenen esiintymispaikkaa tunnetaan\n</p>\n<p>\n<b>B2b.</b> havaittu, päätelty tai ennustettu jatkuva väheneminen\njoissakin seuraavista:\n</p>\n<ul><li><b>(i)</b> levinneisyysalue</li>\n<li><b>(ii)</b> esiintymisalue</li>\n<li><b>(iii)</b> soveliaan elinympäristön määrä ja/tai laatu</li>\n<li><b>(iv)</b> esiintymien tai osapopulaatioiden määrä</li>\n<li><b>(v)</b> lisääntymiskykyisten yksilöiden määrä</li></ul>\n\n<p>\n<b>B2c.</b> erittäin suuret vaihtelut joissakin seuraavista:\n</p>\n<ul><li><b>(i)</b> levinneisyysalue</li>\n<li><b>(ii)</b> esiintymisalue</li>\n<li><b>(iii)</b> esiintymien tai osapopulaatioiden määrä</li>\n<li><b>(iv)</b> lisääntymiskykyisten yksilöiden määrä</li></ul>",
+      "title": "Criterion B. Geographical area"
+    },
+    "criteriaBNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.criteriaBNotes",
+      "title": "Yksityiset muistiinpanot kriteeristä B"
+    },
+    "criteriaC": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.criteriaC",
+      "description": "<p>Pieni ja jatkuvasti taantuva populaatio\tPopulaatio on arvioitu pienemmäksi kuin äärimmäisen\nuhanalaisilla 250, erittäin uhanalaisilla 2 500 ja vaarantuneilla\n10 000 lisääntymiskykyistä yksilöä sekä jompikumpi\nseuraavista:</p>\n\n<p>\n<b>C1</b>\tÄärimmäisen uhanalaisilla vähintään 25 %:n jatkuva\nväheneminen kolmen vuoden tai yhden sukupolven aikana\n(valitaan pitempi jakso, tulevaisuuteen korkeintaan\n100 vuotta), erittäin uhanalaisilla vähintään 20 %:n jatkuva\nväheneminen viiden vuoden tai kahden sukupolven aikana\n(valitaan pitempi jakso, tulevaisuuteen korkeintaan\n100 vuotta) ja vaarantuneilla vähintään 10 %:n jatkuva\nväheneminen kymmenen vuoden tai kolmen sukupolven\naikana (valitaan pitempi jakso, tulevaisuuteen korkeintaan\n100 vuotta)\n</p>\n\n<p>\n<b>C2</b>\tHavaittu, ennustettu tai päätelty lisääntymiskykyisten\nyksilöiden määrän jatkuva väheneminen JA vähintään\ntoinen seuraavista (a–b):\n</p>\n<p>\n<b>C2a.</b> populaation rakenne joko:\n</p>\n<ul><li>\n<b>(i)</b> missään osapopulaatiossa ei ole äärimmäisen\nuhanalaisilla yli 50, erittäin uhanalaisilla yli\n250 ja vaarantuneilla yli 1 000 lisääntymiskykyistä\nyksilöä</li>\n<li>\n<b>(ii)</b> äärimmäisen uhanalaisilla vähintään 90 % ja\nerittäin uhanalaisilla vähintään 95 % lisääntymiskykyisistä\nyksilöistä sekä vaarantuneilla\nkaikki yksilöt ovat yhdessä osapopulaatiossab. erittäin suuret vaihtelut lisääntymiskykyisten\nyksilöiden määrässä\n</li></ul>\n\n<p>\n<b>C2b.</b> erittäin suuret vaihtelut lisääntymiskykyisten\nyksilöiden määrässä\n</p>",
+      "title": "Criterion C. Small and constantly decreasing population"
+    },
+    "criteriaCNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.criteriaCNotes",
+      "title": "Yksityiset muistiinpanot kriteeristä C"
+    },
+    "criteriaD": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.criteriaD",
+      "description": "<p>Populaation arvioitu koko on äärimmäisen uhanalaisilla\nalle 50 ja erittäin uhanalaisilla alle 250 lisääntymiskykyistä\nyksilöä. Vaarantuneilla populaatio on hyvin pieni tai\nrajoittunut jommankumman vaihtoehdon mukaan:</p>\n<p>\n<b>D1</b>\tArvioitu populaatiokoko on alle 1 000 lisääntymiskykyistä\nyksilöä.\n</p>\n\n<p>\n<b>D2</b>\tPopulaatiolla on hyvin rajoittunut esiintymisalue\n(yleensä alle 20 km²) tai vähän esiintymispaikkoja (yleensä\nkorkeintaan viisi), ja populaatio on siten altis äkillisille\nja ennustamattomille ihmistoiminnan tai sattuman vaikutuksille\nja voi lyhyessä ajassa muuttua äärimmäisen\nuhanalaiseksi tai jopa hävitä.\n</p>",
+      "title": "Criterion D. Very small and restricted population"
+    },
+    "criteriaDNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.criteriaDNotes",
+      "title": "Yksityiset muistiinpanot kriteeristä D"
+    },
+    "criteriaE": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.criteriaE",
+      "description": "<p>Kvantitatiivisen analyysin perusteella todennäköisyys\nhävitä luonnosta on äärimmäisen uhanalaisilla vähintään\n50 % kymmenen vuoden tai kolmen sukupolven aikana\n(valitaan pitempi, korkeintaan 100 vuotta), erittäin\nuhanalaisilla vähintään 20 % kahdenkymmenen vuoden\ntai viiden sukupolven aikana (valitaan pitempi, korkeintaan\n100 vuotta) ja vaarantuneilla vähintään 10 % sadan\nvuoden aikana.Kvantitatiivisen analyysin perusteella todennäköisyys\nhävitä luonnosta on äärimmäisen uhanalaisilla vähintään\n50 % kymmenen vuoden tai kolmen sukupolven aikana\n(valitaan pitempi, korkeintaan 100 vuotta), erittäin\nuhanalaisilla vähintään 20 % kahdenkymmenen vuoden\ntai viiden sukupolven aikana (valitaan pitempi, korkeintaan\n100 vuotta) ja vaarantuneilla vähintään 10 % sadan\nvuoden aikana.\n</p>",
+      "title": "Criterion D. Quantitative analysis"
+    },
+    "criteriaENotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.criteriaENotes",
+      "title": "Yksityiset muistiinpanot kriteeristä E"
+    },
+    "criteriaForStatus": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.criteriaForStatus",
+      "title": "Criteria that led to the category"
+    },
+    "criteriaForStatusNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.criteriaForStatusNotes",
+      "title": "Yksityiset muistiinpanot luokkaan johtaneista kriteereistä"
+    },
+    "criteriaNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.criteriaNotes",
+      "title": "Comments on the criteria"
+    },
+    "ddReason": {
+      "type": "string",
+      "enum": [
+        "",
+        "MKV.ddReasonIncompleteSpatialData",
+        "MKV.ddReasonIncompleteTaxonomicData",
+        "MKV.ddReasonIncompleteOtherData"
+      ],
+      "enumNames": [
+        "",
+        "1. Origin unknown",
+        "2. Uncertainty i taxonomy",
+        "3. Incomplete information"
+      ],
+      "range": "MKV.ddReasonEnum",
+      "subject": "MKV.ddReason",
+      "description": "<ul> <li><b>1. Tuntematon alkuperä.</b> Taksoni tunnetaan vain yhdestä tai muutamasta yksilöstä/ näyteestä, joiden löytöpaikkaa ei tunneta tai paikkatiedot ovat hyvin epätarkat, joten taksonin tilaa ei voida päätellä. </li><li><b>2. Taksonominen epävarmuus.</b> Tietojen vähäisyys voi olla seurausta taksonomisesta epävarmuudesta eli levinneisyydestä, ekologiasta, tilasta, ja uhkista on vähän tietoa, koska vähäinen näytteiden ja/ tai havaintojenmäärä johtuu siitä että taksonia edustaa poikkeava yksilö, hybridi, harvinainen värimuoto tai muun lajin alalajia. Se voi selittää tiedon puutetta yhtä todennäköisesti tai todennäköisemmin kuin se, että taksoni on aidosti harvinainen, uhanalainen tai riittämättömästi etsitty. Tästä on kuitenkin erotettava ne taksonit, joiden taksonomiassa/ taksonomisessa asemassa on jotain epäselvää: ne on joko arvioitava normaalisti tai jätettävä arvioinnin ulkopuolelle (NE) ja tästä arviointilistalle mukaan ottamisesta on päätettävä arvioinnin vaiheessa 1 (luku 2). </li><li><b>3. Puutteelliset tiedot.</b> Tiedot ovat riittämättömät arviointikriteerien soveltamiseksi eli kaikki muut syyt tietojen vähäisyyteen. </li></ul>",
+      "title": "Reason for class DD"
+    },
+    "ddReasonNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.ddReasonNotes",
+      "title": "Yksityiset muistiinpanot DD-luokituksen syystä"
+    },
+    "decreaseDuringPeriod": {
+      "type": "string",
+      "range": "xsd:int",
+      "subject": "MKV.decreaseDuringPeriod",
+      "title": "Decrease in population during the period"
+    },
+    "decreaseDuringPeriodNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.decreaseDuringPeriodNotes",
+      "title": "Yksityiset muistiinpanot vähenemisestä"
+    },
+    "distributionAreaMax": {
+      "type": "string",
+      "range": "xsd:int",
+      "subject": "MKV.distributionAreaMax",
+      "title": "Distribution range, max."
+    },
+    "distributionAreaMin": {
+      "type": "string",
+      "range": "xsd:int",
+      "subject": "MKV.distributionAreaMin",
+      "description": "Merkitäksesi \"enintään\" jätä alaraja tyhjäksi. Merkitäksesi \"vähintään\" jätä yläraja tyhjäksi.",
+      "title": "Distribution range, min."
+    },
+    "distributionAreaNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.distributionAreaNotes",
+      "title": "Yksityiset muistiinpanot levinneisyysalueen koosta"
+    },
+    "editNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.editNotes",
+      "title": "Edit notes"
+    },
+    "endangermentReasonNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.endangermentReasonNotes",
+      "title": "Yksityiset muistiinpanot uhanalaisuuden syistä"
+    },
+    "evaluatedTaxon": {
+      "type": "string",
+      "range": "MX.taxon",
+      "subject": "MKV.evaluatedTaxon",
+      "title": "Evaluated taxon"
+    },
+    "evaluationPeriodLength": {
+      "type": "string",
+      "range": "xsd:int",
+      "subject": "MKV.evaluationPeriodLength",
+      "description": "<p>Tarkastelujakso = 3 x sukupolven pituus A-kriteerissä. Minimi 10 vuotta lyhytikäisillä lajeilla, maksimi 100 vuotta pitkäikäisillä lajeilla.</p>\n<p>C-kriteerissä tarkastelujakson pituus vaihtelee luokasta riippuen 1-3 sukupolvea tai 3,5, tai 10 v.</p>\n<p>Kenttä on tarkoitettu ensisijaisesti A-kriteeriä varten. Jos on samaan aikaan käytössä myös C-kriteeri, merkitse siihen liittyvä jakson pituus kommenttikenttään.</p>",
+      "title": "Length of the assessment period"
+    },
+    "evaluationPeriodLengthNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.evaluationPeriodLengthNotes",
+      "title": "Yksityiset muistiinpanot tarkastelujaksosta"
+    },
+    "evaluationYear": {
+      "type": "string",
+      "range": "xsd:gYear",
+      "subject": "MKV.evaluationYear",
+      "title": "Assessment year"
+    },
+    "externalPopulationImpactOnRedListStatus": {
+      "type": "string",
+      "enum": [
+        "",
+        "MKV.externalPopulationImpactOnRedListStatusEnumMinus1",
+        "MKV.externalPopulationImpactOnRedListStatusEnumMinus2",
+        "MKV.externalPopulationImpactOnRedListStatusEnumPlus1",
+        "MKV.externalPopulationImpactOnRedListStatusEnumPlus2"
+      ],
+      "enumNames": [
+        "",
+        "-1",
+        "-2",
+        "+1",
+        "+2"
+      ],
+      "range": "MKV.externalPopulationImpactOnRedListStatusEnum",
+      "subject": "MKV.externalPopulationImpactOnRedListStatus",
+      "description": "<p>Arvioinnin viimeisessä vaiheessa otetaan huomioon Suomen ulkopuolella olevien populaatioiden mahdollinen vaikutus arvioitavaan Suomen populaatioon. Tarvittaessa alennetaan tai korotetaan luokkaa sen perusteella. Luokkaa alennetaan, jos ulkopuolelta saatava täydennys voi vähentää lajin häviämisriskiä. Alennettu tai korotettu luokka on lajin lopullinen uhanalaisuusluokka. </p>\n\n<p>Luokka-kenttään asetetaan alennuksen tai korotuksen aiheuttama lopputulos. Tähän kenttään asetetaan tieto tehdystä alennuksesta tai korotuksesta.</p>",
+      "title": "Reducing or increasing the Red List category"
+    },
+    "externalPopulationImpactOnRedListStatusNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.externalPopulationImpactOnRedListStatusNotes",
+      "title": "Yksityiset muistiinpanot luokan alentamisesta tai korottamisesta"
+    },
+    "fragmentedHabitats": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MKV.fragmentedHabitats",
+      "description": "<p>Onko populaatio voimakkaasti pirstoutunut? = enemmän kuin puolet yksilöistä (tai enemmän kuin puolet asutusta elinympäristöstä) on pienissä eristyneissä laikuissa, jotka ovat </p> <li>liian pieniä ylläpitämään elinvoimaista populaatiota ja</li> <li>kaukana muista elinympäristölaikuista suhteessa lajin leviämiskykyyn.</li>",
+      "title": "Population fragmented"
+    },
+    "fragmentedHabitatsNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.fragmentedHabitatsNotes",
+      "title": "Yksityiset muistiinpanot pirstoutumisesta"
+    },
+    "generationAge": {
+      "type": "number",
+      "range": "xsd:decimal",
+      "subject": "MKV.generationAge",
+      "description": "Vuosissa. (Ks. IUCN-ohje, viimeksi syntyneiden yksilöiden vanhempien keskim. ikä)",
+      "title": "Generation"
+    },
+    "generationAgeNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.generationAgeNotes",
+      "title": "Yksityiset muistiinpanot sukupolvesta"
+    },
+    "groundsForEvaluationNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.groundsForEvaluationNotes",
+      "title": "Comments on assessment criteria"
+    },
+    "habitatGeneralNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.habitatGeneralNotes",
+      "title": "Comments on habitats"
+    },
+    "habitatNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.habitatNotes",
+      "title": "Yksityiset muistiinpanot elinympäristöstä"
+    },
+    "hasEndangermentReason": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "MKV.endangermentObject",
+      "subject": "MKV.hasEndangermentReason",
+      "description": "<ul> <li><b>P - Pyynti:</b> metsästys, kalastus ja laiton tappaminen, myös esimerkiksi muiden eläinten jääminen kalanpyydyksiin</li> <li><b>Ke - Keräily ja poiminta</b>, myös siirto puutarhaan</li> <li><b>H - Häirintä ja liikenne</b></li> <li><b>Ku - Kuluminen:</b> maa - ja kallioperän kuluminen, esimerkiksi tallaamisen, maastoajon, kalliokiipeilyn tai ylilaidunnuksen vuoksi</li> <li><b>R - Rakentaminen (maalla):</b> asutukseen, elinkeinoihin, liikenteeseen ja virkistyskäyttöön liittyvä rakentaminen tierakentaminen, rakentamiseen liittyvät maansiirrot ja läjitykset</li> <li><b>Ks - Kaivannaistoiminta:</b> maa - aineksen ja kalliokiviaineksen otto, kaivostoiminta</li> <li><b>Pm - Peltomaiden muutokset:</b> salaojitus, viljelytapojen muutokset, karjanhoidon muutokset (ei laidunten sulkeutuminen), koneiden käyttö ja viljeltävien lajien vaihdot (ei torjunta - aineet)</li> <li><b>Pr - Pellonraivaus:</b> metsien, soiden ja niittyjen muuttaminen pelloiksi</li> <li><b>N - Avoimien alueiden sulkeutuminen:</b> mm. niitty - ja hakamaiden sekä metsälaidunten sulkeutuminen laidunnuksen ja niiton loputtua, sorakuoppien ja muiden avointen kenttien metsittäminen ja umpeenkasvu</li> <li><b>M - Metsien uudistamis - ja hoitotoimet:</b> toimet, jotka eivät sisälly seuraaviin uhkatekijöihin, esim. maaperän muokkaus. Uhanalaisuuden syynä metsien käyttö. Tarkennetaan työdokumentoinnissa</li> <li><b>Mp - Metsien puulajisuhteiden muutokset:</b> mm. lehtipuiden väheneminen ja lehtojen kuusettuminen</li> <li><b>Mv - Vanhojen metsien väheneminen:</b> vanhojen metsien ja kookkaiden puiden väheneminen</li> <li><b>Mk - Kuloalueiden väheneminen:</b> Kuloalueiden ja muiden luontaisen sukkession alkuvaiheiden väheneminen</li> <li><b>Ml - Lahopuun väheneminen:</b> lahoavan puuaineksen, kuolleiden tai kuolevien puiden sekä oksien, lahoja kolopuiden väheneminen</li> <li><b>O - Ojitus ja turpeenotto</b>, (ei purojen perkaukset): myös kunnostusojitus ja aikaisemmin tehdyn ojituksen myöhäisemmät vaikutukset</li> <li><b>Vr - Vesirakentaminen:</b> voimalaitokset, saha - ja myllypadot, vesien säännöstely, ruoppaukset ja perkaukset (myös purojen), rantavyöhykkeen rakenteellinen muuttaminen (esim. pengerrykset), järvien laskut, tekoaltaiden rakentaminen, pohjaveden otto ja lähteiden hyödyntäminen, mm. pohjaveden pinnan laskun aiheuttamat muutokset</li> <li><b>Kh - Kemialliset haittavaikutukset:</b> ympäristömyrkyt, torjunta - aineet, ilman ja vesien saasteet, öljyvahingot sekä rehevöittävä laskeuma</li> <li><b>I - Ilmastonmuutos:</b> ennustettu ilmaston lämpeneminen, sademäärien lisääntyminen ja äärimmäisten sääilmiöiden yleistyminen seuraavien 20–30 vuoden aikana (käytetään vain, kun on erityisiä perusteita ko. lajiin kohdistuville vaikutuksille)</li> <li><b>S - Satunnaistekijät:</b> satunnaistekijöiden aiheuttama uhka kun kanta tai esiintymisalue on hyvin pieni, myös lyhytaikaiset ilmastonmuutokset</li> <li><b>Kil - Kilpailu:</b> muiden lajien aiheuttama kilpailu</li> <li><b>Ris - Risteytyminen:</b> muiden lajien aiheuttama risteytyminen</li> <li><b>Kv - Suuret kannan vaihtelut</b></li> <li><b>U - Muutokset Suomen ulkopuolella:</b> esim. elinympäristöjen muutokset lintujen talvehtimisalueilla tai muuton aikaisilla levähdysalueilla, ulkomailla tapahtuva pyynti/metsästys</li> <li><b>Vie - Vieraiden lajien aiheuttamat uhat</b>: kilpailu, risteytyminen, taudit, ekosysteemimuutokset</li> <li><b>Muu - Muu tunnettu syy:</b> määriteltyihin uhkatekijöihin sisältymätön tunnettu syy, tarkennetaan työdokumentoinnissa</li> <li><b>? - Syy tuntematon</b></li> </ul>",
+      "title": "Causes of threat"
+    },
+    "hasOccurrence": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "MO.occurrence",
+      "subject": "MKV.hasOccurrence",
+      "title": "Occurrence"
+    },
+    "hasThreat": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "MKV.endangermentObject",
+      "subject": "MKV.hasThreat",
+      "description": "<ul> <li><b>P - Pyynti:</b> metsästys, kalastus ja laiton tappaminen, myös esimerkiksi muiden eläinten jääminen kalanpyydyksiin</li> <li><b>Ke - Keräily ja poiminta</b>, myös siirto puutarhaan</li> <li><b>H - Häirintä ja liikenne</b></li> <li><b>Ku - Kuluminen:</b> maa - ja kallioperän kuluminen, esimerkiksi tallaamisen, maastoajon, kalliokiipeilyn tai ylilaidunnuksen vuoksi</li> <li><b>R - Rakentaminen (maalla):</b> asutukseen, elinkeinoihin, liikenteeseen ja virkistyskäyttöön liittyvä rakentaminen tierakentaminen, rakentamiseen liittyvät maansiirrot ja läjitykset</li> <li><b>Ks - Kaivannaistoiminta:</b> maa - aineksen ja kalliokiviaineksen otto, kaivostoiminta</li> <li><b>Pm - Peltomaiden muutokset:</b> salaojitus, viljelytapojen muutokset, karjanhoidon muutokset (ei laidunten sulkeutuminen), koneiden käyttö ja viljeltävien lajien vaihdot (ei torjunta - aineet)</li> <li><b>Pr - Pellonraivaus:</b> metsien, soiden ja niittyjen muuttaminen pelloiksi</li> <li><b>N - Avoimien alueiden sulkeutuminen:</b> mm. niitty - ja hakamaiden sekä metsälaidunten sulkeutuminen laidunnuksen ja niiton loputtua, sorakuoppien ja muiden avointen kenttien metsittäminen ja umpeenkasvu</li> <li><b>M - Metsien uudistamis - ja hoitotoimet:</b> toimet, jotka eivät sisälly seuraaviin uhkatekijöihin, esim. maaperän muokkaus. Uhanalaisuuden syynä metsien käyttö. Tarkennetaan työdokumentoinnissa</li> <li><b>Mp - Metsien puulajisuhteiden muutokset:</b> mm. lehtipuiden väheneminen ja lehtojen kuusettuminen</li> <li><b>Mv - Vanhojen metsien väheneminen:</b> vanhojen metsien ja kookkaiden puiden väheneminen</li> <li><b>Mk - Kuloalueiden väheneminen:</b> Kuloalueiden ja muiden luontaisen sukkession alkuvaiheiden väheneminen</li> <li><b>Ml - Lahopuun väheneminen:</b> lahoavan puuaineksen, kuolleiden tai kuolevien puiden sekä oksien, lahoja kolopuiden väheneminen</li> <li><b>O - Ojitus ja turpeenotto</b>, (ei purojen perkaukset): myös kunnostusojitus ja aikaisemmin tehdyn ojituksen myöhäisemmät vaikutukset</li> <li><b>Vr - Vesirakentaminen:</b> voimalaitokset, saha - ja myllypadot, vesien säännöstely, ruoppaukset ja perkaukset (myös purojen), rantavyöhykkeen rakenteellinen muuttaminen (esim. pengerrykset), järvien laskut, tekoaltaiden rakentaminen, pohjaveden otto ja lähteiden hyödyntäminen, mm. pohjaveden pinnan laskun aiheuttamat muutokset</li> <li><b>Kh - Kemialliset haittavaikutukset:</b> ympäristömyrkyt, torjunta - aineet, ilman ja vesien saasteet, öljyvahingot sekä rehevöittävä laskeuma</li> <li><b>I - Ilmastonmuutos:</b> ennustettu ilmaston lämpeneminen, sademäärien lisääntyminen ja äärimmäisten sääilmiöiden yleistyminen seuraavien 20–30 vuoden aikana (käytetään vain, kun on erityisiä perusteita ko. lajiin kohdistuville vaikutuksille)</li> <li><b>S - Satunnaistekijät:</b> satunnaistekijöiden aiheuttama uhka kun kanta tai esiintymisalue on hyvin pieni, myös lyhytaikaiset ilmastonmuutokset</li> <li><b>Kil - Kilpailu:</b> muiden lajien aiheuttama kilpailu</li> <li><b>Ris - Risteytyminen:</b> muiden lajien aiheuttama risteytyminen</li> <li><b>Kv - Suuret kannan vaihtelut</b></li> <li><b>U - Muutokset Suomen ulkopuolella:</b> esim. elinympäristöjen muutokset lintujen talvehtimisalueilla tai muuton aikaisilla levähdysalueilla, ulkomailla tapahtuva pyynti/metsästys</li> <li><b>Vie - Vieraiden lajien aiheuttamat uhat</b>: kilpailu, risteytyminen, taudit, ekosysteemimuutokset</li> <li><b>Muu - Muu tunnettu syy:</b> määriteltyihin uhkatekijöihin sisältymätön tunnettu syy, tarkennetaan työdokumentoinnissa</li> <li><b>? - Syy tuntematon</b></li> </ul>",
+      "title": "Threat factors"
+    },
+    "individualCountMax": {
+      "type": "string",
+      "range": "xsd:int",
+      "subject": "MKV.individualCountMax",
+      "description": "Lisääntymiskykyisten yksilöiden määrä (ks. IUCN-ohje)",
+      "title": "Individual count, max."
+    },
+    "individualCountMin": {
+      "type": "string",
+      "range": "xsd:int",
+      "subject": "MKV.individualCountMin",
+      "description": "Lisääntymiskykyisten yksilöiden määrä (ks. IUCN-ohje). Merkitäksesi \"enintään\" jätä alaraja tyhjäksi. Merkitäksesi \"vähintään\" jätä yläraja tyhjäksi.",
+      "title": "Individual count, min."
+    },
+    "individualCountNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.individualCountNotes",
+      "title": "Yksityiset muistiinpanot yksilömääristä"
+    },
+    "lastModified": {
+      "type": "string",
+      "format": "date",
+      "range": "xsd:date",
+      "subject": "MKV.lastModified",
+      "title": "Last modified"
+    },
+    "lastModifiedBy": {
+      "type": "string",
+      "range": "MA.person",
+      "subject": "MKV.lastModifiedBy",
+      "title": "Last modified by"
+    },
+    "lastSightingNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.lastSightingNotes",
+      "description": "Merkitään tiedot mahdollisesti hävinneiden tai hävinneiden lajien viimeisistä havainnosta.",
+      "title": "Last observation"
+    },
+    "legacyPublications": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.legacyPublications",
+      "title": "Vanhat julkaisukommentit"
+    },
+    "locked": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MKV.locked",
+      "title": "Is locked?"
+    },
+    "lsaRecommendation": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MKV.lsaRecommendation",
+      "title": "Recommended for strict protection"
+    },
+    "lsaRecommendationNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.lsaRecommendationNotes",
+      "title": "Yksityiset muistiinpanot Lsa ehdotuksesta"
+    },
+    "occurrenceAreaMax": {
+      "type": "string",
+      "range": "xsd:int",
+      "subject": "MKV.occurrenceAreaMax",
+      "title": "Size of area of occurrence, max."
+    },
+    "occurrenceAreaMin": {
+      "type": "string",
+      "range": "xsd:int",
+      "subject": "MKV.occurrenceAreaMin",
+      "description": "Merkitäksesi \"enintään\" jätä alaraja tyhjäksi. Merkitäksesi \"vähintään\" jätä yläraja tyhjäksi.",
+      "title": "Size of area of occurence, min."
+    },
+    "occurrenceAreaNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.occurrenceAreaNotes",
+      "title": "Yksityiset muistiinpanot esiintymisalueen koosta"
+    },
+    "occurrenceNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.occurrenceNotes",
+      "title": "Comments on occurrence"
+    },
+    "occurrenceRegionsNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.occurrenceRegionsNotes",
+      "title": "Comments on the area of occurrence"
+    },
+    "occurrenceRegionsPrivateNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.occurrenceRegionsPrivateNotes",
+      "title": "Yksityiset muistiinpanot esiintymisalueista"
+    },
+    "otherSources": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.otherSources",
+      "description": "<p>Suulliset tai kirjalliset tiedonannot, henkilökohtaiset tiedostot, muistiinpanot tai julkaisemattomat aineistot, verkkosivut, keskustelupalstat ja tyypillisesti yhtä lajia koskevat epävirallisemmat lähteet</p> <p><b>Viittausohjeita:</b></p> \t\t\t <p>Meikäläinen Matti suullinen tiedonanto 2016</p> <p>Virtanen Terhi, julkaisematon selvitysaineisto Hollolasta 2015</p> <p>Heikkinen Heikki, havaintotiedonanto Nisäkäsharrastajien Nisäkäsverkko-sähköpostilista 3.5.2014 (http://www.myrsky.com/mammals/nisakasverkko.htm)</p> <p>Nämä vitteet tallentuvat vain lomakkelle, niistä ei synny julkaisua.</p>",
+      "title": "Other sources"
+    },
+    "percentageOfGlobalPopulation": {
+      "type": "number",
+      "range": "xsd:decimal",
+      "subject": "MKV.percentageOfGlobalPopulation",
+      "description": "Tyhjä = Tuntematon",
+      "title": "Percentage of global population"
+    },
+    "percentageOfGlobalPopulationNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.percentageOfGlobalPopulationNotes",
+      "title": "Yksityiset muistiinpanot globaalin populaation osuudesta"
+    },
+    "populationSizePeriodBeginning": {
+      "type": "string",
+      "range": "xsd:int",
+      "subject": "MKV.populationSizePeriodBeginning",
+      "description": "Kenttä on tarkoitettu ensisijaisesti A-kriteeriä varten. Jos on samaan aikaan käytössä myös C-kriteerin eri pituinen tarkastelujakso, merkitse sen alun ja lopun populaatiokoko kommenttikenttään. Kommenttikentän käyttö koskee myös tilannetta, jossa on käytössä useita A:n alakriteereitä (A1-A4). Ensisijaisesti lomakkeelle merkitään lopulliseen uhanalaisuusluokkaan johtaneet tiedot.",
+      "title": "Population size in the beginning of assessment period"
+    },
+    "populationSizePeriodEnd": {
+      "type": "string",
+      "range": "xsd:int",
+      "subject": "MKV.populationSizePeriodEnd",
+      "title": "Population size at the end of assessment period"
+    },
+    "populationSizePeriodNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.populationSizePeriodNotes",
+      "title": "Yksityiset muistiinpanot jakson esiintymistä"
+    },
+    "populationVaries": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MKV.populationVaries",
+      "description": "Onko vaihtelun suuruusluokka vähintään 10-kertainen?",
+      "title": "Strong fluctuations in the population"
+    },
+    "populationVariesNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.populationVariesNotes",
+      "title": "Yksityiset muistiinpanot kannanvaihtelusta"
+    },
+    "possiblyRE": {
+      "type": "string",
+      "enum": [
+        "",
+        "MX.iucnRE",
+        "MX.iucnEW",
+        "MX.iucnEX"
+      ],
+      "enumNames": [
+        "",
+        "RE – Regionally Extinct",
+        "EW – Extinct in the Wild",
+        "EX – Extinct"
+      ],
+      "range": "MKV.possiblyREEnum",
+      "subject": "MKV.possiblyRE",
+      "title": "Possibly extinct"
+    },
+    "possiblyRENotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.possiblyRENotes",
+      "title": "Yksityiset muistiinpanot mahdollisesta häviämisestä"
+    },
+    "primaryHabitat": {
+      "type": "string",
+      "range": "MKV.habitatObject",
+      "subject": "MKV.primaryHabitat",
+      "description": "<p>Lisämerkinnät:</p>\n<ul> \n<li><b>v - vanhat metsät</b> (myös yksittäiset vanhat puut ja runsaasti lahopuuta sisältävät nuoremmat metsät)</li>\n<li><b>h - harjumetsät</b>, myös puoliavoimet</li>\n<li><b>p - metsäpaloalueet</b> ja muut luontaisen sukkession alkuvaiheen metsät</li>\n<li><b>j - jalopuuesiintymä</b></li>\n<li><b>pa - paahteinen</b></li>\n<li><b>va - varjoinen</b></li>\n<li><b>ra - sijaitsee rannalla</b> (lajin esiintyminen on sidoksissa rannan läheisyyteen)</li>\n<li><b>ka - karut kalliot ja kivikot</b></li>\n<li><b>ke - keskiravinteiset kalliot ja kivikot</b></li>\n<li><b>ca - kalkkivaikutteinen</b></li>\n</ul>",
+      "title": "Primary habitat"
+    },
+    "publication": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "MP.publication",
+      "subject": "MKV.publication",
+      "description": "<p>Tieteelliset artikkelit, kirjat, julkaistut ja julkaisemattomat raportit, \ntietokannat, rekisterit, atlas-sivustot ym. vakiintuneet lähteet</p>\n<p><b>Viittausohjeita:</b></p> \t\t\t<p><b>Julkaisu</b>: Huhtinen, S., Salo, P., Haikonen, V.& von Bonsdorff, T. 2010: Kotelosienet. - Teoksessa: Rassi, P., Hyvärinen, E., Juslén, A. & Mannerkoski I. (toim.), Suomen lajien uhanalaisuus, Punainen kirja 2010: 272-277. Ympäristöministeriö & Suomen ympäristökeskus, Helsinki. 685 s.</p> \t\t\t<p><b>Tietokanta</b>: Noyes, J. S. 2014: Universal Chalcidoidea Database. – World Wide Web electronic publication. Accessed at http//www.nhm.ac.uk/chalcidoids on 18 December 2014.</p>",
+      "title": "Publications and databases"
+    },
+    "reasonForStatusChange": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string",
+        "enum": [
+          "",
+          "MKV.reasonForStatusChangeGenuine",
+          "MKV.reasonForStatusChangeGenuineBeforePreviousEvaluation",
+          "MKV.reasonForStatusChangeChangesInCriteria",
+          "MKV.reasonForStatusChangeMoreInformation",
+          "MKV.reasonForStatusChangeChangesInTaxonomy",
+          "MKV.reasonForStatusChangeError",
+          "MKV.reasonForStatusChangeErroneousInformation",
+          "MKV.reasonForStatusChangeOther"
+        ],
+        "enumNames": [
+          "",
+          "1. Genuine (recent)",
+          "2. Genuine (since first assessment)",
+          "3. Criteria revision",
+          "4. New information",
+          "5. Taxonomy",
+          "6. Mistake",
+          "7. Incorrect data",
+          "8. Other"
+        ]
+      },
+      "minItems": 0,
+      "range": "MKV.reasonForStatusChangeEnum",
+      "subject": "MKV.reasonForStatusChange",
+      "description": "<p><b>Aito muutos (uusi):</b> muutos johtuu aidosta muutoksesta, joka on tapahtunut edellisen arvioinnin jälkeen (populaation tila huonontunut/ parantunut tms.)</p>\n<p><b>Aito muutos (ennen edellistä arviointia):</b> luokkaa käytetään taksoneihin, jotka arvioidaan vähintään kolmatta kertaa ja joista lasketaan uhanalaisuusindeksi (Red List Index). Muutos on tapahtunut ennen edellistä arviointia, mutta ensimmäisen jälkeen. Muutos on havaittu uuden tiedon perusteella ja mikäli se olisi ollut käytettävissä aiemmin, uusi luokka olisi annettu jo aiemmalla kerralla (aiemmilla kerroilla). Muutoksen ajankohta on dokumentoitava.</p>\n<p><b>Kriteerien muutos:</b> kategorian muutos johtuu arviointikriteerien muutoksista.</p>\n<p><b>Uusi tieto:</b> muutos johtuu siitä, että taksonin statuksesta on saatu uutta tietoa/tieto on lisääntynyt; esim. populaatio on osoittautunut aiempaa käsitystä suuremmaksi tai pienemmäksi.</p>\n<p><b>Taksonominen muutos:</b> kategorian muutos johtuu taksonomisen aseman muuttumisesta; taksoni on vastikään jaettu kahtia (alalajista laji) tai yhdistetty toisen kanssa tai kuvattu uutena tieteelle tai taksoni ei ole enää validi (pidetään nykyisin hybridinä, varianttina tms.).</p>\n<p><b>Virhe:</b> luokka on väärä, koska arvioinnissa on aiemmin tapahtunut virhe.</p>\n<p><b>Virheellinen tieto:</b> aiempi luokka on valittu virheellisen tiedon vuoksi väärin (esim. määritysvirhe).</p>\n<p><b>Muu syy:</b> muutos johtuu muusta syystä kuin aiemmista ja/tai vaatii lisäselvitystä (esimerkiksi arvioijien suhtautuminen epävarmuuteen muuttuu tai arvioinnin tulkintaohjeet ovat muuttuneet.</p>",
+      "title": "Reason for change"
+    },
+    "reasonForStatusChangeNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.reasonForStatusChangeNotes",
+      "title": "Yksityiset muistiinpanot muutoksen syystä"
+    },
+    "redListIndexCorrection": {
+      "type": "string",
+      "enum": [
+        "",
+        "MX.iucnEX",
+        "MX.iucnEW",
+        "MX.iucnRE",
+        "MX.iucnCR",
+        "MX.iucnEN",
+        "MX.iucnVU",
+        "MX.iucnNT",
+        "MX.iucnLC",
+        "MX.iucnDD",
+        "MX.iucnNA",
+        "MX.iucnNE"
+      ],
+      "enumNames": [
+        "",
+        "EX – Extinct",
+        "EW – Extinct in the Wild",
+        "RE – Regionally Extinct",
+        "CR – Critically Endangered",
+        "EN – Endangered",
+        "VU – Vulnerable",
+        "NT – Near Threatened",
+        "LC – Least Concern",
+        "DD – Data Deficient",
+        "NA – Not Applicable",
+        "NE – Not Evaluated"
+      ],
+      "range": "MX.iucnStatuses",
+      "subject": "MKV.redListIndexCorrection",
+      "description": "Tätä ei täytetä kuluvalle vuodelle. Muuttujaa käytetään ainoastaan tarvittaessa jälkikäteen uhanalaisuusindeksin laskemisessa. Jos tätä arviointia jälkikäteen halutaan korjata, arvioinnissa annettua luokkaa ei muuteta, vaan annetaan tässä korjattu luokka.",
+      "title": "Red List Index Back-casted status"
+    },
+    "redListIndexCorrectionNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.redListIndexCorrectionNotes",
+      "title": "Yksityiset muistiinpanot indeksikorjauksesta"
+    },
+    "redListStatus": {
+      "type": "string",
+      "enum": [
+        "MX.iucnEX",
+        "MX.iucnEW",
+        "MX.iucnRE",
+        "MX.iucnCR",
+        "MX.iucnEN",
+        "MX.iucnVU",
+        "MX.iucnNT",
+        "MX.iucnLC",
+        "MX.iucnDD",
+        "MX.iucnNA",
+        "MX.iucnNE"
+      ],
+      "enumNames": [
+        "EX – Extinct",
+        "EW – Extinct in the Wild",
+        "RE – Regionally Extinct",
+        "CR – Critically Endangered",
+        "EN – Endangered",
+        "VU – Vulnerable",
+        "NT – Near Threatened",
+        "LC – Least Concern",
+        "DD – Data Deficient",
+        "NA – Not Applicable",
+        "NE – Not Evaluated"
+      ],
+      "range": "MX.iucnStatuses",
+      "subject": "MKV.redListStatus",
+      "title": "Category"
+    },
+    "redListStatusAccuracyNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.redListStatusAccuracyNotes",
+      "title": "Comments on the accuracy/reliability of the assessment"
+    },
+    "redListStatusMax": {
+      "type": "string",
+      "enum": [
+        "",
+        "MX.iucnEX",
+        "MX.iucnEW",
+        "MX.iucnRE",
+        "MX.iucnCR",
+        "MX.iucnEN",
+        "MX.iucnVU",
+        "MX.iucnNT",
+        "MX.iucnLC",
+        "MX.iucnDD",
+        "MX.iucnNA",
+        "MX.iucnNE"
+      ],
+      "enumNames": [
+        "",
+        "EX – Extinct",
+        "EW – Extinct in the Wild",
+        "RE – Regionally Extinct",
+        "CR – Critically Endangered",
+        "EN – Endangered",
+        "VU – Vulnerable",
+        "NT – Near Threatened",
+        "LC – Least Concern",
+        "DD – Data Deficient",
+        "NA – Not Applicable",
+        "NE – Not Evaluated"
+      ],
+      "range": "MX.iucnStatuses",
+      "subject": "MKV.redListStatusMax",
+      "title": "Range of variation of the category, max."
+    },
+    "redListStatusMin": {
+      "type": "string",
+      "enum": [
+        "",
+        "MX.iucnEX",
+        "MX.iucnEW",
+        "MX.iucnRE",
+        "MX.iucnCR",
+        "MX.iucnEN",
+        "MX.iucnVU",
+        "MX.iucnNT",
+        "MX.iucnLC",
+        "MX.iucnDD",
+        "MX.iucnNA",
+        "MX.iucnNE"
+      ],
+      "enumNames": [
+        "",
+        "EX – Extinct",
+        "EW – Extinct in the Wild",
+        "RE – Regionally Extinct",
+        "CR – Critically Endangered",
+        "EN – Endangered",
+        "VU – Vulnerable",
+        "NT – Near Threatened",
+        "LC – Least Concern",
+        "DD – Data Deficient",
+        "NA – Not Applicable",
+        "NE – Not Evaluated"
+      ],
+      "range": "MX.iucnStatuses",
+      "subject": "MKV.redListStatusMin",
+      "title": "Range of variation of the category, min."
+    },
+    "redListStatusNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.redListStatusNotes",
+      "title": "Yksityiset muistiinpanot luokasta"
+    },
+    "regionallyThreatenedNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.regionallyThreatenedNotes",
+      "title": "Comments on regional threat"
+    },
+    "regionallyThreatenedPrivateNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.regionallyThreatenedPrivateNotes",
+      "title": "Yksityiset muistiinpanot alueellisesta uhanalaisuudesta"
+    },
+    "remarks": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "xsd:string",
+      "subject": "MKV.remarks",
+      "title": "Commentator remarks"
+    },
+    "secondaryHabitat": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "MKV.habitatObject",
+      "subject": "MKV.secondaryHabitat",
+      "title": "Secondary habitat"
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "MKV.stateReady",
+        "MKV.stateReadyForComments",
+        "MKV.stateStarted"
+      ],
+      "enumNames": [
+        "Ready",
+        "Ready for comments",
+        "Started"
+      ],
+      "range": "MKV.stateEnum",
+      "subject": "MKV.state",
+      "title": "State"
+    },
+    "statusA": {
+      "type": "string",
+      "enum": [
+        "",
+        "MX.iucnEX",
+        "MX.iucnEW",
+        "MX.iucnRE",
+        "MX.iucnCR",
+        "MX.iucnEN",
+        "MX.iucnVU",
+        "MX.iucnNT",
+        "MX.iucnLC",
+        "MX.iucnDD",
+        "MX.iucnNA",
+        "MX.iucnNE"
+      ],
+      "enumNames": [
+        "",
+        "EX – Extinct",
+        "EW – Extinct in the Wild",
+        "RE – Regionally Extinct",
+        "CR – Critically Endangered",
+        "EN – Endangered",
+        "VU – Vulnerable",
+        "NT – Near Threatened",
+        "LC – Least Concern",
+        "DD – Data Deficient",
+        "NA – Not Applicable",
+        "NE – Not Evaluated"
+      ],
+      "range": "MX.iucnStatuses",
+      "subject": "MKV.statusA",
+      "title": "Category based on Criterion A"
+    },
+    "statusANotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.statusANotes",
+      "title": "Yksityiset muistiinpanot kriteerin A luokasta"
+    },
+    "statusB": {
+      "type": "string",
+      "enum": [
+        "",
+        "MX.iucnEX",
+        "MX.iucnEW",
+        "MX.iucnRE",
+        "MX.iucnCR",
+        "MX.iucnEN",
+        "MX.iucnVU",
+        "MX.iucnNT",
+        "MX.iucnLC",
+        "MX.iucnDD",
+        "MX.iucnNA",
+        "MX.iucnNE"
+      ],
+      "enumNames": [
+        "",
+        "EX – Extinct",
+        "EW – Extinct in the Wild",
+        "RE – Regionally Extinct",
+        "CR – Critically Endangered",
+        "EN – Endangered",
+        "VU – Vulnerable",
+        "NT – Near Threatened",
+        "LC – Least Concern",
+        "DD – Data Deficient",
+        "NA – Not Applicable",
+        "NE – Not Evaluated"
+      ],
+      "range": "MX.iucnStatuses",
+      "subject": "MKV.statusB",
+      "title": "Category based on Criterion B"
+    },
+    "statusBNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.statusBNotes",
+      "title": "Yksityiset muistiinpanot kriteerin B luokasta"
+    },
+    "statusC": {
+      "type": "string",
+      "enum": [
+        "",
+        "MX.iucnEX",
+        "MX.iucnEW",
+        "MX.iucnRE",
+        "MX.iucnCR",
+        "MX.iucnEN",
+        "MX.iucnVU",
+        "MX.iucnNT",
+        "MX.iucnLC",
+        "MX.iucnDD",
+        "MX.iucnNA",
+        "MX.iucnNE"
+      ],
+      "enumNames": [
+        "",
+        "EX – Extinct",
+        "EW – Extinct in the Wild",
+        "RE – Regionally Extinct",
+        "CR – Critically Endangered",
+        "EN – Endangered",
+        "VU – Vulnerable",
+        "NT – Near Threatened",
+        "LC – Least Concern",
+        "DD – Data Deficient",
+        "NA – Not Applicable",
+        "NE – Not Evaluated"
+      ],
+      "range": "MX.iucnStatuses",
+      "subject": "MKV.statusC",
+      "title": "Category based on Criterion C"
+    },
+    "statusCNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.statusCNotes",
+      "title": "Yksityiset muistiinpanot kriteerin C luokasta"
+    },
+    "statusD": {
+      "type": "string",
+      "enum": [
+        "",
+        "MX.iucnEX",
+        "MX.iucnEW",
+        "MX.iucnRE",
+        "MX.iucnCR",
+        "MX.iucnEN",
+        "MX.iucnVU",
+        "MX.iucnNT",
+        "MX.iucnLC",
+        "MX.iucnDD",
+        "MX.iucnNA",
+        "MX.iucnNE"
+      ],
+      "enumNames": [
+        "",
+        "EX – Extinct",
+        "EW – Extinct in the Wild",
+        "RE – Regionally Extinct",
+        "CR – Critically Endangered",
+        "EN – Endangered",
+        "VU – Vulnerable",
+        "NT – Near Threatened",
+        "LC – Least Concern",
+        "DD – Data Deficient",
+        "NA – Not Applicable",
+        "NE – Not Evaluated"
+      ],
+      "range": "MX.iucnStatuses",
+      "subject": "MKV.statusD",
+      "title": "Category based on Criterion"
+    },
+    "statusDNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.statusDNotes",
+      "title": "Yksityiset muistiinpanot kriteerin D luokasta"
+    },
+    "statusE": {
+      "type": "string",
+      "enum": [
+        "",
+        "MX.iucnEX",
+        "MX.iucnEW",
+        "MX.iucnRE",
+        "MX.iucnCR",
+        "MX.iucnEN",
+        "MX.iucnVU",
+        "MX.iucnNT",
+        "MX.iucnLC",
+        "MX.iucnDD",
+        "MX.iucnNA",
+        "MX.iucnNE"
+      ],
+      "enumNames": [
+        "",
+        "EX – Extinct",
+        "EW – Extinct in the Wild",
+        "RE – Regionally Extinct",
+        "CR – Critically Endangered",
+        "EN – Endangered",
+        "VU – Vulnerable",
+        "NT – Near Threatened",
+        "LC – Least Concern",
+        "DD – Data Deficient",
+        "NA – Not Applicable",
+        "NE – Not Evaluated"
+      ],
+      "range": "MX.iucnStatuses",
+      "subject": "MKV.statusE",
+      "title": "Category based on Criterion E"
+    },
+    "statusENotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.statusENotes",
+      "title": "Yksityiset muistiinpanot kriteerin E luokasta"
+    },
+    "taxonomicNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.taxonomicNotes",
+      "title": "Comments on the taxonomy used in the assessment"
+    },
+    "threatNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.threatNotes",
+      "title": "Yksityiset muistiinpanot uhkatekijöistä"
+    },
+    "typeOfOccurrenceInFinland": {
+      "type": "string",
+      "enum": [
+        "",
+        "MX.doesNotOccur",
+        "MX.typeOfOccurrenceOccurs",
+        "MX.typeOfOccurrenceStablePopulation",
+        "MX.typeOfOccurrenceCommon",
+        "MX.typeOfOccurrenceRare",
+        "MX.typeOfOccurrenceVeryRare",
+        "MX.typeOfOccurrenceVagrant",
+        "MX.typeOfOccurrenceRareVagrant",
+        "MX.typeOfOccurrenceMigrant",
+        "MX.typeOfOccurrenceImport",
+        "MX.typeOfOccurrenceAnthropogenic",
+        "MX.typeOfOccurrenceNotEstablished",
+        "MX.typeOfOccurrenceExtirpated",
+        "MX.typeOfOccurrenceOldRecords",
+        "MX.typeOfOccurrenceUncertain",
+        "MX.typeOfOccurrenceSpontaneousOldResident",
+        "MX.typeOfOccurrenceSpontaneousNewResident",
+        "MX.typeOfOccurrenceAlienOldResident",
+        "MX.typeOfOccurrenceSpontaneousNewEphemeral",
+        "MX.typeOfOccurrenceSpontaneousNewEphemeralOnlyOld",
+        "MX.typeOfOccurrenceSpontaneousOldFormerlyResidentPossiblyExtinct",
+        "MX.typeOfOccurrenceSpontaneousOldFormerlyResidentExtinct",
+        "MX.typeOfOccurrenceAlienNewEphemeral",
+        "MX.typeOfOccurrenceAlienNewEphemeralOnlyold",
+        "MX.typeOfOccurrenceAlienNewResident",
+        "MX.typeOfOccurrenceAlienOldFormerlyResidentPossiblyExtinct",
+        "MX.typeOfOccurrenceAlienOldExtinct",
+        "MX.typeOfOccurrenceSmallDegreeCultivatedOrigin",
+        "MX.typeOfOccurrenceNotableDegreeCultivatedOrigin",
+        "MX.typeOfOccurrenceCompletelyCultivatedOrigin",
+        "MX.typeOfOccurrenceOnlyCultivated",
+        "MX.typeOfOccurrenceMaxShortDistanceEscape",
+        "MX.typeOfOccurrenceMaxSoilImmigrant",
+        "MX.typeOfOccurrenceMaxReplanted",
+        "MX.typeOfOccurrenceMaxRelict",
+        "MX.typeOfOccurrenceNotEvaluated",
+        "MX.typeOfOccurrenceRegularBreeder",
+        "MX.typeOfOccurrenceIrregularBreeder",
+        "MX.typeOfOccurrencePassageMigrant",
+        "MX.typeOfOccurrenceBirdLifeCategoryA",
+        "MX.typeOfOccurrenceBirdLifeCategoryB",
+        "MX.typeOfOccurrenceBirdLifeCategoryC",
+        "MX.typeOfOccurrenceBirdLifeCategoryD",
+        "MX.typeOfOccurrenceBirdLifeCategoryE",
+        "MX.typeOfOccurrenceOccursBasedOnOccurrences"
+      ],
+      "enumNames": [
+        "",
+        "Does not occur",
+        "Occurs",
+        "Stable population",
+        "Common",
+        "Rare",
+        "Very rare",
+        "Regular vagrant",
+        "Irregular vagrant",
+        "Migrant",
+        "Import",
+        "Anthropogenic",
+        "Not established",
+        "Extinct",
+        "Old records only",
+        "Uncertain records only",
+        "AOV - spontaneous, old, resident",
+        "ANV - spontaneous, new, resident",
+        "TOV - alien, old, resident (archaeophyte)",
+        "ANS - spontaneous, new, ephemeral",
+        "ANSX - spontaneous, new, ephemeral, only old records",
+        "AOVU - spontaneous, old, formerly resident, now possibly extinct",
+        "AOVX - spontaneous, old, formerly resident, extinct",
+        "TNS - alien, new, ephemeral",
+        "TNSX - alien, new, ephemeral, only old records (- 1979)",
+        "TNV - alien, new, resident",
+        "TOVU -alien, old, formerly resident, now possibly extinct",
+        "TOVX - alien, old, extinct",
+        "1 - spreading in the wild; to a small degree of cultivated origin",
+        "2 - spreading in the wild;  to a notable degree of cultivated origin",
+        "3 - spreading in the wild; completely of cultivated origin",
+        "C - only as cultivated",
+        "H - at most a short-distance escape from cultivation (inside a garden or similar)",
+        "M - at most a soil immigrant, perhaps slightly spreading vegetatively",
+        "P - extinct in the wild; planted anew into the wild",
+        "R - at most a relict of cultivation",
+        "I - not evaluated",
+        "Regular breeder",
+        "Irregular breeder",
+        "Passage migrant",
+        "BirdLife Category A",
+        "BirdLife Category B",
+        "BirdLife Category C",
+        "BirdLife Category D",
+        "BirdLife Category E",
+        "Occurs on the basis of occurrence data – not an expert evaluation"
+      ],
+      "range": "MX.typeOfOccurrenceEnum",
+      "subject": "MKV.typeOfOccurrenceInFinland",
+      "title": "Type of occurrence in Finland"
+    },
+    "typeOfOccurrenceInFinlandNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MKV.typeOfOccurrenceInFinlandNotes",
+      "title": "Yksityiset muistiinpanot vakinaisuudesta / asemasta Suomessa"
+    }
+  },
+  "required": [
+    "evaluatedTaxon",
+    "evaluationYear",
+    "redListStatus",
+    "state"
+  ]
+}

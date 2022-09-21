@@ -1,0 +1,155 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "@vocab": "http://tun.fi/",
+    "@base": "http://tun.fi/",
+    "default": "http://tun.fi/",
+    "luomus": "http://id.luomus.fi/",
+    "zmuo": "http://id.zmuo.oulu.fi/",
+    "herbo": "http://id.herb.oulu.fi/",
+    "utu": "http://mus.utu.fi/",
+    "xsd": "https://www.w3.org/TR/xmlschema-2/#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "xml": "http://www.w3.org/XML/1998/namespace#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "dwc": "http://rs.tdwg.org/dwc/terms/",
+    "dc": "http://purl.org/dc/terms/",
+    "dwctype": "http://rs.tdwg.org/dwc/dwctype/",
+    "abcd": "http://www.tdwg.org/schemas/abcd/2.06#",
+    "naturforskaren": "http://naturforskaren.se/",
+    "eol": "http://eol.org/",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "dyntaxa": "http://dyntaxa.se/Taxon/Info/",
+    "taxonid": "http://taxonid.org/",
+    "@context": {
+      "@id": "default:@context",
+      "@type": "xsd:string"
+    },
+    "id": "@id",
+    "@type": {
+      "@id": "default:@type",
+      "@type": "xsd:string"
+    },
+    "URL": {
+      "@id": "default:MOS.URL",
+      "@type": "xsd:string"
+    },
+    "abbreviation": {
+      "@id": "default:MOS.abbreviation",
+      "@type": "xsd:string"
+    },
+    "abbreviationExplanation": {
+      "@id": "default:MOS.abbreviationExplanation",
+      "@type": "@id"
+    },
+    "ad": {
+      "@id": "default:MOS.ad",
+      "@type": "xsd:string"
+    },
+    "contentContact": {
+      "@id": "default:MOS.contentContact",
+      "@type": "xsd:string"
+    },
+    "country": {
+      "@id": "default:MOS.country",
+      "@type": "xsd:string"
+    },
+    "datasetID": {
+      "@id": "default:MOS.datasetID",
+      "@type": "@id"
+    },
+    "dateOrdersDue": {
+      "@id": "default:MOS.dateOrdersDue",
+      "@type": "xsd:date"
+    },
+    "editNotes": {
+      "@id": "default:MOS.editNotes",
+      "@type": "xsd:string"
+    },
+    "email": {
+      "@id": "default:MOS.email",
+      "@type": "xsd:string"
+    },
+    "fax": {
+      "@id": "default:MOS.fax",
+      "@type": "xsd:string"
+    },
+    "hidden": {
+      "@id": "default:MOS.hidden",
+      "@type": "xsd:boolean"
+    },
+    "locality": {
+      "@id": "default:MOS.locality",
+      "@type": "xsd:string"
+    },
+    "logo": {
+      "@id": "default:MOS.logo",
+      "@type": "xsd:string"
+    },
+    "notes": {
+      "@id": "default:MOS.notes",
+      "@type": "xsd:string"
+    },
+    "organizationLevel1": {
+      "@id": "default:MOS.organizationLevel1",
+      "@container": "@language"
+    },
+    "organizationLevel2": {
+      "@id": "default:MOS.organizationLevel2",
+      "@container": "@language"
+    },
+    "organizationLevel3": {
+      "@id": "default:MOS.organizationLevel3",
+      "@container": "@language"
+    },
+    "organizationLevel4": {
+      "@id": "default:MOS.organizationLevel4",
+      "@container": "@language"
+    },
+    "phone": {
+      "@id": "default:MOS.phone",
+      "@type": "xsd:string"
+    },
+    "postOfficeBox": {
+      "@id": "default:MOS.postOfficeBox",
+      "@type": "xsd:string"
+    },
+    "postalCode": {
+      "@id": "default:MOS.postalCode",
+      "@type": "xsd:string"
+    },
+    "region": {
+      "@id": "default:MOS.region",
+      "@type": "xsd:string"
+    },
+    "streetAddress": {
+      "@id": "default:MOS.streetAddress",
+      "@type": "xsd:string"
+    },
+    "contentContactID": {
+      "@id": "default:MZ.contentContactID",
+      "@type": "@id"
+    },
+    "creator": {
+      "@id": "default:MZ.creator",
+      "@type": "@id"
+    },
+    "dateCreated": {
+      "@id": "default:MZ.dateCreated",
+      "@type": "xsd:dateTime"
+    },
+    "dateEdited": {
+      "@id": "default:MZ.dateEdited",
+      "@type": "xsd:dateTime"
+    },
+    "editor": {
+      "@id": "default:MZ.editor",
+      "@type": "@id"
+    },
+    "owner": {
+      "@id": "default:MZ.owner",
+      "@type": "@id"
+    }
+  }
+}

@@ -1,0 +1,362 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "subject": "MHL.formNamedPlaceOptionsClass",
+  "additionalProperties": false,
+  "title": "",
+  "description": "",
+  "properties": {
+    "@context": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@context",
+      "title": "Context for the MHL.formNamedPlaceOptionsClass"
+    },
+    "id": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "id",
+      "title": "Id for the MHL.formNamedPlaceOptionsClass"
+    },
+    "@type": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@type",
+      "title": "Type for the MHL.formNamedPlaceOptionsClass"
+    },
+    "adminShowCopyLink": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MHL.adminShowCopyLink",
+      "description": "Named place viewer shows button to copy the URL for the named place viewer",
+      "title": "Show copy link for admin"
+    },
+    "allowAddingPublic": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MHL.allowAddingPublic",
+      "description": "Form users can create new named places for the form",
+      "title": "Allow adding public named places"
+    },
+    "birdAssociationAreaHelp": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MHL.birdAssociationAreaHelp",
+      "description": "Help text for bird association filter",
+      "title": "Bird association area help"
+    },
+    "chooseDescription": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MHL.chooseDescription",
+      "description": "Description shown at named place choose page. Allows HTML.",
+      "title": "Choose page description"
+    },
+    "copyLatestDocumentToNamedPlace": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MHL.copyLatestDocumentToNamedPlace",
+      "description": "The latest document is copied to named place's prepopulatedDocument. if documents date is same or after the current prepopulated document's date, or if prepopulated document doesn't have date. Date is checked from gatheringEvent or from gatherings",
+      "title": "Copy latest document to named place"
+    },
+    "createDescription": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MHL.createDescription",
+      "description": "Description shown above named place form when creating new named place. Allows HTML.",
+      "title": "Create new description"
+    },
+    "createNewButtonLabel": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MHL.createNewButtonLabel",
+      "description": "Label for new named place creation button at named place choose page",
+      "title": "Create new button label"
+    },
+    "createNewButtonPrependingTextLabel": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MHL.createNewButtonPrependingTextLabel",
+      "description": "Label for text before new named place creation button at named place choose page",
+      "title": "Text prepending create new button"
+    },
+    "documentListUseLocalDocumentViewer": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MHL.documentListUseLocalDocumentViewer",
+      "description": "Theme own submissions page uses local document viewer (that shows more accurate data)",
+      "title": "Use local document viewer for own submissions"
+    },
+    "documentViewerForcedFields": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "xsd:string",
+      "subject": "MHL.documentViewerForcedFields",
+      "description": "Forces local document viewer to show these fields",
+      "title": "Document viewer forced fields"
+    },
+    "documentViewerGatheringGeometryJSONPath": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "xsd:string",
+      "subject": "MHL.documentViewerGatheringGeometryJSONPath",
+      "description": "The path of geometry that document viewer should show",
+      "title": "Document viewer gathering geometry JSON path"
+    },
+    "documentViewerZoomToData": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MHL.documentViewerZoomToData",
+      "description": "Document viewer zooms to data instead of locked zoom level",
+      "title": "Document viewer zoom to data"
+    },
+    "earlierLabel": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MHL.earlierLabel",
+      "description": "Admin label for named place viewer's document list",
+      "title": "Earlier document label (ADMIN)"
+    },
+    "editDescription": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MHL.editDescription",
+      "description": "Description shown at top of page when editing named place",
+      "title": "Edit page description"
+    },
+    "filterByBirdAssociationArea": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MHL.filterByBirdAssociationArea",
+      "description": "The named place UI allows filtering by bird association area",
+      "title": "Filter named places by bird association area"
+    },
+    "filterByMunicipality": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MHL.filterByMunicipality",
+      "description": "The named place UI allows filtering by municipality",
+      "title": "Filter named places by municipality"
+    },
+    "filterByTags": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MHL.filterByTags",
+      "description": "The named place UI allows filtering by tags",
+      "title": "Filter named places by tags"
+    },
+    "headerFields": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "xsd:string",
+      "subject": "MHL.headerFields",
+      "description": "When recording a document for a named place, the named place's data of these fields will be shown at the top of the page (defaults to [\"alternativeIDs\", \"name\", \"municipality\"]",
+      "title": "Document header fields of place"
+    },
+    "hideMapTab": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MHL.hideMapTab",
+      "description": "On named place chooser view, map tab is hidden",
+      "title": "Hide map tab"
+    },
+    "includeUnits": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MHL.includeUnits",
+      "description": "Named places will be fetched with units included (hard coded to work only for HR.2049)",
+      "title": "Include units in named place query"
+    },
+    "infoFields": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "xsd:string",
+      "subject": "MHL.infoFields",
+      "description": "Fields that named place viewer shows (if not defined will be digged from uiSchema[\"ui:options\"].fieldsScopes[form collectionID])",
+      "title": "Info fields for viewer"
+    },
+    "lastCensusLabel": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MHL.lastCensusLabel",
+      "description": "Label for named place viewer last census",
+      "title": "Last census label"
+    },
+    "listColumnNameMapping": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "range": "MZ.keyValue",
+      "subject": "MHL.listColumnNameMapping",
+      "description": "Overrides labels for named place list column headers",
+      "title": "List column names"
+    },
+    "listColumns": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "xsd:string",
+      "subject": "MHL.listColumns",
+      "description": "List of columns visible in the list view",
+      "title": "Columns in list"
+    },
+    "listColumnsMultisort": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MHL.listColumnsMultisort",
+      "title": "Columns multisort"
+    },
+    "listLabel": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MHL.listLabel",
+      "description": "Label for named place chooser list tab",
+      "title": "List label"
+    },
+    "mapCluster": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MHL.mapCluster",
+      "title": "Cluster the map points"
+    },
+    "mapOverlayNames": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "xsd:string",
+      "subject": "MHL.mapOverlayNames",
+      "description": "Overlays that named place chooser map should show",
+      "title": "Map overlays"
+    },
+    "mapTileLayerName": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MHL.mapTileLayerName",
+      "description": "Tilelayer name that named place chooser map should show",
+      "title": "Map tilelayer"
+    },
+    "myEarlierLabel": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MHL.myEarlierLabel",
+      "description": "User label for named place viewer's document list",
+      "title": "Earlier document label (USER)"
+    },
+    "namedPlaceFormID": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MHL.namedPlaceFormID",
+      "description": "Form ID of named place form (defaults to MHL.36)",
+      "title": "Form ID"
+    },
+    "namedPlaceList": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "xsd:string",
+      "subject": "MHL.namedPlaceList",
+      "description": "Fields that named places list shows.",
+      "title": "Named place list fields"
+    },
+    "prepopulatedDocumentFields": {
+      "type": "object",
+      "range": "MZ.keyAny",
+      "subject": "MHL.prepopulatedDocumentFields",
+      "description": "When a new named place is created, the prepopulatedDocument will be populated according to this.",
+      "title": "Prepopulated document initialization"
+    },
+    "printLabel": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MHL.printLabel",
+      "description": "Label for print button of named place viewer",
+      "title": "Print button label"
+    },
+    "releaseLabel": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MHL.releaseLabel",
+      "title": "Release reservation label"
+    },
+    "reservableLabel": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MHL.reservableLabel",
+      "title": "Reservable label"
+    },
+    "reservationUntil": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MHL.reservationUntil",
+      "description": "Places are reservable if defined. Value defines when the reservation should expire in ISO-8601. Example: ${year}-10-12",
+      "title": "Reservation expiration"
+    },
+    "reservedLabel": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MHL.reservedLabel",
+      "title": "Reserved label"
+    },
+    "showLegendList": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MHL.showLegendList",
+      "description": "Named place list shows legend for the row colors",
+      "title": "Show list colors legend"
+    },
+    "startWithMap": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MHL.startWithMap",
+      "description": "Named place chooser view starts with map tab instead of list",
+      "title": "Start with map tab"
+    },
+    "useAcceptedDocument": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MHL.useAcceptedDocument",
+      "description": "Instead of populating observation form with prepopulatedDocument, it is populated with acceptedDocument. Admin can change the acceptedDocument from observation list",
+      "title": "use accepted document"
+    },
+    "useLabel": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MHL.useLabel",
+      "description": "Named place viewer label for button for recording new observation",
+      "title": "Use place label"
+    },
+    "zoomToData": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MHL.zoomToData",
+      "description": "Named place chooser map is initialized with data fitted in view.",
+      "title": "Zoom to data"
+    }
+  }
+}

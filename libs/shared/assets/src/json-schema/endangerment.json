@@ -1,0 +1,105 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "subject": "MKV.endangermentObject",
+  "additionalProperties": false,
+  "title": "Endagerment object",
+  "description": "",
+  "properties": {
+    "@context": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@context",
+      "title": "Context for the Endagerment object"
+    },
+    "id": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "id",
+      "title": "Id for the Endagerment object"
+    },
+    "@type": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@type",
+      "title": "Type for the Endagerment object"
+    },
+    "herbo:sortOrder": {
+      "type": "integer",
+      "range": "xsd:integer",
+      "subject": "herbo:sortOrder",
+      "title": "herbo:sortOrder"
+    },
+    "endangerment": {
+      "type": "string",
+      "enum": [
+        "MKV.endangermentReasonP",
+        "MKV.endangermentReasonKe",
+        "MKV.endangermentReasonH",
+        "MKV.endangermentReasonKu",
+        "MKV.endangermentReasonR",
+        "MKV.endangermentReasonKs",
+        "MKV.endangermentReasonPm",
+        "MKV.endangermentReasonPr",
+        "MKV.endangermentReasonN",
+        "MKV.endangermentReasonM",
+        "MKV.endangermentReasonMp",
+        "MKV.endangermentReasonMv",
+        "MKV.endangermentReasonMk",
+        "MKV.endangermentReasonMl",
+        "MKV.endangermentReasonO",
+        "MKV.endangermentReasonVr",
+        "MKV.endangermentReasonKh",
+        "MKV.endangermentReasonI",
+        "MKV.endangermentReasonS",
+        "MKV.endangermentReasonKil",
+        "MKV.endangermentReasonRis",
+        "MKV.endangermentReasonKv",
+        "MKV.endangermentReasonU",
+        "MKV.endangermentReasonVie",
+        "MKV.endangermentReasonMuu",
+        "MKV.endangermentReasonT"
+      ],
+      "enumNames": [
+        "P – Trapping, hunting, fishing",
+        "Ke – Picking and collecting",
+        "H – Disturbance and traffic",
+        "Ku – Mechanical wear",
+        "R – Construction (on the land)",
+        "Ks – Sand and gravel quarrying, mineral aggregate extraction, mining",
+        "Pm – Changes in arable land",
+        "Pr – Clearing of areas for arable land",
+        "N – Overgrowing of meadows and other open habitats",
+        "M – Forest management activities",
+        "Mp – Changes in the tree species composition of forests",
+        "Mv – Reduction of old-growth forests",
+        "Mk – Reduction of burnt forest areas",
+        "Ml – Decreasing amounts of decaying wood",
+        "O – Peatland drainage for forestry and peat harvesting",
+        "Vr – Construction of waterways",
+        "Kh – Chemical disturbances",
+        "I – Climate change",
+        "S – Random factors",
+        "Kil – Competition",
+        "Ris – Hybridisation",
+        "Kv – Extreme fluctuations in population size",
+        "U – Changes in other countries",
+        "Vie – Threats caused by alien species",
+        "Muu – Other known reason",
+        "? – Cause unknown"
+      ],
+      "range": "MKV.endangermentReasonEnum",
+      "subject": "MKV.endangerment",
+      "title": "Endangerment"
+    },
+    "sortOrder": {
+      "type": "integer",
+      "range": "xsd:integer",
+      "subject": "sortOrder",
+      "title": "sortOrder"
+    }
+  },
+  "required": [
+    "endangerment"
+  ]
+}

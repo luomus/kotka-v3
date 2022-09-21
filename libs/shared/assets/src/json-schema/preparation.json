@@ -1,0 +1,148 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "subject": "MF.preparationClass",
+  "additionalProperties": false,
+  "title": "",
+  "description": "",
+  "properties": {
+    "@context": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@context",
+      "title": "Context for the MF.preparationClass"
+    },
+    "id": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "id",
+      "title": "Id for the MF.preparationClass"
+    },
+    "@type": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@type",
+      "title": "Type for the MF.preparationClass"
+    },
+    "preparationDate": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MF.preparationDate",
+      "description": "Date when the preparation/sample was prepared.",
+      "title": "Preparation date"
+    },
+    "preparationMaterials": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string",
+        "enum": [
+          "",
+          "MF.preparationMaterialsAcetone",
+          "MF.preparationMaterialsAmmonia",
+          "MF.preparationMaterialsBasyntan",
+          "MF.preparationMaterialsBorax",
+          "MF.preparationMaterialsEulan",
+          "MF.preparationMaterialsHydrogenPeroxide",
+          "MF.preparationMaterialsMethyleneChloride",
+          "MF.preparationMaterialsNovaltan",
+          "MF.preparationMaterialsPapaine",
+          "MF.preparationMaterialsPlaster",
+          "MF.preparationMaterialsPolyurethane",
+          "MF.preparationMaterialsPretanix",
+          "MF.preparationMaterialsPurifiedGasoline",
+          "MF.preparationMaterialsWoodWool",
+          "MF.preparationMaterialsCTAB",
+          "MF.preparationMaterialsEZNAForensicKit",
+          "MF.preparationMaterialsDNEasyBloodAndTissueKit",
+          "MF.preparationMaterialsDNEasyPlantKit",
+          "MF.preparationMaterialsNucleospinTissueKit",
+          "MF.preparationMaterialsNucleospinPlantTwo",
+          "MF.preparationMaterialsSaltExtraction",
+          "MF.preparationMaterialsDNeasyPlantMiniKit"
+        ],
+        "enumNames": [
+          "",
+          "Acetone",
+          "Ammonia",
+          "Basyntan",
+          "Borax",
+          "Eulan",
+          "Hydrogen peroxide",
+          "Methylene chloride",
+          "Novaltan",
+          "Papaine",
+          "Plaster",
+          "Polyurethane",
+          "Pretanix",
+          "Purified gasoline",
+          "Wood wool",
+          "CTAB",
+          "EZNA forensic kit",
+          "DNeasy Blood & Tissue Kit",
+          "DNeasy Plant Kit",
+          "Nucleospin tissue kit",
+          "Nucleospin plant II",
+          "Salt extraction",
+          "DNeasy Plant Mini Kit"
+        ]
+      },
+      "minItems": 0,
+      "range": "MF.preparationMaterialsEnum",
+      "subject": "MF.preparationMaterials",
+      "description": "Materials (chemicals, kits etc.) used in the preparation process. It is possible to choose several.",
+      "title": "Preparation process materials"
+    },
+    "preparationProcess": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string",
+        "enum": [
+          "",
+          "MF.preparationProcessTanning",
+          "MF.preparationProcessEnzymaticMaceration",
+          "MF.preparationProcessDegreasing",
+          "MF.preparationProcessBeetleCleaning",
+          "MF.preparationProcessPEG",
+          "MF.preparationProcessFreezeDrying"
+        ],
+        "enumNames": [
+          "",
+          "Tanning",
+          "Enzymatic maceration",
+          "Degreasing",
+          "Beetle cleaning",
+          "PEG",
+          "Freeze-drying"
+        ]
+      },
+      "minItems": 0,
+      "range": "MF.preparationProcessEnum",
+      "subject": "MF.preparationProcess",
+      "description": "Processes used in the preparation. It is possible to choose several.",
+      "title": "Preparation process"
+    },
+    "preparationProcessNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MF.preparationProcessNotes",
+      "description": "Additional information about the preparation process.",
+      "title": "Preparation process notes"
+    },
+    "preparedBy": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MF.preparedBy",
+      "description": "Name of the person who prepared the preparation/sample, preferably in the format 'lastname, firstname'",
+      "title": "Prepared by"
+    },
+    "isPartOf": {
+      "type": "string",
+      "range": "rdfs:Resource",
+      "subject": "MY.isPartOf",
+      "description": "Which parent or larger collection this is part of.",
+      "title": "Is part of"
+    }
+  }
+}

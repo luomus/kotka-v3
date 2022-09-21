@@ -1,0 +1,87 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "@vocab": "http://tun.fi/",
+    "@base": "http://tun.fi/",
+    "default": "http://tun.fi/",
+    "luomus": "http://id.luomus.fi/",
+    "zmuo": "http://id.zmuo.oulu.fi/",
+    "herbo": "http://id.herb.oulu.fi/",
+    "utu": "http://mus.utu.fi/",
+    "xsd": "https://www.w3.org/TR/xmlschema-2/#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "xml": "http://www.w3.org/XML/1998/namespace#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "dwc": "http://rs.tdwg.org/dwc/terms/",
+    "dc": "http://purl.org/dc/terms/",
+    "dwctype": "http://rs.tdwg.org/dwc/dwctype/",
+    "abcd": "http://www.tdwg.org/schemas/abcd/2.06#",
+    "naturforskaren": "http://naturforskaren.se/",
+    "eol": "http://eol.org/",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "dyntaxa": "http://dyntaxa.se/Taxon/Info/",
+    "taxonid": "http://taxonid.org/",
+    "@context": {
+      "@id": "default:@context",
+      "@type": "xsd:string"
+    },
+    "id": "@id",
+    "@type": {
+      "@id": "default:@type",
+      "@type": "xsd:string"
+    },
+    "areaType": {
+      "@id": "default:ML.areaType",
+      "@type": "@id"
+    },
+    "countryCodeISOalpha2": {
+      "@id": "default:ML.countryCodeISOalpha2",
+      "@type": "xsd:string"
+    },
+    "countryCodeISOalpha3": {
+      "@id": "default:ML.countryCodeISOalpha3",
+      "@type": "xsd:string"
+    },
+    "isPartOf": {
+      "@id": "default:ML.isPartOf",
+      "@type": "@id"
+    },
+    "isPartOfBirdAssociationArea": {
+      "@id": "default:ML.isPartOfBirdAssociationArea",
+      "@type": "@id"
+    },
+    "isPartOfEnvironmentalELY": {
+      "@id": "default:ML.isPartOfEnvironmentalELY",
+      "@type": "@id"
+    },
+    "isPartOfProvince": {
+      "@id": "default:ML.isPartOfProvince",
+      "@type": "@id"
+    },
+    "name": {
+      "@id": "default:ML.name",
+      "@container": "@language"
+    },
+    "previouslyOfficialName": {
+      "@id": "default:ML.previouslyOfficialName",
+      "@type": "xsd:string"
+    },
+    "provinceCodeAlpha": {
+      "@id": "default:ML.provinceCodeAlpha",
+      "@container": "@language"
+    },
+    "provinceCodeNumeric": {
+      "@id": "default:ML.provinceCodeNumeric",
+      "@type": "xsd:string"
+    },
+    "ringingDepartmentBirdAssociationAreaCode": {
+      "@id": "default:ML.ringingDepartmentBirdAssociationAreaCode",
+      "@type": "xsd:string"
+    },
+    "ringingDepartmentMunicipalityCode": {
+      "@id": "default:ML.ringingDepartmentMunicipalityCode",
+      "@type": "xsd:string"
+    }
+  }
+}

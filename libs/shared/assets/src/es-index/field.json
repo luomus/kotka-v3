@@ -1,0 +1,395 @@
+{
+  "settings": {
+    "number_of_shards": 3,
+    "index.mapping.ignore_malformed": true,
+    "index.max_result_window": 1000000,
+    "index.mapping.total_fields.limit": 10000,
+    "index.mapping.nested_objects.limit": 100000
+  },
+  "mappings": {
+    "properties": {
+      "@context": {
+        "type": "keyword"
+      },
+      "id": {
+        "type": "keyword"
+      },
+      "@type": {
+        "type": "keyword"
+      },
+      "name": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "fields": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "fields": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "keyword",
+                "ignore_above": 200
+              },
+              "fields": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "keyword",
+                    "ignore_above": 200
+                  },
+                  "fields": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "keyword",
+                        "ignore_above": 200
+                      },
+                      "fields": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "keyword",
+                            "ignore_above": 200
+                          },
+                          "fields": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "keyword",
+                                "ignore_above": 200
+                              },
+                              "fields": {
+                                "type": "keyword",
+                                "ignore_above": 200
+                              },
+                              "filters": {
+                                "type": "object",
+                                "enabled": false
+                              },
+                              "formID": {
+                                "type": "keyword",
+                                "ignore_above": 200
+                              },
+                              "label": {
+                                "type": "keyword",
+                                "ignore_above": 200
+                              },
+                              "notices": {
+                                "type": "object",
+                                "enabled": false
+                              },
+                              "options": {
+                                "type": "object",
+                                "enabled": false
+                              },
+                              "required": {
+                                "type": "boolean"
+                              },
+                              "type": {
+                                "type": "keyword",
+                                "ignore_above": 200
+                              },
+                              "ui": {
+                                "type": "object",
+                                "enabled": false
+                              },
+                              "validators": {
+                                "type": "object",
+                                "enabled": false
+                              },
+                              "value": {
+                                "type": "keyword",
+                                "ignore_above": 200
+                              },
+                              "warnings": {
+                                "type": "object",
+                                "enabled": false
+                              }
+                            }
+                          },
+                          "filters": {
+                            "type": "object",
+                            "enabled": false
+                          },
+                          "formID": {
+                            "type": "keyword",
+                            "ignore_above": 200
+                          },
+                          "label": {
+                            "type": "keyword",
+                            "ignore_above": 200
+                          },
+                          "notices": {
+                            "type": "object",
+                            "enabled": false
+                          },
+                          "options": {
+                            "type": "object",
+                            "enabled": false
+                          },
+                          "required": {
+                            "type": "boolean"
+                          },
+                          "type": {
+                            "type": "keyword",
+                            "ignore_above": 200
+                          },
+                          "ui": {
+                            "type": "object",
+                            "enabled": false
+                          },
+                          "validators": {
+                            "type": "object",
+                            "enabled": false
+                          },
+                          "value": {
+                            "type": "keyword",
+                            "ignore_above": 200
+                          },
+                          "warnings": {
+                            "type": "object",
+                            "enabled": false
+                          }
+                        }
+                      },
+                      "filters": {
+                        "type": "object",
+                        "enabled": false
+                      },
+                      "formID": {
+                        "type": "keyword",
+                        "ignore_above": 200
+                      },
+                      "label": {
+                        "type": "keyword",
+                        "ignore_above": 200
+                      },
+                      "notices": {
+                        "type": "object",
+                        "enabled": false
+                      },
+                      "options": {
+                        "type": "object",
+                        "enabled": false
+                      },
+                      "required": {
+                        "type": "boolean"
+                      },
+                      "type": {
+                        "type": "keyword",
+                        "ignore_above": 200
+                      },
+                      "ui": {
+                        "type": "object",
+                        "enabled": false
+                      },
+                      "validators": {
+                        "type": "object",
+                        "enabled": false
+                      },
+                      "value": {
+                        "type": "keyword",
+                        "ignore_above": 200
+                      },
+                      "warnings": {
+                        "type": "object",
+                        "enabled": false
+                      }
+                    }
+                  },
+                  "filters": {
+                    "type": "object",
+                    "enabled": false
+                  },
+                  "formID": {
+                    "type": "keyword",
+                    "ignore_above": 200
+                  },
+                  "label": {
+                    "type": "keyword",
+                    "ignore_above": 200
+                  },
+                  "notices": {
+                    "type": "object",
+                    "enabled": false
+                  },
+                  "options": {
+                    "type": "object",
+                    "enabled": false
+                  },
+                  "required": {
+                    "type": "boolean"
+                  },
+                  "type": {
+                    "type": "keyword",
+                    "ignore_above": 200
+                  },
+                  "ui": {
+                    "type": "object",
+                    "enabled": false
+                  },
+                  "validators": {
+                    "type": "object",
+                    "enabled": false
+                  },
+                  "value": {
+                    "type": "keyword",
+                    "ignore_above": 200
+                  },
+                  "warnings": {
+                    "type": "object",
+                    "enabled": false
+                  }
+                }
+              },
+              "filters": {
+                "type": "object",
+                "enabled": false
+              },
+              "formID": {
+                "type": "keyword",
+                "ignore_above": 200
+              },
+              "label": {
+                "type": "keyword",
+                "ignore_above": 200
+              },
+              "notices": {
+                "type": "object",
+                "enabled": false
+              },
+              "options": {
+                "type": "object",
+                "enabled": false
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "type": {
+                "type": "keyword",
+                "ignore_above": 200
+              },
+              "ui": {
+                "type": "object",
+                "enabled": false
+              },
+              "validators": {
+                "type": "object",
+                "enabled": false
+              },
+              "value": {
+                "type": "keyword",
+                "ignore_above": 200
+              },
+              "warnings": {
+                "type": "object",
+                "enabled": false
+              }
+            }
+          },
+          "filters": {
+            "type": "object",
+            "enabled": false
+          },
+          "formID": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "label": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "notices": {
+            "type": "object",
+            "enabled": false
+          },
+          "options": {
+            "type": "object",
+            "enabled": false
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "type": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "ui": {
+            "type": "object",
+            "enabled": false
+          },
+          "validators": {
+            "type": "object",
+            "enabled": false
+          },
+          "value": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "warnings": {
+            "type": "object",
+            "enabled": false
+          }
+        }
+      },
+      "filters": {
+        "type": "object",
+        "enabled": false
+      },
+      "formID": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "label": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "notices": {
+        "type": "object",
+        "enabled": false
+      },
+      "options": {
+        "type": "object",
+        "enabled": false
+      },
+      "required": {
+        "type": "boolean"
+      },
+      "type": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "ui": {
+        "type": "object",
+        "enabled": false
+      },
+      "validators": {
+        "type": "object",
+        "enabled": false
+      },
+      "value": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "warnings": {
+        "type": "object",
+        "enabled": false
+      },
+      "_meta": {
+        "properties": {
+          "created": {
+            "type": "date"
+          },
+          "edited": {
+            "type": "date"
+          }
+        }
+      }
+    }
+  }
+}

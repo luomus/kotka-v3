@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "subject": "MP.publication",
+  "additionalProperties": false,
+  "title": "Publication",
+  "description": "",
+  "properties": {
+    "@context": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@context",
+      "title": "Context for the Publication"
+    },
+    "id": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "id",
+      "title": "Id for the Publication"
+    },
+    "@type": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@type",
+      "title": "Type for the Publication"
+    },
+    "dc:URI": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "dc:URI",
+      "title": "URI"
+    },
+    "dc:bibliographicCitation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "range": "xsd:string",
+      "subject": "dc:bibliographicCitation",
+      "title": "Bibliographic Citation"
+    }
+  }
+}

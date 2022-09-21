@@ -1,0 +1,424 @@
+{
+  "settings": {
+    "number_of_shards": 3,
+    "index.mapping.ignore_malformed": true,
+    "index.max_result_window": 1000000,
+    "index.mapping.total_fields.limit": 10000,
+    "index.mapping.nested_objects.limit": 100000
+  },
+  "mappings": {
+    "properties": {
+      "@context": {
+        "type": "keyword"
+      },
+      "id": {
+        "type": "keyword"
+      },
+      "@type": {
+        "type": "keyword"
+      },
+      "actionNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "borderGain": {
+        "type": "boolean"
+      },
+      "borderGainNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "countOfOccurrencesMax": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "countOfOccurrencesMin": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "countOfOccurrencesNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "criteriaA": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "criteriaANotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "criteriaB": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "criteriaBNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "criteriaC": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "criteriaCNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "criteriaD": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "criteriaDNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "criteriaE": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "criteriaENotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "criteriaForStatus": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "criteriaForStatusNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "criteriaNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "ddReason": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "ddReasonNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "decreaseDuringPeriod": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "decreaseDuringPeriodNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "distributionAreaMax": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "distributionAreaMin": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "distributionAreaNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "editNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "endangermentReasonNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "evaluatedTaxon": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "evaluationPeriodLength": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "evaluationPeriodLengthNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "evaluationYear": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "externalPopulationImpactOnRedListStatus": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "externalPopulationImpactOnRedListStatusNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "fragmentedHabitats": {
+        "type": "boolean"
+      },
+      "fragmentedHabitatsNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "generationAge": {
+        "type": "float"
+      },
+      "generationAgeNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "groundsForEvaluationNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "habitatGeneralNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "habitatNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "hasEndangermentReason": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "hasOccurrence": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "hasThreat": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "individualCountMax": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "individualCountMin": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "individualCountNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "lastModified": {
+        "type": "date"
+      },
+      "lastModifiedBy": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "lastSightingNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "legacyPublications": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "locked": {
+        "type": "boolean"
+      },
+      "lsaRecommendation": {
+        "type": "boolean"
+      },
+      "lsaRecommendationNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "occurrenceAreaMax": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "occurrenceAreaMin": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "occurrenceAreaNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "occurrenceNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "occurrenceRegionsNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "occurrenceRegionsPrivateNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "otherSources": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "percentageOfGlobalPopulation": {
+        "type": "float"
+      },
+      "percentageOfGlobalPopulationNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "populationSizePeriodBeginning": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "populationSizePeriodEnd": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "populationSizePeriodNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "populationVaries": {
+        "type": "boolean"
+      },
+      "populationVariesNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "possiblyRE": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "possiblyRENotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "primaryHabitat": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "publication": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "reasonForStatusChange": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "reasonForStatusChangeNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "redListIndexCorrection": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "redListIndexCorrectionNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "redListStatus": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "redListStatusAccuracyNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "redListStatusMax": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "redListStatusMin": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "redListStatusNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "regionallyThreatenedNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "regionallyThreatenedPrivateNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "remarks": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "secondaryHabitat": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "state": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "statusA": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "statusANotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "statusB": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "statusBNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "statusC": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "statusCNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "statusD": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "statusDNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "statusE": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "statusENotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "taxonomicNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "threatNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "typeOfOccurrenceInFinland": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "typeOfOccurrenceInFinlandNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "_meta": {
+        "properties": {
+          "created": {
+            "type": "date"
+          },
+          "edited": {
+            "type": "date"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "settings": {
+    "number_of_shards": 3,
+    "index.mapping.ignore_malformed": true,
+    "index.max_result_window": 1000000,
+    "index.mapping.total_fields.limit": 10000,
+    "index.mapping.nested_objects.limit": 100000
+  },
+  "mappings": {
+    "properties": {
+      "@context": {
+        "type": "keyword"
+      },
+      "id": {
+        "type": "keyword"
+      },
+      "@type": {
+        "type": "keyword"
+      },
+      "benefitsDerivedAndShared": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "datasetName": {
+        "properties": {
+          "en": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "fi": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "sv": {
+            "type": "keyword",
+            "ignore_above": 200
+          }
+        }
+      },
+      "datasetType": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "description": {
+        "properties": {
+          "en": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "fi": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "sv": {
+            "type": "keyword",
+            "ignore_above": 200
+          }
+        }
+      },
+      "personsResponsible": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "researchCollaborator": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "researchFundingDuration": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "researchFundingRecipient": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "researchFundingSource": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "creator": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "dateCreated": {
+        "type": "date"
+      },
+      "dateEdited": {
+        "type": "date"
+      },
+      "editor": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "owner": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "_meta": {
+        "properties": {
+          "created": {
+            "type": "date"
+          },
+          "edited": {
+            "type": "date"
+          }
+        }
+      }
+    }
+  }
+}

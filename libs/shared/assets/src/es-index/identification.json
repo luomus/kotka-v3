@@ -1,0 +1,137 @@
+{
+  "settings": {
+    "number_of_shards": 3,
+    "index.mapping.ignore_malformed": true,
+    "index.max_result_window": 1000000,
+    "index.mapping.total_fields.limit": 10000,
+    "index.mapping.nested_objects.limit": 100000
+  },
+  "mappings": {
+    "properties": {
+      "@context": {
+        "type": "keyword"
+      },
+      "id": {
+        "type": "keyword"
+      },
+      "@type": {
+        "type": "keyword"
+      },
+      "herbo:sortOrder": {
+        "type": "integer"
+      },
+      "associatedObservationTaxa": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "author": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "det": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "detDate": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "detMethod": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "detVerbatim": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "genusQualifier": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "identificationBasis": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "identificationNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "infraAuthor": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "infraEpithet": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "infraRank": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "infrasubspecificSubdivision": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "isPartOf": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "isTaxonGroup": {
+        "type": "boolean"
+      },
+      "preferredIdentification": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "sec": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "speciesQualifier": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "taxon": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "taxonID": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "taxonRank": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "taxonSpecifier": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "taxonURI": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "taxonVerbatim": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "publicityRestrictions": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "sortOrder": {
+        "type": "integer"
+      },
+      "_meta": {
+        "properties": {
+          "created": {
+            "type": "date"
+          },
+          "edited": {
+            "type": "date"
+          }
+        }
+      }
+    }
+  }
+}

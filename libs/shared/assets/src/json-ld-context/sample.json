@@ -1,0 +1,151 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "@vocab": "http://tun.fi/",
+    "@base": "http://tun.fi/",
+    "default": "http://tun.fi/",
+    "luomus": "http://id.luomus.fi/",
+    "zmuo": "http://id.zmuo.oulu.fi/",
+    "herbo": "http://id.herb.oulu.fi/",
+    "utu": "http://mus.utu.fi/",
+    "xsd": "https://www.w3.org/TR/xmlschema-2/#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "xml": "http://www.w3.org/XML/1998/namespace#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "dwc": "http://rs.tdwg.org/dwc/terms/",
+    "dc": "http://purl.org/dc/terms/",
+    "dwctype": "http://rs.tdwg.org/dwc/dwctype/",
+    "abcd": "http://www.tdwg.org/schemas/abcd/2.06#",
+    "naturforskaren": "http://naturforskaren.se/",
+    "eol": "http://eol.org/",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "dyntaxa": "http://dyntaxa.se/Taxon/Info/",
+    "taxonid": "http://taxonid.org/",
+    "@context": {
+      "@id": "default:@context",
+      "@type": "xsd:string"
+    },
+    "id": "@id",
+    "@type": {
+      "@id": "default:@type",
+      "@type": "xsd:string"
+    },
+    "DNAExtractionInstrument": {
+      "@id": "default:MF.DNAExtractionInstrument",
+      "@type": "xsd:string"
+    },
+    "additionalIDs": {
+      "@id": "default:MF.additionalIDs",
+      "@type": "xsd:string"
+    },
+    "bold": {
+      "@id": "default:MF.bold",
+      "@type": "xsd:string"
+    },
+    "collectionID": {
+      "@id": "default:MF.collectionID",
+      "@type": "@id"
+    },
+    "condition": {
+      "@id": "default:MF.condition",
+      "@type": "xsd:string"
+    },
+    "datasetID": {
+      "@id": "default:MF.datasetID",
+      "@type": "@id"
+    },
+    "elutionMedium": {
+      "@id": "default:MF.elutionMedium",
+      "@type": "@id"
+    },
+    "event": {
+      "@id": "default:MF.event",
+      "@type": "xsd:string"
+    },
+    "genbank": {
+      "@id": "default:MF.genbank",
+      "@type": "xsd:string"
+    },
+    "individualsInPreparation": {
+      "@id": "default:MF.individualsInPreparation",
+      "@type": "@id"
+    },
+    "material": {
+      "@id": "default:MF.material",
+      "@type": "@id"
+    },
+    "notes": {
+      "@id": "default:MF.notes",
+      "@type": "xsd:string"
+    },
+    "preparationType": {
+      "@id": "default:MF.preparationType",
+      "@type": "@id"
+    },
+    "preservation": {
+      "@id": "default:MF.preservation",
+      "@type": "@id"
+    },
+    "publication": {
+      "@id": "default:MF.publication",
+      "@type": "xsd:string"
+    },
+    "quality": {
+      "@id": "default:MF.quality",
+      "@type": "@id"
+    },
+    "qualityCheckDate": {
+      "@id": "default:MF.qualityCheckDate",
+      "@type": "xsd:string"
+    },
+    "qualityCheckMethod": {
+      "@id": "default:MF.qualityCheckMethod",
+      "@type": "@id"
+    },
+    "qualityNotes": {
+      "@id": "default:MF.qualityNotes",
+      "@type": "xsd:string"
+    },
+    "sampleLocation": {
+      "@id": "default:MF.sampleLocation",
+      "@type": "xsd:string"
+    },
+    "specimenID": {
+      "@id": "default:MF.specimenID",
+      "@type": "@id"
+    },
+    "status": {
+      "@id": "default:MF.status",
+      "@type": "@id"
+    },
+    "isPartOf": {
+      "@id": "default:MY.isPartOf",
+      "@type": "@id"
+    },
+    "measurement": {
+      "@id": "default:MY.measurement",
+      "@container": "@set"
+    },
+    "creator": {
+      "@id": "default:MZ.creator",
+      "@type": "@id"
+    },
+    "dateCreated": {
+      "@id": "default:MZ.dateCreated",
+      "@type": "xsd:dateTime"
+    },
+    "dateEdited": {
+      "@id": "default:MZ.dateEdited",
+      "@type": "xsd:dateTime"
+    },
+    "editor": {
+      "@id": "default:MZ.editor",
+      "@type": "@id"
+    },
+    "owner": {
+      "@id": "default:MZ.owner",
+      "@type": "@id"
+    }
+  }
+}

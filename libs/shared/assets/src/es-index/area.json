@@ -1,0 +1,108 @@
+{
+  "settings": {
+    "number_of_shards": 3,
+    "index.mapping.ignore_malformed": true,
+    "index.max_result_window": 1000000,
+    "index.mapping.total_fields.limit": 10000,
+    "index.mapping.nested_objects.limit": 100000
+  },
+  "mappings": {
+    "properties": {
+      "@context": {
+        "type": "keyword"
+      },
+      "id": {
+        "type": "keyword"
+      },
+      "@type": {
+        "type": "keyword"
+      },
+      "areaType": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "countryCodeISOalpha2": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "countryCodeISOalpha3": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "isPartOf": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "isPartOfBirdAssociationArea": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "isPartOfEnvironmentalELY": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "isPartOfProvince": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "name": {
+        "properties": {
+          "en": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "fi": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "sv": {
+            "type": "keyword",
+            "ignore_above": 200
+          }
+        }
+      },
+      "previouslyOfficialName": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "provinceCodeAlpha": {
+        "properties": {
+          "en": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "fi": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "sv": {
+            "type": "keyword",
+            "ignore_above": 200
+          }
+        }
+      },
+      "provinceCodeNumeric": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "ringingDepartmentBirdAssociationAreaCode": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "ringingDepartmentMunicipalityCode": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "_meta": {
+        "properties": {
+          "created": {
+            "type": "date"
+          },
+          "edited": {
+            "type": "date"
+          }
+        }
+      }
+    }
+  }
+}

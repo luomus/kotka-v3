@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "subject": "MHL.formFooterClass",
+  "additionalProperties": false,
+  "title": "",
+  "description": "",
+  "properties": {
+    "@context": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@context",
+      "title": "Context for the MHL.formFooterClass"
+    },
+    "id": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "id",
+      "title": "Id for the MHL.formFooterClass"
+    },
+    "@type": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@type",
+      "title": "Type for the MHL.formFooterClass"
+    },
+    "footerDescription": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MHL.footerDescription",
+      "description": "Text to show for footer",
+      "title": "Description"
+    },
+    "footerLogos": {
+      "type": "object",
+      "range": "MZ.keyAny",
+      "subject": "MHL.footerLogos",
+      "description": "Key is an image URI, value is the URI of the page clicking the image opens",
+      "title": "Logos"
+    }
+  }
+}

@@ -1,0 +1,161 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "subject": "GX.dataset",
+  "additionalProperties": false,
+  "title": "Dataset",
+  "description": "",
+  "properties": {
+    "@context": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@context",
+      "title": "Context for the Dataset"
+    },
+    "id": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "id",
+      "title": "Id for the Dataset"
+    },
+    "@type": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@type",
+      "title": "Type for the Dataset"
+    },
+    "benefitsDerivedAndShared": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "GX.benefitsDerivedAndShared",
+      "description": "What monetary or non-monetary benefits arised from the project and how they were shared. (Related to the monitoring of the utilisation of genetic resources and Nagoya compliance).",
+      "title": "Benefits derived and shared"
+    },
+    "datasetName": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "minProperties": 1,
+      "range": "xsd:string",
+      "subject": "GX.datasetName",
+      "description": "Name of the dataset. This must be unique.",
+      "title": "Name"
+    },
+    "datasetType": {
+      "type": "string",
+      "enum": [
+        "",
+        "GX.datasetTypeProject"
+      ],
+      "enumNames": [
+        "",
+        "Project"
+      ],
+      "range": "GX.datasetTypeEnum",
+      "subject": "GX.datasetType",
+      "description": "Type of the dataset. Usually basic, project type is generally used only to give information on project Nagoya compliance.",
+      "title": "Dataset type"
+    },
+    "description": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "range": "xsd:string",
+      "subject": "GX.description",
+      "description": "Description of the dataset, so that other people understand what it is about.",
+      "title": "Description"
+    },
+    "personsResponsible": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "GX.personsResponsible",
+      "description": "Person(s) responsible for the dataset.",
+      "title": "Person(s) responsible"
+    },
+    "researchCollaborator": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "GX.researchCollaborator",
+      "description": "Institutions or persons collaborating in the project.",
+      "title": "Research collaborator(s)"
+    },
+    "researchFundingDuration": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "GX.researchFundingDuration",
+      "description": "Duration of the project funding (dates from and to). (related to the monitoring of the utilisation of genetic resources and Nagoya compliance).",
+      "title": "Research funding duration"
+    },
+    "researchFundingRecipient": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "GX.researchFundingRecipient",
+      "description": "Which person or institution received the project funding (related to the monitoring of the utilisation of genetic resources and Nagoya compliance).",
+      "title": "Research funding recipient"
+    },
+    "researchFundingSource": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "GX.researchFundingSource",
+      "description": "Who funded the project (related to the monitoring of the utilisation of genetic resources and Nagoya compliance).",
+      "title": "Research funding source"
+    },
+    "creator": {
+      "type": "string",
+      "range": "MA.person",
+      "subject": "MZ.creator",
+      "title": "Creator"
+    },
+    "dateCreated": {
+      "type": "string",
+      "format": "date-time",
+      "range": "xsd:dateTime",
+      "subject": "MZ.dateCreated",
+      "title": "Created"
+    },
+    "dateEdited": {
+      "type": "string",
+      "format": "date-time",
+      "range": "xsd:dateTime",
+      "subject": "MZ.dateEdited",
+      "title": "Edited"
+    },
+    "editor": {
+      "type": "string",
+      "range": "MA.person",
+      "subject": "MZ.editor",
+      "title": "Editor"
+    },
+    "owner": {
+      "type": "string",
+      "range": "MOS.organization",
+      "subject": "MZ.owner",
+      "description": "Team or organisation that owns the record and can edit it.",
+      "title": "Owner of record"
+    }
+  },
+  "required": [
+    "datasetName",
+    "personsResponsible"
+  ]
+}

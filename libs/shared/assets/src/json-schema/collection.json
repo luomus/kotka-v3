@@ -1,0 +1,715 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "subject": "MY.collection",
+  "additionalProperties": false,
+  "title": "Collection",
+  "description": "",
+  "properties": {
+    "@context": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@context",
+      "title": "Context for the Collection"
+    },
+    "id": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "id",
+      "title": "Id for the Collection"
+    },
+    "@type": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@type",
+      "title": "Type for the Collection"
+    },
+    "secureLevel": {
+      "type": "string",
+      "enum": [
+        "",
+        "MX.secureLevelNone",
+        "MX.secureLevelKM1",
+        "MX.secureLevelKM5",
+        "MX.secureLevelKM10",
+        "MX.secureLevelKM25",
+        "MX.secureLevelKM50",
+        "MX.secureLevelKM100",
+        "MX.secureLevelHighest",
+        "MX.secureLevelNoShow"
+      ],
+      "enumNames": [
+        "",
+        "None",
+        "1 km",
+        "5 km",
+        "10 km",
+        "25 km",
+        "50 km",
+        "100 km",
+        "Fully hidden",
+        "Not shown at all - used mainly to prevent spam"
+      ],
+      "range": "MX.secureLevels",
+      "subject": "MX.secureLevel",
+      "description": "Secure level (salaus-/karkeistustaso) for the data",
+      "title": "Secure level"
+    },
+    "abbreviation": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.abbreviation",
+      "description": "Official abbreviation (or acronym) for this collection",
+      "title": "Collection code"
+    },
+    "allowedForDwStatistics": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MY.allowedForDwStatistics",
+      "description": "Admin field. Is it allowed to use collection with data warehouse /statistic endpoints.",
+      "title": "Allowed for DW statistics"
+    },
+    "citation": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.citation",
+      "description": "Example how to cite this collection in a scientific article, if using organization, name and abbreviation is not enough.",
+      "title": "Citation recommendation"
+    },
+    "collectionLocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "range": "xsd:string",
+      "subject": "MY.collectionLocation",
+      "description": "Where is the collection physically located? E.g. building name and room number. [not shown in public]",
+      "title": "Location of collection"
+    },
+    "collectionName": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "minProperties": 1,
+      "range": "xsd:string",
+      "subject": "MY.collectionName",
+      "description": "Name of the collection in different languages. (Not name of collection database.)",
+      "title": "Name"
+    },
+    "collectionQuality": {
+      "type": "string",
+      "enum": [
+        "MY.collectionQualityEnum3",
+        "MY.collectionQualityEnum2",
+        "MY.collectionQualityEnum1"
+      ],
+      "enumNames": [
+        "Professional / professionally curated",
+        "Expert hobbyists / expert curated",
+        "Citizen science / mostly uncurated"
+      ],
+      "range": "MY.collectionQualityEnum",
+      "subject": "MY.collectionQuality",
+      "description": "Quality classification for the collection.",
+      "title": "Collection quality"
+    },
+    "collectionSize": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.collectionSize",
+      "description": "How many specimens, records or such does the collection contain? Fill in approximate number, describe more in notes if necessary.",
+      "title": "Size (approx.)"
+    },
+    "collectionType": {
+      "type": "string",
+      "enum": [
+        "MY.collectionTypeSpecimens",
+        "MY.collectionTypeLiving",
+        "MY.collectionTypeMonitoring",
+        "MY.collectionTypeObservations",
+        "MY.collectionTypePublicationdata",
+        "MY.collectionTypePublication",
+        "MY.collectionTypeMixed",
+        "MY.collectionTypeOther",
+        "MY.collectionTypeGardenArea",
+        "MY.collectionTypeIndoorGardenArea",
+        "MY.collectionTypeOutdoorGardenArea",
+        "MY.collectionTypeGardenSublocation"
+      ],
+      "enumNames": [
+        "Specimen collection",
+        "Living collection",
+        "Monitoring scheme",
+        "Free-form observations",
+        "Data from publication(s)",
+        "Publication(s)",
+        "Mixed",
+        "Other",
+        "Garden area",
+        "Indoor garden area",
+        "Outdoor garden area",
+        "Garden sublocation"
+      ],
+      "range": "MY.collectionTypes",
+      "subject": "MY.collectionType",
+      "description": "Type of the collection (specimen, monitoring etc).",
+      "title": "Type"
+    },
+    "concealmentBasis": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "range": "xsd:string",
+      "subject": "MY.concealmentBasis",
+      "description": "Legal basis for concealment or quarantine",
+      "title": "Basis for concealment or quarantine"
+    },
+    "contactEmail": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.contactEmail",
+      "description": "Personal or general (e.g. group of people in the organisation) email address to reach the person(s) responsible.",
+      "title": "Contact email"
+    },
+    "coverageBasis": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "range": "xsd:string",
+      "subject": "MY.coverageBasis",
+      "description": "Concise definition of the coverage, if not clear from name or description. For example, 'Winter birds of Finland'.",
+      "title": "Coverage basis"
+    },
+    "dataLocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "range": "xsd:string",
+      "subject": "MY.dataLocation",
+      "description": "Where is the digitized data stored and backed up? Be exact, so that others can find the data. [not shown in public]",
+      "title": "Location of data and backups"
+    },
+    "dataNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.dataNotes",
+      "description": "Diary-like notes about the data, with date/time. For example \"2020-08-19: Changed country names Fönland to Finland\", or \"Specimens collected during 2019 are missing coordinates due to malfunctioning GPS\"",
+      "title": "Notes about the data"
+    },
+    "dataQuality": {
+      "type": "string",
+      "enum": [
+        "",
+        "MY.dataQuality1",
+        "MY.dataQuality2",
+        "MY.dataQuality3",
+        "MY.dataQuality4",
+        "MY.dataQuality5",
+        "MY.dataQualityNA"
+      ],
+      "enumNames": [
+        "",
+        "1 star",
+        "2 star",
+        "3 star",
+        "4 star",
+        "5 star",
+        "Not applicable"
+      ],
+      "range": "MY.dataQualityEnum",
+      "subject": "MY.dataQuality",
+      "description": "Quality estimation for the data in this collection",
+      "title": "Data quality"
+    },
+    "dataQualityDescription": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "range": "xsd:string",
+      "subject": "MY.dataQualityDescription",
+      "description": "Description and reasons for the data quality in different languages.",
+      "title": "Data quality description"
+    },
+    "dataQuarantinePeriod": {
+      "type": "integer",
+      "range": "xsd:integer",
+      "subject": "MY.dataQuarantinePeriod",
+      "description": "Embargo period in years after which data is opened",
+      "title": "Embargo in years"
+    },
+    "dataUseTerms": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "range": "xsd:string",
+      "subject": "MY.dataUseTerms",
+      "description": "Description of possible special terms for data use (for example not for commercial purposes etc.)",
+      "title": "Special terms for data use"
+    },
+    "description": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "minProperties": 1,
+      "range": "xsd:string",
+      "subject": "MY.description",
+      "description": "Free-form description of the collection in different languages.",
+      "title": "Description"
+    },
+    "digitizedSize": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.digitizedSize",
+      "description": "How many percent of the collection is in digital form, e.g. in a database or Excel file? Fill in approximate number, describe more in notes if necessary.",
+      "title": "% digitized (approx.)"
+    },
+    "downloadRequestHandler": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "MA.person",
+      "subject": "MY.downloadRequestHandler",
+      "description": "Admin field. The identifier of the person responsible for handling requests for restricted data for this set (typically same person who's responsible for the collection)",
+      "title": "Download request handler"
+    },
+    "editNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.editNotes",
+      "description": "Reason for this edit or notes about it.",
+      "title": "Notes about this edit"
+    },
+    "gbifDoi": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.gbifDoi",
+      "description": "Admin field. DOI received from GBIF after the collection has been published.",
+      "title": "Collection DOI from GBIF"
+    },
+    "geographicCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "range": "xsd:string",
+      "subject": "MY.geographicCoverage",
+      "description": "Smallest common geographical area for the specimens/data in the collection (for example, country or continent name).",
+      "title": "Geographic coverage"
+    },
+    "intellectualDescription": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "range": "xsd:string",
+      "subject": "MY.intellectualDescription",
+      "description": "Description of the rights governing the data (for example, what contracts have been made about this). If left blank, Luomus data policy is followed.",
+      "title": "Copyright description"
+    },
+    "intellectualOwner": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.intellectualOwner",
+      "description": "Name of the institution or organisation publishing the data.",
+      "title": "Publisher name (en)"
+    },
+    "intellectualRights": {
+      "type": "string",
+      "enum": [
+        "MY.intellectualRightsCC-BY",
+        "MY.intellectualRightsCC0",
+        "MY.intellectualRightsPD",
+        "MY.intellectualRightsARR"
+      ],
+      "enumNames": [
+        "Creative Commons Attribution",
+        "Creative Commons Zero",
+        "Public Domain",
+        "All rights reserved"
+      ],
+      "range": "MY.intellectualRightsEnum",
+      "subject": "MY.intellectualRights",
+      "description": "License which is used when publishing data that belongs to this collection.",
+      "title": "License for use"
+    },
+    "internalUseOnly": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MY.internalUseOnly",
+      "description": "Is the data to be used only within Kotka?",
+      "title": "Internal use only"
+    },
+    "isPartOf": {
+      "type": "string",
+      "range": "rdfs:Resource",
+      "subject": "MY.isPartOf",
+      "description": "Which parent or larger collection this is part of.",
+      "title": "Is part of"
+    },
+    "language": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.language",
+      "description": "Language the data is (mainly) written in, if applicable.",
+      "title": "Language"
+    },
+    "metadataCreator": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.metadataCreator",
+      "title": "Person responsible for this metadata"
+    },
+    "metadataStatus": {
+      "type": "string",
+      "enum": [
+        "",
+        "MY.metadataStatusPreliminary",
+        "MY.metadataStatusSatisfactory",
+        "MY.metadataStatusComprehensive",
+        "MY.metadataStatusHidden"
+      ],
+      "enumNames": [
+        "",
+        "preliminary - needs improvement",
+        "satisfactory - could be improved",
+        "comprehensive",
+        "hidden - this metadata should not be used"
+      ],
+      "range": "MY.metadataStatuses",
+      "subject": "MY.metadataStatus",
+      "description": "Indication of how comprehensive the information on this form is.",
+      "title": "Status of this metadata"
+    },
+    "methods": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "range": "xsd:string",
+      "subject": "MY.methods",
+      "description": "Methods used when creating this collection, if they are standardized. Includes information on items such as census methods, tools, instrument calibration and software.",
+      "title": "Methods"
+    },
+    "notes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.notes",
+      "description": "Additional information to the data in each section.",
+      "title": "Notes"
+    },
+    "onlineUrl": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "range": "xsd:string",
+      "subject": "MY.onlineUrl",
+      "description": "Web address (URL) with more info about the collection.",
+      "title": "URL"
+    },
+    "personResponsible": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.personResponsible",
+      "description": "Person(s) responsible for the collection (Lastname, Firstname; Lastname, Firstname).",
+      "title": "Person responsible"
+    },
+    "publicAccess": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MY.publicAccess",
+      "description": "Used for botanic garden collections. Is the collection/garden area accessible to public or not.",
+      "title": "Accessibility to public"
+    },
+    "publicationDescription": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "range": "xsd:string",
+      "subject": "MY.publicationDescription",
+      "description": "Description of possible restrictions on publication of the data (for example, is there data about endangered species which should be concealed?)",
+      "title": "Publication terms description"
+    },
+    "publicationTerms": {
+      "type": "string",
+      "enum": [
+        "",
+        "MY.publicationTermsFree",
+        "MY.publicationTermsOfficial",
+        "MY.publicationTermsInternal",
+        "MY.publicationTermsNone"
+      ],
+      "enumNames": [
+        "",
+        "Free to publish",
+        "Official use only",
+        "Internal use only",
+        "No rights for use"
+      ],
+      "range": "MY.publicationTermsEnum",
+      "subject": "MY.publicationTerms",
+      "description": "How can Luomus publish the data, if it is owned by third party?",
+      "title": "Publication terms"
+    },
+    "publisherShortname": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "range": "xsd:string",
+      "subject": "MY.publisherShortname",
+      "description": "Admin field. Name that is easy for users to remember and understand. E.g. \"Luomus\", \"University of Turku\".",
+      "title": "Publisher short name"
+    },
+    "shareToGbif": {
+      "type": "string",
+      "range": "MY.collection",
+      "subject": "MY.shareToGbif",
+      "description": "Admin field. Can the data be shared to GBIF or not: Given collection ID means data is shared under that collection.",
+      "title": "Share to GBIF"
+    },
+    "taxonomicCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "range": "xsd:string",
+      "subject": "MY.taxonomicCoverage",
+      "description": "Lowest common taxon in the collection (for example, scientific name of an order).",
+      "title": "Taxonomic coverage"
+    },
+    "temporalCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "range": "xsd:string",
+      "subject": "MY.temporalCoverage",
+      "description": "When were the specimens/data collected?",
+      "title": "Temporal coverage"
+    },
+    "typesSize": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.typesSize",
+      "description": "How many TYPE specimens does the collection contain?  Fill in approximate number, describe more in notes if necessary.",
+      "title": "Amount of type specimens (approx.)"
+    },
+    "creator": {
+      "type": "string",
+      "range": "MA.person",
+      "subject": "MZ.creator",
+      "title": "Creator"
+    },
+    "dateCreated": {
+      "type": "string",
+      "format": "date-time",
+      "range": "xsd:dateTime",
+      "subject": "MZ.dateCreated",
+      "title": "Created"
+    },
+    "dateEdited": {
+      "type": "string",
+      "format": "date-time",
+      "range": "xsd:dateTime",
+      "subject": "MZ.dateEdited",
+      "title": "Edited"
+    },
+    "editor": {
+      "type": "string",
+      "range": "MA.person",
+      "subject": "MZ.editor",
+      "title": "Editor"
+    },
+    "owner": {
+      "type": "string",
+      "range": "MOS.organization",
+      "subject": "MZ.owner",
+      "description": "Team or organisation that owns the record and can edit it.",
+      "title": "Owner of record"
+    },
+    "publicityRestrictions": {
+      "type": "string",
+      "enum": [
+        "",
+        "MZ.publicityRestrictionsPublic",
+        "MZ.publicityRestrictionsProtected",
+        "MZ.publicityRestrictionsPrivate"
+      ],
+      "enumNames": [
+        "",
+        "public",
+        "protected",
+        "private"
+      ],
+      "range": "MZ.publicityRestrictionsEnum",
+      "subject": "MZ.publicityRestrictions",
+      "description": "PUBLIC: all data can be published; PROTECTED: exact locality is hidden (100*100km square); PRIVATE: most of the data is hidden. Empty value means same as public.",
+      "title": "Publicity restrictions"
+    }
+  },
+  "required": [
+    "collectionName",
+    "collectionQuality",
+    "collectionType",
+    "contactEmail",
+    "description",
+    "intellectualRights",
+    "personResponsible"
+  ]
+}

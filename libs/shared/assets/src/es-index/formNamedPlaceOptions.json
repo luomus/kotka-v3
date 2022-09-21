@@ -1,0 +1,188 @@
+{
+  "settings": {
+    "number_of_shards": 3,
+    "index.mapping.ignore_malformed": true,
+    "index.max_result_window": 1000000,
+    "index.mapping.total_fields.limit": 10000,
+    "index.mapping.nested_objects.limit": 100000
+  },
+  "mappings": {
+    "properties": {
+      "@context": {
+        "type": "keyword"
+      },
+      "id": {
+        "type": "keyword"
+      },
+      "@type": {
+        "type": "keyword"
+      },
+      "adminShowCopyLink": {
+        "type": "boolean"
+      },
+      "allowAddingPublic": {
+        "type": "boolean"
+      },
+      "birdAssociationAreaHelp": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "chooseDescription": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "copyLatestDocumentToNamedPlace": {
+        "type": "boolean"
+      },
+      "createDescription": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "createNewButtonLabel": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "createNewButtonPrependingTextLabel": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "documentListUseLocalDocumentViewer": {
+        "type": "boolean"
+      },
+      "documentViewerForcedFields": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "documentViewerGatheringGeometryJSONPath": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "documentViewerZoomToData": {
+        "type": "boolean"
+      },
+      "earlierLabel": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "editDescription": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "filterByBirdAssociationArea": {
+        "type": "boolean"
+      },
+      "filterByMunicipality": {
+        "type": "boolean"
+      },
+      "filterByTags": {
+        "type": "boolean"
+      },
+      "headerFields": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "hideMapTab": {
+        "type": "boolean"
+      },
+      "includeUnits": {
+        "type": "boolean"
+      },
+      "infoFields": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "lastCensusLabel": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "listColumnNameMapping": {
+        "type": "object",
+        "enabled": false
+      },
+      "listColumns": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "listColumnsMultisort": {
+        "type": "boolean"
+      },
+      "listLabel": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "mapCluster": {
+        "type": "boolean"
+      },
+      "mapOverlayNames": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "mapTileLayerName": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "myEarlierLabel": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "namedPlaceFormID": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "namedPlaceList": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "prepopulatedDocumentFields": {
+        "type": "object",
+        "enabled": false
+      },
+      "printLabel": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "releaseLabel": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "reservableLabel": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "reservationUntil": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "reservedLabel": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "showLegendList": {
+        "type": "boolean"
+      },
+      "startWithMap": {
+        "type": "boolean"
+      },
+      "useAcceptedDocument": {
+        "type": "boolean"
+      },
+      "useLabel": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "zoomToData": {
+        "type": "boolean"
+      },
+      "_meta": {
+        "properties": {
+          "created": {
+            "type": "date"
+          },
+          "edited": {
+            "type": "date"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,186 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "subject": "HBF.downloadRequest",
+  "additionalProperties": false,
+  "title": "Download request",
+  "description": "",
+  "properties": {
+    "@context": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@context",
+      "title": "Context for the Download request"
+    },
+    "id": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "id",
+      "title": "Id for the Download request"
+    },
+    "@type": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@type",
+      "title": "Type for the Download request"
+    },
+    "apiKeyExpires": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "HBF.apiKeyExpires",
+      "title": "API-key expires"
+    },
+    "approximateResultSize": {
+      "type": "integer",
+      "range": "xsd:integer",
+      "subject": "HBF.approximateResultSize",
+      "title": "Approximate result size"
+    },
+    "collectionId": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "xsd:string",
+      "subject": "HBF.collectionId",
+      "title": "collectionId"
+    },
+    "completed": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "HBF.completed",
+      "title": "completed"
+    },
+    "created": {
+      "type": "string",
+      "format": "date",
+      "range": "xsd:date",
+      "subject": "HBF.created",
+      "title": "Created date"
+    },
+    "createdFile": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "HBF.createdFile",
+      "title": "Created file name"
+    },
+    "createdFileSize": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "HBF.createdFileSize",
+      "title": "Size in MB"
+    },
+    "dataUsePurpose": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "HBF.dataUsePurpose",
+      "title": "Purpose of data use"
+    },
+    "downloadFormat": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "HBF.downloadFormat",
+      "title": "Download format"
+    },
+    "downloadInclude": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "xsd:string",
+      "subject": "HBF.downloadInclude",
+      "title": "Include to download"
+    },
+    "downloadType": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "HBF.downloadType",
+      "title": "Download type"
+    },
+    "downloaded": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string",
+        "format": "date"
+      },
+      "minItems": 0,
+      "range": "xsd:date",
+      "subject": "HBF.downloaded",
+      "title": "Download date"
+    },
+    "email": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "HBF.email",
+      "title": "Email"
+    },
+    "failed": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "HBF.failed",
+      "title": "Has failed"
+    },
+    "failureReason": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "HBF.failureReason",
+      "title": "Failure reason"
+    },
+    "filter": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "range": "xsd:string",
+      "subject": "HBF.filter",
+      "title": "Filter"
+    },
+    "locale": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "HBF.locale",
+      "title": "Locale"
+    },
+    "person": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "HBF.person",
+      "title": "Person id"
+    },
+    "requested": {
+      "type": "string",
+      "format": "date",
+      "range": "xsd:date",
+      "subject": "HBF.requested",
+      "title": "Request date"
+    },
+    "source": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "HBF.source",
+      "title": "source"
+    },
+    "warehouse": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "HBF.warehouse",
+      "title": "Warehouse type"
+    }
+  },
+  "required": [
+    "approximateResultSize",
+    "completed",
+    "downloadType",
+    "filter",
+    "requested",
+    "source",
+    "warehouse"
+  ]
+}

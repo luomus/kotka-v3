@@ -1,0 +1,151 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "@vocab": "http://tun.fi/",
+    "@base": "http://tun.fi/",
+    "default": "http://tun.fi/",
+    "luomus": "http://id.luomus.fi/",
+    "zmuo": "http://id.zmuo.oulu.fi/",
+    "herbo": "http://id.herb.oulu.fi/",
+    "utu": "http://mus.utu.fi/",
+    "xsd": "https://www.w3.org/TR/xmlschema-2/#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "xml": "http://www.w3.org/XML/1998/namespace#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "dwc": "http://rs.tdwg.org/dwc/terms/",
+    "dc": "http://purl.org/dc/terms/",
+    "dwctype": "http://rs.tdwg.org/dwc/dwctype/",
+    "abcd": "http://www.tdwg.org/schemas/abcd/2.06#",
+    "naturforskaren": "http://naturforskaren.se/",
+    "eol": "http://eol.org/",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "dyntaxa": "http://dyntaxa.se/Taxon/Info/",
+    "taxonid": "http://taxonid.org/",
+    "@context": {
+      "@id": "default:@context",
+      "@type": "xsd:string"
+    },
+    "id": "@id",
+    "@type": {
+      "@id": "default:@type",
+      "@type": "xsd:string"
+    },
+    "LTKMLoginName": {
+      "@id": "default:MA.LTKMLoginName",
+      "@type": "xsd:string"
+    },
+    "address": {
+      "@id": "default:MA.address",
+      "@type": "xsd:string"
+    },
+    "defaultLanguage": {
+      "@id": "default:MA.defaultLanguage",
+      "@type": "xsd:string"
+    },
+    "defaultQNamePrefix": {
+      "@id": "default:MA.defaultQNamePrefix",
+      "@type": "xsd:string"
+    },
+    "description": {
+      "@id": "default:MA.description",
+      "@type": "xsd:string"
+    },
+    "emailAddress": {
+      "@id": "default:MA.emailAddress",
+      "@type": "xsd:string"
+    },
+    "facebookLoginName": {
+      "@id": "default:MA.facebookLoginName",
+      "@type": "xsd:string"
+    },
+    "fieldjournalLoginName": {
+      "@id": "default:MA.fieldjournalLoginName",
+      "@type": "xsd:string"
+    },
+    "firstJoined": {
+      "@id": "default:MA.firstJoined",
+      "@type": "xsd:date"
+    },
+    "fullName": {
+      "@id": "default:MA.fullName",
+      "@type": "xsd:string"
+    },
+    "givenNames": {
+      "@id": "default:MA.givenNames",
+      "@type": "xsd:string"
+    },
+    "googleLoginName": {
+      "@id": "default:MA.googleLoginName",
+      "@type": "xsd:string"
+    },
+    "group": {
+      "@id": "default:MA.group",
+      "@type": "xsd:string"
+    },
+    "hakaLoginName": {
+      "@id": "default:MA.hakaLoginName",
+      "@type": "xsd:string"
+    },
+    "hatikkaLoginName": {
+      "@id": "default:MA.hatikkaLoginName",
+      "@type": "xsd:string"
+    },
+    "inaturalistLoginName": {
+      "@id": "default:MA.inaturalistLoginName",
+      "@type": "xsd:string"
+    },
+    "inheritedName": {
+      "@id": "default:MA.inheritedName",
+      "@type": "xsd:string"
+    },
+    "insectDatabaseLoginName": {
+      "@id": "default:MA.insectDatabaseLoginName",
+      "@type": "xsd:string"
+    },
+    "lajiAuthLoginName": {
+      "@id": "default:MA.lajiAuthLoginName",
+      "@type": "xsd:string"
+    },
+    "lintuvaaraLoginName": {
+      "@id": "default:MA.lintuvaaraLoginName",
+      "@type": "xsd:string"
+    },
+    "omariistaLoginName": {
+      "@id": "default:MA.omariistaLoginName",
+      "@type": "xsd:string"
+    },
+    "organisation": {
+      "@id": "default:MA.organisation",
+      "@type": "@id"
+    },
+    "preferredName": {
+      "@id": "default:MA.preferredName",
+      "@type": "xsd:string"
+    },
+    "previousEmailAddress": {
+      "@id": "default:MA.previousEmailAddress",
+      "@type": "xsd:string"
+    },
+    "role": {
+      "@id": "default:MA.role",
+      "@type": "@id"
+    },
+    "roleAnnotation": {
+      "@id": "default:MA.roleAnnotation",
+      "@type": "@id"
+    },
+    "roleKotka": {
+      "@id": "default:MA.roleKotka",
+      "@type": "@id"
+    },
+    "virtuLoginName": {
+      "@id": "default:MA.virtuLoginName",
+      "@type": "xsd:string"
+    },
+    "yearOfBirth": {
+      "@id": "default:MA.yearOfBirth",
+      "@type": "xsd:gYear"
+    }
+  }
+}

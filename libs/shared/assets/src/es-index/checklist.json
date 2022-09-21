@@ -1,0 +1,63 @@
+{
+  "settings": {
+    "number_of_shards": 3,
+    "index.mapping.ignore_malformed": true,
+    "index.max_result_window": 1000000,
+    "index.mapping.total_fields.limit": 10000,
+    "index.mapping.nested_objects.limit": 100000
+  },
+  "mappings": {
+    "properties": {
+      "@context": {
+        "type": "keyword"
+      },
+      "id": {
+        "type": "keyword"
+      },
+      "@type": {
+        "type": "keyword"
+      },
+      "dc:bibliographicCitation": {
+        "properties": {
+          "en": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "fi": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "sv": {
+            "type": "keyword",
+            "ignore_above": 200
+          }
+        }
+      },
+      "isPublic": {
+        "type": "boolean"
+      },
+      "owner": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "rootTaxon": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "rdfs:comment": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "_meta": {
+        "properties": {
+          "created": {
+            "type": "date"
+          },
+          "edited": {
+            "type": "date"
+          }
+        }
+      }
+    }
+  }
+}

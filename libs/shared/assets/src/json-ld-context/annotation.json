@@ -1,0 +1,127 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "@vocab": "http://tun.fi/",
+    "@base": "http://tun.fi/",
+    "default": "http://tun.fi/",
+    "luomus": "http://id.luomus.fi/",
+    "zmuo": "http://id.zmuo.oulu.fi/",
+    "herbo": "http://id.herb.oulu.fi/",
+    "utu": "http://mus.utu.fi/",
+    "xsd": "https://www.w3.org/TR/xmlschema-2/#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "xml": "http://www.w3.org/XML/1998/namespace#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "dwc": "http://rs.tdwg.org/dwc/terms/",
+    "dc": "http://purl.org/dc/terms/",
+    "dwctype": "http://rs.tdwg.org/dwc/dwctype/",
+    "abcd": "http://www.tdwg.org/schemas/abcd/2.06#",
+    "naturforskaren": "http://naturforskaren.se/",
+    "eol": "http://eol.org/",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "dyntaxa": "http://dyntaxa.se/Taxon/Info/",
+    "taxonid": "http://taxonid.org/",
+    "@context": {
+      "@id": "default:@context",
+      "@type": "xsd:string"
+    },
+    "id": "@id",
+    "@type": {
+      "@id": "default:@type",
+      "@type": "xsd:string"
+    },
+    "addedTags": {
+      "@id": "default:MAN.addedTags",
+      "@type": "@id"
+    },
+    "annotationByPerson": {
+      "@id": "default:MAN.annotationByPerson",
+      "@type": "@id"
+    },
+    "annotationBySystem": {
+      "@id": "default:MAN.annotationBySystem",
+      "@type": "@id"
+    },
+    "annotationClass": {
+      "@id": "default:MAN.annotationClass",
+      "@type": "@id"
+    },
+    "byRole": {
+      "@id": "default:MAN.byRole",
+      "@type": "@id"
+    },
+    "censusAnnotation": {
+      "@id": "default:MAN.censusAnnotation",
+      "@type": "@id"
+    },
+    "created": {
+      "@id": "default:MAN.created",
+      "@type": "xsd:dateTime"
+    },
+    "createdTimestamp": {
+      "@id": "default:MAN.createdTimestamp",
+      "@type": "xsd:nonNegativeInteger"
+    },
+    "deletedTimestamp": {
+      "@id": "default:MAN.deletedTimestamp",
+      "@type": "xsd:nonNegativeInteger"
+    },
+    "identification": {
+      "@id": "default:MAN.identification",
+      "@container": "@set"
+    },
+    "invasiveControlEffectiveness": {
+      "@id": "default:MAN.invasiveControlEffectiveness",
+      "@type": "@id"
+    },
+    "lineTransectAnnotation": {
+      "@id": "default:MAN.lineTransectAnnotation",
+      "@type": "@id"
+    },
+    "notes": {
+      "@id": "default:MAN.notes",
+      "@type": "xsd:string"
+    },
+    "occurrenceAtTimeOfAnnotation": {
+      "@id": "default:MAN.occurrenceAtTimeOfAnnotation",
+      "@container": "@set"
+    },
+    "opinion": {
+      "@id": "default:MAN.opinion",
+      "@type": "xsd:string"
+    },
+    "removedTags": {
+      "@id": "default:MAN.removedTags",
+      "@type": "@id"
+    },
+    "rootID": {
+      "@id": "default:MAN.rootID",
+      "@type": "@id"
+    },
+    "targetID": {
+      "@id": "default:MAN.targetID",
+      "@type": "@id"
+    },
+    "type": {
+      "@id": "default:MAN.type",
+      "@type": "@id"
+    },
+    "createdBySystem": {
+      "@id": "default:MZ.createdBySystem",
+      "@type": "@id"
+    },
+    "deleted": {
+      "@id": "default:MZ.deleted",
+      "@type": "xsd:boolean"
+    },
+    "deletedByPerson": {
+      "@id": "default:MZ.deletedByPerson",
+      "@type": "@id"
+    },
+    "deletedDateTime": {
+      "@id": "default:MZ.deletedDateTime",
+      "@type": "xsd:dateTime"
+    }
+  }
+}

@@ -1,6 +1,11 @@
 {
   "/api": {
-    "target": "http://localhost:3333",
-    "secure": false
+    "target": {
+      "host": "kotka-api",
+      "port": 3333,
+      "protocol": "http:"
+    },
+    "secure": false,
+    "changeOrigin": true
   }
 }

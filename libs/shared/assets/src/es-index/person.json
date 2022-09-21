@@ -1,0 +1,147 @@
+{
+  "settings": {
+    "number_of_shards": 3,
+    "index.mapping.ignore_malformed": true,
+    "index.max_result_window": 1000000,
+    "index.mapping.total_fields.limit": 10000,
+    "index.mapping.nested_objects.limit": 100000
+  },
+  "mappings": {
+    "properties": {
+      "@context": {
+        "type": "keyword"
+      },
+      "id": {
+        "type": "keyword"
+      },
+      "@type": {
+        "type": "keyword"
+      },
+      "LTKMLoginName": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "address": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "defaultLanguage": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "defaultQNamePrefix": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "description": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "emailAddress": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "facebookLoginName": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "fieldjournalLoginName": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "firstJoined": {
+        "type": "date"
+      },
+      "fullName": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "givenNames": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "googleLoginName": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "group": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "hakaLoginName": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "hatikkaLoginName": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "inaturalistLoginName": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "inheritedName": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "insectDatabaseLoginName": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "lajiAuthLoginName": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "lintuvaaraLoginName": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "omariistaLoginName": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "organisation": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "preferredName": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "previousEmailAddress": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "role": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "roleAnnotation": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "roleKotka": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "virtuLoginName": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "yearOfBirth": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "_meta": {
+        "properties": {
+          "created": {
+            "type": "date"
+          },
+          "edited": {
+            "type": "date"
+          }
+        }
+      }
+    }
+  }
+}

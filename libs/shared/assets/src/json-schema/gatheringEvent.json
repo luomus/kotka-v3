@@ -1,0 +1,1483 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "subject": "MZ.gatheringEvent",
+  "additionalProperties": false,
+  "title": "Global gathering event",
+  "description": "",
+  "properties": {
+    "@context": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@context",
+      "title": "Context for the Global gathering event"
+    },
+    "id": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "id",
+      "title": "Id for the Global gathering event"
+    },
+    "@type": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@type",
+      "title": "Type for the Global gathering event"
+    },
+    "acknowledgeNoUnitsInCensus": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MY.acknowledgeNoUnitsInCensus",
+      "title": "No units in census"
+    },
+    "artificialLight": {
+      "type": "string",
+      "enum": [
+        "",
+        "MY.artificialLightEnum1",
+        "MY.artificialLightEnum2",
+        "MY.artificialLightEnum3",
+        "MY.artificialLightEnum4",
+        "MY.artificialLightEnum5"
+      ],
+      "enumNames": [
+        "",
+        "Artificial light in close proximity (closer than 10m)",
+        "Artificial light in moderate proximity (10 - 50 m)",
+        "Artificial light far away (over 50m)",
+        "No artificial light in sight",
+        "Not known"
+      ],
+      "range": "MY.artificialLightEnum",
+      "subject": "MY.artificialLight",
+      "title": "Artificial light"
+    },
+    "breaksDuringCensusInMinutes": {
+      "type": "integer",
+      "minimum": 0,
+      "range": "xsd:nonNegativeInteger",
+      "subject": "MY.breaksDuringCensusInMinutes",
+      "title": "Breaks kept in minutes"
+    },
+    "censusHinderedByEnviromentalFactors": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MY.censusHinderedByEnviromentalFactors",
+      "title": "Weather (etc) hindered the census"
+    },
+    "censusHinderedByFog": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MY.censusHinderedByFog",
+      "title": "Fog hindered the census"
+    },
+    "censusHinderedByRain": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MY.censusHinderedByRain",
+      "title": "Rain hindered the census"
+    },
+    "censusHinderedByWind": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MY.censusHinderedByWind",
+      "title": "Wind hindered the census"
+    },
+    "censusPrematurelyAborted": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MY.censusPrematurelyAborted",
+      "title": "Was the census prematurely aborted?"
+    },
+    "cloudCover": {
+      "type": "string",
+      "enum": [
+        "",
+        "MY.cloudCoverOktaEnumUnknown",
+        "MY.cloudCoverOktaEnum0",
+        "MY.cloudCoverOktaEnum1",
+        "MY.cloudCoverOktaEnum2",
+        "MY.cloudCoverOktaEnum3",
+        "MY.cloudCoverOktaEnum4",
+        "MY.cloudCoverOktaEnum5",
+        "MY.cloudCoverOktaEnum6",
+        "MY.cloudCoverOktaEnum7",
+        "MY.cloudCoverOktaEnum8"
+      ],
+      "enumNames": [
+        "",
+        "Ei tietoa",
+        "0 -Täysin pilvetöntä",
+        "1 - Noin 1/8 taivaasta pilvien peitossa",
+        "2 - Noin ¼ taivaasta pilvessä",
+        "3 - Noin 3/8 taivaasta pilvessä",
+        "4 - Puolet taivaasta pilvessä",
+        "5 - Noin 5/8 taivaasta pilvessä",
+        "6 - Noin ¾ taivaasta pilvessä",
+        "7 - Taivas lähes pilvessä (7/8)",
+        "8 - Täysin pilvistä"
+      ],
+      "range": "MY.cloudCoverOktaEnum",
+      "subject": "MY.cloudCover",
+      "title": "Cloudiness"
+    },
+    "cloudCoverEnd": {
+      "type": "string",
+      "enum": [
+        "",
+        "MY.cloudCoverOktaEnumUnknown",
+        "MY.cloudCoverOktaEnum0",
+        "MY.cloudCoverOktaEnum1",
+        "MY.cloudCoverOktaEnum2",
+        "MY.cloudCoverOktaEnum3",
+        "MY.cloudCoverOktaEnum4",
+        "MY.cloudCoverOktaEnum5",
+        "MY.cloudCoverOktaEnum6",
+        "MY.cloudCoverOktaEnum7",
+        "MY.cloudCoverOktaEnum8"
+      ],
+      "enumNames": [
+        "",
+        "Ei tietoa",
+        "0 -Täysin pilvetöntä",
+        "1 - Noin 1/8 taivaasta pilvien peitossa",
+        "2 - Noin ¼ taivaasta pilvessä",
+        "3 - Noin 3/8 taivaasta pilvessä",
+        "4 - Puolet taivaasta pilvessä",
+        "5 - Noin 5/8 taivaasta pilvessä",
+        "6 - Noin ¾ taivaasta pilvessä",
+        "7 - Taivas lähes pilvessä (7/8)",
+        "8 - Täysin pilvistä"
+      ],
+      "range": "MY.cloudCoverOktaEnum",
+      "subject": "MY.cloudCoverEnd",
+      "title": "End cloud cover"
+    },
+    "cloudCoverStart": {
+      "type": "string",
+      "enum": [
+        "",
+        "MY.cloudCoverOktaEnumUnknown",
+        "MY.cloudCoverOktaEnum0",
+        "MY.cloudCoverOktaEnum1",
+        "MY.cloudCoverOktaEnum2",
+        "MY.cloudCoverOktaEnum3",
+        "MY.cloudCoverOktaEnum4",
+        "MY.cloudCoverOktaEnum5",
+        "MY.cloudCoverOktaEnum6",
+        "MY.cloudCoverOktaEnum7",
+        "MY.cloudCoverOktaEnum8"
+      ],
+      "enumNames": [
+        "",
+        "Ei tietoa",
+        "0 -Täysin pilvetöntä",
+        "1 - Noin 1/8 taivaasta pilvien peitossa",
+        "2 - Noin ¼ taivaasta pilvessä",
+        "3 - Noin 3/8 taivaasta pilvessä",
+        "4 - Puolet taivaasta pilvessä",
+        "5 - Noin 5/8 taivaasta pilvessä",
+        "6 - Noin ¾ taivaasta pilvessä",
+        "7 - Taivas lähes pilvessä (7/8)",
+        "8 - Täysin pilvistä"
+      ],
+      "range": "MY.cloudCoverOktaEnum",
+      "subject": "MY.cloudCoverStart",
+      "title": "Start cloud cover"
+    },
+    "completeList": {
+      "type": "object",
+      "subject": "MY.completeList",
+      "additionalProperties": false,
+      "title": "List completeness",
+      "description": "",
+      "properties": {
+        "completeListTaxonID": {
+          "type": "string",
+          "range": "MX.taxon",
+          "subject": "MY.completeListTaxonID",
+          "title": "Species"
+        },
+        "completeListType": {
+          "type": "string",
+          "enum": [
+            "",
+            "MY.completeListTypeCompleteWithBreedingStatus",
+            "MY.completeListTypeComplete",
+            "MY.completeListTypeIncomplete"
+          ],
+          "enumNames": [
+            "",
+            "Täydellinen lajilista sisältäen pesimävarmuusindeksit kaikille havainnoille (A; suositeltava pesimäkaudella)",
+            "Täydellinen lajilista, voi sisältää pesimävarmuusindeksejä (B)",
+            "Epätäydellinen lajilista (C; hajahavainnoille)"
+          ],
+          "range": "MY.completeListTypeEnum",
+          "subject": "MY.completeListType",
+          "title": "Species list completeness"
+        }
+      },
+      "range": "MY.completeListClass"
+    },
+    "dateBegin": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.dateBegin",
+      "title": "Start date"
+    },
+    "dateEnd": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.dateEnd",
+      "title": "End date"
+    },
+    "gatheringFact": {
+      "type": "object",
+      "subject": "MY.gatheringFact",
+      "additionalProperties": false,
+      "title": "gatheringFact",
+      "description": "",
+      "properties": {
+        "batCollector": {
+          "type": "string",
+          "enum": [
+            "",
+            "MY.batCollectorAlone",
+            "MY.batCollectorWithProjectGroupMember",
+            "MY.batCollectorSomeoneElse"
+          ],
+          "enumNames": [
+            "",
+            "Alone",
+            "With someone from the project group",
+            "With someone else"
+          ],
+          "range": "MY.batCollectorEnum",
+          "subject": "MY.batCollector",
+          "title": "I placed the sound recorder to the terrain"
+        },
+        "binocularsUsed": {
+          "type": "boolean",
+          "range": "xsd:boolean",
+          "subject": "MY.binocularsUsed",
+          "title": "Binoculars"
+        },
+        "censusAreaHectares": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "MY.censusAreaHectares",
+          "title": "Census area/ha"
+        },
+        "invasiveControlOtherExpensesInEuros": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "MY.invasiveControlOtherExpensesInEuros",
+          "title": "Estimated of other expenses in euros"
+        },
+        "invasiveControlWorkHours": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "MY.invasiveControlWorkHours",
+          "title": "Work hours spent during the control"
+        },
+        "lineTransectSegmentCounted": {
+          "type": "boolean",
+          "range": "xsd:boolean",
+          "subject": "MY.lineTransectSegmentCounted",
+          "title": "Biotope counted"
+        },
+        "lineTransectSegmentMetersEnd": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "MY.lineTransectSegmentMetersEnd",
+          "title": "Biotope's end meter amount from the start of the line"
+        },
+        "lineTransectSegmentMetersStart": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "MY.lineTransectSegmentMetersStart",
+          "title": "Biotope's start meter amount from the start of the line"
+        },
+        "observedAreaHectares": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "MY.observedAreaHectares",
+          "title": "Observed area/ha"
+        },
+        "pointCountHabitat": {
+          "type": "string",
+          "enum": [
+            "",
+            "MY.pointCountHabitat0",
+            "MY.pointCountHabitat1",
+            "MY.pointCountHabitat2",
+            "MY.pointCountHabitat3",
+            "MY.pointCountHabitat4",
+            "MY.pointCountHabitat5",
+            "MY.pointCountHabitat6",
+            "MY.pointCountHabitat7",
+            "MY.pointCountHabitat8",
+            "MY.pointCountHabitat9",
+            "MY.pointCountHabitat10",
+            "MY.pointCountHabitat11",
+            "MY.pointCountHabitat12",
+            "MY.pointCountHabitat13",
+            "MY.pointCountHabitat14",
+            "MY.pointCountHabitat15",
+            "MY.pointCountHabitat16",
+            "MY.pointCountHabitat17"
+          ],
+          "enumNames": [
+            "",
+            "Tuntematon (0)",
+            "Kuusimetsä (1)",
+            "Mäntymetsä (2)",
+            "Lehtimetsä (3)",
+            "Sekametsä (4)",
+            "Lehtipensaikko (5)",
+            "Havupuutaimikko (6)",
+            "Hakkuuaukea (7)",
+            "Räme (8)",
+            "Avosuo (9)",
+            "Rantaniitty (10)",
+            "Pelto (11)",
+            "Maaseutuasutus (12)",
+            "Puisto (13)",
+            "Kaupunkiasutus (14)",
+            "Tunturikoivikko (15)",
+            "Tunturipaljakka (16)",
+            "Muu (17)"
+          ],
+          "range": "MY.pointCountHabitatEnum",
+          "subject": "MY.pointCountHabitat",
+          "title": "Biotooppi"
+        },
+        "shorelineLengthMeters": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "MY.shorelineLengthMeters",
+          "title": "Shoreline length/m"
+        },
+        "spottingScopeUsed": {
+          "type": "boolean",
+          "range": "xsd:boolean",
+          "subject": "MY.spottingScopeUsed",
+          "title": "Spotting scope"
+        },
+        "sunniness": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "MY.sunniness",
+          "title": "Sunniness %"
+        },
+        "sykeButterFlyCensusWind": {
+          "type": "string",
+          "enum": [
+            "",
+            "MY.sykeButterFlyCensusWindEnumUnknown",
+            "MY.sykeButterFlyCensusWindEnum0",
+            "MY.sykeButterFlyCensusWindEnum1",
+            "MY.sykeButterFlyCensusWindEnum2",
+            "MY.sykeButterFlyCensusWindEnum3",
+            "MY.sykeButterFlyCensusWindEnum4",
+            "MY.sykeButterFlyCensusWindEnum5",
+            "MY.sykeButterFlyCensusWindEnum6"
+          ],
+          "enumNames": [
+            "",
+            "Ei tietoa",
+            "0 - Tyyntä, savu nousee pystysuoraan",
+            "1 - Hiukan savun ajautumista sivusuunnassa",
+            "2 - Tuuli tuntuu kasvoilla, lehdet havisevat",
+            "3 - Lehdet ja oksat pienessä liikkeessä",
+            "4 - Pöly nousee maasta, pienet oksat heiluvat",
+            "5 - Pienehköt lehtipuut heiluvat",
+            "6 - Suuret oksat heiluvat, tuuli suhisee"
+          ],
+          "range": "MY.sykeButterFlyCensusWindEnum",
+          "subject": "MY.sykeButterFlyCensusWind",
+          "title": "Windiness"
+        },
+        "sykeButterFlyCensusWindEnd": {
+          "type": "string",
+          "enum": [
+            "",
+            "MY.sykeButterFlyCensusWindEnumUnknown",
+            "MY.sykeButterFlyCensusWindEnum0",
+            "MY.sykeButterFlyCensusWindEnum1",
+            "MY.sykeButterFlyCensusWindEnum2",
+            "MY.sykeButterFlyCensusWindEnum3",
+            "MY.sykeButterFlyCensusWindEnum4",
+            "MY.sykeButterFlyCensusWindEnum5",
+            "MY.sykeButterFlyCensusWindEnum6"
+          ],
+          "enumNames": [
+            "",
+            "Ei tietoa",
+            "0 - Tyyntä, savu nousee pystysuoraan",
+            "1 - Hiukan savun ajautumista sivusuunnassa",
+            "2 - Tuuli tuntuu kasvoilla, lehdet havisevat",
+            "3 - Lehdet ja oksat pienessä liikkeessä",
+            "4 - Pöly nousee maasta, pienet oksat heiluvat",
+            "5 - Pienehköt lehtipuut heiluvat",
+            "6 - Suuret oksat heiluvat, tuuli suhisee"
+          ],
+          "range": "MY.sykeButterFlyCensusWindEnum",
+          "subject": "MY.sykeButterFlyCensusWindEnd",
+          "title": "End windiness"
+        },
+        "sykeButterFlyCensusWindStart": {
+          "type": "string",
+          "enum": [
+            "",
+            "MY.sykeButterFlyCensusWindEnumUnknown",
+            "MY.sykeButterFlyCensusWindEnum0",
+            "MY.sykeButterFlyCensusWindEnum1",
+            "MY.sykeButterFlyCensusWindEnum2",
+            "MY.sykeButterFlyCensusWindEnum3",
+            "MY.sykeButterFlyCensusWindEnum4",
+            "MY.sykeButterFlyCensusWindEnum5",
+            "MY.sykeButterFlyCensusWindEnum6"
+          ],
+          "enumNames": [
+            "",
+            "Ei tietoa",
+            "0 - Tyyntä, savu nousee pystysuoraan",
+            "1 - Hiukan savun ajautumista sivusuunnassa",
+            "2 - Tuuli tuntuu kasvoilla, lehdet havisevat",
+            "3 - Lehdet ja oksat pienessä liikkeessä",
+            "4 - Pöly nousee maasta, pienet oksat heiluvat",
+            "5 - Pienehköt lehtipuut heiluvat",
+            "6 - Suuret oksat heiluvat, tuuli suhisee"
+          ],
+          "range": "MY.sykeButterFlyCensusWindEnum",
+          "subject": "MY.sykeButterFlyCensusWindStart",
+          "title": "Start windiness"
+        },
+        "waterbirdCensusPeriod": {
+          "type": "string",
+          "enum": [
+            "",
+            "MY.waterbirdCensusPeriodEnum1",
+            "MY.waterbirdCensusPeriodEnum2",
+            "MY.waterbirdCensusPeriodEnumJuvenile",
+            "MY.waterbirdCensusPeriodEnumAdditional",
+            "MY.waterbirdCensusPeriodEnumCombined"
+          ],
+          "enumNames": [
+            "",
+            "1. laskenta",
+            "2. laskenta",
+            "Poikuelaskenta",
+            "Lisälaskenta",
+            "Kaikki"
+          ],
+          "range": "MY.waterbirdCensusPeriodEnum",
+          "subject": "MY.waterbirdCensusPeriod",
+          "title": "Census period"
+        },
+        "waterbirdHabitat": {
+          "type": "string",
+          "enum": [
+            "",
+            "MY.waterbirdHabitatEnum1",
+            "MY.waterbirdHabitatEnum2",
+            "MY.waterbirdHabitatEnum3",
+            "MY.waterbirdHabitatEnum4",
+            "MY.waterbirdHabitatEnum5",
+            "MY.waterbirdHabitatEnum6",
+            "MY.waterbirdHabitatEnum7",
+            "MY.waterbirdHabitatEnum8",
+            "MY.waterbirdHabitatEnum9",
+            "MY.waterbirdHabitatEnum10"
+          ],
+          "enumNames": [
+            "",
+            "1. Karu, metsä- tai suorantainen järvi tai lampi",
+            "2. Syvä, osittain rehevöitynyt järvi, lahdissa laajahkoja ruovikoita",
+            "3. Matala, metsä- tai suorantainen runsaskasvustoinen järvi tai lampi",
+            "4. Runsaskasvustoinen järvi maanviljelyksen tai asutuksen vaikutuspiirissä",
+            "5. Karu, vähäkasvustoinen merenranta",
+            "6. Rehevähkö merenranta, jonkun verran ruovikoita (sekä matalia, että syviä rantoja)",
+            "7. Runsaskasvustoinen merenlahti (sekä matalia että syviä rantoja)",
+            "8. Muu, mm. tekoaltaat ja joet",
+            "9. Umpeenkasvanut / Kuivatettu (ei avovettä)",
+            "10. Rakennetut kosteikot"
+          ],
+          "range": "MY.waterbirdHabitatEnum",
+          "subject": "MY.waterbirdHabitat",
+          "title": "Habitat"
+        },
+        "ACAFLAonAlder": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.ACAFLAonAlder",
+          "title": "Urpiaisten ruokailut lepällä"
+        },
+        "ACAFLAonBirch": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.ACAFLAonBirch",
+          "title": "Urpiaisten ruokailut koivulla"
+        },
+        "ACAFLAonGround": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.ACAFLAonGround",
+          "title": "Urpiaisten ruokailut maassa"
+        },
+        "ACAFLAonPine": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.ACAFLAonPine",
+          "title": "Urpiaisten ruokailut männyllä"
+        },
+        "ACAFLAonSpruce": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.ACAFLAonSpruce",
+          "title": "Urpiaisten ruokailut kuusella"
+        },
+        "CARSPIonAlder": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.CARSPIonAlder",
+          "title": "Vihervarpusten ruokailut lepällä"
+        },
+        "CARSPIonBirch": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.CARSPIonBirch",
+          "title": "Vihervarpusten ruokailut koivulla"
+        },
+        "CARSPIonGround": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.CARSPIonGround",
+          "title": "Vihervarpusten ruokailut maassa"
+        },
+        "CARSPIonPine": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.CARSPIonPine",
+          "title": "CARSPIonPine"
+        },
+        "CARSPIonSpruce": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.CARSPIonSpruce",
+          "title": "Vihervarpusten ruokailut kuusella"
+        },
+        "LOXIAonAlder": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.LOXIAonAlder",
+          "title": "Käpylintujen ruokailut lepällä"
+        },
+        "LOXIAonBirch": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.LOXIAonBirch",
+          "title": "Käpylintujen ruokailut koivulla"
+        },
+        "LOXIAonGround": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.LOXIAonGround",
+          "title": "Käpylintujen ruokailut maassa"
+        },
+        "LOXIAonPine": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.LOXIAonPine",
+          "title": "Käpylintujen ruokailut männyllä"
+        },
+        "LOXIAonSpruce": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.LOXIAonSpruce",
+          "title": "Käpylintujen ruokailut kuusella"
+        },
+        "abundanceBOMGAR": {
+          "type": "string",
+          "enum": [
+            "",
+            "WBC.speciesAbundanceEnum0",
+            "WBC.speciesAbundanceEnum1",
+            "WBC.speciesAbundanceEnum2",
+            "WBC.speciesAbundanceEnum3"
+          ],
+          "enumNames": [
+            "",
+            "0. Ei tietoa",
+            "1. Ohi",
+            "2. Samanaikainen",
+            "3. Nähtävästi vasta tulossa"
+          ],
+          "range": "WBC.speciesAbundanceEnum",
+          "subject": "WBC.abundanceBOMGAR",
+          "title": "Tilhi"
+        },
+        "abundancePINENU": {
+          "type": "string",
+          "enum": [
+            "",
+            "WBC.speciesAbundanceEnum0",
+            "WBC.speciesAbundanceEnum1",
+            "WBC.speciesAbundanceEnum2",
+            "WBC.speciesAbundanceEnum3"
+          ],
+          "enumNames": [
+            "",
+            "0. Ei tietoa",
+            "1. Ohi",
+            "2. Samanaikainen",
+            "3. Nähtävästi vasta tulossa"
+          ],
+          "range": "WBC.speciesAbundanceEnum",
+          "subject": "WBC.abundancePINENU",
+          "title": "Taviokuurna"
+        },
+        "abundanceTURPIL": {
+          "type": "string",
+          "enum": [
+            "",
+            "WBC.speciesAbundanceEnum0",
+            "WBC.speciesAbundanceEnum1",
+            "WBC.speciesAbundanceEnum2",
+            "WBC.speciesAbundanceEnum3"
+          ],
+          "enumNames": [
+            "",
+            "0. Ei tietoa",
+            "1. Ohi",
+            "2. Samanaikainen",
+            "3. Nähtävästi vasta tulossa"
+          ],
+          "range": "WBC.speciesAbundanceEnum",
+          "subject": "WBC.abundanceTURPIL",
+          "title": "Räkättirastas"
+        },
+        "birdFeederCount": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.birdFeederCount",
+          "title": "Lintulautoja (kpl)"
+        },
+        "birdFeederCountBiotopeA": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.birdFeederCountBiotopeA",
+          "title": "Kaatopaikan lintulaudat"
+        },
+        "birdFeederCountBiotopeB": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.birdFeederCountBiotopeB",
+          "title": "Kaupunkiasutuksen lintulaudat"
+        },
+        "birdFeederCountBiotopeC": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.birdFeederCountBiotopeC",
+          "title": "Maaseutuasutuksen lintulaudat"
+        },
+        "birdFeederCountBiotopeD": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.birdFeederCountBiotopeD",
+          "title": "Pellon lintulaudat"
+        },
+        "birdFeederCountBiotopeE": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.birdFeederCountBiotopeE",
+          "title": "Metsän lintulaudat"
+        },
+        "birdFeederCountBiotopeF": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.birdFeederCountBiotopeF",
+          "title": "Lintulaudat muu biotooppi"
+        },
+        "birdFeederCountBiotopeG": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.birdFeederCountBiotopeG",
+          "title": "Hakkuuaukean lintulaudat"
+        },
+        "birdFeederCountBiotopeH": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.birdFeederCountBiotopeH",
+          "title": "Ruovikon lintulaudat"
+        },
+        "cloudAndRain": {
+          "type": "string",
+          "enum": [
+            "",
+            "WBC.cloudAndRainEnum0",
+            "WBC.cloudAndRainEnum1",
+            "WBC.cloudAndRainEnum2",
+            "WBC.cloudAndRainEnum3",
+            "WBC.cloudAndRainEnum4"
+          ],
+          "enumNames": [
+            "",
+            "Ei tietoa",
+            "1 - Enimmäkseen kirkasta",
+            "2 - Vaihtelevaa pilvisyyttä",
+            "3 - Enimmäkseen täyspilvistä",
+            "4 - Ajoittain sadetta tai pyryä"
+          ],
+          "range": "WBC.cloudAndRainEnum",
+          "subject": "WBC.cloudAndRain",
+          "title": "Pilvisyys ja sade"
+        },
+        "descriptionBiotopeF": {
+          "type": "string",
+          "range": "xsd:string",
+          "subject": "WBC.descriptionBiotopeF",
+          "title": "Mitä biotooppiin Muu (F) kuuluu"
+        },
+        "feedingStationCount": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.feedingStationCount",
+          "title": "Ruokintapaikkoja (kpl)"
+        },
+        "feedingStationCountBiotopeA": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.feedingStationCountBiotopeA",
+          "title": "feedingStationCountBiotopeA"
+        },
+        "feedingStationCountBiotopeB": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.feedingStationCountBiotopeB",
+          "title": "Kaupunkiasutuksen ruokintapaikat"
+        },
+        "feedingStationCountBiotopeC": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.feedingStationCountBiotopeC",
+          "title": "Maaseutuasutuksen ruokintapaikat"
+        },
+        "feedingStationCountBiotopeD": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.feedingStationCountBiotopeD",
+          "title": "Pellon ruokintapaikat"
+        },
+        "feedingStationCountBiotopeE": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.feedingStationCountBiotopeE",
+          "title": "Metsän ruokintapaikat"
+        },
+        "feedingStationCountBiotopeF": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.feedingStationCountBiotopeF",
+          "title": "Ruokintapaikat muu biotooppi"
+        },
+        "feedingStationCountBiotopeG": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.feedingStationCountBiotopeG",
+          "title": "Ruovikon ruokintapaikat"
+        },
+        "feedingStationCountBiotopeH": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.feedingStationCountBiotopeH",
+          "title": "Ruovikon ruokintapaikat"
+        },
+        "iceCover": {
+          "type": "string",
+          "enum": [
+            "",
+            "WBC.iceCoverEnum0",
+            "WBC.iceCoverEnum1",
+            "WBC.iceCoverEnum2",
+            "WBC.iceCoverEnum3",
+            "WBC.iceCoverEnum4"
+          ],
+          "enumNames": [
+            "",
+            "0. Ei tietoa",
+            "1. Vesistöt sulat",
+            "2. Vain rannat/lahdet jäässä",
+            "3. Joitakin sulapaikkoja",
+            "4. Vesistöt kokonaan jäässä"
+          ],
+          "range": "WBC.iceCoverEnum",
+          "subject": "WBC.iceCover",
+          "title": "Jääpeite"
+        },
+        "meanTemperature": {
+          "type": "integer",
+          "range": "xsd:integer",
+          "subject": "WBC.meanTemperature",
+          "title": "Keskilämpötila (asteen tarkkuus)"
+        },
+        "observerCount": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "range": "xsd:positiveInteger",
+          "subject": "WBC.observerCount",
+          "title": "Laskijoiden lukumäärä"
+        },
+        "observerID": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.observerID",
+          "title": "Havainnoijanumero"
+        },
+        "pineConesAtCensus": {
+          "type": "string",
+          "enum": [
+            "",
+            "WBC.berriesAndConesEnum0",
+            "WBC.berriesAndConesEnum1",
+            "WBC.berriesAndConesEnum2",
+            "WBC.berriesAndConesEnum3",
+            "WBC.berriesAndConesEnum4",
+            "WBC.berriesAndConesEnum5",
+            "WBC.berriesAndConesEnum6"
+          ],
+          "enumNames": [
+            "",
+            "0. Ei tietoa",
+            "1. Ei lainkaan",
+            "2. Hyvin vähän",
+            "3. Vähän",
+            "4. Kohtalaisesti",
+            "5. Runsaasti",
+            "6. Hyvin runsaasti"
+          ],
+          "range": "WBC.berriesAndConesEnum",
+          "subject": "WBC.pineConesAtCensus",
+          "title": "Männynkäpyjä laskenta-aikaan"
+        },
+        "routeID": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.routeID",
+          "title": "Reitin numero"
+        },
+        "routeLength": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.routeLength",
+          "title": "Reitin pituus (m)"
+        },
+        "routeLengthBiotopeA": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.routeLengthBiotopeA",
+          "title": "Route length dump"
+        },
+        "routeLengthBiotopeB": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.routeLengthBiotopeB",
+          "title": "Route length urban"
+        },
+        "routeLengthBiotopeC": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.routeLengthBiotopeC",
+          "title": "Route length countryside"
+        },
+        "routeLengthBiotopeD": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.routeLengthBiotopeD",
+          "title": "Route length field"
+        },
+        "routeLengthBiotopeE": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.routeLengthBiotopeE",
+          "title": "Route length forest"
+        },
+        "routeLengthBiotopeF": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.routeLengthBiotopeF",
+          "title": "Route length other biotope"
+        },
+        "routeLengthBiotopeG": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.routeLengthBiotopeG",
+          "title": "Route length cutting open"
+        },
+        "routeLengthBiotopeH": {
+          "type": "integer",
+          "minimum": 0,
+          "range": "xsd:nonNegativeInteger",
+          "subject": "WBC.routeLengthBiotopeH",
+          "title": "Route length reed"
+        },
+        "routeLengthChange": {
+          "type": "integer",
+          "range": "xsd:integer",
+          "subject": "WBC.routeLengthChange",
+          "title": "Reitin muutokset (m)"
+        },
+        "routeLengthChangeBiotopeA": {
+          "type": "integer",
+          "range": "xsd:integer",
+          "subject": "WBC.routeLengthChangeBiotopeA",
+          "title": "Reitin muutokset kaatopaikka"
+        },
+        "routeLengthChangeBiotopeB": {
+          "type": "integer",
+          "range": "xsd:integer",
+          "subject": "WBC.routeLengthChangeBiotopeB",
+          "title": "Reitin muutokset kaupunkiasutus"
+        },
+        "routeLengthChangeBiotopeC": {
+          "type": "integer",
+          "range": "xsd:integer",
+          "subject": "WBC.routeLengthChangeBiotopeC",
+          "title": "Reitin muutokset maaseutuasutus"
+        },
+        "routeLengthChangeBiotopeD": {
+          "type": "integer",
+          "range": "xsd:integer",
+          "subject": "WBC.routeLengthChangeBiotopeD",
+          "title": "Reitin muutokset pelto"
+        },
+        "routeLengthChangeBiotopeE": {
+          "type": "integer",
+          "range": "xsd:integer",
+          "subject": "WBC.routeLengthChangeBiotopeE",
+          "title": "Reitin muutokset metsä"
+        },
+        "routeLengthChangeBiotopeF": {
+          "type": "integer",
+          "range": "xsd:integer",
+          "subject": "WBC.routeLengthChangeBiotopeF",
+          "title": "Reitin muutokset muu biotooppi"
+        },
+        "routeLengthChangeBiotopeG": {
+          "type": "integer",
+          "range": "xsd:integer",
+          "subject": "WBC.routeLengthChangeBiotopeG",
+          "title": "Reitin muutokset hakkuuaukea"
+        },
+        "routeLengthChangeBiotopeH": {
+          "type": "integer",
+          "range": "xsd:integer",
+          "subject": "WBC.routeLengthChangeBiotopeH",
+          "title": "Reitin muutokset ruovikko"
+        },
+        "snowAndIceOnTrees": {
+          "type": "string",
+          "enum": [
+            "",
+            "WBC.snowAndIceOnTreesEnum0",
+            "WBC.snowAndIceOnTreesEnum1",
+            "WBC.snowAndIceOnTreesEnum2",
+            "WBC.snowAndIceOnTreesEnum3"
+          ],
+          "enumNames": [
+            "",
+            "0. Ei tietoa",
+            "1. Ei ollenkaan",
+            "2. Vähän",
+            "3. Huomattava määrä"
+          ],
+          "range": "WBC.snowAndIceOnTreesEnum",
+          "subject": "WBC.snowAndIceOnTrees",
+          "title": "Puissa oleva lumi ja jääkarsta"
+        },
+        "snowCover": {
+          "type": "string",
+          "enum": [
+            "",
+            "WBC.snowCoverEnum0",
+            "WBC.snowCoverEnum1",
+            "WBC.snowCoverEnum2",
+            "WBC.snowCoverEnum3",
+            "WBC.snowCoverEnum4",
+            "WBC.snowCoverEnum5",
+            "WBC.snowCoverEnum6",
+            "WBC.snowCoverEnum7",
+            "WBC.snowCoverEnum8"
+          ],
+          "enumNames": [
+            "",
+            "0. Ei tietoa",
+            "1. Ei lunta",
+            "2. Lunta vain paikoitellen",
+            "3. Alle 5 cm",
+            "4. 5-10 cm",
+            "5. 11-20 cm",
+            "6. 21-50 cm",
+            "7. 51-100 cm",
+            "8. Yli 1 m"
+          ],
+          "range": "WBC.snowCoverEnum",
+          "subject": "WBC.snowCover",
+          "title": "Lumipeite"
+        },
+        "sorbusBerriesAtCensus": {
+          "type": "string",
+          "enum": [
+            "",
+            "WBC.berriesAndConesEnum0",
+            "WBC.berriesAndConesEnum1",
+            "WBC.berriesAndConesEnum2",
+            "WBC.berriesAndConesEnum3",
+            "WBC.berriesAndConesEnum4",
+            "WBC.berriesAndConesEnum5",
+            "WBC.berriesAndConesEnum6"
+          ],
+          "enumNames": [
+            "",
+            "0. Ei tietoa",
+            "1. Ei lainkaan",
+            "2. Hyvin vähän",
+            "3. Vähän",
+            "4. Kohtalaisesti",
+            "5. Runsaasti",
+            "6. Hyvin runsaasti"
+          ],
+          "range": "WBC.berriesAndConesEnum",
+          "subject": "WBC.sorbusBerriesAtCensus",
+          "title": "Pihlajanmarjoja laskenta-aikaan"
+        },
+        "sorbusBerriesEarlyFall": {
+          "type": "string",
+          "enum": [
+            "",
+            "WBC.berriesAndConesEnum0",
+            "WBC.berriesAndConesEnum1",
+            "WBC.berriesAndConesEnum2",
+            "WBC.berriesAndConesEnum3",
+            "WBC.berriesAndConesEnum4",
+            "WBC.berriesAndConesEnum5",
+            "WBC.berriesAndConesEnum6"
+          ],
+          "enumNames": [
+            "",
+            "0. Ei tietoa",
+            "1. Ei lainkaan",
+            "2. Hyvin vähän",
+            "3. Vähän",
+            "4. Kohtalaisesti",
+            "5. Runsaasti",
+            "6. Hyvin runsaasti"
+          ],
+          "range": "WBC.berriesAndConesEnum",
+          "subject": "WBC.sorbusBerriesEarlyFall",
+          "title": "Pihlajanmarjoja alkusyksyllä"
+        },
+        "spruceConesAtCensus": {
+          "type": "string",
+          "enum": [
+            "",
+            "WBC.berriesAndConesEnum0",
+            "WBC.berriesAndConesEnum1",
+            "WBC.berriesAndConesEnum2",
+            "WBC.berriesAndConesEnum3",
+            "WBC.berriesAndConesEnum4",
+            "WBC.berriesAndConesEnum5",
+            "WBC.berriesAndConesEnum6"
+          ],
+          "enumNames": [
+            "",
+            "0. Ei tietoa",
+            "1. Ei lainkaan",
+            "2. Hyvin vähän",
+            "3. Vähän",
+            "4. Kohtalaisesti",
+            "5. Runsaasti",
+            "6. Hyvin runsaasti"
+          ],
+          "range": "WBC.berriesAndConesEnum",
+          "subject": "WBC.spruceConesAtCensus",
+          "title": "Kuusenkäpyjä laskenta-aikaan"
+        },
+        "typeOfSnowCover": {
+          "type": "string",
+          "enum": [
+            "",
+            "WBC.typeOfSnowCoverEnum0",
+            "WBC.typeOfSnowCoverEnum1",
+            "WBC.typeOfSnowCoverEnum2"
+          ],
+          "enumNames": [
+            "",
+            "0. Ei tietoa tai ei lunta",
+            "1. Lumi pehmeää",
+            "2. Lumessa kova hankikerros"
+          ],
+          "range": "WBC.typeOfSnowCoverEnum",
+          "subject": "WBC.typeOfSnowCover",
+          "title": "Maassa olevan lumen laatu"
+        },
+        "visibility": {
+          "type": "string",
+          "enum": [
+            "",
+            "WBC.visibilityEnum0",
+            "WBC.visibilityEnum1",
+            "WBC.visibilityEnum2",
+            "WBC.visibilityEnum3",
+            "WBC.visibilityEnum4"
+          ],
+          "enumNames": [
+            "",
+            "Ei tietoa",
+            "Hyvä",
+            "Hyvä-kohtalainen",
+            "Kohtalainen-huono",
+            "Huono"
+          ],
+          "range": "WBC.visibilityEnum",
+          "subject": "WBC.visibility",
+          "title": "Näkyvyys"
+        },
+        "waterbodies": {
+          "type": "string",
+          "enum": [
+            "",
+            "WBC.waterbodiesEnum0",
+            "WBC.waterbodiesEnum1",
+            "WBC.waterbodiesEnum2",
+            "WBC.waterbodiesEnum3",
+            "WBC.waterbodiesEnum4",
+            "WBC.waterbodiesEnum5"
+          ],
+          "enumNames": [
+            "",
+            "Ei tietoa",
+            "Meren rantaa",
+            "Järven rantaa",
+            "Joen vartta",
+            "Edellisten yhdistelmä",
+            "Ei vesistöjä"
+          ],
+          "range": "WBC.waterbodiesEnum",
+          "subject": "WBC.waterbodies",
+          "title": "Vesistöt"
+        },
+        "wayOfTravel": {
+          "type": "string",
+          "enum": [
+            "",
+            "WBC.wayOfTravelEnum0",
+            "WBC.wayOfTravelEnum1",
+            "WBC.wayOfTravelEnum2",
+            "WBC.wayOfTravelEnum3",
+            "WBC.wayOfTravelEnum9"
+          ],
+          "enumNames": [
+            "",
+            "Jalkaisin",
+            "Suksilla",
+            "Muu, mikä",
+            "Boat",
+            "Tuntematon"
+          ],
+          "range": "WBC.wayOfTravelEnum",
+          "subject": "WBC.wayOfTravel",
+          "title": "Kulkutapa"
+        },
+        "wayOfTravelNotes": {
+          "type": "string",
+          "range": "xsd:string",
+          "subject": "WBC.wayOfTravelNotes",
+          "title": "Kulkutavan kuvaus"
+        },
+        "wind": {
+          "type": "string",
+          "enum": [
+            "",
+            "WBC.windEnum0",
+            "WBC.windEnum1",
+            "WBC.windEnum2",
+            "WBC.windEnum3",
+            "WBC.windEnum4"
+          ],
+          "enumNames": [
+            "",
+            "Ei tietoa",
+            "Tyyntä-heikkoa",
+            "Heikkoa-kohtalaista",
+            "Kohtalaista-navakkaa",
+            "Navakkaa-kovaa"
+          ],
+          "range": "WBC.windEnum",
+          "subject": "WBC.wind",
+          "title": "Tuuli"
+        }
+      },
+      "range": "MY.gatheringFactClass"
+    },
+    "geometry": {
+      "type": "object",
+      "range": "MZ.geometry",
+      "subject": "MY.geometry",
+      "title": "Coordinates"
+    },
+    "gpsUsed": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MY.gpsUsed",
+      "title": "GPS used"
+    },
+    "leg": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "xsd:string",
+      "subject": "MY.leg",
+      "description": "Name of the collector(s), in format 'Lastname, Firstname; Lastname Firstname'",
+      "title": "Leg"
+    },
+    "legPublic": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MY.legPublic",
+      "title": "Display names publically?"
+    },
+    "legUserID": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "xsd:string",
+      "subject": "MY.legUserID",
+      "description": "Alkuperäislähteen käyttäjätunnus",
+      "title": "Käyttäjätunnus"
+    },
+    "namedPlaceNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.namedPlaceNotes",
+      "title": "Info about this route"
+    },
+    "notes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.notes",
+      "description": "Additional information to the data in each section.",
+      "title": "Notes"
+    },
+    "rainIntensity": {
+      "type": "string",
+      "enum": [
+        "",
+        "MY.rainIntensityEnumNoRain",
+        "MY.rainIntensityEnumLightRain",
+        "MY.rainIntensityEnumModerateRain",
+        "MY.rainIntensityEnumHeavyRain",
+        "MY.rainIntensityEnumTorrentialRain"
+      ],
+      "enumNames": [
+        "",
+        "No rain",
+        "Light rain",
+        "Moderate rain",
+        "Heavy rain",
+        "Torrential rain"
+      ],
+      "range": "MY.rainIntensityEnum",
+      "subject": "MY.rainIntensity",
+      "title": "Rain intensity"
+    },
+    "routeDirectionAdhered": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MY.routeDirectionAdhered",
+      "title": "Adhered route direction"
+    },
+    "spottingScopeUsed": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MY.spottingScopeUsed",
+      "title": "Spotting scope"
+    },
+    "startDistanceFromNECorner": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.startDistanceFromNECorner",
+      "title": "Start distance from NE corner (m)"
+    },
+    "startPointDeviation": {
+      "type": "integer",
+      "range": "xsd:integer",
+      "subject": "MY.startPointDeviation",
+      "title": "Start point deviation (m)"
+    },
+    "taxonCensus": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "object",
+        "subject": "MY.taxonCensusClass",
+        "additionalProperties": false,
+        "title": "Completeness of census",
+        "description": "",
+        "properties": {
+          "censusTaxonID": {
+            "type": "string",
+            "range": "MX.taxon",
+            "subject": "MY.censusTaxonID",
+            "title": "Censused taxon"
+          },
+          "censusTaxonSetID": {
+            "type": "string",
+            "enum": [
+              "",
+              "MX.taxonSetSykeButterflyCensusPapilionoidea",
+              "MX.taxonSetSykeButterflyCensusOther",
+              "MX.taxonSetWaterbirdWaterbirds",
+              "MX.taxonSetWaterbirdWaders",
+              "MX.taxonSetWaterbirdGulls",
+              "MX.taxonSetWaterbirdPasserines",
+              "MX.taxonSetWaterbirdAmphibia",
+              "MX.taxonSetSykeBumblebee",
+              "MVL.1201",
+              "MX.taxonSetSykeBumblebeeOther",
+              "MX.taxonSetBirdAtlasCommon"
+            ],
+            "enumNames": [
+              "",
+              "SYKE's Butterfly Census: Butterflies",
+              "SYKE's Butterly Census: Other Macrolepidoptera",
+              "Waterbird Census: Waterbirds",
+              "Waterbird Census: Waders",
+              "Waterbird Census: Gulls",
+              "Waterbird Census: Passerines",
+              "Waterbird Census: Amphibians",
+              "SYKE's Bumblebee Census",
+              "Spring monitoring species",
+              "Syken kimalaistutkimus: Ylemmät taksonit",
+              "Bird atlas: common breeders"
+            ],
+            "range": "MX.taxonSetEnum",
+            "subject": "MY.censusTaxonSetID",
+            "title": "Censused taxon set"
+          },
+          "taxonCensusType": {
+            "type": "string",
+            "enum": [
+              "MY.taxonCensusTypeCounted",
+              "MY.taxonCensusTypeEstimated",
+              "MY.taxonCensusTypeNotCounted"
+            ],
+            "enumNames": [
+              "All species identified and counted",
+              "All species identified, count estimated",
+              "All species identified, count is not estimated"
+            ],
+            "range": "MY.taxonCensusEnum",
+            "subject": "MY.taxonCensusType",
+            "title": "Completeness of census"
+          }
+        },
+        "required": [
+          "taxonCensusType"
+        ]
+      },
+      "minItems": 0,
+      "range": "MY.taxonCensusClass",
+      "subject": "MY.taxonCensus",
+      "title": "Completely recorded taxon"
+    },
+    "temperature": {
+      "type": "integer",
+      "range": "xsd:integer",
+      "subject": "MY.temperature",
+      "title": "Temperature in celsius"
+    },
+    "temperatureEnd": {
+      "type": "number",
+      "range": "xsd:decimal",
+      "subject": "MY.temperatureEnd",
+      "title": "End temperature / °C"
+    },
+    "temperatureStart": {
+      "type": "number",
+      "range": "xsd:decimal",
+      "subject": "MY.temperatureStart",
+      "title": "Start temperature / °C"
+    },
+    "timeEnd": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.timeEnd",
+      "title": "End time"
+    },
+    "timeStart": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "MY.timeStart",
+      "title": "Start time"
+    }
+  }
+}

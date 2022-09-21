@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ReplaySubject } from 'rxjs';
+import { pipe, ReplaySubject } from 'rxjs';
 import {map, tap, distinctUntilChanged} from 'rxjs/operators'
 export interface IUserServiceState {
   user: any | null;
@@ -24,6 +24,7 @@ export class UserService {
   constructor(
     private httpClient: HttpClient
   ) {
+    this.getSessionProfile().subscribe()
   }
 
   getSessionProfile() {

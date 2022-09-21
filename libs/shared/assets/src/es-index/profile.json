@@ -1,0 +1,100 @@
+{
+  "settings": {
+    "number_of_shards": 3,
+    "index.mapping.ignore_malformed": true,
+    "index.max_result_window": 1000000,
+    "index.mapping.total_fields.limit": 10000,
+    "index.mapping.nested_objects.limit": 100000
+  },
+  "mappings": {
+    "properties": {
+      "@context": {
+        "type": "keyword"
+      },
+      "id": {
+        "type": "keyword"
+      },
+      "@type": {
+        "type": "keyword"
+      },
+      "birdSongRecognitionSkillLevels": {
+        "type": "object",
+        "properties": {
+          "birdSongRecognitionArea": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "birdSongRecognitionSkillLevel": {
+            "type": "keyword",
+            "ignore_above": 200
+          }
+        }
+      },
+      "birdwatchingActivityLevel": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "blocked": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "finnishBirdSongRecognitionSkillLevel": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "friendRequests": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "friends": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "image": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "nameVisibleInKerttu": {
+        "type": "boolean"
+      },
+      "personalCollectionIdentifier": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "profileDescription": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "settings": {
+        "type": "object",
+        "enabled": false
+      },
+      "taxonExpertise": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "taxonExpertiseNotes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "userID": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "profileKey": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "_meta": {
+        "properties": {
+          "created": {
+            "type": "date"
+          },
+          "edited": {
+            "type": "date"
+          }
+        }
+      }
+    }
+  }
+}

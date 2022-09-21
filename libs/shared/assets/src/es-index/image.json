@@ -1,0 +1,132 @@
+{
+  "settings": {
+    "number_of_shards": 3,
+    "index.mapping.ignore_malformed": true,
+    "index.max_result_window": 1000000,
+    "index.mapping.total_fields.limit": 10000,
+    "index.mapping.nested_objects.limit": 100000
+  },
+  "mappings": {
+    "properties": {
+      "@context": {
+        "type": "keyword"
+      },
+      "id": {
+        "type": "keyword"
+      },
+      "@type": {
+        "type": "keyword"
+      },
+      "LuomusIntellectualRights": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "caption": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "captureDateTime": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "capturerVerbatim": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "documentURI": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "fullURL": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "keyword": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "largeURL": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "originalFilename": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "originalURL": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "sourceSystem": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "squareThumbnailURL": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "taxonDescriptionCaption": {
+        "properties": {
+          "en": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "fi": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "sv": {
+            "type": "keyword",
+            "ignore_above": 200
+          }
+        }
+      },
+      "taxonURI": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "taxonVerbatim": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "thumbnailURL": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "uploadedBy": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "wgs84Lat": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "wgs84Lon": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "intellectualOwner": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "intellectualRights": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "publicityRestrictions": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "_meta": {
+        "properties": {
+          "created": {
+            "type": "date"
+          },
+          "edited": {
+            "type": "date"
+          }
+        }
+      }
+    }
+  }
+}

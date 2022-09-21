@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "subject": "MFP.formPermissionPerson",
+  "additionalProperties": false,
+  "title": "",
+  "description": "",
+  "properties": {
+    "@context": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@context",
+      "title": "Context for the MFP.formPermissionPerson"
+    },
+    "id": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "id",
+      "title": "Id for the MFP.formPermissionPerson"
+    },
+    "@type": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@type",
+      "title": "Type for the MFP.formPermissionPerson"
+    },
+    "personID": {
+      "type": "string",
+      "range": "MA.person",
+      "subject": "MFP.personID",
+      "title": "Users person id"
+    },
+    "admins": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "MY.collection",
+      "subject": "MFPP.admins",
+      "title": "List of collections where person is admin"
+    },
+    "editors": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "MY.collection",
+      "subject": "MFPP.editors",
+      "title": "List of collections where person is editor"
+    },
+    "permissionRequests": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "MY.collection",
+      "subject": "MFPP.permissionRequests",
+      "title": "List of collections where person has permission requests"
+    }
+  },
+  "required": [
+    "personID"
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "settings": {
+    "number_of_shards": 3,
+    "index.mapping.ignore_malformed": true,
+    "index.max_result_window": 1000000,
+    "index.mapping.total_fields.limit": 10000,
+    "index.mapping.nested_objects.limit": 100000
+  },
+  "mappings": {
+    "properties": {
+      "@context": {
+        "type": "keyword"
+      },
+      "id": {
+        "type": "keyword"
+      },
+      "@type": {
+        "type": "keyword"
+      },
+      "deviceManufacturer": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "deviceManufacturerID": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "deviceType": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "creator": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "dateCreated": {
+        "type": "date"
+      },
+      "dateEdited": {
+        "type": "date"
+      },
+      "editor": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "ownerPerson": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "_meta": {
+        "properties": {
+          "created": {
+            "type": "date"
+          },
+          "edited": {
+            "type": "date"
+          }
+        }
+      }
+    }
+  }
+}

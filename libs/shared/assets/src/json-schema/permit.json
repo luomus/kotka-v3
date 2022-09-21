@@ -1,0 +1,103 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "subject": "HRA.permitClass",
+  "additionalProperties": false,
+  "title": "",
+  "description": "",
+  "properties": {
+    "@context": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@context",
+      "title": "Context for the HRA.permitClass"
+    },
+    "id": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "id",
+      "title": "Id for the HRA.permitClass"
+    },
+    "@type": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@type",
+      "title": "Type for the HRA.permitClass"
+    },
+    "permitEndDate": {
+      "type": "string",
+      "format": "date",
+      "range": "xsd:date",
+      "subject": "HRA.permitEndDate",
+      "title": "End date"
+    },
+    "permitFile": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "HRA.permitFile",
+      "title": "File"
+    },
+    "permitNotes": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "HRA.permitNotes",
+      "title": "Notes"
+    },
+    "permitStartDate": {
+      "type": "string",
+      "format": "date",
+      "range": "xsd:date",
+      "subject": "HRA.permitStartDate",
+      "title": "Start date"
+    },
+    "permitStatus": {
+      "type": "string",
+      "enum": [
+        "",
+        "HRA.permitStatusAvailable",
+        "HRA.permitStatusNotRequired"
+      ],
+      "enumNames": [
+        "",
+        "Available",
+        "Not required"
+      ],
+      "range": "HRA.permitStatusEnum",
+      "subject": "HRA.permitStatus",
+      "title": "Permit status"
+    },
+    "permitType": {
+      "type": "string",
+      "enum": [
+        "",
+        "HRA.permitTypePIC",
+        "HRA.permitTypeMAT",
+        "HRA.permitTypeMTA",
+        "HRA.permitCollectingPermit",
+        "HRA.permitTypeExportPermit",
+        "HRA.permitTypeOther",
+        "HRA.permitTypeMemorandumOfUnderstanding"
+      ],
+      "enumNames": [
+        "",
+        "PIC",
+        "MAT",
+        "MTA",
+        "Collecting permit",
+        "Export permit",
+        "Other",
+        "Memorandum of Understanding (MOU)"
+      ],
+      "range": "HRA.permitTypeEnum",
+      "subject": "HRA.permitType",
+      "title": "Permit type"
+    },
+    "isPartOf": {
+      "type": "string",
+      "range": "rdfs:Resource",
+      "subject": "MY.isPartOf",
+      "description": "Which parent or larger collection this is part of.",
+      "title": "Is part of"
+    }
+  }
+}

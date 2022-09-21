@@ -2,7 +2,7 @@
   "$schema": "./node_modules/nx/schemas/workspace-schema.json",
   "version": 2,
   "projects": {
-    "api": "apps/api",
+    "kotka-api": "apps/kotka-api",
     "api-interfaces": "libs/api-interfaces",
     "kotka": "apps/kotka",
     "kotka-e2e": "apps/kotka-e2e"

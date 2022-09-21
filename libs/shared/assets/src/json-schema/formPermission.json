@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "subject": "MFP.formPermission",
+  "additionalProperties": false,
+  "title": "",
+  "description": "",
+  "properties": {
+    "@context": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@context",
+      "title": "Context for the MFP.formPermission"
+    },
+    "id": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "id",
+      "title": "Id for the MFP.formPermission"
+    },
+    "@type": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@type",
+      "title": "Type for the MFP.formPermission"
+    },
+    "admins": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "MA.person",
+      "subject": "MFP.admins",
+      "title": "List persons who are admins"
+    },
+    "collectionID": {
+      "type": "string",
+      "range": "MY.collection",
+      "subject": "MFP.collectionID",
+      "title": "Collection id for which permission handled"
+    },
+    "editors": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "MA.person",
+      "subject": "MFP.editors",
+      "title": "List persons who have access to this form"
+    },
+    "permissionRequests": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "MA.person",
+      "subject": "MFP.permissionRequests",
+      "title": "List of persons who requested permission"
+    }
+  },
+  "required": [
+    "collectionID"
+  ]
+}

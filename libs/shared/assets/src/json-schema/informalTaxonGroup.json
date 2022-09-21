@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "subject": "MVL.informalTaxonGroup",
+  "additionalProperties": false,
+  "title": "Informal Taxon Group",
+  "description": "",
+  "properties": {
+    "@context": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@context",
+      "title": "Context for the Informal Taxon Group"
+    },
+    "id": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "id",
+      "title": "Id for the Informal Taxon Group"
+    },
+    "@type": {
+      "type": "string",
+      "range": "xsd:string",
+      "subject": "@type",
+      "title": "Type for the Informal Taxon Group"
+    },
+    "explicitlyDefinedRoot": {
+      "type": "boolean",
+      "range": "xsd:boolean",
+      "subject": "MVL.explicitlyDefinedRoot",
+      "description": "If this is true, the group is considered a root even if it has parents. For example Fishes is part of Water animals but still is wanted to be a root by itself.",
+      "title": "Explicitly defined root"
+    },
+    "hasSubGroup": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "range": "MVL.informalTaxonGroup",
+      "subject": "MVL.hasSubGroup",
+      "title": "Has subgroup"
+    },
+    "name": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "fi": {
+          "type": "string"
+        },
+        "sv": {
+          "type": "string"
+        }
+      },
+      "minProperties": 1,
+      "range": "xsd:string",
+      "subject": "MVL.name",
+      "title": "name"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

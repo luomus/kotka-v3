@@ -1,0 +1,55 @@
+{
+  "settings": {
+    "number_of_shards": 3,
+    "index.mapping.ignore_malformed": true,
+    "index.max_result_window": 1000000,
+    "index.mapping.total_fields.limit": 10000,
+    "index.mapping.nested_objects.limit": 100000
+  },
+  "mappings": {
+    "properties": {
+      "@context": {
+        "type": "keyword"
+      },
+      "id": {
+        "type": "keyword"
+      },
+      "@type": {
+        "type": "keyword"
+      },
+      "dateBegin": {
+        "type": "date"
+      },
+      "dateEnd": {
+        "type": "date"
+      },
+      "geometry": {
+        "type": "geo_shape",
+        "ignore_malformed": true,
+        "coerce": true
+      },
+      "habitatDescription": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "habitatIUCN": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "substrate": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "_meta": {
+        "properties": {
+          "created": {
+            "type": "date"
+          },
+          "edited": {
+            "type": "date"
+          }
+        }
+      }
+    }
+  }
+}

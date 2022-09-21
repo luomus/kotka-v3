@@ -1,0 +1,267 @@
+{
+  "settings": {
+    "number_of_shards": 3,
+    "index.mapping.ignore_malformed": true,
+    "index.max_result_window": 1000000,
+    "index.mapping.total_fields.limit": 10000,
+    "index.mapping.nested_objects.limit": 100000
+  },
+  "mappings": {
+    "properties": {
+      "@context": {
+        "type": "keyword"
+      },
+      "id": {
+        "type": "keyword"
+      },
+      "@type": {
+        "type": "keyword"
+      },
+      "addedTags": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "annotationByPerson": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "annotationBySystem": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "annotationClass": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "byRole": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "censusAnnotation": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "created": {
+        "type": "date"
+      },
+      "createdTimestamp": {
+        "type": "integer"
+      },
+      "deletedTimestamp": {
+        "type": "integer"
+      },
+      "identification": {
+        "properties": {
+          "id": {
+            "type": "keyword"
+          },
+          "@type": {
+            "type": "keyword"
+          },
+          "@context": {
+            "type": "keyword"
+          },
+          "herbo:sortOrder": {
+            "type": "integer"
+          },
+          "associatedObservationTaxa": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "author": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "det": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "detDate": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "detMethod": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "detVerbatim": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "genusQualifier": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "identificationBasis": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "identificationNotes": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "infraAuthor": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "infraEpithet": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "infraRank": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "infrasubspecificSubdivision": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "isPartOf": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "isTaxonGroup": {
+            "type": "boolean"
+          },
+          "preferredIdentification": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "sec": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "speciesQualifier": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "taxon": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "taxonID": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "taxonRank": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "taxonSpecifier": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "taxonURI": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "taxonVerbatim": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "publicityRestrictions": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "sortOrder": {
+            "type": "integer"
+          }
+        }
+      },
+      "invasiveControlEffectiveness": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "lineTransectAnnotation": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "notes": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "occurrenceAtTimeOfAnnotation": {
+        "properties": {
+          "countryVerbatim": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "dateBegin": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "dateEnd": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "locality": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "municipalityVerbatim": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "taxonId": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "taxonVerbatim": {
+            "type": "keyword",
+            "ignore_above": 200
+          },
+          "wgs84centerPointLat": {
+            "type": "float"
+          },
+          "wgs84centerPointLon": {
+            "type": "float"
+          }
+        }
+      },
+      "opinion": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "removedTags": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "rootID": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "targetID": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "type": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "createdBySystem": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "deleted": {
+        "type": "boolean"
+      },
+      "deletedByPerson": {
+        "type": "keyword",
+        "ignore_above": 200
+      },
+      "deletedDateTime": {
+        "type": "date"
+      },
+      "_meta": {
+        "properties": {
+          "created": {
+            "type": "date"
+          },
+          "edited": {
+            "type": "date"
+          }
+        }
+      }
+    }
+  }
+}
