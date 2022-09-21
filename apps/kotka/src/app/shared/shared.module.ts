@@ -5,12 +5,14 @@ import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { AppComponent } from './components/app/app.component';
 import { NavComponent } from './components/nav/nav.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 
 @NgModule({
   imports: [
     CommonModule,
     RouterModule,
-    CollapseModule
+    CollapseModule,
+    BsDropdownModule
   ],
   declarations: [
     AppComponent,
