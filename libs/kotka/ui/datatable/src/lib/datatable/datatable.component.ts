@@ -17,6 +17,8 @@ import {
 } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
 
+export type DatatableColumn = ColDef;
+
 export interface SortModel {
   colId: string;
   sort: 'asc' | 'desc';
@@ -27,7 +29,7 @@ export interface GetRowsParams extends IGetRowsParams {
 }
 
 export interface DatatableSource {
-  rowCount: number | null;
+  rowCount?: number;
   getRows: (params: GetRowsParams) => void;
 }
 
