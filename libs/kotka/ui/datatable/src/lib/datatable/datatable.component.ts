@@ -12,8 +12,8 @@ import {
   GridApi,
   GridOptions,
   IGetRowsParams,
-  IDatasource,
-  Module, RowModelType
+  Module,
+  RowModelType
 } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
 
@@ -46,10 +46,10 @@ interface GridReadyEvent {
 })
 export class DatatableComponent implements OnChanges {
   @Input()
-  public columnDefs: ColDef[] = [];
+  public columnDefs: DatatableColumn[] = [];
 
   @Input()
-  public datasource?: IDatasource;
+  public datasource?: DatatableSource;
 
   @Input()
   public loading? = false;
@@ -61,10 +61,12 @@ export class DatatableComponent implements OnChanges {
   selectedColsChange = new EventEmitter<string[]>();
 
   public modules: Module[] = [InfiniteRowModelModule];
-  public defaultColDef = {
+  public defaultColDef: DatatableColumn = {
     flex: 1,
     resizable: true,
     minWidth: 100,
+    sortable: true,
+    filter: true
   };
   public components: any;
   public rowBuffer = 0;

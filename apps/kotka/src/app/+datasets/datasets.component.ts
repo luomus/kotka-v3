@@ -25,6 +25,8 @@ export class DatasetsComponent implements OnInit {
   datasource: DatatableSource = {
     rowCount: 3,
     getRows: (params: GetRowsParams) => {
+      const sortModel = params.sortModel;
+      const filterModel = params.filterModel;
       this.getData().subscribe(data => {
         data = data.slice(params.startRow, params.endRow + 1);
         params.successCallback(data);
