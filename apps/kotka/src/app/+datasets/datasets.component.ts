@@ -18,13 +18,16 @@ export class DatasetsComponent implements OnInit {
     }
   }, {
     headerName: 'Name',
-    field: 'datasetName'
+    field: 'datasetName',
+    flex: 2
   }, {
     headerName: 'Persons responsible',
-    field: 'personsResponsible'
+    field: 'personsResponsible',
+    flex: 2
   }, {
     headerName: 'Description',
-    field: 'description'
+    field: 'description',
+    flex: 6
   }];
 
   datasource: DatatableSource = {
@@ -49,9 +52,9 @@ export class DatasetsComponent implements OnInit {
 
   private getData() {
     return of([
-      {id: 'GX.1', datasetName: 'dataset 1', personsResponsible: 'testi', description: 'kuvaus'},
+      {id: 'GX.1', datasetName: 'dataset 1', personsResponsible: 'Kotka Kokoelma', description: 'kuvaus'},
       {id: 'GX.2', datasetName: 'dataset 2', personsResponsible: 'kotka', description: '...'},
-      {id: 'GX.3', datasetName: 'dataset 3', personsResponsible: 'kolmas', description: '3'}
+      {id: 'GX.3', datasetName: 'dataset 3', personsResponsible: 'kolmas kolmonen', description: '3'}
     ]);
   }
 }
