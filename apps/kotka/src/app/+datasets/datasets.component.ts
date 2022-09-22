@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DatatableColumn, DatatableSource, GetRowsParams } from '../../../../../libs/kotka/ui/datatable/src';
+import { URICellRenderer } from '../../../../../libs/kotka/ui/datatable/src/lib/renderers/uri-cell-renderer';
 import { of } from 'rxjs';
 
 @Component({
@@ -10,7 +11,11 @@ import { of } from 'rxjs';
 export class DatasetsComponent implements OnInit {
   columnDefs: DatatableColumn[] = [{
     headerName: 'URI',
-    field: 'id'
+    field: 'id',
+    cellRenderer: URICellRenderer,
+    cellRendererParams: {
+      domain: 'http://tun.fi/'
+    }
   }, {
     headerName: 'Name',
     field: 'datasetName'
@@ -28,8 +33,12 @@ export class DatasetsComponent implements OnInit {
       const sortModel = params.sortModel;
       const filterModel = params.filterModel;
       this.getData().subscribe(data => {
-        data = data.slice(params.startRow, params.endRow + 1);
-        params.successCallback(data);
+        data = data.slice(params.startRow, params.endRow);
+        let lastRow = -1;
+        if (data.length <= params.endRow) {
+          lastRow = data.length;
+        }
+        params.successCallback(data, lastRow);
       });
     }
   };

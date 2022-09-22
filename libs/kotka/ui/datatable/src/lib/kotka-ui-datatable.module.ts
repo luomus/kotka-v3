@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { DatatableComponent } from './datatable/datatable.component';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
@@ -13,6 +14,7 @@ import { AgGridModule } from '@ag-grid-community/angular';
 import { CsvExportModule } from '@ag-grid-community/csv-export';
 import { ModuleRegistry } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
+import { URICellRenderer } from './renderers/uri-cell-renderer';
 
 ModuleRegistry.registerModules([CsvExportModule, InfiniteRowModelModule]);
 
@@ -27,7 +29,8 @@ ModuleRegistry.registerModules([CsvExportModule, InfiniteRowModelModule]);
     ModalModule,
     PopoverModule,
     TypeaheadModule,
-    AgGridModule
+    AgGridModule,
+    RouterModule
   ],
   exports: [
     AlertModule,
@@ -40,6 +43,6 @@ ModuleRegistry.registerModules([CsvExportModule, InfiniteRowModelModule]);
     TypeaheadModule,
     DatatableComponent,
   ],
-  declarations: [DatatableComponent],
+  declarations: [DatatableComponent, URICellRenderer],
 })
 export class KotkaUiDatatableModule {}
