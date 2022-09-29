@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import { DatatableColumn, DatatableSource, GetRowsParams } from '../../../../../libs/kotka/ui/datatable/src';
 import { URICellRenderer } from '../../../../../libs/kotka/ui/datatable/src/lib/renderers/uri-cell-renderer';
 import { of } from 'rxjs';
@@ -7,6 +7,7 @@ import { of } from 'rxjs';
   selector: 'kotka-datasets',
   templateUrl: './datasets.component.html',
   styleUrls: ['./datasets.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DatasetsComponent implements OnInit {
   columnDefs: DatatableColumn[] = [{

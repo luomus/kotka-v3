@@ -5,7 +5,7 @@ import { NotFoundComponent } from './shared/components/not-found/not-found.compo
 
 const baseRoutes: Routes = [
   { path: 'user', loadChildren: () => import('./+user/user.module').then(m => m.UserModule), data: {preload: false} },
-  { path: 'datasets', pathMatch: 'full', loadChildren: () => import('./+datasets/datasets.module').then(m => m.DatasetsModule), data: {preload: false} },
+  { path: 'datasets', loadChildren: () => import('./+datasets/datasets.module').then(m => m.DatasetsModule), data: {preload: false} },
   { path: '**', pathMatch: 'full', component: NotFoundComponent }
 ];
 
