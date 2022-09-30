@@ -48,7 +48,7 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
   private mount() {
     combineLatest([
       import('laji-form'),
-      import('laji-form/lib/themes/bs3')
+      import('laji-form/lib/themes/stub')
     ]).subscribe(([formPackage, themePackage]) => {
       this.lajiFormWrapperProto = formPackage.default;
       this.lajiFormTheme = themePackage.default;
@@ -83,7 +83,7 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
             // settings: this.settings,
             // apiClient: this.apiClient,
             lang: 'en',
-            renderSubmit: false,
+            renderSubmit: true,
             // topOffset: LajiFormComponent.TOP_OFFSET,
             // bottomOffset: LajiFormComponent.BOTTOM_OFFSET,
             /*notifier: {
