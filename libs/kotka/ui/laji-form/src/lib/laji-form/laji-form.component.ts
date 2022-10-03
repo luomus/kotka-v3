@@ -8,6 +8,8 @@ import {
   AfterViewInit,
   OnDestroy,
   NgZone,
+  EventEmitter,
+  Output,
 } from '@angular/core';
 import LajiForm from 'laji-form/lib/index';
 import { Theme as LajiFormTheme } from 'laji-form/lib/themes/theme';
@@ -26,6 +28,8 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
   private lajiFormWrapper?: LajiForm;
   private lajiFormWrapperProto?: any;
   private lajiFormTheme?: LajiFormTheme;
+
+  @Output() formSubmit: EventEmitter<any> = new EventEmitter<any>();
 
   @ViewChild('lajiForm', { static: true }) lajiFormRoot!: ElementRef;
 
@@ -76,7 +80,7 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
             formData: this.formData,
             validators: form.validators,
             warnings: form.warnings,
-            // onSubmit: this._onSubmit.bind(this),
+            onSubmit: this.onSubmit.bind(this),
             // onChange: this._onChange.bind(this),
             // onSettingsChange: this._onSettingsChange.bind(this),
             // onValidationError: this._onValidationError.bind(this),
@@ -105,14 +109,19 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
   }
 
-
   private unMount() {
-      try {
-        this.ngZone.runOutsideAngular(() => {
-          this.lajiFormWrapper?.unmount();
-        });
-      } catch (err) {
-        // this.logger.warn('Unmounting failed', err);
-      }
+    try {
+      this.ngZone.runOutsideAngular(() => {
+        this.lajiFormWrapper?.unmount();
+      });
+    } catch (err) {
+      // this.logger.warn('Unmounting failed', err);
     }
   }
+
+  private onSubmit(data: any) {
+    this.ngZone.run(() => {
+      this.formSubmit.emit(data.formData);
+    });
+  }
+}

@@ -13,6 +13,11 @@ export const datasetsRoutes: Routes = [
     path: 'add',
     pathMatch: 'full',
     component: DatasetFormComponent
+  },
+  {
+    path: 'edit',
+    pathMatch: 'full',
+    component: DatasetFormComponent
   }
 ];
 
