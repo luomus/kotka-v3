@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Message } from '@kotka/api-interfaces';
+import { TitleService } from '../../services/title.service';
 
 @Component({
   selector: 'kotka-root',
@@ -10,5 +11,11 @@ import { Message } from '@kotka/api-interfaces';
 export class AppComponent {
   title = 'kotka'
   hello$ = this.http.get<Message>('/api/hello');
-  constructor(private http: HttpClient) {}
+
+  constructor(
+    private titleService: TitleService,
+    private http: HttpClient
+  ) {
+    this.titleService.startRouteListener();
+  }
 }

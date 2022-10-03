@@ -7,17 +7,20 @@ export const datasetsRoutes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    component: DatasetsComponent
+    component: DatasetsComponent,
+    data: { title: 'Datasets' }
   },
   {
     path: 'add',
     pathMatch: 'full',
-    component: DatasetFormComponent
+    component: DatasetFormComponent,
+    data: { title: 'Add dataset' }
   },
   {
     path: 'edit',
     pathMatch: 'full',
-    component: DatasetFormComponent
+    component: DatasetFormComponent,
+    data: { title: 'Edit dataset', addUriToTitle: true }
   }
 ];
 
