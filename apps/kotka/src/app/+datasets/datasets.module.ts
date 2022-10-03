@@ -6,7 +6,7 @@ import { DatasetsComponent } from './datasets.component';
 import { KotkaUiMainContentModule } from '../../../../../libs/kotka/ui/main-content/src';
 import { KotkaUiDatatableModule } from '../../../../../libs/kotka/ui/datatable/src';
 import { DatasetFormComponent } from './dataset-form/dataset-form.component';
-import { KotkaUiLajiFormModule } from '../../../../../libs/kotka/ui/laji-form/src';
+import { FormViewModule } from '../shared-modules/form-view/form-view.module';
 
 @NgModule({
   imports: [
@@ -15,7 +15,7 @@ import { KotkaUiLajiFormModule } from '../../../../../libs/kotka/ui/laji-form/sr
     CommonModule,
     KotkaUiMainContentModule,
     KotkaUiDatatableModule,
-    KotkaUiLajiFormModule
+    FormViewModule
   ],
   declarations: [DatasetsComponent, DatasetFormComponent],
 })

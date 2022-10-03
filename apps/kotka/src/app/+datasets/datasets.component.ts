@@ -6,7 +6,7 @@ import { of } from 'rxjs';
 @Component({
   selector: 'kotka-datasets',
   templateUrl: './datasets.component.html',
-  styleUrls: ['./datasets.component.css'],
+  styleUrls: ['./datasets.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DatasetsComponent implements OnInit {

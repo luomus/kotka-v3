@@ -1,11 +1,3 @@
-<ng-container *ngIf="routeParams$ | async as routeParams">
-  <kui-main-content [header]="routeParams.editMode ? 'Edit dataset ' + routeParams.datasetURI : 'Add dataset'">
-    <kui-laji-form
-      *ngIf="formParams$ | async as formParams"
-      [form]="formParams.form"
-      [formData]="formParams.formData"
-      (formSubmit)="onSubmit($event)"
-    >
-    </kui-laji-form>
-  </kui-main-content>
-</ng-container>
+<kotka-form-view
+  [dataTypeName]="'dataset'"
+></kotka-form-view>
