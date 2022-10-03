@@ -40,7 +40,7 @@ export class FormViewComponent {
             datasetName: {en: 'dataset 1'}, personsResponsible: 'Kotka Kokoelma', description: {fi: 'kuvaus'}
           });
         } else {
-          return of({});
+          return of(undefined);
         }
       })
     );
