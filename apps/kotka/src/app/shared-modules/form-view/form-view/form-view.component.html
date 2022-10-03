@@ -1,9 +1,9 @@
-<ng-container *ngIf="routeParams$ | async as routeParams">
+<ng-container *ngIf="routeParams$ | async as routeParams else spinner">
   <kui-main-content
     [header]="routeParams.editMode ? 'Edit ' + dataTypeName + ' ' + routeParams.dataURI : 'Add ' + dataTypeName"
   >
     <kui-laji-form
-      *ngIf="formParams$ | async as formParams"
+      *ngIf="formParams$ | async as formParams else spinner"
       [form]="formParams.form"
       [formData]="formParams.formData"
       (formSubmit)="onSubmit($event)"
@@ -11,3 +11,6 @@
     </kui-laji-form>
   </kui-main-content>
 </ng-container>
+<ng-template #spinner>
+  <kui-spinner></kui-spinner>
+</ng-template>
