@@ -47,8 +47,8 @@
         <li dropdown class="nav-item me-3 dropdown" routerLinkActive="active">
           <a class="nav-link" dropdownToggle id="datasets-menu">Datasets <i class="fa fa-caret-down"></i></a>
           <ul class="dropdown-menu" *dropdownMenu role="menu" aria-labelledby="datasets-menu">
-            <li><a class="dropdown-item" href="/datasets">All</a></li>
-            <li><a class="dropdown-item" href="/datasets/add"><i class="fa fa-plus"></i> Add dataset</a></li>
+            <li><a class="dropdown-item" routerLink="/datasets">All</a></li>
+            <li><a class="dropdown-item" routerLink="/datasets/add"><i class="fa fa-plus"></i> Add dataset</a></li>
           </ul>
         </li>
 
@@ -97,8 +97,8 @@
       </ul>
 
       <ul class="nav navbar-nav" routerLinkActive="active">
-        <ng-container *ngIf="userService.user$ | async; let user; else userLogin">
-          <li dropdown class="nav-item dropdown" placement="bottom right">
+        <ng-container *ngIf="userService.isLoggedIn$ | async else userLogin">
+          <li dropdown class="nav-item dropdown" placement="bottom right" *ngIf="userService.user$ | async as user;">
             <a class="nav-link" dropdownToggle id="user-menu"><i class="fa fa-user"></i>&nbsp; {{ user.fullName }}</a>
             <ul class="dropdown-menu dropdown-menu-right" *dropdownMenu>
               <li><a class="dropdown-item" href="/user/logout"><i class="fa fa-power-off"></i> Logout</a></li>
@@ -106,7 +106,7 @@
           </li>
         </ng-container>
         <ng-template #userLogin>
-          <a *ngIf="true" class="nav-link" href="/api/auth/login" placement="botton right">Login</a>
+          <a *ngIf="true" class="nav-link" routerLink="/api/auth/login" placement="botton right">Login</a>
         </ng-template>
       </ul>
     </div>

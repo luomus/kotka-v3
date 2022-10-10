@@ -15,9 +15,14 @@ export class LogoutComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.userService.logout().subscribe(() => {
-      this.router.navigate(['/'])
-    })
+    this.userService.logout().subscribe({
+      'next': () => {
+        this.router.navigate(['/']);
+      },
+      'error': () => {
+        this.router.navigate(['/']);
+      }
+    });
   }
 
 }
