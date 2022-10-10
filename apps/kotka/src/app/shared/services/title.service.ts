@@ -3,7 +3,7 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { filter, map } from 'rxjs/operators';
 
-const MAIN_TITLE = 'Kotka'
+const MAIN_TITLE = 'Kotka';
 
 @Injectable({
   providedIn: 'root'

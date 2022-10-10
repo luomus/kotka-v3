@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, Observable, of, switchMap } from 'rxjs';
-import { map, tap, distinctUntilChanged, filter, take } from 'rxjs/operators'
+import { map, tap, distinctUntilChanged } from 'rxjs/operators';
 import { WINDOW } from '@ng-toolkit/universal';
 import { Person } from '../../../../../../libs/shared/models/src';
 
@@ -10,7 +10,7 @@ export interface IUserServiceState {
   isLoggedIn: boolean | null;
 }
 
-const path = '/api/auth/'
+const path = '/api/auth/';
 let _state: IUserServiceState = {
   user: null,
   isLoggedIn: null
@@ -59,13 +59,13 @@ export class UserService {
   login(token: string) {
     return this.httpClient.post<Person>(path + 'login', { token }).pipe(
       tap(user => this.updateUser(user)),
-    )
+    );
   }
 
   logout() {
     return this.httpClient.get(path + 'logout').pipe(
       tap(() => this.updateUser(null)),
-    )
+    );
   }
 
   private updateUser(user: Person | null) {

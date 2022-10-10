@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot } from '@angular/router';
+import { CanActivate } from '@angular/router';
 
 import { UserService } from './user.service';
 import { take, tap } from 'rxjs/operators';
@@ -12,7 +12,7 @@ export class OnlyLoggedIn implements CanActivate {
     private userService: UserService
   ) { }
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
+  canActivate(): Observable<boolean> | Promise<boolean> | boolean {
     return this.userService.isLoggedIn$.pipe(
       take(1),
       tap(isLoggedIn => {

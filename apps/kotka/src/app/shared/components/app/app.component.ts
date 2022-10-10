@@ -9,7 +9,7 @@ import { TitleService } from '../../services/title.service';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  title = 'kotka'
+  title = 'kotka';
   hello$ = this.http.get<Message>('/api/hello');
 
   constructor(
