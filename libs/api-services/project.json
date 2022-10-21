@@ -1,0 +1,25 @@
+{
+  "projectType": "library",
+  "sourceRoot": "libs/api-services/src",
+  "prefix": "kotka",
+  "targets": {
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/api-services"],
+      "options": {
+        "jestConfig": "libs/api-services/jest.config.ts",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/api-services/**/*.ts",
+          "libs/api-services/**/*.html"
+        ]
+      }
+    }
+  },
+  "tags": []
+}

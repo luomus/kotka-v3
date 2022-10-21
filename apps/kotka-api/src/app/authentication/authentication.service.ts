@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
 import { catchError, map } from 'rxjs';
+import { LajiApiService } from '@kotka/api-services';
 
 const kotkaRoles = [
   'MA.admin',
@@ -13,7 +13,7 @@ const kotkaRoles = [
 export class AuthenticationService {
 
   constructor(
-    private readonly httpService: HttpService,
+    private readonly lajiApiSevice: LajiApiService,
   ) {}
 
   public getLoginUrl(): string {
@@ -21,7 +21,7 @@ export class AuthenticationService {
   }
 
   public getProfile(token: string) {
-    const person = this.httpService.get(`${process.env['LAJI_API_URL']}/person/${token}`, { params: { access_token: process.env['LAJI_API_TOKEN']}}).pipe(
+    const $person = this.lajiApiSevice.get(`person/${token}`).pipe(
       catchError((err) => { throw new UnauthorizedException('Error retrieving user profile from laji-auth.')}),
       map(res => res.data),
       map(data => {
@@ -44,18 +44,18 @@ export class AuthenticationService {
       })),
     );
 
-    return person;
+    return $person;
   }
 
   public logoutUser(token: string) {
-    return this.httpService.delete(`${process.env['LAJI_API_URL']}/person-token/${token}`, { params: { access_token: process.env['LAJI_API_TOKEN']}}).pipe(
+    return this.lajiApiSevice.delete(`person-token/${token}`).pipe(
       catchError((err) => { throw new InternalServerErrorException('Error terminating user laji-auth login.')})
     );
   }
 
   public checkLoginValidity(token: string) {
-    return this.httpService.get(`${process.env['LAJI_API_URL']}/person-token/${token}`, { params: { access_token: process.env['LAJI_API_TOKEN']}}).pipe(
-      catchError((err) => { throw new UnauthorizedException('Error validating user personToken.') })
+    return this.lajiApiSevice.get(`person-token/${token}`).pipe(
+      catchError((err) => { throw new UnauthorizedException('Error validating user personToken.') }),
     );
   }
 }
