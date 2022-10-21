@@ -4,8 +4,8 @@ https://docs.nestjs.com/providers#services
 
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { lastValueFrom, map } from 'rxjs';
-import { parse, serialize, graph } from 'rdflib'
-import { compact, toRDF } from 'jsonld'
+import { parse, serialize, graph } from 'rdflib';
+import { compact, toRDF } from 'jsonld';
 import { SchemaService } from '@kotka/api-services';
 import { StoreObject } from '@kotka/shared/models';
 
@@ -13,7 +13,7 @@ const documentTypes = [
   'GX.dataset',
   'MY.document',
   'MY.collection'
-]
+];
 
 @Injectable()
 export class TriplestoreMapperService implements OnModuleInit {
@@ -40,10 +40,11 @@ export class TriplestoreMapperService implements OnModuleInit {
         delete json['@context'];
         resolve(json);
         } catch (err) {
-          console.log(err)
+          console.log(err);
         }
 
-    })})
+      });
+    });
   }
 
   async jsonToTriplestore (data, type): Promise<string> {
@@ -64,9 +65,9 @@ export class TriplestoreMapperService implements OnModuleInit {
         serialize(null, data, undefined, 'application/rdf+xml', (err, data) => {
           data = data.replace(/IIII/g, '.').replace(/:tun/g, '').replace(/tun:/g, '');
           resolve(data);
-        })
+        });
       });
-    })
+    });
   }
   
   documentMaps = {};
@@ -101,7 +102,7 @@ export class TriplestoreMapperService implements OnModuleInit {
 
         if (typeof ctx['@context'][key] === 'object') {
           if (ctx['@context'][key]['@id'] && defaultNS) {
-            ctx['@context'][key]['@id'] = ctx['@context'][key]['@id'].replace('default:', defaultNS)
+            ctx['@context'][key]['@id'] = ctx['@context'][key]['@id'].replace('default:', defaultNS);
           }
           ctx2['@context'][key] = { ...ctx['@context'][key] };
           ctx3['@context'][key] = { ...ctx['@context'][key] };
@@ -132,7 +133,7 @@ export class TriplestoreMapperService implements OnModuleInit {
       this.fromContext[type] = ctx2;
       this.returnContext[type] = ctx3;
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
   }
 }
