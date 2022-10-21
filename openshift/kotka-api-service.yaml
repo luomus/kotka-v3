@@ -1,0 +1,16 @@
+apiVersion: apps.openshift.io/v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: kotka-api
+  name: kotka-api
+spec:
+  ports:
+    - name: "3333"
+      port: 3333
+      targetPort: 3333
+  selector:
+    io.kompose.service: kotka-api
+status:
+  loadBalancer: {}

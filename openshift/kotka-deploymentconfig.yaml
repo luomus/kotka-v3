@@ -1,0 +1,96 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: kotka
+  name: kotka
+spec:
+  replicas: 1
+  selector:
+    io.kompose.service: kotka
+  strategy:
+    resources: {}
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: kotka
+    spec:
+      containers:
+        - args:
+            - npm
+            - run
+            - start
+            - --
+            - kotka
+            - --host
+            - 0.0.0.0
+          env:
+            - name: LAJI_API_TOKEN
+              valueFrom:
+                configMapKeyRef:
+                  key: LAJI_API_TOKEN
+                  name: env
+            - name: LAJI_API_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: LAJI_API_URL
+                  name: env
+            - name: LAJI_AUTH_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: LAJI_AUTH_URL
+                  name: env
+            - name: LAJI_STORE_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: LAJI_STORE_URL
+                  name: env
+            - name: SESSION_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  key: SESSION_SECRET
+                  name: env
+            - name: SYSTEM_ID
+              valueFrom:
+                configMapKeyRef:
+                  key: SYSTEM_ID
+                  name: env
+          image: ' '
+          name: kotka
+          ports:
+            - containerPort: 4200
+          resources: {}
+          volumeMounts:
+            - mountPath: /app
+              name: kotka-claim0
+            - mountPath: /app/node_modules
+              name: kotka-claim1
+      restartPolicy: Always
+      volumes:
+        - name: kotka-claim0
+          persistentVolumeClaim:
+            claimName: kotka-claim0
+        - name: kotka-claim1
+          persistentVolumeClaim:
+            claimName: kotka-claim1
+  test: false
+  triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - kotka
+        from:
+          kind: ImageStreamTag
+          name: kotka:latest
+      type: ImageChange
+status:
+  availableReplicas: 0
+  latestVersion: 0
+  observedGeneration: 0
+  replicas: 0
+  unavailableReplicas: 0
+  updatedReplicas: 0

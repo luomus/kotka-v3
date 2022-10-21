@@ -1,0 +1,14 @@
+apiVersion: v1
+data:
+  LAJI_API_TOKEN: 62l1g9p6IO3SZB7c3hwDjtSbh4pzH7xzC8xg0XS3U71LF73bYkfrZA3Z3PNEViV8
+  LAJI_API_URL: https://apitest.laji.fi/v0
+  LAJI_AUTH_URL: https://fmnh-ws-test.it.helsinki.fi/laji-auth/login
+  LAJI_STORE_URL: https://store-dev.luomus.fi
+  SESSION_SECRET: abc
+  SYSTEM_ID: KE.1321
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: kotka-env
+  name: env
