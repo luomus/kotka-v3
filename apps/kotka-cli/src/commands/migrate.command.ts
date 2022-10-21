@@ -1,9 +1,8 @@
 import { LajiStoreService, TriplestoreService } from "@kotka/api-services";
 import { TriplestoreMapperService } from "@kotka/mappers";
 import { Command, Console, createSpinner } from "nestjs-console";
-import { InvalidOptionArgumentError } from 'commander'
 import { lastValueFrom } from "rxjs";
-import { Dataset, StoreObject } from '@kotka/shared/models';
+import { StoreObject } from '@kotka/shared/models';
 
 interface Options {
   limit: number,
@@ -54,9 +53,9 @@ export class MigrateCommand {
         const tempMaxSeq = this.findMaxID(data);
 
         if (maxSeq < tempMaxSeq) {
-          maxSeq = tempMaxSeq
+          maxSeq = tempMaxSeq;
         }
-      })
+      });
     } else if (data.id && typeof data.id === 'string') {
       maxSeq = this.getIDNumber(data.id);
     }
@@ -72,7 +71,7 @@ export class MigrateCommand {
     const parsedVal = parseInt(option);
 
     if (isNaN(parsedVal)) {
-      throw new InvalidOptionArgumentError('Error parsing option to integer.');
+      throw new Error('Error parsing option to integer.');
     }
 
     return parsedVal;
@@ -113,8 +112,6 @@ export class MigrateCommand {
 
         const jsonData = await this.triplestoreMapperService.triplestoreToJson(triplestoreData.data, type);
 
-        console.log(jsonData, limit, offset)
-
         if ((Array.isArray(jsonData) && jsonData.length < limit) || !Array.isArray(jsonData)) {
           stop = true;
         } else {
@@ -127,7 +124,7 @@ export class MigrateCommand {
           if (tempMaxSeq > maxSeq) maxSeq = tempMaxSeq;
         }
 
-        await lastValueFrom(this.lajiStoreService.post(this.getType(type), jsonData))
+        await lastValueFrom(this.lajiStoreService.post(this.getType(type), jsonData));
 
       } catch (err) {
         if (err.response.status === 404 && offset === 0) {
@@ -140,12 +137,12 @@ export class MigrateCommand {
           return;
         }
       }
-    } while (!stop)
+    } while (!stop);
 
     if (options.seq) {
-      spin.succeed(`Transfer done, maximum sequence: ${maxSeq}`)
-      return
+      spin.succeed(`Transfer done, maximum sequence: ${maxSeq}`);
+      return;
     }
-    spin.succeed('Transfer done')
+    spin.succeed('Transfer done');
   }
 }

@@ -15,4 +15,4 @@ bootstrap.init().then(async (app) => {
     await app.close();
     process.exit(1);
   }
-})
+});

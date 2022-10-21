@@ -1,14 +1,19 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { pipe, ReplaySubject } from 'rxjs';
-import {map, tap, distinctUntilChanged} from 'rxjs/operators'
+import { Inject, Injectable } from '@angular/core';
+import { BehaviorSubject, catchError, Observable, of, switchMap } from 'rxjs';
+import { map, tap, distinctUntilChanged } from 'rxjs/operators';
+import { WINDOW } from '@ng-toolkit/universal';
+import { Person } from '../../../../../../libs/shared/models/src';
+
 export interface IUserServiceState {
-  user: any | null;
+  user: Person | null;
+  isLoggedIn: boolean | null;
 }
 
-const path = '/api/auth/'
+const path = '/api/auth/';
 let _state: IUserServiceState = {
   user: null,
+  isLoggedIn: null
 };
 
 @Injectable({
@@ -16,36 +21,62 @@ let _state: IUserServiceState = {
 })
 
 export class UserService {
-  private store = new ReplaySubject<IUserServiceState>(1);
+  private store = new BehaviorSubject<IUserServiceState>(_state);
   private state$ = this.store.asObservable();
-  
+
   user$ = this.state$.pipe(map((state) => state.user), distinctUntilChanged());
+  isLoggedIn$: Observable<boolean>;
 
   constructor(
+    @Inject(WINDOW) private window: Window,
     private httpClient: HttpClient
   ) {
-    this.getSessionProfile().subscribe()
+    this.isLoggedIn$ = this.state$.pipe(
+      map(state => state.isLoggedIn),
+      switchMap(isLoggedIn => {
+        if (isLoggedIn === null) {
+          return this.getSessionProfile().pipe(
+            switchMap(() => this.isLoggedIn$)
+          );
+        } else {
+          return of(isLoggedIn);
+        }
+      }),
+      distinctUntilChanged()
+    );
   }
 
-  getSessionProfile() {
-    return this.httpClient.get(path + 'user').pipe(
-      tap(user => this.updateState({ user }))
-    )
+  private getSessionProfile(): Observable<Person | null> {
+    return this.httpClient.get<Person>(path + 'user').pipe(
+      tap(user => this.updateUser(user)),
+      catchError(() => {
+        this.updateUser(null);
+        return of(null);
+      })
+    );
   }
 
-  login(token: any) {
-    return this.httpClient.post(path + 'login', { token }).pipe(
-      tap(user => this.updateState({ user })),
-    )
+  login(token: string) {
+    return this.httpClient.post<Person>(path + 'login', { token }).pipe(
+      tap(user => this.updateUser(user)),
+    );
   }
 
   logout() {
     return this.httpClient.get(path + 'logout').pipe(
-      tap(() => this.updateState({ user: null })),
-    )
+      tap(() => this.updateUser(null)),
+    );
+  }
+
+  private updateUser(user: Person | null) {
+    this.updateState({user, isLoggedIn: !!user});
   }
 
   private updateState(state: IUserServiceState) {
     this.store.next(_state = state);
+  }
+
+  redirectToLogin(): void {
+    this.window.location.href = path + 'login';
   }
 }

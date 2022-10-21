@@ -14,7 +14,7 @@ export class DatasetController {
     private readonly lajiStoreService: LajiStoreService,
   ) {}
 
-  private readonly type = 'dataset'
+  private readonly type = 'dataset';
 
   @UseGuards(AuthenticateCookieGuard)
   @Get() 
@@ -24,7 +24,7 @@ export class DatasetController {
 
     return res.data;
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
   }
 

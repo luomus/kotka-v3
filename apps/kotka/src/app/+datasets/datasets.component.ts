@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DatatableColumn, DatatableSource, GetRowsParams } from '../../../../../libs/kotka/ui/datatable/src';
 import { URICellRenderer } from '../../../../../libs/kotka/ui/datatable/src/lib/renderers/uri-cell-renderer';
 import { of } from 'rxjs';
@@ -6,9 +6,10 @@ import { of } from 'rxjs';
 @Component({
   selector: 'kotka-datasets',
   templateUrl: './datasets.component.html',
-  styleUrls: ['./datasets.component.css'],
+  styleUrls: ['./datasets.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DatasetsComponent implements OnInit {
+export class DatasetsComponent {
   columnDefs: DatatableColumn[] = [{
     headerName: 'URI',
     field: 'id',
@@ -33,8 +34,8 @@ export class DatasetsComponent implements OnInit {
   datasource: DatatableSource = {
     rowCount: 3,
     getRows: (params: GetRowsParams) => {
-      const sortModel = params.sortModel;
-      const filterModel = params.filterModel;
+      // const sortModel = params.sortModel;
+      // const filterModel = params.filterModel;
       this.getData().subscribe(data => {
         data = data.slice(params.startRow, params.endRow);
         let lastRow = -1;
@@ -45,10 +46,6 @@ export class DatasetsComponent implements OnInit {
       });
     }
   };
-
-  constructor() {}
-
-  ngOnInit(): void {}
 
   private getData() {
     return of([

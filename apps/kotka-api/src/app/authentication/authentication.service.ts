@@ -17,12 +17,12 @@ export class AuthenticationService {
   ) {}
 
   public getLoginUrl(): string {
-    return `${process.env.LAJI_AUTH_URL}?target=${process.env.SYSTEM_ID}&redirectMethod=GET&next=`
+    return `${process.env.LAJI_AUTH_URL}?target=${process.env.SYSTEM_ID}&redirectMethod=GET&next=`;
   }
 
   public getProfile(token: string) {
     const $person = this.lajiApiSevice.get(`person/${token}`).pipe(
-      catchError((err) => { throw new UnauthorizedException('Error retrieving user profile from laji-auth.')}),
+      catchError((err) => { throw new UnauthorizedException('Error retrieving user profile from laji-auth.'); }),
       map(res => res.data),
       map(data => {
         if (!data) {
@@ -49,13 +49,13 @@ export class AuthenticationService {
 
   public logoutUser(token: string) {
     return this.lajiApiSevice.delete(`person-token/${token}`).pipe(
-      catchError((err) => { throw new InternalServerErrorException('Error terminating user laji-auth login.')})
+      catchError((err) => { throw new InternalServerErrorException('Error terminating user laji-auth login.'); })
     );
   }
 
   public checkLoginValidity(token: string) {
     return this.lajiApiSevice.get(`person-token/${token}`).pipe(
-      catchError((err) => { throw new UnauthorizedException('Error validating user personToken.') }),
+      catchError((err) => { throw new UnauthorizedException('Error validating user personToken.'); }),
     );
   }
 }

@@ -1,5 +1,5 @@
 import { Injectable, ExecutionContext } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport'
+import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
 export class AuthenticatePersonTokenGuard extends AuthGuard('custom') {
@@ -11,6 +11,6 @@ export class AuthenticatePersonTokenGuard extends AuthGuard('custom') {
     const request = context.switchToHttp().getRequest();
     await super.logIn(request);
 
-    return true
+    return true;
   }
 }
