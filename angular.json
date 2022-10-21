@@ -6,6 +6,8 @@
     "api-services": "libs/api-services",
     "kotka": "apps/kotka",
     "kotka-api": "apps/kotka-api",
-    "kotka-e2e": "apps/kotka-e2e"
+    "kotka-cli": "apps/kotka-cli",
+    "kotka-e2e": "apps/kotka-e2e",
+    "mappers": "libs/mappers"
   }
 }

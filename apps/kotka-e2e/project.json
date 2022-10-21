@@ -2,7 +2,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/kotka-e2e/src",
   "projectType": "application",
-  "schematics": {
+  "generators": {
     "@schematics/angular:component": {
       "style": "scss"
     }
