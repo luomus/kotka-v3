@@ -13,9 +13,11 @@ import {
   GridOptions,
   IGetRowsParams,
   Module,
+  RowModelType
 } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
-import { IDatasource } from '@ag-grid-community/core/dist/cjs/interfaces/iDatasource';
+
+export type DatatableColumn = ColDef;
 
 export interface SortModel {
   colId: string;
@@ -27,7 +29,7 @@ export interface GetRowsParams extends IGetRowsParams {
 }
 
 export interface DatatableSource {
-  rowCount: number | null;
+  rowCount?: number;
   getRows: (params: GetRowsParams) => void;
 }
 
@@ -44,10 +46,10 @@ interface GridReadyEvent {
 })
 export class DatatableComponent implements OnChanges {
   @Input()
-  public columnDefs: ColDef[] = [];
+  public columnDefs: DatatableColumn[] = [];
 
   @Input()
-  public datasource?: IDatasource;
+  public datasource?: DatatableSource;
 
   @Input()
   public loading? = false;
@@ -59,15 +61,17 @@ export class DatatableComponent implements OnChanges {
   selectedColsChange = new EventEmitter<string[]>();
 
   public modules: Module[] = [InfiniteRowModelModule];
-  public defaultColDef = {
+  public defaultColDef: DatatableColumn = {
     flex: 1,
     resizable: true,
     minWidth: 100,
+    sortable: true,
+    filter: true
   };
   public components: any;
   public rowBuffer = 0;
-  public rowSelection = 'multiple';
-  public rowModelType = 'infinite';
+  public rowSelection: 'single'|'multiple'|undefined = 'multiple';
+  public rowModelType: RowModelType = 'infinite';
   public paginationPageSize = 100;
   public cacheOverflowSize = 2;
   public maxConcurrentDatasourceRequests = 1;
@@ -90,10 +94,10 @@ export class DatatableComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.loading) {
+    if (changes['loading']) {
       this.updateLoading();
     }
-    if (changes.datasource) {
+    if (changes['datasource']) {
       this.updateDatasource();
     }
   }
