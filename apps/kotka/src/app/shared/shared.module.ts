@@ -6,6 +6,7 @@ import { AppComponent } from './components/app/app.component';
 import { NavComponent } from './components/nav/nav.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { KotkaUiSpinnerModule } from '../../../../../libs/kotka/ui/spinner/src';
 
 @NgModule({
   imports: [
@@ -19,7 +20,9 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
     NavComponent,
     NotFoundComponent
   ],
-  exports: []
+  exports: [
+    KotkaUiSpinnerModule
+  ]
 })
 export class SharedModule {
   static forRoot(): ModuleWithProviders<SharedModule> {

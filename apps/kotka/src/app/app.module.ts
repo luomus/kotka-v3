@@ -8,6 +8,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { AppComponent } from './shared/components/app/app.component';
+import { NgtUniversalModule } from '@ng-toolkit/universal';
 
 @NgModule({
   imports: [
@@ -15,6 +16,7 @@ import { AppComponent } from './shared/components/app/app.component';
     BrowserAnimationsModule,
     HttpClientModule,
     QuicklinkModule,
+    NgtUniversalModule,
     AppRoutingModule,
     SharedModule.forRoot(),
     ModalModule.forRoot(),

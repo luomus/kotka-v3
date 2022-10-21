@@ -19,9 +19,16 @@ export class LoginComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       const token = params['token'];
       if (token) {
-        this.userService.login(token).subscribe(() => {
-          this.router.navigate(['/']);
+        this.userService.login(token).subscribe({
+          'next': () => {
+            this.router.navigate(['/']);
+          },
+          'error': () => {
+            this.router.navigate(['/']);
+          }
         });
+      } else {
+        this.router.navigate(['/']);
       }
     });
   }
