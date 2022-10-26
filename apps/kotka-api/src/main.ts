@@ -29,7 +29,7 @@ async function bootstrap() {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  await app.listen(port);
+  await app.listen(port, host);
   Logger.log(
     `🚀 Application is running on: http://${host}:${port}/${globalPrefix}`
   );
