@@ -15,6 +15,9 @@ RUN npm ci \
 COPY --chown=node:node ./tsconfig.base.json ./nx.json ./angular.json ./
 COPY --chown=node:node ./apps ./apps
 COPY --chown=node:node ./libs ./libs
+COPY --chown=node:node ./tools ./tools
+
+RUN chmod a+r ./tools/docker/nginx/nginx.conf
 
 # Build all versions of store so that they can be cherry-picked in other targets as needed
 RUN npm run ng -- build kotka-api \
@@ -23,6 +26,7 @@ RUN npm run ng -- build kotka-api \
 
 FROM nginxinc/nginx-unprivileged as kotka
 
+COPY --from=builder /app/tools/docker/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist/apps/kotka /usr/share/nginx/html
 
 EXPOSE 8080

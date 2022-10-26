@@ -5,7 +5,7 @@ services:
       - .env
     build:
       context: ./
-      dockerfile: ./tools/docker/dev/kotka-api/Dockerfile
+      dockerfile: ./tools/docker/kotka/dev/kotka-api/Dockerfile
     volumes:
       - .:/app
       - shared-volume:/app/node_modules
@@ -16,7 +16,7 @@ services:
       - .env
     build:
       context: ./
-      dockerfile: ./tools/docker/dev/kotka/Dockerfile
+      dockerfile: ./tools/docker/kotka/dev/kotka/Dockerfile
     volumes:
       - .:/app
       - shared-volume:/app/node_modules
