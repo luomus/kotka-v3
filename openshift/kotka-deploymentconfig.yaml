@@ -19,63 +19,58 @@ spec:
         io.kompose.service: kotka
     spec:
       containers:
-        - args:
-            - npm
-            - run
-            - start
-            - --
-            - kotka
-            - --host
-            - 0.0.0.0
-          env:
+        - env:
             - name: LAJI_API_TOKEN
               valueFrom:
-                configMapKeyRef:
+                secretKeyRef:
+                  name: kotka-secret
                   key: LAJI_API_TOKEN
-                  name: env
             - name: LAJI_API_URL
               valueFrom:
                 configMapKeyRef:
+                  name: kotka-config
                   key: LAJI_API_URL
-                  name: env
             - name: LAJI_AUTH_URL
               valueFrom:
                 configMapKeyRef:
+                  name: kotka-config
                   key: LAJI_AUTH_URL
-                  name: env
             - name: LAJI_STORE_URL
               valueFrom:
                 configMapKeyRef:
+                  name: kotka-config
                   key: LAJI_STORE_URL
-                  name: env
+            - name: LAJI_STORE_AUTH
+              valueFrom:
+                secretKeyRef:
+                  name: kotka-secret
+                  key: LAJI_STORE_AUTH
             - name: SESSION_SECRET
               valueFrom:
-                configMapKeyRef:
+                secretKeyRef:
+                  name: kotka-secret
                   key: SESSION_SECRET
-                  name: env
             - name: SYSTEM_ID
               valueFrom:
                 configMapKeyRef:
+                  name: kotka-config
                   key: SYSTEM_ID
-                  name: env
+            - name: TRIPLESTORE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: kotka-config
+                  key: TRIPLESTORE_URL
+            - name: TRIPLSETORE_AUTH
+              valueFrom:
+                secretKeyRef:
+                  name: kotka-secret
+                  key: TRIPLESTORE_AUTH
           image: ' '
           name: kotka
           ports:
-            - containerPort: 4200
+            - containerPort: 8080
           resources: {}
-          volumeMounts:
-            - mountPath: /app
-              name: kotka-claim0
-            - mountPath: /app/node_modules
-              name: kotka-claim1
       restartPolicy: Always
-      volumes:
-        - name: kotka-claim0
-          persistentVolumeClaim:
-            claimName: kotka-claim0
-        - name: kotka-claim1
-          persistentVolumeClaim:
-            claimName: kotka-claim1
   test: false
   triggers:
     - type: ConfigChange

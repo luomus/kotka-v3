@@ -14,6 +14,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
+  const host = process.env.HOST || 'localhost';
   const port = process.env.PORT || 3333;
 
   app.use(
@@ -27,10 +28,10 @@ async function bootstrap() {
 
   app.use(passport.initialize());
   app.use(passport.session());
-  
+
   await app.listen(port);
   Logger.log(
-    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
+    `🚀 Application is running on: http://${host}:${port}/${globalPrefix}`
   );
 }
 

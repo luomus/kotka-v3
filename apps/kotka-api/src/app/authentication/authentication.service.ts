@@ -28,7 +28,7 @@ export class AuthenticationService {
         if (!data) {
           throw new UnauthorizedException('No profile data fond.');
         }
-        
+
         return data;
       }),
       map(data => {
