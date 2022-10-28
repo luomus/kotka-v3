@@ -1,7 +1,9 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DatatableColumn, DatatableSource, GetRowsParams } from '../../../../../libs/kotka/ui/datatable/src';
 import { URICellRenderer } from '../../../../../libs/kotka/ui/datatable/src/lib/renderers/uri-cell-renderer';
-import { of } from 'rxjs';
+import { ApiService } from '../shared/services/api.service';
+import { Observable } from 'rxjs';
+import { Dataset } from '@kotka/shared/models';
 
 @Component({
   selector: 'kotka-datasets',
@@ -19,7 +21,7 @@ export class DatasetsComponent {
     }
   }, {
     headerName: 'Name',
-    field: 'datasetName',
+    field: 'datasetName.en',
     flex: 2
   }, {
     headerName: 'Persons responsible',
@@ -27,7 +29,7 @@ export class DatasetsComponent {
     flex: 2
   }, {
     headerName: 'Description',
-    field: 'description',
+    field: 'description.en',
     flex: 6
   }];
 
@@ -47,11 +49,11 @@ export class DatasetsComponent {
     }
   };
 
-  private getData() {
-    return of([
-      {id: 'GX.1', datasetName: 'dataset 1', personsResponsible: 'Kotka Kokoelma', description: 'kuvaus'},
-      {id: 'GX.2', datasetName: 'dataset 2', personsResponsible: 'kotka', description: '...'},
-      {id: 'GX.3', datasetName: 'dataset 3', personsResponsible: 'kolmas kolmonen', description: '3'}
-    ]);
+  constructor(
+    private apiService: ApiService
+  ) { }
+
+  private getData(): Observable<Dataset[]> {
+    return this.apiService.getAllDatasets();
   }
 }
