@@ -1,6 +1,6 @@
 <ng-container *ngIf="routeParams$ | async as routeParams else spinner">
   <kui-main-content
-    [header]="routeParams.editMode ? 'Edit ' + dataTypeName + ' ' + (routeParams.dataURI || ''): 'Add ' + dataTypeName"
+    [header]="routeParams.editMode ? 'Edit ' + (dataTypeName || dataType) + ' ' + (routeParams.dataURI || ''): 'Add ' + (dataTypeName || dataType)"
   >
     <ng-container *ngIf="formParams$ | async as formParams else spinner">
       <kui-laji-form
@@ -11,7 +11,7 @@
       >
       </kui-laji-form>
       <ng-template #notFound>
-        {{ dataTypeName | titlecase }} <ng-container *ngIf="routeParams.dataURI">with URI {{ routeParams.dataURI }} </ng-container>was not found.
+        {{ (dataTypeName || dataType) | titlecase }} <ng-container *ngIf="routeParams.dataURI">with URI {{ routeParams.dataURI }} </ng-container>was not found.
       </ng-template>
     </ng-container>
   </kui-main-content>

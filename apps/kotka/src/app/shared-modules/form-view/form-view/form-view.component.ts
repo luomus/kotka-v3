@@ -4,6 +4,7 @@ import { FormService } from '../../../shared/services/form.service';
 import { Form } from '../../../../../../../libs/shared/models/src/models/LajiForm';
 import { combineLatest, Observable, of, switchMap } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { ApiService, DataType } from '../../../shared/services/api.service';
 
 @Component({
   selector: 'kotka-form-view',
@@ -12,14 +13,16 @@ import { map } from 'rxjs/operators';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormViewComponent {
-  @Input() dataTypeName = '';
+  @Input() dataType?: DataType;
+  @Input() dataTypeName?: string;
 
   routeParams$: Observable<{editMode: boolean, dataURI?: string}>;
   formParams$: Observable<{form: Form.SchemaForm, formData: any}>;
 
   constructor(
     private activeRoute: ActivatedRoute,
-    private formService: FormService
+    private formService: FormService,
+    private apiService: ApiService
   ) {
     this.routeParams$ = combineLatest([
       this.activeRoute.url.pipe(
@@ -35,10 +38,10 @@ export class FormViewComponent {
     const datasetForm$ = this.formService.getForm('MHL.731');
     const formData$ = this.routeParams$.pipe(
       switchMap(params => {
-        if (params.dataURI) {
-          return of({
-            datasetName: {en: 'dataset 1'}, personsResponsible: 'Kotka Kokoelma', description: {fi: 'kuvaus'}
-          });
+        if (params.dataURI && this.dataType) {
+          const uriParts = params.dataURI.split('/');
+          const id = uriParts.pop() as string;
+          return this.apiService.getById(this.dataType, id);
         } else {
           return of(undefined);
         }

@@ -4,7 +4,7 @@ import { Dataset, ListResponse } from '@kotka/shared/models';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-enum ApiResultType {
+export enum DataType {
   dataset = 'dataset'
 }
 
@@ -20,10 +20,14 @@ export class ApiService {
   ) {}
 
   getAllDatasets(): Observable<Dataset[]> {
-    return this.getAll(ApiResultType.dataset);
+    return this.getAll(DataType.dataset);
   }
 
-  getAll(type: ApiResultType): Observable<Dataset[]> {
+  getById(type: DataType, id: string): Observable<Dataset> {
+    return this.httpClient.get<Dataset>(path + type + '/' + id);
+  }
+
+  private getAll(type: DataType): Observable<Dataset[]> {
     return this.httpClient.get<ListResponse<Dataset>>(path + type).pipe(
       map(result => result.member)
     );
