@@ -5,29 +5,31 @@ WORKDIR /app
 RUN chown -Rh node:node /app
 USER node
 
-# Copy the things that are needed for installing corrent node_modules
+# Copy the things that are needed for installing node_modules
 COPY --chown=node:node ./package*.json ./decorate-angular-cli.js ./
 
 RUN npm ci \
  && npm cache clean --force
 
-# Copy to image only the files that are really needed
+# Copy only the files that are needed for building the projects
 COPY --chown=node:node ./tsconfig.base.json ./nx.json ./angular.json ./
 COPY --chown=node:node ./apps ./apps
 COPY --chown=node:node ./libs ./libs
-COPY --chown=node:node ./tools ./tools
 
-RUN chmod a+r ./tools/docker/nginx/nginx.conf
-
-# Build all versions of store so that they can be cherry-picked in other targets as needed
+# Build kotka and kotka-api
 RUN npm run ng -- build kotka-api \
  && npm run ng -- build kotka
 
 
 FROM nginxinc/nginx-unprivileged as kotka
 
-COPY --from=builder /app/tools/docker/nginx/nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=builder /app/dist/apps/kotka /usr/share/nginx/html
+USER nginx
+
+# Set default nginx config
+COPY --chown=nginx:nginx ./tools/docker/nginx/nginx.conf /etc/nginx/conf.d/default.conf
+RUN chmod a+r /etc/nginx/conf.d/default.conf
+
+COPY --chown=nginx:nginx --from=builder /app/dist/apps/kotka /usr/share/nginx/html/
 
 EXPOSE 8080
 

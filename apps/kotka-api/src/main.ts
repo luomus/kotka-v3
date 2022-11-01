@@ -29,7 +29,8 @@ async function bootstrap() {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  await app.listen(port, host);
+  const hostName = host !== 'localhost' ? host : undefined;
+  await app.listen(port, hostName);
   Logger.log(
     `🚀 Application is running on: http://${host}:${port}/${globalPrefix}`
   );
