@@ -2,6 +2,7 @@
 https://docs.nestjs.com/providers#services
 */
 
+import { StoreGetQuery } from '@kotka/api-interfaces';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 
@@ -14,12 +15,12 @@ export class LajiStoreService {
   private urlBase = process.env['LAJI_STORE_URL'];
   private baseConfig = { headers: { Authorization: 'Basic ' + process.env['LAJI_STORE_AUTH'] }};
 
-  getAll(type: string, config: Record<string, unknown> = {}) {
-    return this.httpService.get(`${this.urlBase}${type}`, Object.assign(config, this.baseConfig));
+  getAll(type: string, query: StoreGetQuery = {}) {
+    return this.httpService.get(`${this.urlBase}${type}`, Object.assign({ params: query }, this.baseConfig));
   }
 
   post(type: string, body: unknown) {
-    return this.httpService.put(`${this.urlBase}${type}`, body, this.baseConfig);
+    return this.httpService.post(`${this.urlBase}${type}`, body, this.baseConfig);
   }
   get(type: string, id: string) {
     return this.httpService.get(`${this.urlBase}${type}/${id}`, this.baseConfig);
@@ -30,6 +31,6 @@ export class LajiStoreService {
   }
 
   delete(type: string, id: string) {
-    return this.httpService.delete(`${this.urlBase}${type}/${id}`)
+    return this.httpService.delete(`${this.urlBase}${type}/${id}`, this.baseConfig);
   }
 }

@@ -93,6 +93,10 @@ export class MigrateCommand {
       {
         flags: '-s, --seq',
         required: false
+      },
+      {
+        flags: '-dr, --dry-run',
+        required: false
       }
     ],
     description: 'Migrate items of specified type from triplestore to laji-store'
@@ -118,22 +122,38 @@ export class MigrateCommand {
           offset += limit;
         }
 
-        if (options.seq) {
+        if (options['seq']) {
           const tempMaxSeq = this.findMaxID(jsonData);
 
           if (tempMaxSeq > maxSeq) maxSeq = tempMaxSeq;
         }
 
-        await lastValueFrom(this.lajiStoreService.post(this.getType(type), jsonData));
+        if (options['dryRun']) {
+          if (Array.isArray(jsonData)) {
+            jsonData.forEach(data => {
+              console.log(JSON.stringify(data));
+            });
+          } else {
+            console.log(JSON.stringify(jsonData));
+          }
+        } else {
+          await lastValueFrom(this.lajiStoreService.post(this.getType(type), jsonData));
+        }
 
       } catch (err) {
         if (err.response.status === 404 && offset === 0) {
           spin.fail('No transferable items found.');
+          stop = true;
           return;
         } else if (err.response.status === 404 && offset !== 0) {
           stop = true;
         } else {
-          spin.fail(err);
+          spin.fail(err.message);
+          if (err.response.status === 422) {
+            console.error(JSON.stringify(JSON.parse(err.config.data), null, 2));
+            console.error(JSON.stringify(err.response.data.error, null, 2));
+          }
+          stop = true;
           return;
         }
       }

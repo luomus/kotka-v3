@@ -10,6 +10,6 @@ RUN npm ci --legacy-peer-deps && npm cache clean --force
 
 COPY --chown=node:node . .
 
-EXPOSE 4300
+EXPOSE 4200
 
 CMD npm run start -- kotka --host 0.0.0.0
