@@ -6,7 +6,7 @@ import { StoreGetQuery } from '@kotka/api-interfaces';
 import { lastValueFrom } from 'rxjs';
 import { LajiStoreService, TriplestoreService } from '@kotka/api-services';
 import { TriplestoreMapperService } from '@kotka/mappers';
-import { Body, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Delete, Get, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
 import { StoreObject } from '@kotka/shared/models';
 import { cloneDeep } from 'lodash';
@@ -34,10 +34,19 @@ export abstract class LajiStoreController {
     }
   }
 
+
   @UseGuards(AuthenticateCookieGuard)
   @Post()
-  async post(@Body() body: StoreObject) {
+  async post(@Req() req, @Body() body: StoreObject) {
     try {
+      const user = req.user.profile.id;
+      const date = new Date().toISOString();
+
+      body['creator'] = user;
+      body['editor'] = user;
+      body['dateCreated'] = date;
+      body['dateEdited'] = date;
+
       const res = await lastValueFrom(this.lajiStoreService.post(this.type, body));
 
       const rdfXml = await this.triplestoreMapperService.jsonToTriplestore(cloneDeep(res.data), this.triplestoreType);
@@ -66,8 +75,14 @@ export abstract class LajiStoreController {
 
   @UseGuards(AuthenticateCookieGuard)
   @Put(':id')
-  async put(@Param('id') id: string, @Body() body: StoreObject) {
+  async put(@Req() req, @Param('id') id: string, @Body() body: StoreObject) {
     try {
+      const user = req.user.profile.id;
+      const date = new Date().toISOString();
+
+      body['editor'] = user;
+      body['dateEdited'] = date;
+
       const res = await lastValueFrom(this.lajiStoreService.put(this.type, id, body));
 
       const rdfXml = await this.triplestoreMapperService.jsonToTriplestore(cloneDeep(res.data), this.triplestoreType);
