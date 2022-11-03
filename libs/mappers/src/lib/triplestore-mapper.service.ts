@@ -55,6 +55,8 @@ export class TriplestoreMapperService implements OnModuleInit {
 
     if (data['@type']) {
       data['@type'] = data['@type'].replace('.', 'IIII');
+    } else {
+      data['@type'] = type.replace('.', 'IIII');
     }
 
     const rdf = await toRDF(data, {format: 'application/n-quads'});
