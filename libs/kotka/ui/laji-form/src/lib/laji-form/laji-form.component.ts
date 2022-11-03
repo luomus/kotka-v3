@@ -52,7 +52,7 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
   private mount() {
     combineLatest([
       import('laji-form'),
-      import('laji-form/lib/themes/stub')
+      import('laji-form/lib/themes/bs5')
     ]).subscribe(([formPackage, themePackage]) => {
       this.lajiFormWrapperProto = formPackage.default;
       this.lajiFormTheme = themePackage.default;
