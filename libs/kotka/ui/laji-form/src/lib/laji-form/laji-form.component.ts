@@ -3,8 +3,6 @@ import {
   Input,
   ViewChild,
   ElementRef,
-  OnChanges,
-  SimpleChanges,
   AfterViewInit,
   OnDestroy,
   NgZone,
@@ -21,13 +19,14 @@ import { combineLatest } from 'rxjs';
   templateUrl: './laji-form.component.html',
   styleUrls: ['./laji-form.component.scss'],
 })
-export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
+export class LajiFormComponent implements AfterViewInit, OnDestroy {
   @Input() form: Form.SchemaForm | null = null;
   @Input() formData: any = {};
 
   private lajiFormWrapper?: LajiForm;
   private lajiFormWrapperProto?: any;
   private lajiFormTheme?: LajiFormTheme;
+  private isBlocked = false;
 
   @Output() formSubmit: EventEmitter<any> = new EventEmitter<any>();
 
@@ -45,8 +44,22 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
     this.unMount();
   }
 
-  ngOnChanges(changes: SimpleChanges) {
+  block() {
+    if (!this.isBlocked) {
+      this.ngZone.runOutsideAngular(() => {
+        this.lajiFormWrapper?.pushBlockingLoader();
+      });
+      this.isBlocked = true;
+    }
+  }
 
+  unBlock() {
+    if (this.isBlocked) {
+      this.ngZone.runOutsideAngular(() => {
+        this.lajiFormWrapper?.popBlockingLoader();
+      });
+      this.isBlocked = false;
+    }
   }
 
   private mount() {
