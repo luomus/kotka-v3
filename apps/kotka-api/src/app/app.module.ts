@@ -5,14 +5,16 @@ import { Module } from '@nestjs/common';
 
 import { ApiServicesModule } from '@kotka/api-services';
 import { DatasetModule } from './dataset/dataset.module';
+import { FormModule } from './form/form.module';
 
 @Module({
   imports: [
-    SharedModule, 
+    SharedModule,
     MappersModule,
     AuthenticationModule,
     ApiServicesModule,
-    DatasetModule
+    DatasetModule,
+    FormModule
   ],
   controllers: [],
   providers: []
