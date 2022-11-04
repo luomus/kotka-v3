@@ -1,8 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Dataset, ListResponse } from '@kotka/shared/models';
-import { Observable, of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 export enum DataType {
   dataset = 'dataset'
@@ -21,10 +20,6 @@ export class ApiService {
     private httpClient: HttpClient
   ) {}
 
-  getAllDatasets(): Observable<Dataset[]> {
-    return this.getAll(DataType.dataset);
-  }
-
   getById(type: DataType.dataset, id: string): Observable<Dataset>;
   getById(type: DataType, id: string): Observable<DataObject> {
     return this.httpClient.get<DataObject>(path + type + '/' + id);
@@ -40,17 +35,28 @@ export class ApiService {
     return this.httpClient.put<DataObject>(path + type + '/' + id, data);
   }
 
-  private getAll(type: DataType.dataset, page?: number, results?: Dataset[]): Observable<Dataset[]>;
-  private getAll(type: DataType, page=1, results: DataObject[]=[]): Observable<DataObject[]> {
-    const params = new HttpParams().set('page', page);
-    return this.httpClient.get<ListResponse<Dataset>>(path + type, {params}).pipe(
+  getData(type: DataType.dataset, page?: number, pageSize?: number, sort?: string, searchQuery?: string): Observable<ListResponse<Dataset>>;
+  getData(type: DataType, page=1, pageSize=100, sort?: string, searchQuery?: string): Observable<ListResponse<DataObject>> {
+    let params = new HttpParams().set('page', page).set('page_size', pageSize);
+    if (sort) {
+      params = params.set('sort', sort);
+    }
+    if (searchQuery) {
+      params = params.set('q', searchQuery);
+    }
+    return this.httpClient.get<ListResponse<DataObject>>(path + type, {params});
+  }
+
+  /*private getAll(type: DataType.dataset, page?: number, pageSize?: number, results?: Dataset[]): Observable<Dataset[]>;
+  private getAll(type: DataType, page=1, pageSize=100, results: DataObject[]=[]): Observable<DataObject[]> {
+    return this.getData(type, page, pageSize).pipe(
       switchMap(result => {
         results = results.concat(result.member);
         if (result.currentPage < result.lastPage) {
-          return this.getAll(type, page + 1, results);
+          return this.getAll(type, page + 1, pageSize, results);
         }
         return of(results);
       })
     );
-  }
+  }*/
 }

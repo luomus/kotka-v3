@@ -1,9 +1,8 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { DatatableColumn, DatatableSource, GetRowsParams } from '../../../../../libs/kotka/ui/datatable/src';
+import { DatatableColumn, DatatableSource, GetRowsParams} from '../../../../../libs/kotka/ui/datatable/src';
 import { URICellRenderer } from '../../../../../libs/kotka/ui/datatable/src/lib/renderers/uri-cell-renderer';
-import { ApiService } from '../shared/services/api.service';
-import { Observable } from 'rxjs';
-import { Dataset } from '@kotka/shared/models';
+import { DataType } from '../shared/services/api.service';
+import { DatatableDataService } from '../shared/services/datatable-data.service';
 
 @Component({
   selector: 'kotka-datasets',
@@ -37,24 +36,13 @@ export class DatasetsComponent {
   datasource: DatatableSource = {
     rowCount: 3,
     getRows: (params: GetRowsParams) => {
-      // const sortModel = params.sortModel;
-      // const filterModel = params.filterModel;
-      this.getData().subscribe(data => {
-        data = data.slice(params.startRow, params.endRow);
-        let lastRow = -1;
-        if (data.length <= params.endRow) {
-          lastRow = data.length;
-        }
-        params.successCallback(data, lastRow);
+      this.dataService.getData(DataType.dataset, params.startRow, params.endRow, params.sortModel, params.filterModel).subscribe(result => {
+        params.successCallback(result.member, result.totalItems);
       });
     }
   };
 
   constructor(
-    private apiService: ApiService
+    private dataService: DatatableDataService
   ) { }
-
-  private getData(): Observable<Dataset[]> {
-    return this.apiService.getAllDatasets();
-  }
 }
