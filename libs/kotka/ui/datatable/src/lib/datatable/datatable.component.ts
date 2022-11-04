@@ -17,7 +17,10 @@ import {
 } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
 
-export type DatatableColumn = ColDef;
+export interface DatatableColumn extends ColDef {
+  hideDefaultHeaderTooltip?: boolean;
+  hideDefaultTooltip?: boolean;
+}
 
 export interface SortModel {
   colId: string;
@@ -45,8 +48,9 @@ interface GridReadyEvent {
   styleUrls: ['./datatable.component.scss'],
 })
 export class DatatableComponent implements OnChanges {
-  @Input()
-  public columnDefs: DatatableColumn[] = [];
+  @Input() set columns(columns: DatatableColumn[]) {
+    this.setColumns(columns);
+  }
 
   @Input()
   public datasource?: DatatableSource;
@@ -61,10 +65,11 @@ export class DatatableComponent implements OnChanges {
   selectedColsChange = new EventEmitter<string[]>();
 
   public modules: Module[] = [InfiniteRowModelModule];
-  public defaultColDef: DatatableColumn = {
+  public colDefs: ColDef[] = [];
+  public defaultColDef: ColDef = {
     flex: 1,
     resizable: true,
-    minWidth: 100,
+    minWidth: 120,
     sortable: true,
     filter: true
   };
@@ -128,5 +133,17 @@ export class DatatableComponent implements OnChanges {
           .map((c) => c.getUserProvidedColDef()?.field || '')
       );
     }
+  }
+
+  private setColumns(columns: DatatableColumn[]) {
+    this.colDefs = columns.map(col => {
+      if (!col.hideDefaultHeaderTooltip) {
+        col.headerTooltip = col.headerName;
+      }
+      if (!col.hideDefaultTooltip) {
+        col.tooltipField = col.field;
+      }
+      return col;
+    });
   }
 }

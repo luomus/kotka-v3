@@ -12,13 +12,14 @@ import { Dataset } from '@kotka/shared/models';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DatasetsComponent {
-  columnDefs: DatatableColumn[] = [{
+  columns: DatatableColumn[] = [{
     headerName: 'URI',
     field: 'id',
     cellRenderer: URICellRenderer,
     cellRendererParams: {
       domain: 'http://tun.fi/'
-    }
+    },
+    hideDefaultTooltip: true
   }, {
     headerName: 'Name',
     field: 'datasetName.en',

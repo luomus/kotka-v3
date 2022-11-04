@@ -12,7 +12,7 @@ import { ICellRendererParams } from '@ag-grid-community/core';
         <i class="fa fa-pen-to-square"></i>
       </a>
       <small id="domainValue">{{ domain }}</small>
-      <span id="idValue">{{ value }}</span>
+      <span id="idValue" title="{{ value }}">{{ value }}</span>
     </div>
   `,
   styles: [`
