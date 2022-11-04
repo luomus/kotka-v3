@@ -71,7 +71,8 @@ export class DatatableComponent implements OnChanges {
     resizable: true,
     minWidth: 120,
     sortable: true,
-    filter: true
+    filter: true,
+    floatingFilter: true
   };
   public components: any;
   public rowBuffer = 0;
