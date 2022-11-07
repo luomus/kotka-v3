@@ -14,7 +14,12 @@ export class LajiAuthStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(req: Request, done: any) {
-    const user = await lastValueFrom(this.authService.getProfile(req.body.token));
-    done(null, user);
+    try {
+      const user = await lastValueFrom(this.authService.getProfile(req.body.token));
+      done(null, user);
+    } catch (err) {
+      done(err, false);
+    }
+
   }
 }

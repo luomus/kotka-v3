@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
-import { catchError, map } from 'rxjs';
+import { catchError, map, mergeMap } from 'rxjs';
 import { LajiApiService } from '@kotka/api-services';
 
 const kotkaRoles = [
@@ -21,27 +21,36 @@ export class AuthenticationService {
   }
 
   public getProfile(token: string) {
-    const $person = this.lajiApiSevice.get(`person/${token}`).pipe(
-      catchError((err) => { throw new UnauthorizedException('Error retrieving user profile from laji-auth.'); }),
-      map(res => res.data),
-      map(data => {
-        if (!data) {
-          throw new UnauthorizedException('No profile data fond.');
+    const $person = this.lajiApiSevice.get(`person-token/${token}`).pipe(
+      catchError((err) => { throw new UnauthorizedException('Error retrieving personToken information from laji-auth.', err); }),
+      mergeMap((res) => {
+        if (res.data.target !== process.env['SYSTEM_ID']) {
+          throw new UnauthorizedException('PersonToken for different system.');
         }
 
-        return data;
-      }),
-      map(data => {
-        if (!data.roleKotka || !kotkaRoles.includes(data.roleKotka)) {
-          throw new UnauthorizedException('User missing Kotka role.');
-        }
+        return this.lajiApiSevice.get(`person/${token}`).pipe(
+          catchError((err) => { throw new UnauthorizedException('Error retrieving user profile from laji-auth.', err); }),
+          map(res => res.data),
+          map(data => {
+            if (!data) {
+              throw new UnauthorizedException('No profile data fond.');
+            }
 
-        return data;
-      }),
-      map(data => ({
-        personToken: token,
-        profile: data
-      })),
+            return data;
+          }),
+          map(data => {
+            if (!data.roleKotka || !kotkaRoles.includes(data.roleKotka)) {
+              throw new UnauthorizedException('User missing Kotka role.');
+            }
+
+            return data;
+          }),
+          map(data => ({
+            personToken: token,
+            profile: data
+          })),
+        );
+      })
     );
 
     return $person;
