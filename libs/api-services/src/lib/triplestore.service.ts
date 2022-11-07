@@ -8,7 +8,7 @@ export class TriplestoreService {
   ) {}
 
   private baseParams = { format: 'RDF/XML' };
-  private headers = { Authorization: 'Basic ' + process.env['TRIPLESTORE_AUTH'] }
+  private headers = { Authorization: 'Basic ' + process.env['TRIPLESTORE_AUTH'] };
   private baseUrl = process.env['TRIPLESTORE_URL'];
 
   public get(resource: string, params = {}) {

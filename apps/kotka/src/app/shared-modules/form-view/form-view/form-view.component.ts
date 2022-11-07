@@ -9,11 +9,11 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormService } from '../../../shared/services/form.service';
-import { Form } from '../../../../../../../libs/shared/models/src/models/LajiForm';
+import { LajiForm } from '@kotka/shared/models';
 import { combineLatest, Observable, of, ReplaySubject, switchMap } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DataObject, ApiService, DataType } from '../../../shared/services/api.service';
-import { LajiFormComponent } from '../../../../../../../libs/kotka/ui/laji-form/src/lib/laji-form/laji-form.component';
+import { LajiFormComponent } from '@kotka/ui/laji-form';
 
 @Component({
   selector: 'kotka-form-view',
@@ -28,7 +28,7 @@ export class FormViewComponent implements OnChanges {
 
   routeParams$: Observable<{editMode: boolean, dataURI?: string}>;
   formId$: ReplaySubject<string> = new ReplaySubject<string>();
-  formParams$: Observable<{form: Form.SchemaForm, formData?: DataObject}>;
+  formParams$: Observable<{form: LajiForm.SchemaForm, formData?: DataObject}>;
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
 

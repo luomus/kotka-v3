@@ -1,5 +1,5 @@
 <kui-main-content [header]="'Datasets'">
-  <span *ngIf="totalCount">{{ totalCount }} datasets found</span>
+  <span *ngIf="totalCount !== undefined">{{ totalCount }} datasets found</span>
   <kui-datatable
     style="height: calc(100vh - 190px)"
     [columns]="columns"

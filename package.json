@@ -11,6 +11,7 @@
     "dev": "nx ",
     "kotka:cli": "ts-node --project=./apps/kotka-cli/tsconfig.app.json -r tsconfig-paths/register ./apps/kotka-cli/src/console.ts",
     "lint": "nx lint",
+    "lint:all": "nx run-many --target=lint --projects=api-interfaces,api-services,kotka,kotka-api,kotka-cli,kotka-e2e,laji-form,mappers",
     "prepare": "husky install"
   },
   "private": true,

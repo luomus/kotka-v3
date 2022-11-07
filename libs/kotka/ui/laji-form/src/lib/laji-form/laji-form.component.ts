@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import LajiForm from 'laji-form/lib/index';
 import { Theme as LajiFormTheme } from 'laji-form/lib/themes/theme';
-import { Form } from '../../../../../../shared/models/src/models/LajiForm';
+import { LajiForm as LajiFormModel } from '@kotka/shared/models';
 import { combineLatest } from 'rxjs';
 
 @Component({
@@ -20,7 +20,7 @@ import { combineLatest } from 'rxjs';
   styleUrls: ['./laji-form.component.scss'],
 })
 export class LajiFormComponent implements AfterViewInit, OnDestroy {
-  @Input() form: Form.SchemaForm | null = null;
+  @Input() form: LajiFormModel.SchemaForm | null = null;
   @Input() formData: any = {};
 
   private lajiFormWrapper?: LajiForm;
@@ -77,7 +77,7 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
 
   private createNewLajiForm(onReady?: () => void) {
     if (this.lajiFormWrapperProto && this.form) {
-      const form = this.form as Form.SchemaForm;
+      const form = this.form as LajiFormModel.SchemaForm;
       try {
         this.ngZone.runOutsideAngular(() => {
           this.unMount();
@@ -111,8 +111,7 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
             },*/
             // showShortcutButton: this.showShortcutButton,
             // onError: this._onError,
-            onComponentDidMount: onReady ? onReady() : () => {
-            },
+            onComponentDidMount: onReady ? onReady() : () => undefined,
             optimizeOnChange: true
           });
         });

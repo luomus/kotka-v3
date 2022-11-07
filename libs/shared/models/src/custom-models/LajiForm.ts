@@ -1,10 +1,10 @@
 /**
  * Form interface
  */
-import { Document } from './Document';
-import { Annotation } from './Annotation';
+import { Document } from '../models/Document';
+import { Annotation } from '../models/Annotation';
 
-export namespace Form {
+export namespace LajiForm {
   export enum PrintType {
     lineTransect = 'MHL.printTypeLineTransect',
   }
