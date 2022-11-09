@@ -6,7 +6,7 @@ import { ICellRendererParams } from '@ag-grid-community/core';
   selector: 'uri-cell-renderer',
   template: `
     <div *ngIf="value" class="uri-cell-layout">
-      <a id="editButton" type="button" class="btn btn-info" [routerLink]="['edit']" [queryParams]="{
+      <a id="editButton" type="button" class="btn btn-info text-white" [routerLink]="['edit']" [queryParams]="{
         uri: domain + value
       }">
         <i class="fa fa-pen-to-square"></i>

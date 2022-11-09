@@ -62,6 +62,12 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
     }
   }
 
+  saveFormClicked() {
+    this.ngZone.runOutsideAngular(() => {
+      this.lajiFormWrapper?.submit();
+    });
+  }
+
   private mount() {
     combineLatest([
       import('laji-form'),
@@ -100,7 +106,7 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
             // settings: this.settings,
             // apiClient: this.apiClient,
             lang: 'en',
-            renderSubmit: true,
+            renderSubmit: false,
             // topOffset: LajiFormComponent.TOP_OFFSET,
             // bottomOffset: LajiFormComponent.BOTTOM_OFFSET,
             /*notifier: {

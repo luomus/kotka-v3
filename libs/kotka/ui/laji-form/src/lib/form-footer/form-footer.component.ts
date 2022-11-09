@@ -1,7 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  ViewEncapsulation,
+  Output,
+  EventEmitter,
+  ViewEncapsulation
 } from '@angular/core';
 
 @Component({
@@ -12,5 +14,5 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormFooterComponent {
-
+  @Output() saveForm: EventEmitter<void> = new EventEmitter<void>();
 }
