@@ -71,6 +71,7 @@
     "@nrwl/nest": "14.4.2",
     "@nrwl/node": "14.4.2",
     "@nrwl/workspace": "14.4.2",
+    "@types/bootstrap": "^5.2.6",
     "@types/express-session": "^1.17.5",
     "@types/jest": "27.4.1",
     "@types/node": "16.11.7",

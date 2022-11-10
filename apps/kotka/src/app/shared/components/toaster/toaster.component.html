@@ -1,0 +1,9 @@
+<div class="toaster position-fixed top-0 end-0 px-3 pt-2 m-16">
+  <div *ngFor="let toast of currentToasts; index as i">
+    <kotka-toast
+      [type]="toast.type"
+      [message]="toast.message"
+      (disposeEvent)="dispose(i)"
+    ></kotka-toast>
+  </div>
+</div>

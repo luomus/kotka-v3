@@ -7,13 +7,14 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { FormService } from '../../../shared/services/form.service';
 import { LajiForm } from '@kotka/shared/models';
 import { combineLatest, Observable, of, ReplaySubject, switchMap } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DataObject, ApiService, DataType } from '../../../shared/services/api.service';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
+import { ToastService } from '../../../shared/services/toast.service';
 
 @Component({
   selector: 'kotka-form-view',
@@ -33,10 +34,10 @@ export class FormViewComponent implements OnChanges {
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
 
   constructor(
+    public notifier: ToastService,
     private activeRoute: ActivatedRoute,
     private formService: FormService,
     private apiService: ApiService,
-    private router: Router,
     private cdr: ChangeDetectorRef
   ) {
     this.routeParams$ = combineLatest([
@@ -90,7 +91,7 @@ export class FormViewComponent implements OnChanges {
     this.lajiForm?.block();
     saveData$.subscribe(() => {
       this.lajiForm?.unBlock();
-      this.router.navigate(['..'], {relativeTo: this.activeRoute});
+      this.notifier.showSuccess('Save success!');
       this.cdr.markForCheck();
     });
   }

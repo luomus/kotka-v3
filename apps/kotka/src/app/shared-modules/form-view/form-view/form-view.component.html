@@ -8,6 +8,7 @@
         *ngIf="(!routeParams.editMode || formParams.formData) else notFound"
         [form]="formParams.form"
         [formData]="formParams.formData"
+        [notifier]="notifier"
         (formSubmit)="onSubmit($event)"
       >
       </kui-laji-form>

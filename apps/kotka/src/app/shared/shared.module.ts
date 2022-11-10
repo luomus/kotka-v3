@@ -7,30 +7,25 @@ import { NavComponent } from './components/nav/nav.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { KotkaUiSpinnerModule } from '../../../../../libs/kotka/ui/spinner/src';
+import { ToasterComponent } from './components/toaster/toaster.component';
+import { ToastComponent } from './components/toaster/toast/toast.component';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    RouterModule,
-    CollapseModule,
-    BsDropdownModule
-  ],
+  imports: [CommonModule, RouterModule, CollapseModule, BsDropdownModule],
   declarations: [
     AppComponent,
     NavComponent,
-    NotFoundComponent
+    NotFoundComponent,
+    ToasterComponent,
+    ToastComponent,
   ],
-  exports: [
-    KotkaUiSpinnerModule
-  ]
+  exports: [KotkaUiSpinnerModule],
 })
 export class SharedModule {
   static forRoot(): ModuleWithProviders<SharedModule> {
     return {
       ngModule: SharedModule,
-      providers: [
-
-      ]
+      providers: [],
     };
   }
 }

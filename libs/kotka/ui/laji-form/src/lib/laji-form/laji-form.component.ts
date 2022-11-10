@@ -13,6 +13,7 @@ import LajiForm from 'laji-form/lib/index';
 import { Theme as LajiFormTheme } from 'laji-form/lib/themes/theme';
 import { LajiForm as LajiFormModel } from '@kotka/shared/models';
 import { combineLatest } from 'rxjs';
+import { Notifier } from '../models';
 
 @Component({
   selector: 'kui-laji-form',
@@ -24,6 +25,7 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
   static BOTTOM_OFFSET = 50;
   @Input() form: LajiFormModel.SchemaForm | null = null;
   @Input() formData: any = {};
+  @Input() notifier?: Notifier;
 
   private lajiFormWrapper?: LajiForm;
   private lajiFormWrapperProto?: any;
@@ -109,12 +111,12 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
             renderSubmit: false,
             topOffset: LajiFormComponent.TOP_OFFSET,
             bottomOffset: LajiFormComponent.BOTTOM_OFFSET,
-            /*notifier: {
-              success: msg => this.toastsService.showSuccess(msg),
-              info: msg => this.toastsService.showInfo(msg),
-              warning: msg => this.toastsService.showWarning(msg),
-              error: msg => this.toastsService.showError(msg),
-            },*/
+            notifier: {
+              success: (msg: string) => this.notifier?.showSuccess(msg),
+              info: (msg: string) => this.notifier?.showInfo(msg),
+              warning: (msg: string) => this.notifier?.showWarning(msg),
+              error: (msg: string) => this.notifier?.showError(msg),
+            },
             // onError: this._onError,
             onComponentDidMount: onReady ? onReady() : () => undefined,
             optimizeOnChange: true
