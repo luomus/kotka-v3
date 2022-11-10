@@ -20,6 +20,8 @@ import { combineLatest } from 'rxjs';
   styleUrls: ['./laji-form.component.scss'],
 })
 export class LajiFormComponent implements AfterViewInit, OnDestroy {
+  static TOP_OFFSET = 0;
+  static BOTTOM_OFFSET = 50;
   @Input() form: LajiFormModel.SchemaForm | null = null;
   @Input() formData: any = {};
 
@@ -87,7 +89,7 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
       try {
         this.ngZone.runOutsideAngular(() => {
           this.unMount();
-          /*this.apiClient.lang = this.translate.currentLang;
+          /*this.apiClient.lang = 'en';
           this.apiClient.personToken = this.userService.getToken();
           this.apiClient.formID = this.form.id;*/
           this.lajiFormWrapper = new this.lajiFormWrapperProto({
@@ -101,28 +103,25 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
             warnings: form.warnings,
             onSubmit: this.onSubmit.bind(this),
             // onChange: this._onChange.bind(this),
-            // onSettingsChange: this._onSettingsChange.bind(this),
             // onValidationError: this._onValidationError.bind(this),
-            // settings: this.settings,
             // apiClient: this.apiClient,
             lang: 'en',
             renderSubmit: false,
-            // topOffset: LajiFormComponent.TOP_OFFSET,
-            // bottomOffset: LajiFormComponent.BOTTOM_OFFSET,
+            topOffset: LajiFormComponent.TOP_OFFSET,
+            bottomOffset: LajiFormComponent.BOTTOM_OFFSET,
             /*notifier: {
               success: msg => this.toastsService.showSuccess(msg),
               info: msg => this.toastsService.showInfo(msg),
               warning: msg => this.toastsService.showWarning(msg),
               error: msg => this.toastsService.showError(msg),
             },*/
-            // showShortcutButton: this.showShortcutButton,
             // onError: this._onError,
             onComponentDidMount: onReady ? onReady() : () => undefined,
             optimizeOnChange: true
           });
         });
       } catch (err) {
-        // this.logger.error('Failed to load LajiForm', {error: err});
+        console.log('Failed to load LajiForm', {error: err});
       }
     }
   }
@@ -133,7 +132,7 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
         this.lajiFormWrapper?.unmount();
       });
     } catch (err) {
-      // this.logger.warn('Unmounting failed', err);
+      console.log('Unmounting failed', err);
     }
   }
 
