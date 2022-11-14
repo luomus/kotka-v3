@@ -6,6 +6,7 @@ import { Module } from '@nestjs/common';
 import { ApiServicesModule } from '@kotka/api-services';
 import { DatasetModule } from './dataset/dataset.module';
 import { FormModule } from './form/form.module';
+import { PersonModule } from './person/person.module';
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { FormModule } from './form/form.module';
     AuthenticationModule,
     ApiServicesModule,
     DatasetModule,
-    FormModule
+    FormModule,
+    PersonModule
   ],
   controllers: [],
   providers: []

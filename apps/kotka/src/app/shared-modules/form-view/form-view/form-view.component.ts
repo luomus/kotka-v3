@@ -3,14 +3,16 @@ import {
   ChangeDetectorRef,
   Component,
   Input,
+  OnInit,
   OnChanges,
+  OnDestroy,
   SimpleChanges,
   ViewChild
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormService } from '../../../shared/services/form.service';
 import { LajiForm } from '@kotka/shared/models';
-import { combineLatest, Observable, of, ReplaySubject, switchMap } from 'rxjs';
+import { combineLatest, Observable, of, ReplaySubject, Subscription, switchMap } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DataObject, ApiService, DataType } from '../../../shared/services/api.service';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
@@ -22,7 +24,7 @@ import { ToastService } from '../../../shared/services/toast.service';
   styleUrls: ['./form-view.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormViewComponent implements OnChanges {
+export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
   @Input() formId?: string;
   @Input() dataType?: DataType;
   @Input() dataTypeName?: string;
@@ -32,6 +34,9 @@ export class FormViewComponent implements OnChanges {
   formParams$: Observable<{form: LajiForm.SchemaForm, formData?: DataObject}>;
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
+
+  private formData = new ReplaySubject<DataObject|undefined>(1);
+  private routeSub?: Subscription;
 
   constructor(
     public notifier: ToastService,
@@ -54,7 +59,13 @@ export class FormViewComponent implements OnChanges {
     const form$ = this.formId$.pipe(
       switchMap(formId => this.formService.getForm(formId))
     );
-    const formData$ = this.routeParams$.pipe(
+    this.formParams$ = combineLatest([form$, this.formData]).pipe(
+      map(([form, formData]) => ({form, formData}))
+    );
+  }
+
+  ngOnInit() {
+    this.routeSub = this.routeParams$.pipe(
       switchMap(params => {
         if (params.dataURI && this.dataType) {
           const uriParts = params.dataURI.split('/');
@@ -64,9 +75,8 @@ export class FormViewComponent implements OnChanges {
           return of(undefined);
         }
       })
-    );
-    this.formParams$ = combineLatest([form$, formData$]).pipe(
-      map(([form, formData]) => ({form, formData}))
+    ).subscribe(
+      formData => this.formData.next(formData)
     );
   }
 
@@ -74,6 +84,10 @@ export class FormViewComponent implements OnChanges {
     if (changes['formId'] && this.formId) {
       this.formId$.next(this.formId);
     }
+  }
+
+  ngOnDestroy() {
+    this.routeSub?.unsubscribe();
   }
 
   onSubmit(data: DataObject) {
@@ -89,14 +103,18 @@ export class FormViewComponent implements OnChanges {
     }
 
     this.lajiForm?.block();
-    saveData$.subscribe(() => {
-      this.lajiForm?.unBlock();
-      this.notifier.showSuccess('Save success!');
-      this.cdr.markForCheck();
-    }, () => {
-      this.lajiForm?.unBlock();
-      this.notifier.showError('Save failed!');
-      this.cdr.markForCheck();
+    saveData$.subscribe({
+      'next': formData => {
+        this.formData.next(formData);
+        this.lajiForm?.unBlock();
+        this.notifier.showSuccess('Save success!');
+        this.cdr.markForCheck();
+      },
+      'error': () => {
+        this.lajiForm?.unBlock();
+        this.notifier.showError('Save failed!');
+        this.cdr.markForCheck();
+      }
     });
   }
 }

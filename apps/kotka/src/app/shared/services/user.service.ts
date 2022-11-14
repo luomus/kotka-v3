@@ -1,19 +1,23 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, Observable, of, switchMap } from 'rxjs';
-import { map, tap, distinctUntilChanged } from 'rxjs/operators';
+import { BehaviorSubject, catchError, Observable, of, switchMap, isObservable } from 'rxjs';
+import { map, tap, distinctUntilChanged, share } from 'rxjs/operators';
 import { WINDOW } from '@ng-toolkit/universal';
 import { Person } from '../../../../../../libs/shared/models/src';
 
 export interface IUserServiceState {
   user: Person | null;
   isLoggedIn: boolean | null;
+  allUsers: Record<string, Person|Observable<Person>>;
 }
 
-const path = '/api/auth/';
+const authPath = '/api/auth/';
+const personPath = '/api/person/';
+
 let _state: IUserServiceState = {
   user: null,
-  isLoggedIn: null
+  isLoggedIn: null,
+  allUsers: {}
 };
 
 @Injectable({
@@ -47,7 +51,7 @@ export class UserService {
   }
 
   private getSessionProfile(): Observable<Person | null> {
-    return this.httpClient.get<Person>(path + 'user').pipe(
+    return this.httpClient.get<Person>(authPath + 'user').pipe(
       tap(user => this.updateUser(user)),
       catchError(() => {
         this.updateUser(null);
@@ -57,19 +61,56 @@ export class UserService {
   }
 
   login(token: string) {
-    return this.httpClient.post<Person>(path + 'login', { token }).pipe(
+    return this.httpClient.post<Person>(authPath + 'login', { token }).pipe(
       tap(user => this.updateUser(user)),
     );
   }
 
   logout() {
-    return this.httpClient.get(path + 'logout').pipe(
+    return this.httpClient.get(authPath + 'logout').pipe(
       tap(() => this.updateUser(null)),
     );
   }
 
+  getPersonInfo(id: string, info: 'fullName' = 'fullName'): Observable<string> {
+    if (!id || !id.startsWith('MA.')) {
+      return of(id);
+    }
+
+    const pickValue = (obs: Observable<Person>): Observable<string> => obs.pipe(
+      map(person => person[info] ?? ''
+      )
+    );
+
+    if (_state.allUsers[id]) {
+      return pickValue(
+        isObservable(_state.allUsers[id]) ?
+          _state.allUsers[id] as Observable<Person> :
+          of(_state.allUsers[id] as Person)
+      );
+    }
+    if (_state.user && id === _state.user.id) {
+      return pickValue(of(_state.user));
+    }
+
+    _state.allUsers[id] = this.httpClient.get<Person>(personPath + id).pipe(
+      tap({
+          next: person => _state.allUsers[id] = person as Person,
+          error: () => delete _state.allUsers[id]
+      }),
+      catchError(() => of({
+        id,
+        fullName: id,
+        emailAddress: id
+      })),
+      share()
+    );
+
+    return pickValue(_state.allUsers[id] as Observable<Person>);
+  }
+
   private updateUser(user: Person | null) {
-    this.updateState({user, isLoggedIn: !!user});
+    this.updateState({..._state, user, isLoggedIn: !!user});
   }
 
   private updateState(state: IUserServiceState) {
@@ -77,6 +118,6 @@ export class UserService {
   }
 
   redirectToLogin(): void {
-    this.window.location.href = path + 'login';
+    this.window.location.href = authPath + 'login';
   }
 }
