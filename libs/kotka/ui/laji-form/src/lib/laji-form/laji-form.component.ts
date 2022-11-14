@@ -127,7 +127,7 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  private onError(error, info) {
+  private onError(error: Error, info: any) {
     console.log('LajiForm crashed', {error, info, document: this.formData});
     this.notifier?.showError('An unexpected error occurred');
   }
