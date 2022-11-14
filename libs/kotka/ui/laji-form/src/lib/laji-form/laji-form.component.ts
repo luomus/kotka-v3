@@ -105,7 +105,6 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
             warnings: form.warnings,
             onSubmit: this.onSubmit.bind(this),
             // onChange: this._onChange.bind(this),
-            // onValidationError: this._onValidationError.bind(this),
             // apiClient: this.apiClient,
             lang: 'en',
             renderSubmit: false,
@@ -117,7 +116,7 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
               warning: (msg: string) => this.notifier?.showWarning(msg),
               error: (msg: string) => this.notifier?.showError(msg),
             },
-            // onError: this._onError,
+            onError: this.onError,
             onComponentDidMount: onReady ? onReady() : () => undefined,
             optimizeOnChange: true
           });
@@ -126,6 +125,11 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
         console.log('Failed to load LajiForm', {error: err});
       }
     }
+  }
+
+  private onError(error, info) {
+    console.log('LajiForm crashed', {error, info, document: this.formData});
+    this.notifier?.showError('An unexpected error occurred');
   }
 
   private unMount() {
