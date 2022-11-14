@@ -1,37 +1,20 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { ToastEvent, ToastService } from '../../services/toast.service';
+import { ChangeDetectionStrategy, Component, TemplateRef, HostBinding } from '@angular/core';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'kotka-toaster',
   templateUrl: './toaster.component.html',
   styleUrls: ['./toaster.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ToasterComponent implements OnInit {
-  currentToasts: ToastEvent[] = [];
+export class ToasterComponent {
+  @HostBinding('class') classes = 'toast-container position-fixed top-0 end-0 p-3';
 
   constructor(
-    private toastService: ToastService,
-    private cdr: ChangeDetectorRef
+    public toastService: ToastService
   ) {}
 
-  ngOnInit() {
-    this.subscribeToToasts();
-  }
-
-  subscribeToToasts() {
-    this.toastService.toastEvents.subscribe((toasts) => {
-      const currentToast: ToastEvent = {
-        type: toasts.type,
-        message: toasts.message,
-      };
-      this.currentToasts.push(currentToast);
-      this.cdr.detectChanges();
-    });
-  }
-
-  dispose(index: number) {
-    this.currentToasts.splice(index, 1);
-    this.cdr.detectChanges();
+  asTemplate(tpl: any): TemplateRef<any>|undefined {
+    return tpl instanceof TemplateRef ? tpl : undefined;
   }
 }

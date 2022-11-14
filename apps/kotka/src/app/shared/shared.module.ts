@@ -8,16 +8,15 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { KotkaUiSpinnerModule } from '../../../../../libs/kotka/ui/spinner/src';
 import { ToasterComponent } from './components/toaster/toaster.component';
-import { ToastComponent } from './components/toaster/toast/toast.component';
+import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
-  imports: [CommonModule, RouterModule, CollapseModule, BsDropdownModule],
+  imports: [CommonModule, RouterModule, CollapseModule, BsDropdownModule, NgbToastModule],
   declarations: [
     AppComponent,
     NavComponent,
     NotFoundComponent,
     ToasterComponent,
-    ToastComponent,
   ],
   exports: [KotkaUiSpinnerModule],
 })

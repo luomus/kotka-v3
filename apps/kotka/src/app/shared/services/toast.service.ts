@@ -1,53 +1,53 @@
-import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Injectable, TemplateRef } from '@angular/core';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { take } from 'rxjs/operators';
 
-export enum EventTypes {
-  Success = 'success',
-  Info = 'info',
-  Warning = 'warning',
-  Error = 'error',
+export interface ToastOptions {
+  className?: string;
+  delay?: number;
+  autoHide?: boolean;
 }
-export interface ToastEvent {
-  type: EventTypes;
-  message: string;
+export interface ToastInfo extends ToastOptions {
+  textOrTpl: string | TemplateRef<any>;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class ToastService {
-  toastEvents: Observable<ToastEvent>;
-  private _toastEvents = new Subject<ToastEvent>();
+  toasts$: Observable<ToastInfo[]>;
+  private toastsSubject = new BehaviorSubject<ToastInfo[]>([]);
 
   constructor() {
-    this.toastEvents = this._toastEvents.asObservable();
+    this.toasts$ = this.toastsSubject.asObservable();
+  }
+
+  show(textOrTpl: string | TemplateRef<any>, options: ToastOptions = {}) {
+    const newToast = { textOrTpl, ...options };
+    this.toasts$.pipe(take(1)).subscribe(toasts => {
+      this.toastsSubject.next([...toasts, newToast]);
+    });
+  }
+
+  remove(toast: ToastInfo) {
+    this.toasts$.pipe(take(1)).subscribe(toasts => {
+      this.toastsSubject.next(toasts.filter(t => t !== toast));
+    });
   }
 
   showSuccess(message: string) {
-    this._toastEvents.next({
-      message,
-      type: EventTypes.Success,
-    });
+    this.show(message, { className: 'bg-success text-light' });
   }
 
   showError(message: string) {
-    this._toastEvents.next({
-      message,
-      type: EventTypes.Error,
-    });
+    this.show(message, { className: 'bg-danger text-light', autoHide: false });
   }
 
   showInfo(message: string) {
-    this._toastEvents.next({
-      message,
-      type: EventTypes.Info,
-    });
+    this.show(message, { className: 'bg-info text-light' });
   }
 
   showWarning(message: string) {
-    this._toastEvents.next({
-      message,
-      type: EventTypes.Warning,
-    });
+    this.show(message, { className: 'bg-warning text-light' });
   }
 }

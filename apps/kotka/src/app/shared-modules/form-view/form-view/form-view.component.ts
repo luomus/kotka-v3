@@ -93,6 +93,10 @@ export class FormViewComponent implements OnChanges {
       this.lajiForm?.unBlock();
       this.notifier.showSuccess('Save success!');
       this.cdr.markForCheck();
+    }, () => {
+      this.lajiForm?.unBlock();
+      this.notifier.showError('Save failed!');
+      this.cdr.markForCheck();
     });
   }
 }
