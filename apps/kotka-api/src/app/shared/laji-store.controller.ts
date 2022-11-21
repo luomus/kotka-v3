@@ -42,13 +42,13 @@ export abstract class LajiStoreController {
       body['dateCreated'] = date;
       body['dateEdited'] = date;
 
-      //const res = await lastValueFrom(this.lajiStoreService.post(this.type.split('.')[1], body));
+      const res = await lastValueFrom(this.lajiStoreService.post(this.type.split('.')[1], body));
 
-      //const rdfXml = await this.triplestoreMapperService.jsonToTriplestore(cloneDeep(res.data), this.type);
+      const rdfXml = await this.triplestoreMapperService.jsonToTriplestore(cloneDeep(res.data), this.type);
 
-      //await lastValueFrom(this.triplestoreService.put(res.data.id, rdfXml));
+      await lastValueFrom(this.triplestoreService.put(res.data.id, rdfXml));
     
-      return body;//res.data;
+      return res.data;
     } catch (err) {
       console.error(err);
       throw err;
@@ -76,13 +76,13 @@ export abstract class LajiStoreController {
       body['editor'] = user;
       body['dateEdited'] = date;
 
-      //const res = await lastValueFrom(this.lajiStoreService.put(this.type.split('.')[1], id, body));
+      const res = await lastValueFrom(this.lajiStoreService.put(this.type.split('.')[1], id, body));
 
-      //const rdfXml = await this.triplestoreMapperService.jsonToTriplestore(cloneDeep(res.data), this.type);
+      const rdfXml = await this.triplestoreMapperService.jsonToTriplestore(cloneDeep(res.data), this.type);
 
-      //await lastValueFrom(this.triplestoreService.put(res.data.id, rdfXml));
+      await lastValueFrom(this.triplestoreService.put(res.data.id, rdfXml));
       
-      return body;//res.data;
+      return res.data;
     } catch (err) {
       console.error(err);
       throw err;
@@ -94,11 +94,10 @@ export abstract class LajiStoreController {
   @HttpCode(204)
   async delete(@Param('id') id: string) {
     try {
-      //await lastValueFrom(this.lajiStoreService.delete(this.type, id));
+      await lastValueFrom(this.lajiStoreService.delete(this.type, id));
 
-      //await lastValueFrom(this.triplestoreService.delete(id));
+      await lastValueFrom(this.triplestoreService.delete(id));
 
-      return 'DELETED';
     } catch (err) {
       console.error(err);
       throw err;
