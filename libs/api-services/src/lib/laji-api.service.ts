@@ -15,6 +15,6 @@ export class LajiApiService {
   }
 
   public delete(path: string, params = {}) {
-    return this.httpService.get(this.baseUrl + path, { params: Object.assign(this.baseParams, params) });
+    return this.httpService.delete(this.baseUrl + path, { params: Object.assign(this.baseParams, params) });
   }
 }

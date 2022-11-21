@@ -3,6 +3,7 @@ https://docs.nestjs.com/providers#services
 */
 
 import { StoreGetQuery } from '@kotka/api-interfaces';
+import { StoreObject } from '@kotka/shared/models';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 
@@ -19,14 +20,14 @@ export class LajiStoreService {
     return this.httpService.get(`${this.urlBase}${type}`, Object.assign({ params: query }, this.baseConfig));
   }
 
-  post(type: string, body: unknown) {
+  post(type: string, body: StoreObject) {
     return this.httpService.post(`${this.urlBase}${type}`, body, this.baseConfig);
   }
   get(type: string, id: string) {
     return this.httpService.get(`${this.urlBase}${type}/${id}`, this.baseConfig);
   }
 
-  put(type: string, id: string, body: unknown) {
+  put(type: string, id: string, body: StoreObject) {
     return this.httpService.put(`${this.urlBase}${type}/${id}`, body, this.baseConfig);
   }
 
