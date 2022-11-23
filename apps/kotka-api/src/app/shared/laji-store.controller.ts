@@ -42,7 +42,7 @@ export abstract class LajiStoreController {
       body['dateCreated'] = date;
       body['dateEdited'] = date;
 
-      const res = await lastValueFrom(this.lajiStoreService.post(this.type.split('.')[1], body));
+      const res = await lastValueFrom(this.lajiStoreService.post(this.type, body));
 
       const rdfXml = await this.triplestoreMapperService.jsonToTriplestore(cloneDeep(res.data), this.type);
 
@@ -58,7 +58,7 @@ export abstract class LajiStoreController {
   @Get(':id')
   async get(@Param('id') id: string) {
     try {
-      const res = await lastValueFrom(this.lajiStoreService.get(this.type.split('.')[1], id));
+      const res = await lastValueFrom(this.lajiStoreService.get(this.type, id));
 
       return res.data;
     } catch (err) {
@@ -76,7 +76,7 @@ export abstract class LajiStoreController {
       body['editor'] = user;
       body['dateEdited'] = date;
 
-      const res = await lastValueFrom(this.lajiStoreService.put(this.type.split('.')[1], id, body));
+      const res = await lastValueFrom(this.lajiStoreService.put(this.type, id, body));
 
       const rdfXml = await this.triplestoreMapperService.jsonToTriplestore(cloneDeep(res.data), this.type);
 

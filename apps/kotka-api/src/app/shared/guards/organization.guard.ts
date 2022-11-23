@@ -4,6 +4,7 @@ https://docs.nestjs.com/guards#guards
 
 import { LajiStoreService } from '@kotka/api-services';
 import { StoreObject } from '@kotka/shared/models';
+import { allowAccessByOrganization } from '@kotka/shared/utils';
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { lastValueFrom, Observable } from 'rxjs';
@@ -31,7 +32,7 @@ export class OrganizationGuard implements CanActivate {
 
       const res = await lastValueFrom(this.lajiStoreService.get(type, req.params.id));
 
-      if (!req.user.profile.organisation.includes(res.data.owner)) {
+      if (!allowAccessByOrganization(res.data, req.user.profile)) {
         throw new ForbiddenException(`Uset may only ${req.method} a ${type} which belongs to one of their own organizations.`);
       }
     }

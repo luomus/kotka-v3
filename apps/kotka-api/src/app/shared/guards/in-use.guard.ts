@@ -36,7 +36,7 @@ export class InUseGuard implements CanActivate {
     //const res = await lastValueFrom(this.lajistoreSevice.getAll(type, req.params.id));
     const data = Object.keys(res.data['rdf:RDF']).filter(key => inUseTypes.includes(key));
 
-    if (data) {
+    if (data && data.length > 0) {
       throw new ForbiddenException('Deletion target is in use.');
     }
 

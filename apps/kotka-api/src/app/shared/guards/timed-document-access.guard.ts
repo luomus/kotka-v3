@@ -7,6 +7,7 @@ import { Injectable, CanActivate, ExecutionContext, InternalServerErrorException
 import { Reflector } from '@nestjs/core';
 import { lastValueFrom } from 'rxjs';
 import * as moment from 'moment';
+import { allowAccessByTime } from '@kotka/shared/utils';
 
 @Injectable()
 export class TimedDocumentAccessGuard implements CanActivate {
@@ -37,7 +38,7 @@ export class TimedDocumentAccessGuard implements CanActivate {
 
     const res = await lastValueFrom(this.lajiStoreService.get(type, req.params.id));
 
-    if (moment(res.data.dateCreated).add(timedAccessMetadata).isBefore(moment())) {
+    if (!allowAccessByTime(res.data, timedAccessMetadata)) {
       throw new ForbiddenException(`Time limit for ${type} ${req.method} has passed.`);
     }
 
