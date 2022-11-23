@@ -18,6 +18,7 @@ import { DataObject, ApiService, DataType } from '../../../shared/services/api.s
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ToastService } from '../../../shared/services/toast.service';
 import { UserService } from '../../../shared/services/user.service';
+import { FormApiClient } from '../../../shared/services/form-api-client';
 
 @Component({
   selector: 'kotka-form-view',
@@ -42,6 +43,7 @@ export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
   private routeSub?: Subscription;
 
   constructor(
+    public formApiClient: FormApiClient,
     public notifier: ToastService,
     private activeRoute: ActivatedRoute,
     private formService: FormService,
