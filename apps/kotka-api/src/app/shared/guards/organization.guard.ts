@@ -22,13 +22,17 @@ export class OrganizationGuard implements CanActivate {
     const req = context.switchToHttp().getRequest();
     const type = this.reflector.get('controllerType', context.getClass());
 
+    if (req.user.profile.role.includes('MA.admin')) {
+      return true;
+    }
+
     if(req.method === 'POST') {
       const doc = req.body;
 
-      if (!req.user.profile.organisation.includes(doc.owner)) {
+      if (!allowAccessByOrganization(doc, req.user.profile)) {
         throw new ForbiddenException(`User may only ${req.method} a ${type} with one of their own organizations as owner.`);
       }
-    } else if (req.method === 'PUT' || (req.method === 'DELETE' && !req.user.profile.role.includes('MA.admin'))) {
+    } else if (req.method === 'PUT' || req.method === 'DELETE') {
 
       const res = await lastValueFrom(this.lajiStoreService.get(type, req.params.id));
 
