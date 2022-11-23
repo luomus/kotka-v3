@@ -1,2 +1,6 @@
 <div #lajiForm style="margin-bottom: 60px"></div>
-<kui-form-footer (saveForm)="saveFormClicked()"></kui-form-footer>
+<kui-form-footer
+  [showDeleteButton]="showDeleteButton"
+  (saveForm)="saveFormClicked()"
+  (delete)="delete.emit(formData)"
+></kui-form-footer>

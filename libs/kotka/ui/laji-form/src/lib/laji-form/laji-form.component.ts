@@ -25,6 +25,8 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
   static BOTTOM_OFFSET = 50;
   @Input() form: LajiFormModel.SchemaForm | null = null;
   @Input() formData: any = {};
+  @Input() disabled = false;
+  @Input() showDeleteButton = true;
   @Input() apiClient?: any;
   @Input() notifier?: Notifier;
 
@@ -34,6 +36,7 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
   private isBlocked = false;
 
   @Output() formSubmit: EventEmitter<any> = new EventEmitter<any>();
+  @Output() delete: EventEmitter<any> = new EventEmitter<any>();
 
   @ViewChild('lajiForm', { static: true }) lajiFormRoot!: ElementRef;
 

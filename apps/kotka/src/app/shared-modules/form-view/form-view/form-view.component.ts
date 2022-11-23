@@ -9,7 +9,7 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormService } from '../../../shared/services/form.service';
 import { LajiForm } from '@kotka/shared/models';
 import { combineLatest, Observable, of, ReplaySubject, Subscription, switchMap } from 'rxjs';
@@ -49,6 +49,7 @@ export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
     private formService: FormService,
     private apiService: ApiService,
     private userService: UserService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {
     this.routeParams$ = combineLatest([
@@ -134,5 +135,33 @@ export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  onDelete(data: DataObject) {
+    if (!this.dataType) {
+      return;
+    }
+    if (!data.id) {
+      this.navigateAway();
+      return;
+    }
+
+    this.lajiForm?.block();
+    this.apiService.delete(this.dataType, data.id).subscribe({
+      'next': () => {
+        this.lajiForm?.unBlock();
+        this.notifier.showSuccess('Success!');
+        this.navigateAway();
+      },
+      'error': () => {
+        this.lajiForm?.unBlock();
+        this.notifier.showError('Delete failed!');
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  private navigateAway() {
+    this.router.navigate(['..'], {relativeTo: this.activeRoute});
   }
 }

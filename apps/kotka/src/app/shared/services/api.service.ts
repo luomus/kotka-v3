@@ -35,6 +35,11 @@ export class ApiService {
     return this.httpClient.put<DataObject>(path + type + '/' + id, data);
   }
 
+  delete(type: DataType.dataset, id: string): Observable<null>;
+  delete(type: DataType, id: string): Observable<null> {
+    return this.httpClient.delete<null>(path + type + '/' + id);
+  }
+
   getData(type: DataType.dataset, page?: number, pageSize?: number, sort?: string, searchQuery?: string): Observable<ListResponse<Dataset>>;
   getData(type: DataType, page=1, pageSize=100, sort?: string, searchQuery?: string): Observable<ListResponse<DataObject>> {
     let params = new HttpParams().set('page', page).set('page_size', pageSize);

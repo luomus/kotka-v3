@@ -17,6 +17,7 @@
         [apiClient]="formApiClient"
         [notifier]="notifier"
         (formSubmit)="onSubmit($event)"
+        (delete)="onDelete($event)"
       >
       </kui-laji-form>
       <ng-template #notFound>
