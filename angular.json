@@ -10,6 +10,6 @@
     "kotka-e2e": "apps/kotka-e2e",
     "laji-form": "libs/kotka/ui/laji-form",
     "mappers": "libs/mappers",
-    "shared-utils": "libs/shared/utils"
+    "utils": "libs/utils"
   }
 }

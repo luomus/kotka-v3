@@ -4,7 +4,7 @@ https://docs.nestjs.com/guards#guards
 
 import { LajiStoreService } from '@kotka/api-services';
 import { StoreObject } from '@kotka/shared/models';
-import { allowAccessByOrganization } from '@kotka/shared/utils';
+import { allowAccessByOrganization } from '@kotka/utils';
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { lastValueFrom, Observable } from 'rxjs';

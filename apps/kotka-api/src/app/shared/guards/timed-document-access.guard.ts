@@ -7,7 +7,7 @@ import { Injectable, CanActivate, ExecutionContext, InternalServerErrorException
 import { Reflector } from '@nestjs/core';
 import { lastValueFrom } from 'rxjs';
 import * as moment from 'moment';
-import { allowAccessByTime } from '@kotka/shared/utils';
+import { allowAccessByTime } from '@kotka/utils';
 
 @Injectable()
 export class TimedDocumentAccessGuard implements CanActivate {
