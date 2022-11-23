@@ -40,7 +40,7 @@ export class TriplestoreMapperService implements OnModuleInit {
         delete json['@context'];
         resolve(json);
         } catch (err) {
-          console.log(err);
+          console.error(err);
         }
 
       });
@@ -135,7 +135,7 @@ export class TriplestoreMapperService implements OnModuleInit {
       this.fromContext[type] = ctx2;
       this.returnContext[type] = ctx3;
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   }
 }
