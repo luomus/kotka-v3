@@ -17,6 +17,8 @@ import { map } from 'rxjs/operators';
 import { DataObject, ApiService, DataType } from '../../../shared/services/api.service';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ToastService } from '../../../shared/services/toast.service';
+import { UserService } from '../../../shared/services/user.service';
+import { FormApiClient } from '../../../shared/services/form-api-client';
 
 @Component({
   selector: 'kotka-form-view',
@@ -33,16 +35,20 @@ export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
   formId$: ReplaySubject<string> = new ReplaySubject<string>();
   formParams$: Observable<{form: LajiForm.SchemaForm, formData?: DataObject}>;
 
+  formContext: Record<string, any> = {};
+
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
 
   private formData = new ReplaySubject<DataObject|undefined>(1);
   private routeSub?: Subscription;
 
   constructor(
+    public formApiClient: FormApiClient,
     public notifier: ToastService,
     private activeRoute: ActivatedRoute,
     private formService: FormService,
     private apiService: ApiService,
+    private userService: UserService,
     private cdr: ChangeDetectorRef
   ) {
     this.routeParams$ = combineLatest([
@@ -57,7 +63,19 @@ export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
     );
 
     const form$ = this.formId$.pipe(
-      switchMap(formId => this.formService.getForm(formId))
+      switchMap(formId => combineLatest([
+        this.formService.getForm(formId),
+        this.userService.user$]
+      ).pipe(
+        map(([form, user]) => {
+          const userName = user?.fullName.split(' ').reverse().join(', ');
+          form.uiSchemaContext = {
+            defaultPersonsResponsible: userName,
+            ...form.uiSchemaContext
+          };
+          return form;
+        })
+      ))
     );
     this.formParams$ = combineLatest([form$, this.formData]).pipe(
       map(([form, formData]) => ({form, formData}))

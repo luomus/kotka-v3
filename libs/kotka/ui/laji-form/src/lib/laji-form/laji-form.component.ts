@@ -25,6 +25,7 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
   static BOTTOM_OFFSET = 50;
   @Input() form: LajiFormModel.SchemaForm | null = null;
   @Input() formData: any = {};
+  @Input() apiClient?: any;
   @Input() notifier?: Notifier;
 
   private lajiFormWrapper?: LajiForm;
@@ -91,9 +92,7 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
       try {
         this.ngZone.runOutsideAngular(() => {
           this.unMount();
-          /*this.apiClient.lang = 'en';
-          this.apiClient.personToken = this.userService.getToken();
-          this.apiClient.formID = this.form.id;*/
+
           this.lajiFormWrapper = new this.lajiFormWrapperProto({
             rootElem: this.lajiFormRoot.nativeElement,
             theme: this.lajiFormTheme,
@@ -105,7 +104,7 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
             warnings: form.warnings,
             onSubmit: this.onSubmit.bind(this),
             // onChange: this._onChange.bind(this),
-            // apiClient: this.apiClient,
+            apiClient: this.apiClient,
             lang: 'en',
             renderSubmit: false,
             topOffset: LajiFormComponent.TOP_OFFSET,

@@ -14,6 +14,7 @@
         *ngIf="(!routeParams.editMode || formParams.formData) else notFound"
         [form]="formParams.form"
         [formData]="formParams.formData"
+        [apiClient]="formApiClient"
         [notifier]="notifier"
         (formSubmit)="onSubmit($event)"
       >

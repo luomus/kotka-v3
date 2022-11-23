@@ -41,7 +41,7 @@
     "@nrwl/angular": "14.4.2",
     "bootstrap": "^5.2.1",
     "express-session": "^1.17.3",
-    "laji-form": "^14.1.3",
+    "laji-form": "^14.1.5",
     "lodash": "^4.17.21",
     "nestjs-console": "^8.0.0",
     "ngx-bootstrap": "^9.0.0",

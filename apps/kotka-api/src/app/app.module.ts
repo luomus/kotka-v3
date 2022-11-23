@@ -7,6 +7,7 @@ import { ApiServicesModule } from '@kotka/api-services';
 import { DatasetModule } from './dataset/dataset.module';
 import { FormModule } from './form/form.module';
 import { PersonModule } from './person/person.module';
+import { AutocompleteModule } from './autocomplete/autocomplete.module';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { PersonModule } from './person/person.module';
     ApiServicesModule,
     DatasetModule,
     FormModule,
-    PersonModule
+    PersonModule,
+    AutocompleteModule
   ],
   controllers: [],
   providers: []
