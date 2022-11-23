@@ -58,13 +58,13 @@ export class AuthenticationService {
 
   public logoutUser(token: string) {
     return this.lajiApiSevice.delete(`person-token/${token}`).pipe(
-      catchError((err) => { throw new InternalServerErrorException('Error terminating user laji-auth login.'); })
+      catchError((err) => { throw new InternalServerErrorException('Error terminating user laji-auth login.', err); })
     );
   }
 
   public checkLoginValidity(token: string) {
     return this.lajiApiSevice.get(`person-token/${token}`).pipe(
-      catchError((err) => { throw new UnauthorizedException('Error validating user personToken.'); }),
+      catchError((err) => { throw new UnauthorizedException('Error validating user personToken.', err); }),
     );
   }
 }

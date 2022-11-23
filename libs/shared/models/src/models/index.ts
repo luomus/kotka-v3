@@ -241,6 +241,13 @@ export type StoreObject = BibliographicResource
    | Validator
    | Video;
 
+   export type KotkaDocumentObject =
+   | Dataset
+   | Document
+   | Organization
+   | Sample
+   | Transaction
+
 export type KeyOfUnion<K extends StoreObject> = K extends keyof K ? K : never;
 
 export type Lang = 'en' | 'fi' | 'sv';
