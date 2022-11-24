@@ -120,4 +120,15 @@ export class UserService {
   redirectToLogin(): void {
     this.window.location.href = authPath + 'login';
   }
+
+  formatUserName(fullName?: string) {
+    if (!fullName) {
+      return '';
+    }
+
+    const splitIdx = fullName.indexOf(' ');
+    const firstName = fullName.substring(0, splitIdx);
+    const lastName = fullName.substring(splitIdx + 1);
+    return lastName + ', ' + firstName;
+  }
 }

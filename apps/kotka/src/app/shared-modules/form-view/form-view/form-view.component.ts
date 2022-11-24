@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormService } from '../../../shared/services/form.service';
-import { LajiForm } from '@kotka/shared/models';
+import { LajiForm, Person } from '@kotka/shared/models';
 import { combineLatest, Observable, of, ReplaySubject, Subscription, switchMap } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DataObject, ApiService, DataType } from '../../../shared/services/api.service';
@@ -30,10 +30,11 @@ export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
   @Input() formId?: string;
   @Input() dataType?: DataType;
   @Input() dataTypeName?: string;
+  @Input() getInitialFormDataFunc?: (user: Person) => Partial<DataObject>;
 
   routeParams$: Observable<{editMode: boolean, dataURI?: string}>;
   formId$: ReplaySubject<string> = new ReplaySubject<string>();
-  formParams$: Observable<{form: LajiForm.SchemaForm, formData?: DataObject}>;
+  formParams$: Observable<{form: LajiForm.SchemaForm, formData?: Partial<DataObject>}>;
 
   formContext: Record<string, any> = {};
 
@@ -64,22 +65,23 @@ export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
     );
 
     const form$ = this.formId$.pipe(
-      switchMap(formId => combineLatest([
-        this.formService.getForm(formId),
-        this.userService.user$]
-      ).pipe(
-        map(([form, user]) => {
-          const userName = user?.fullName.split(' ').reverse().join(', ');
-          form.uiSchemaContext = {
-            defaultPersonsResponsible: userName,
-            ...form.uiSchemaContext
-          };
-          return form;
-        })
-      ))
+      switchMap(formId => this.formService.getForm(formId))
     );
-    this.formParams$ = combineLatest([form$, this.formData]).pipe(
-      map(([form, formData]) => ({form, formData}))
+
+    this.formParams$ = combineLatest([form$, this.formData, this.userService.user$]).pipe(
+      map(([form, data, user]) => {
+        form.uiSchemaContext = {
+          userName: this.userService.formatUserName(user?.fullName),
+          ...form.uiSchemaContext
+        };
+
+        let formData: Partial<DataObject>|undefined = data;
+        if (!formData && this.getInitialFormDataFunc && user) {
+          formData = this.getInitialFormDataFunc(user);
+        }
+
+        return {form, formData};
+      })
     );
   }
 

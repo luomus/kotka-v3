@@ -46,7 +46,7 @@ export namespace LajiForm {
   }
 
   export interface IUISchemaContext {
-    defaultPersonsResponsible?: string;
+    userName?: string;
     creator?: string;
     municipalityEnum?: IEnum;
     biogeographicalProvinceEnum?: IEnum;

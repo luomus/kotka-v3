@@ -4,7 +4,7 @@
     [containerClass]="'container'"
   >
     <ng-container *ngIf="formParams$ | async as formParams else spinner">
-      <div *ngIf="formParams.formData" class="mb-1">
+      <div *ngIf="formParams.formData && formParams.formData.id" class="mb-1">
         <strong class="d-block">Last edited by</strong>
         <span>{{ (formParams.formData.creator || '') | user }} on {{ formParams.formData.dateEdited | date:'dd.MM.YYYY HH:mm' }}</span>
         <strong class="d-block">Originally created by</strong>
