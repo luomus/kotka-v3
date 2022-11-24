@@ -7,7 +7,7 @@ import { of } from 'rxjs';
   providedIn: 'root'
 })
 export class FormApiClient {
-  private basePath = '/api/';
+  private basePath = '/api';
 
   constructor(
     private httpClient: HttpClient
