@@ -24,10 +24,10 @@ export class InUseGuard implements CanActivate {
       return true;
     }
   
-    const type = this.reflector.get('controllerType', context.getClass());
-    const inUseTypes = this.reflector.get('inUseTypes', context.getClass());
+    const type: string = this.reflector.get('controllerType', context.getClass());
+    const inUseTypes: Array<string> = this.reflector.get('inUseTypes', context.getClass());
 
-    if (!inUseTypes) {
+    if (inUseTypes.length === 0 || !inUseTypes) {
       return true;
     }
 

@@ -2,12 +2,9 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
-import { lastValueFrom } from 'rxjs';
+import { Controller, UseGuards } from '@nestjs/common';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
 import { LajiStoreService, TriplestoreService } from '@kotka/api-services';
-import { Dataset } from '@kotka/shared/models';
-import { StoreGetQuery } from '@kotka/api-interfaces';
 import { TriplestoreMapperService } from '@kotka/mappers';
 import { LajiStoreController } from '../shared/laji-store.controller';
 import { ControllerType } from '../shared/decorators/controller-type.decorator';

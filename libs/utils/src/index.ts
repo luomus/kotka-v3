@@ -1,1 +1,1 @@
-export * from './lib/acces-guard-utils';
+export * from './lib/access-guard-utils';

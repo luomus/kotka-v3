@@ -20,7 +20,7 @@ export class OrganizationGuard implements CanActivate {
     context: ExecutionContext
   ): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
-    const type = this.reflector.get('controllerType', context.getClass());
+    const type: string = this.reflector.get('controllerType', context.getClass());
 
     if (req.user.profile.role.includes('MA.admin')) {
       return true;
