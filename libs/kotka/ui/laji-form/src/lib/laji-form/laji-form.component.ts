@@ -26,7 +26,7 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
   @Input() form: LajiFormModel.SchemaForm | null = null;
   @Input() formData: any = {};
   @Input() disabled = false;
-  @Input() showDeleteButton = true;
+  @Input() showDeleteButton = false;
   @Input() apiClient?: any;
   @Input() notifier?: Notifier;
 
@@ -53,7 +53,7 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
   }
 
   block() {
-    if (!this.isBlocked) {
+    if (!this.isBlocked && this.lajiFormWrapper) {
       this.ngZone.runOutsideAngular(() => {
         this.lajiFormWrapper?.pushBlockingLoader();
       });
@@ -62,7 +62,7 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
   }
 
   unBlock() {
-    if (this.isBlocked) {
+    if (this.isBlocked && this.lajiFormWrapper) {
       this.ngZone.runOutsideAngular(() => {
         this.lajiFormWrapper?.popBlockingLoader();
       });
@@ -120,7 +120,8 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
             },
             onError: this.onError,
             onComponentDidMount: onReady ? onReady() : () => undefined,
-            optimizeOnChange: true
+            optimizeOnChange: true,
+            disabled: this.disabled
           });
         });
       } catch (err) {

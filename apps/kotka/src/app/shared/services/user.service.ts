@@ -131,4 +131,8 @@ export class UserService {
     const lastName = fullName.substring(splitIdx + 1);
     return lastName + ', ' + firstName;
   }
+
+  isICTAdmin(user: Person): boolean {
+    return (user.role || []).includes('MA.admin');
+  }
 }

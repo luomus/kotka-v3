@@ -4,6 +4,7 @@ import { FormViewComponent } from './form-view/form-view.component';
 import { KotkaUiMainContentModule } from '../../../../../../libs/kotka/ui/main-content/src';
 import { KotkaUiLajiFormModule } from '@kotka/ui/laji-form';
 import { SharedModule } from '../../shared/shared.module';
+import { NgbAlertModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [FormViewComponent],
@@ -11,7 +12,8 @@ import { SharedModule } from '../../shared/shared.module';
     CommonModule,
     SharedModule,
     KotkaUiMainContentModule,
-    KotkaUiLajiFormModule
+    KotkaUiLajiFormModule,
+    NgbAlertModule
   ],
   exports: [
     FormViewComponent

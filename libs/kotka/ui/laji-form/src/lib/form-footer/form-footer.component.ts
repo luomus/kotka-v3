@@ -15,6 +15,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormFooterComponent {
+  @Input() disabled = false;
   @Input() showDeleteButton = false;
 
   @Output() saveForm: EventEmitter<void> = new EventEmitter<void>();

@@ -4,6 +4,10 @@
     [containerClass]="'container'"
   >
     <ng-container *ngIf="formParams$ | async as formParams else spinner">
+      <ngb-alert *ngIf="formParams.disabled && !disabledAlertIsDismissed" [type]="'warning'" (closed)="disabledAlertIsDismissed = true">
+        <strong>Note:</strong>
+        You can only view and copy this record. To be able to edit this record, you must belong to {{ formParams.formData?.owner }}
+      </ngb-alert>
       <div *ngIf="formParams.formData && formParams.formData.id" class="mb-1">
         <strong class="d-block">Last edited by</strong>
         <span>{{ (formParams.formData.creator || '') | user }} on {{ formParams.formData.dateEdited | date:'dd.MM.YYYY HH:mm' }}</span>
@@ -14,6 +18,8 @@
         *ngIf="(!routeParams.editMode || formParams.formData) else notFound"
         [form]="formParams.form"
         [formData]="formParams.formData"
+        [disabled]="formParams.disabled"
+        [showDeleteButton]="formParams.showDeleteButton"
         [apiClient]="formApiClient"
         [notifier]="notifier"
         (formSubmit)="onSubmit($event)"
