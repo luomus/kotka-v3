@@ -17,7 +17,6 @@ export class AutocompleteController {
     try {
       query = {...query, personToken: request['user'].personToken};
       const res = await lastValueFrom(this.lajiApiSevice.get(`${path}/${field}`, query));
-
       return res.data;
     } catch (err) {
       console.error(err);
