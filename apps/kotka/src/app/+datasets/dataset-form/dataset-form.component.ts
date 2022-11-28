@@ -13,7 +13,7 @@ export class DatasetFormComponent {
 
   getInitialFormData(user: Person): Partial<Dataset> {
     const formData: Partial<Dataset> = {};
-    if (user?.organisation && user.organisation.length > 0) {
+    if (user?.organisation && user.organisation.length === 1) {
       formData.owner = user.organisation[0];
     }
     return formData;
