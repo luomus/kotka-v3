@@ -61,11 +61,20 @@ async function bootstrap() {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  app.use('/api/laji', createProxyMiddleware({
+  const lajiApiBase = '/api/laji';
+  const allowedPaths = ['/autocomplete', '/forms', '/organization', '/person'];
+
+  const proxyFilter = (pathname: string, req: Request) => {
+    const path = pathname.replace(lajiApiBase, '');
+    const isAllowedPath = allowedPaths.some(allowedPath => path.startsWith(allowedPath));
+    return isAllowedPath && req.method === 'GET';
+  };
+
+  app.use(lajiApiBase, createProxyMiddleware(proxyFilter, {
     target: process.env['LAJI_API_URL'],
     changeOrigin: true,
     pathRewrite: (path, req) => {
-      let newPath = path.replace('/api/laji', '');
+      let newPath = path.replace(lajiApiBase, '');
 
       const queryString = getLajiApiQueryString(req);
       newPath = `${newPath.split('?')[0]}?${queryString}`;
