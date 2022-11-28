@@ -1,1 +1,5 @@
-<div></div>
+<div class="p-4">
+  <ngb-alert *ngIf="errorMsg" [type]="'danger'" [dismissible]="false">
+    <strong>Logout failed:</strong> {{ errorMsg }}
+  </ngb-alert>
+</div>

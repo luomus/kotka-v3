@@ -1,17 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserService } from '../../shared/services/user.service';
 
 @Component({
   selector: 'kotka-logout',
   templateUrl: './logout.component.html',
-  styleUrls: ['./logout.component.css']
+  styleUrls: ['./logout.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LogoutComponent implements OnInit {
+  errorMsg?: string;
 
   constructor(
     private router: Router,
-    private userService: UserService
+    private userService: UserService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
@@ -20,7 +23,8 @@ export class LogoutComponent implements OnInit {
         this.router.navigate(['/']);
       },
       'error': () => {
-        this.router.navigate(['/']);
+        this.errorMsg = 'Unexpected error occurred';
+        this.cdr.markForCheck();
       }
     });
   }
