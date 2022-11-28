@@ -9,7 +9,7 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { KotkaUiSpinnerModule } from '../../../../../libs/kotka/ui/spinner/src';
 import { ToasterComponent } from './components/toaster/toaster.component';
 import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
-import { UserPipe } from './pipes/user.pipe';
+import { LabelPipe } from './pipes/label.pipe';
 
 @NgModule({
   imports: [CommonModule, RouterModule, CollapseModule, BsDropdownModule, NgbToastModule],
@@ -18,9 +18,9 @@ import { UserPipe } from './pipes/user.pipe';
     NavComponent,
     NotFoundComponent,
     ToasterComponent,
-    UserPipe
+    LabelPipe
   ],
-    exports: [KotkaUiSpinnerModule, UserPipe],
+    exports: [KotkaUiSpinnerModule, LabelPipe],
 })
 export class SharedModule {
   static forRoot(): ModuleWithProviders<SharedModule> {

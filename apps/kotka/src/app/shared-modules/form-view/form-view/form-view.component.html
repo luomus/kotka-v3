@@ -6,13 +6,13 @@
     <ng-container *ngIf="formParams$ | async as formParams else spinner">
       <ngb-alert *ngIf="formParams.disabled && !disabledAlertIsDismissed" [type]="'warning'" (closed)="disabledAlertIsDismissed = true">
         <strong>Note:</strong>
-        You can only view and copy this record. To be able to edit this record, you must belong to {{ formParams.formData?.owner }}
+        You can only view and copy this record. To be able to edit this record, you must belong to {{ formParams.formData?.owner | label }}
       </ngb-alert>
       <div *ngIf="formParams.formData && formParams.formData.id" class="mb-1">
         <strong class="d-block">Last edited by</strong>
-        <span>{{ (formParams.formData.creator || '') | user }} on {{ formParams.formData.dateEdited | date:'dd.MM.YYYY HH:mm' }}</span>
+        <span>{{ (formParams.formData.creator || '') | label }} on {{ formParams.formData.dateEdited | date:'dd.MM.YYYY HH:mm' }}</span>
         <strong class="d-block">Originally created by</strong>
-        <span>{{ (formParams.formData.editor || '') | user }} on {{ formParams.formData.dateCreated | date:'dd.MM.YYYY HH:mm' }}</span>
+        <span>{{ (formParams.formData.editor || '') | label }} on {{ formParams.formData.dateCreated | date:'dd.MM.YYYY HH:mm' }}</span>
       </div>
       <kui-laji-form
         *ngIf="(!routeParams.editMode || formParams.formData) else notFound"
