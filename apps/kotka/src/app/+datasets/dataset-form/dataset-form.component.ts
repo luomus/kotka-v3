@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DataType } from '../../shared/services/api.service';
-import { Dataset, Person } from '@kotka/shared/models';
+import { Dataset, Person, isDataset } from '@kotka/shared/models';
 
 @Component({
   selector: 'kotka-dataset-form',
@@ -17,5 +17,12 @@ export class DatasetFormComponent {
       formData.owner = user.organisation[0];
     }
     return formData;
+  }
+
+  asDataset(value: any): Dataset|undefined {
+    if (isDataset(value)) {
+      return value as Dataset;
+    }
+    return undefined;
   }
 }

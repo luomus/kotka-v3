@@ -10,6 +10,7 @@ import { KotkaUiSpinnerModule } from '../../../../../libs/kotka/ui/spinner/src';
 import { ToasterComponent } from './components/toaster/toaster.component';
 import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
 import { LabelPipe } from './pipes/label.pipe';
+import { OldKotkaUrlPipe } from './pipes/old-kotka-url.pipe';
 
 @NgModule({
   imports: [CommonModule, RouterModule, CollapseModule, BsDropdownModule, NgbToastModule],
@@ -18,9 +19,10 @@ import { LabelPipe } from './pipes/label.pipe';
     NavComponent,
     NotFoundComponent,
     ToasterComponent,
-    LabelPipe
+    LabelPipe,
+    OldKotkaUrlPipe
   ],
-    exports: [KotkaUiSpinnerModule, LabelPipe],
+  exports: [KotkaUiSpinnerModule, LabelPipe, OldKotkaUrlPipe],
 })
 export class SharedModule {
   static forRoot(): ModuleWithProviders<SharedModule> {

@@ -7,7 +7,9 @@ import {
   OnChanges,
   OnDestroy,
   SimpleChanges,
-  ViewChild
+  ViewChild,
+  ContentChild,
+  TemplateRef
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormService } from '../../../shared/services/form.service';
@@ -45,6 +47,7 @@ export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
   disabledAlertIsDismissed = false;
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
+  @ContentChild('headerTpl', {static: true}) formHeader?: TemplateRef<Element>;
 
   private formData = new ReplaySubject<DataObject|undefined>(1);
   private routeSub?: Subscription;

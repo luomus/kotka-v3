@@ -4,6 +4,7 @@
 
 export const environment = {
   production: false,
+  oldKotkaUrl: 'https://kotkatest.luomus.fi/'
 };
 
 /*
