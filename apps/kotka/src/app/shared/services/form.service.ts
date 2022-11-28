@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { LajiForm } from '@kotka/shared/models';
 
-const path = '/api/form/';
+const path = '/api/laji/forms/';
 
 @Injectable({
   providedIn: 'root'

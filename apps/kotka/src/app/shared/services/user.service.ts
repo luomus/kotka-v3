@@ -12,7 +12,7 @@ export interface IUserServiceState {
 }
 
 const authPath = '/api/auth/';
-const personPath = '/api/person/';
+const personPath = '/api/laji/person/by-id/';
 
 let _state: IUserServiceState = {
   user: null,

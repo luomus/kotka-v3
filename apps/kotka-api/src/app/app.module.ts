@@ -5,9 +5,6 @@ import { Module } from '@nestjs/common';
 
 import { ApiServicesModule } from '@kotka/api-services';
 import { DatasetModule } from './dataset/dataset.module';
-import { FormModule } from './form/form.module';
-import { PersonModule } from './person/person.module';
-import { AutocompleteModule } from './autocomplete/autocomplete.module';
 
 @Module({
   imports: [
@@ -15,10 +12,7 @@ import { AutocompleteModule } from './autocomplete/autocomplete.module';
     MappersModule,
     AuthenticationModule,
     ApiServicesModule,
-    DatasetModule,
-    FormModule,
-    PersonModule,
-    AutocompleteModule
+    DatasetModule
   ],
   controllers: [],
   providers: []
