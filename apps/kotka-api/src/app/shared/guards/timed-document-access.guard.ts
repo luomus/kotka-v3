@@ -6,7 +6,6 @@ import { LajiStoreService } from '@kotka/api-services';
 import { Injectable, CanActivate, ExecutionContext, InternalServerErrorException, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { lastValueFrom } from 'rxjs';
-import * as moment from 'moment';
 import { allowAccessByTime } from '@kotka/utils';
 
 @Injectable()
