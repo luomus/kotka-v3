@@ -20,13 +20,18 @@ export class TimedDocumentAccessGuard implements CanActivate {
     context: ExecutionContext
   ): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
+    const target = context.getHandler().name;
 
-    if (req.user.profile.role.includes('MA.admin')) {
+    if (req.user.profile.role?.includes('MA.admin')) {
+      return true;
+    }
+
+    if (['getAll', 'post'].includes(target)) {
       return true;
     }
 
     const type = this.reflector.get('controllerType', context.getClass());
-    const timedAccessMetadata = this.reflector.get('timedAccessMetadata', context.getClass())?.[context.getHandler().name];
+    const timedAccessMetadata = this.reflector.get('timedAccessMetadata', context.getClass())?.[target];
 
     if (!timedAccessMetadata) {
       return true;
