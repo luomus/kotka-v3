@@ -63,6 +63,7 @@
     "@angular/cli": "~14.2.9",
     "@angular/compiler-cli": "~14.2.10",
     "@angular/language-service": "~14.2.10",
+    "@golevelup/ts-jest": "^0.3.4",
     "@nestjs/schematics": "^8.0.0",
     "@nestjs/testing": "^8.0.0",
     "@nrwl/cli": "14.4.2",
