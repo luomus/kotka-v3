@@ -1,8 +1,8 @@
-import { ApiServicesModule, LajiStoreService, TriplestoreService } from '@kotka/api-services';
-import { MappersModule, TriplestoreMapperService } from '@kotka/mappers';
+import { ApiServicesModule, TriplestoreService } from '@kotka/api-services';
+import { MappersModule } from '@kotka/mappers';
 import { Test } from '@nestjs/testing';
 import { of } from 'rxjs';
-import { HttpModule, HttpService } from '@nestjs/axios';
+import { HttpModule } from '@nestjs/axios';
 import { InUseGuard } from './in-use.guard';
 import { Reflector } from '@nestjs/core';
 import { createMock } from '@golevelup/ts-jest';

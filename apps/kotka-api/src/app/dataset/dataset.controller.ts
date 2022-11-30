@@ -18,7 +18,7 @@ const type = 'GX.dataset';
 
 @Controller('dataset')
 @ControllerType(type)
-@TimedAccessSet({ delete: { 'd': 14 }})
+@TimedAccessSet({ del: { 'd': 14 }})
 @InUseTypesSet(['MY.document', 'MOS.organization'])
 @UseGuards(
   AuthenticateCookieGuard,
