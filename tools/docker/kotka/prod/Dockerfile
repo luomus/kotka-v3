@@ -30,6 +30,7 @@ COPY --chown=nginx:nginx ./tools/docker/nginx/nginx.conf /etc/nginx/conf.d/defau
 RUN chmod a+r /etc/nginx/conf.d/default.conf
 
 COPY --chown=nginx:nginx --from=builder /app/dist/apps/kotka /usr/share/nginx/html/
+RUN chmod a+r /usr/share/nginx/html/favicon.ico
 
 EXPOSE 8080
 
