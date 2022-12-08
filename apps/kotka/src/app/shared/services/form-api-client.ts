@@ -3,11 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { of } from 'rxjs';
 
+const AUTOCOMPLETE_ORGANIZATION_RESOURCE = '/autocomplete/organization';
+
 @Injectable({
   providedIn: 'root'
 })
 export class FormApiClient {
-  private basePath = '/api';
+  private basePath = '/api/laji';
 
   constructor(
     private httpClient: HttpClient
@@ -24,6 +26,11 @@ export class FormApiClient {
 
     if (!options) {
       options = {};
+    }
+
+    switch (resource) {
+      case AUTOCOMPLETE_ORGANIZATION_RESOURCE:
+        queryParameters['includePersonToken'] = true;
     }
 
     return this.httpClient.request(

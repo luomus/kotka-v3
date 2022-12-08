@@ -2,4 +2,14 @@
   [formId]="'MHL.731'"
   [dataType]="dataType"
   [getInitialFormDataFunc]="getInitialFormData"
-></kotka-form-view>
+>
+  <ng-template #headerTpl let-formData="formData">
+    <a
+      *ngIf="asDataset(formData) as formData"
+      [href]='("specimens/search?q=dataset.raw:\"" + formData.datasetName.en + "\"") | oldKotkaUrl'
+      target="_blank"
+    >
+      Specimens in this dataset
+    </a>
+  </ng-template>
+</kotka-form-view>

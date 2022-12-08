@@ -2,6 +2,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { ModuleWithProviders } from '@angular/core';
 import { LoginComponent } from './login/login.component';
 import { LogoutComponent } from './logout/logout.component';
+import { OnlyLoggedIn } from '../shared/services/only-logged-in';
 
 export const userRoutes: Routes = [
   {
@@ -12,7 +13,8 @@ export const userRoutes: Routes = [
   {
     path: 'logout',
     pathMatch: 'full',
-    component: LogoutComponent
+    component: LogoutComponent,
+    canActivate: [OnlyLoggedIn]
   }
 ];
 

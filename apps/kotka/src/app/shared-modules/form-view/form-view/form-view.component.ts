@@ -7,7 +7,9 @@ import {
   OnChanges,
   OnDestroy,
   SimpleChanges,
-  ViewChild
+  ViewChild,
+  ContentChild,
+  TemplateRef
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormService } from '../../../shared/services/form.service';
@@ -19,6 +21,7 @@ import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ToastService } from '../../../shared/services/toast.service';
 import { UserService } from '../../../shared/services/user.service';
 import { FormApiClient } from '../../../shared/services/form-api-client';
+import { allowAccessByOrganization, allowAccessByTime } from '@kotka/utils';
 
 @Component({
   selector: 'kotka-form-view',
@@ -34,11 +37,17 @@ export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
 
   routeParams$: Observable<{editMode: boolean, dataURI?: string}>;
   formId$: ReplaySubject<string> = new ReplaySubject<string>();
-  formParams$: Observable<{form: LajiForm.SchemaForm, formData?: Partial<DataObject>}>;
+  formParams$: Observable<{
+    form: LajiForm.SchemaForm,
+    formData?: Partial<DataObject>,
+    disabled: boolean,
+    showDeleteButton: boolean
+  }>;
 
-  formContext: Record<string, any> = {};
+  disabledAlertIsDismissed = false;
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
+  @ContentChild('headerTpl', {static: true}) formHeader?: TemplateRef<Element>;
 
   private formData = new ReplaySubject<DataObject|undefined>(1);
   private routeSub?: Subscription;
@@ -70,17 +79,26 @@ export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
 
     this.formParams$ = combineLatest([form$, this.formData, this.userService.user$]).pipe(
       map(([form, data, user]) => {
+        if (!user) {
+          throw new Error('Missing user information');
+        }
+
+        const isAdmin = this.userService.isICTAdmin(user);
+        const isEditMode = !!data;
+        const disabled = isEditMode && !isAdmin && !allowAccessByOrganization(data, user);
+        const showDeleteButton = isEditMode && (isAdmin || (!disabled && allowAccessByTime(data, {'d': 14})));
+
         form.uiSchemaContext = {
           userName: this.userService.formatUserName(user?.fullName),
           ...form.uiSchemaContext
         };
 
         let formData: Partial<DataObject>|undefined = data;
-        if (!formData && this.getInitialFormDataFunc && user) {
+        if (!formData && this.getInitialFormDataFunc) {
           formData = this.getInitialFormDataFunc(user);
         }
 
-        return {form, formData};
+        return {form, formData, disabled, showDeleteButton};
       })
     );
   }

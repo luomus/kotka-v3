@@ -21,14 +21,14 @@ export class AuthenticationService {
   }
 
   public getProfile(token: string) {
-    const $person = this.lajiApiSevice.get(`person-token/${token}`).pipe(
+    const $person = this.lajiApiSevice.get<any>(`person-token/${token}`).pipe(
       catchError((err) => { throw new UnauthorizedException('Error retrieving personToken information from laji-auth.', err); }),
       mergeMap((res) => {
         if (res.data.target !== process.env['SYSTEM_ID']) {
           throw new UnauthorizedException('PersonToken for different system.');
         }
 
-        return this.lajiApiSevice.get(`person/${token}`).pipe(
+        return this.lajiApiSevice.get<any>(`person/${token}`).pipe(
           catchError((err) => { throw new UnauthorizedException('Error retrieving user profile from laji-auth.', err); }),
           map(res => res.data),
           map(data => {

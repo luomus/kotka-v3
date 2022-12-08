@@ -1,9 +1,9 @@
 <div class="form-footer bg-secondary" style="--bs-bg-opacity: .75">
   <div class="d-grid gap-2 d-sm-flex">
-    <button class="btn btn-primary text-light col-lg-2 col-sm-3 col-xs-12" type="submit" (click)="saveForm.emit()">
+    <button class="btn btn-primary text-light col-lg-2 col-sm-3 col-xs-12" type="submit" (click)="saveForm.emit()" [disabled]="disabled">
       Save & keep editing
     </button>
-    <button class="btn btn-danger text-light col-lg-1 col-sm-2 col-xs-12" type="submit" (click)="delete.emit()">
+    <button *ngIf="showDeleteButton" class="btn btn-danger text-light col-lg-1 col-sm-2 col-xs-12" type="submit" (click)="delete.emit()" [disabled]="disabled">
       Delete
     </button>
   </div>

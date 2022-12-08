@@ -7,12 +7,14 @@ import { KotkaUiMainContentModule } from '../../../../../libs/kotka/ui/main-cont
 import { KotkaUiDatatableModule } from '../../../../../libs/kotka/ui/datatable/src';
 import { DatasetFormComponent } from './dataset-form/dataset-form.component';
 import { FormViewModule } from '../shared-modules/form-view/form-view.module';
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
   imports: [
     routing,
     RouterModule,
     CommonModule,
+    SharedModule,
     KotkaUiMainContentModule,
     KotkaUiDatatableModule,
     FormViewModule
