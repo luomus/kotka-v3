@@ -14,6 +14,7 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
+    "esModuleInterop": true,
     "paths": {
       "@kotka/api-interfaces": ["libs/api-interfaces/src/index.ts"],
       "@kotka/api-services": ["libs/api-services/src/index.ts"],

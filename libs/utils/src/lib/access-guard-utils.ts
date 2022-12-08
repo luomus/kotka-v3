@@ -1,5 +1,5 @@
 import { KotkaDocumentObject, Person } from "@kotka/shared/models";
-import * as moment from 'moment';
+import moment from 'moment';
 
 export function allowAccessByOrganization(document: KotkaDocumentObject, user: Person): boolean {
   if (!document.owner || !user.organisation) {

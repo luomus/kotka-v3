@@ -6,7 +6,7 @@ import { Controller, UseGuards } from '@nestjs/common';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
 import { LajiStoreService, TriplestoreService } from '@kotka/api-services';
 import { TriplestoreMapperService } from '@kotka/mappers';
-import { LajiStoreController } from '../shared/laji-store.controller';
+import { LajiStoreController } from '../shared/controllers/laji-store.controller';
 import { ControllerType } from '../shared/decorators/controller-type.decorator';
 import { OrganizationGuard } from '../shared/guards/organization.guard';
 import { TimedAccessSet } from '../shared/decorators/timed-access-set.decorator';

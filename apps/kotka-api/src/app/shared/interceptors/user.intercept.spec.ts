@@ -32,7 +32,7 @@ describe('UserInterceptor', () => {
 
     const req = mockContext.switchToHttp().getRequest();
     expect(req).toEqual({method: 'POST', user: {profile: { id: 'MA.1' }}, body: { creator: 'MA.1', editor: 'MA.1' }});
-    expect(mockNext).toBeCalledTimes(1);
+    expect(mockNext.handle).toBeCalledTimes(1);
   });
 
   it('User is set correctly when using PUT, route handler is called', () => {
@@ -57,7 +57,7 @@ describe('UserInterceptor', () => {
 
     const req = mockContext.switchToHttp().getRequest();
     expect(req).toEqual({method: 'PUT', params: { id: 'GX.1' }, user: {profile: { id: 'MA.1' }}, body: { id: 'GX.1', creator: 'MA.2', editor: 'MA.1' }});
-    expect(mockNext).toBeCalledTimes(1);
+    expect(mockNext.handle).toBeCalledTimes(1);
   });
 
   it('GET-request will pass trough without modification to request or error, route handler is called', () => {
@@ -65,6 +65,7 @@ describe('UserInterceptor', () => {
       getRequest: () => ({
         method: 'GET',
         params: { id: 'GX.1' },
+        user: { profile: { id: 'MA.1' }},
       })
     })});
 
@@ -73,8 +74,8 @@ describe('UserInterceptor', () => {
     userInterceptor.intercept(mockContext, mockNext);
 
     const req = mockContext.switchToHttp().getRequest();
-    expect(req).toEqual({ method: 'GET', params: { id: 'GX.1' }});
-    expect(mockNext).toBeCalledTimes(1);
+    expect(req).toEqual({ method: 'GET', params: { id: 'GX.1' }, user: { profile: { id: 'MA.1' }}});
+    expect(mockNext.handle).toBeCalledTimes(1);
   });
 
   it('DELETE-request will pass trough without modification to request or error, route handler is called', () => {
@@ -82,6 +83,7 @@ describe('UserInterceptor', () => {
       getRequest: () => ({
         method: 'DELETE',
         params: { id: 'GX.1' },
+        user: { profile: { id: 'MA.1' }},
       })
     })});
 
@@ -90,7 +92,7 @@ describe('UserInterceptor', () => {
     userInterceptor.intercept(mockContext, mockNext);
 
     const req = mockContext.switchToHttp().getRequest();
-    expect(req).toEqual({ method: 'DELETE', params: { id: 'GX.1' }});
-    expect(mockNext).toBeCalledTimes(1);
+    expect(req).toEqual({ method: 'DELETE', params: { id: 'GX.1' }, user: { profile: { id: 'MA.1' }}});
+    expect(mockNext.handle).toBeCalledTimes(1);
   });
 });

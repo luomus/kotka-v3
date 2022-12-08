@@ -4,6 +4,7 @@ import { LajiApiService } from './laji-api.service';
 import { LajiStoreService } from './laji-store.service';
 import { SchemaService } from './schema.service';
 import { TriplestoreService } from './triplestore.service';
+import { FormService } from './form.service';
 
 @Module({
   imports: [
@@ -14,13 +15,15 @@ import { TriplestoreService } from './triplestore.service';
     LajiApiService,
     LajiStoreService,
     TriplestoreService,
-    SchemaService
+    SchemaService,
+    FormService
   ],
   exports: [
     LajiApiService,
     LajiStoreService,
     TriplestoreService,
-    SchemaService
+    SchemaService,
+    FormService
   ],
 })
 export class ApiServicesModule {}

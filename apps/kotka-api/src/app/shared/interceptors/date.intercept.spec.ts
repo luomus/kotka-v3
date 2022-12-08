@@ -33,7 +33,7 @@ describe('DateInterceptor', () => {
 
     const req = mockContext.switchToHttp().getRequest();
     expect(req).toEqual({method: 'POST', body: { dateCreated: '2022-11-22T12:00:00.000Z', dateEdited: '2022-11-22T12:00:00.000Z' }});
-    expect(mockNext).toBeCalledTimes(1);
+    expect(mockNext.handle).toBeCalledTimes(1);
   });
 
   it('Date is set correctly when using PUT', () => {
@@ -57,7 +57,7 @@ describe('DateInterceptor', () => {
 
     const req = mockContext.switchToHttp().getRequest();
     expect(req).toEqual({method: 'PUT', params: { id: 'GX.1' }, body: { id: 'GX.1', dateCreated: '2022-11-11T12:00:00.000Z', dateEdited: '2022-11-22T12:00:00.000Z' }});
-    expect(mockNext).toBeCalledTimes(1);
+    expect(mockNext.handle).toBeCalledTimes(1);
   });
 
 
@@ -75,7 +75,7 @@ describe('DateInterceptor', () => {
 
     const req = mockContext.switchToHttp().getRequest();
     expect(req).toEqual({ method: 'GET', params: { id: 'GX.1' }});
-    expect(mockNext).toBeCalledTimes(1);
+    expect(mockNext.handle).toBeCalledTimes(1);
   });
 
   it('DELETE-request will pass trough without modification to request or error', () => {
@@ -92,6 +92,6 @@ describe('DateInterceptor', () => {
 
     const req = mockContext.switchToHttp().getRequest();
     expect(req).toEqual({ method: 'DELETE', params: { id: 'GX.1' }});
-    expect(mockNext).toBeCalledTimes(1);
+    expect(mockNext.handle).toBeCalledTimes(1);
   });
 });
