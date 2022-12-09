@@ -72,7 +72,7 @@ async function bootstrap() {
   app.use(lajiApiBase, createProxyMiddleware(proxyFilter, {
     target: process.env['LAJI_API_URL'],
     changeOrigin: true,
-    pathRewrite: (path, req) => {
+    pathRewrite: (path, req: UserRequest) => {
       let newPath = path.replace(lajiApiBase, '');
 
       const queryString = getLajiApiQueryString(req);

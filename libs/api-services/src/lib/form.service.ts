@@ -48,7 +48,7 @@ export class FormService {
       throw new InternalServerErrorException(`Could not find formId for document of type ${type}`);
     }
 
-    const res = await lastValueFrom(this.lajiApiService.get(`/forms/${types[type]}`));
+    const res = await lastValueFrom(this.lajiApiService.get<Record<string, unknown>>(`/forms/${types[type]}`));
 
     this.forms[type] = res.data;   
   }
