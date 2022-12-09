@@ -1,7 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { createMock } from '@golevelup/ts-jest';
-import { CallHandler, ExecutionContext, UnprocessableEntityException } from '@nestjs/common';
-import { UserInterceptor } from './user.interceptor';
+import { CallHandler, ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 import { ValidatorInterceptor } from './validator.interceptor';
 import { ApiServicesModule, FormService } from '@kotka/api-services';
 import { Reflector } from '@nestjs/core';
@@ -226,5 +225,32 @@ describe('ValidationInterceptor', () => {
     await validatorInterceptor.intercept(mockContext, mockNext);
 
     expect(mockNext.handle).toBeCalledTimes(1);
+  });
+
+  it('Failure to fetch the mock form results in no calls to next handler and thrown error', async () => {
+    jest.spyOn(formService, 'getForm').mockImplementation((type) => new Promise((resolve, reject) => { throw new InternalServerErrorException('Unable to fetch form for validation.', 'Message'); }));
+    const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+      getRequest: () => ({
+        method: 'POST',
+        body: {
+          owner: 'MOS.1',
+          datasetName: {
+            en: 'Test'
+          },
+          personsResponsible: 'Tester'
+        }
+      })
+    })});
+
+    const mockNext = createMock<CallHandler>();
+
+    expect.assertions(2);
+
+    try {
+      await validatorInterceptor.intercept(mockContext, mockNext);
+     } catch (e) {
+      expect(JSON.stringify(e)).toContain('Unable to fetch form for validation.');
+      expect(mockNext.handle).toBeCalledTimes(0);
+     }
   });
 });
