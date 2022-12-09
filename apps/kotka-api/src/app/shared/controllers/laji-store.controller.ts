@@ -38,13 +38,13 @@ export abstract class LajiStoreController {
   @Post()
   async post(@Req() req, @Body() body: StoreObject) {
     try {
-      //const res = await lastValueFrom(this.lajiStoreService.post(this.type, body));
+      const res = await lastValueFrom(this.lajiStoreService.post(this.type, body));
 
-      //const rdfXml = await this.triplestoreMapperService.jsonToTriplestore(cloneDeep(res.data), this.type);
+      const rdfXml = await this.triplestoreMapperService.jsonToTriplestore(cloneDeep(res.data), this.type);
 
-      //await lastValueFrom(this.triplestoreService.put(res.data.id, rdfXml));
+      await lastValueFrom(this.triplestoreService.put(res.data.id, rdfXml));
     
-      return body;//res.data;
+      return res.data;
     } catch (err) {
       console.error(err);
       throw err;
