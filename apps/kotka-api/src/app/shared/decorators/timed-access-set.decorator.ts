@@ -6,9 +6,8 @@ import { SetMetadata } from '@nestjs/common';
 
 interface TimedAccessMetadata {
   get?: {[key: string]: number},
-  post?: {[key: string]: number},
   put?: {[key: string]: number},
-  delete?: {[key: string]: number}
+  del?: {[key: string]: number}
 };
 
 export const TimedAccessSet = (data: TimedAccessMetadata) => SetMetadata('timedAccessMetadata', data);

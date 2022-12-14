@@ -3,11 +3,10 @@ https://docs.nestjs.com/guards#guards
 */
 
 import { LajiStoreService } from '@kotka/api-services';
-import { StoreObject } from '@kotka/shared/models';
 import { allowAccessByOrganization } from '@kotka/utils';
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { lastValueFrom, Observable } from 'rxjs';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class OrganizationGuard implements CanActivate {
@@ -22,7 +21,7 @@ export class OrganizationGuard implements CanActivate {
     const req = context.switchToHttp().getRequest();
     const type: string = this.reflector.get('controllerType', context.getClass());
 
-    if (req.user.profile.role.includes('MA.admin')) {
+    if (req.user.profile.role?.includes('MA.admin')) {
       return true;
     }
 

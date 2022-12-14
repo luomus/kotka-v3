@@ -5,12 +5,11 @@
 
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import session from 'express-session';
+import passport from 'passport';
 import { Request } from 'express';
-import * as session from 'express-session';
-import * as passport from 'passport';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { Person } from '@kotka/shared/models';
-
 import { AppModule } from './app/app.module';
 
 interface UserRequest extends Request {
@@ -73,7 +72,7 @@ async function bootstrap() {
   app.use(lajiApiBase, createProxyMiddleware(proxyFilter, {
     target: process.env['LAJI_API_URL'],
     changeOrigin: true,
-    pathRewrite: (path, req) => {
+    pathRewrite: (path, req: UserRequest) => {
       let newPath = path.replace(lajiApiBase, '');
 
       const queryString = getLajiApiQueryString(req);
