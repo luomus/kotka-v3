@@ -1,6 +1,7 @@
 <kotka-form-view
   [formId]="'MHL.731'"
   [dataType]="dataType"
+  [dataTypeName]="'tag'"
   [getInitialFormDataFunc]="getInitialFormData"
 >
   <ng-template #headerTpl let-formData="formData">
@@ -9,7 +10,7 @@
       [href]='("specimens/search?q=dataset.raw:\"" + formData.datasetName.en + "\"") | oldKotkaUrl'
       target="_blank"
     >
-      Specimens in this dataset
+      Specimens in this tag
     </a>
   </ng-template>
 </kotka-form-view>
