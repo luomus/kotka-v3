@@ -50,7 +50,6 @@ export class FormService {
 
     try {
       const res = await lastValueFrom(this.lajiApiService.get<Record<string, unknown>>(`/forms/${types[type]}`));
-
       this.forms[type] = res.data;
     } catch (e: any) {
       throw new InternalServerErrorException('Unable to fetch form for validation.', e.message);

@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
-import { catchError, map, mergeMap } from 'rxjs';
+import { catchError, map, mergeMap, tap } from 'rxjs';
 import { LajiApiService } from '@kotka/api-services';
 
 const kotkaRoles = [
@@ -56,15 +56,33 @@ export class AuthenticationService {
     return $person;
   }
 
-  public logoutUser(token: string) {
-    return this.lajiApiSevice.delete(`person-token/${token}`).pipe(
-      catchError((err) => { throw new InternalServerErrorException('Error terminating user laji-auth login.', err); })
+  public logoutUser(request) {
+    return this.lajiApiSevice.delete(`person-token/${request.user?.personToken}`).pipe(
+      tap(() => this.invalidateSession(request)),
+      catchError((err) => {
+        throw new InternalServerErrorException('Error terminating user laji-auth login.', err);
+      }),
     );
   }
 
-  public checkLoginValidity(token: string) {
-    return this.lajiApiSevice.get(`person-token/${token}`).pipe(
-      catchError((err) => { throw new UnauthorizedException('Error validating user personToken.', err); }),
+  public checkLoginValidity(request) {
+    return this.lajiApiSevice.get(`person-token/${request.user.personToken}`).pipe(
+      catchError((err) => {
+        if (err.response?.data?.error?.message && err.response?.data?.error?.message.includes('INVALID TOKEN')) {
+          this.invalidateSession(request);
+          throw new UnauthorizedException('Person token invalid, teriminating session.');
+        }
+
+        throw new InternalServerErrorException('Error validating user personToken.', err);
+      }),
     );
   }
+
+  public invalidateSession(request) {
+    request.logout((err) => {
+      request.session.cookie.maxAge = 0;
+    });
+
+    request.session.cookie.maxAge = 0;
+  };
 }

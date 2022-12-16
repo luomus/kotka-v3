@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Redirect, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, InternalServerErrorException, Post, Redirect, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { AuthenticateCookieGuard } from './authenticateCookie.guard';
 import { AuthenticatePersonTokenGuard } from './authenticatePersonToken.guard';
@@ -34,28 +34,21 @@ export class AuthenticationController {
   @UseGuards(AuthenticateCookieGuard)
   @Get('logout')
   async logoutUser(@Req() request) {
-    if (request.user) {
-      await lastValueFrom(this.authService.logoutUser(request.user.personToken));
-    }
-  
-    request.logout((err) => {
-      request.session.cookie.maxAge = 0;
-    });
-
-    request.session.cookie.maxAge = 0;
+    await lastValueFrom(this.authService.logoutUser(request));
   }
 
   @UseGuards(AuthenticateCookieGuard)
   @Get('user')
   async getUser(@Req() request) {
     if (request.user?.personToken) {
-      const user = await lastValueFrom(this.authService.checkLoginValidity(request.user.personToken));
+      const user = await lastValueFrom(this.authService.checkLoginValidity(request));
 
       if (user) {
         return request.user.profile;
       }
     }
 
-    return null;
+    this.authService.invalidateSession(request);
+    throw new InternalServerErrorException('No person token attached to session, closing session.');
   }
 }

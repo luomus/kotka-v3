@@ -1,16 +1,14 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
-
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import session from 'express-session';
 import passport from 'passport';
 import { Request } from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
-import { Person } from '@kotka/shared/models';
 import { AppModule } from './app/app.module';
+import Redis from 'ioredis';
+import connectRedis from 'connect-redis';
+import { AuthenticationService } from './app/authentication/authentication.service';
+import { Person } from '@kotka/shared/models';
 
 interface UserRequest extends Request {
   user?: {
@@ -43,17 +41,33 @@ function getLajiApiQueryString(req: UserRequest): string {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const authService = app.get<AuthenticationService>(AuthenticationService);
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
   const host = process.env.HOST || 'localhost';
   const port = process.env.PORT || 3333;
 
+  const RedisStore = connectRedis(session);
+  const redisClient = new Redis({
+    host: 'redis',
+    password: process.env['REDIS_PASSWORD']
+  });
+
   app.use(
     session({
+      store: new RedisStore({ 
+        client: redisClient,
+        ttl: 14 * 24 * 3600
+      }),
       secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: false,
-      name: 'kotka'
+      name: 'kotka',
+      cookie: {
+        sameSite: true,
+        secure: process.env['SECURE_COOKIE'] === 'true',
+        maxAge: 14 * 24 * 3600 * 1000
+      }
     })
   );
 
@@ -69,18 +83,32 @@ async function bootstrap() {
     return isAllowedPath && req.method === 'GET';
   };
 
-  app.use(lajiApiBase, createProxyMiddleware(proxyFilter, {
+  const proxyServer = createProxyMiddleware(proxyFilter, {
     target: process.env['LAJI_API_URL'],
     changeOrigin: true,
-    pathRewrite: (path, req: UserRequest) => {
+    pathRewrite: (path: string, req: UserRequest) => {
       let newPath = path.replace(lajiApiBase, '');
 
       const queryString = getLajiApiQueryString(req);
       newPath = `${newPath.split('?')[0]}?${queryString}`;
 
       return newPath;
-    }
-  }));
+    },
+    onProxyRes: (proxyRes, req: UserRequest, res) => {
+      const data = [];
+      proxyRes.on('data', (chunk) => {
+        data.push(chunk);
+      });
+
+      proxyRes.on('end', async () => {
+        if (proxyRes.statusCode === 401 || (proxyRes.statusCode === 400 && Buffer.concat(data).toString().includes('INVALID TOKEN'))) {
+          authService.invalidateSession(req);
+        }
+      });
+    },
+  });
+
+  app.use(lajiApiBase, proxyServer);
 
   const hostName = host !== 'localhost' ? host : undefined;
   await app.listen(port, hostName);

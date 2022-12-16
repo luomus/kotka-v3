@@ -1,5 +1,12 @@
 version: '3'
 services:
+  redis:
+    image: redis
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis:/data
   kotka-api:
     env_file:
       - .env
@@ -26,3 +33,4 @@ services:
      - kotka-api
 volumes:
   shared-volume:
+  redis:
