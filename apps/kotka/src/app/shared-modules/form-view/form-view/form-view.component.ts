@@ -22,6 +22,7 @@ import { ToastService } from '../../../shared/services/toast.service';
 import { UserService } from '../../../shared/services/user.service';
 import { FormApiClient } from '../../../shared/services/form-api-client';
 import { allowAccessByOrganization, allowAccessByTime } from '@kotka/utils';
+import { DialogService } from '../../../shared/services/dialog.service';
 
 @Component({
   selector: 'kotka-form-view',
@@ -59,6 +60,7 @@ export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
     private formService: FormService,
     private apiService: ApiService,
     private userService: UserService,
+    private dialogService: DialogService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {
@@ -158,11 +160,16 @@ export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   onDelete(data: DataObject) {
-    if (!this.dataType) {
-      return;
-    }
-    if (!data.id) {
-      this.navigateAway();
+    const name = (this.dataTypeName || this.dataType);
+    this.dialogService.confirm(`Are you sure you want to delete this ${name}?`).subscribe(confirm => {
+      if (confirm) {
+        this.delete(data);
+      }
+    });
+  }
+
+  private delete(data: DataObject) {
+    if (!this.dataType || !data.id) {
       return;
     }
 

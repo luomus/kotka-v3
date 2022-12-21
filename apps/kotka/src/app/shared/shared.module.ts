@@ -12,16 +12,18 @@ import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
 import { LabelPipe } from './pipes/label.pipe';
 import { OldKotkaUrlPipe } from './pipes/old-kotka-url.pipe';
 import { KotkaUiMainContentModule } from '../../../../../libs/kotka/ui/main-content/src';
+import { ConfirmModalComponent } from './components/confirm-modal/confirm-modal';
 
 @NgModule({
-    imports: [CommonModule, RouterModule, CollapseModule, BsDropdownModule, NgbToastModule, KotkaUiMainContentModule],
+  imports: [CommonModule, RouterModule, CollapseModule, BsDropdownModule, NgbToastModule, KotkaUiMainContentModule],
   declarations: [
     AppComponent,
     NavComponent,
     NotFoundComponent,
     ToasterComponent,
     LabelPipe,
-    OldKotkaUrlPipe
+    OldKotkaUrlPipe,
+    ConfirmModalComponent
   ],
   exports: [KotkaUiSpinnerModule, LabelPipe, OldKotkaUrlPipe],
 })
