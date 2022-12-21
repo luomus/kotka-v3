@@ -1,4 +1,5 @@
 FROM node:14 as builder
+ARG CONFIGURATION=production
 ENV NODE_ENV build
 
 WORKDIR /app
@@ -18,7 +19,7 @@ COPY --chown=node:node ./libs ./libs
 
 # Build kotka and kotka-api
 RUN npm run ng -- build kotka-api \
- && npm run ng -- build kotka
+ && npm run ng -- build kotka --configuration $CONFIGURATION
 
 
 FROM nginxinc/nginx-unprivileged as kotka

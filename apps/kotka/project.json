@@ -39,6 +39,27 @@
           ],
           "outputHashing": "all"
         },
+        "beta": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "1mb",
+              "maximumError": "2mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "fileReplacements": [
+            {
+              "replace": "apps/kotka/src/environments/environment.ts",
+              "with": "apps/kotka/src/environments/environment.beta.ts"
+            }
+          ],
+          "outputHashing": "all"
+        },
         "development": {
           "buildOptimizer": false,
           "optimization": false,
@@ -55,6 +76,9 @@
       "configurations": {
         "production": {
           "browserTarget": "kotka:build:production"
+        },
+        "beta": {
+          "browserTarget": "kotka:build:beta"
         },
         "development": {
           "browserTarget": "kotka:build:development"
