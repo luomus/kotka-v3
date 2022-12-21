@@ -1,5 +1,6 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { UserService } from '../../services/user.service';
+import { NavigationEnd, Router } from '@angular/router';
 
 @Component({
   selector: 'kotka-nav',
@@ -19,8 +20,18 @@ import { UserService } from '../../services/user.service';
 })
 export class NavComponent {
   isCollapsed = true;
+  currentPath = '';
 
   constructor (
+    router: Router,
     public userService: UserService,
-  ) {}
+    private cdr: ChangeDetectorRef
+  ) {
+    router.events.subscribe(event => {
+      if (event instanceof NavigationEnd ) {
+        this.currentPath = event.url;
+        this.cdr.markForCheck();
+      }
+    });
+  }
 }

@@ -16,8 +16,8 @@ export class AuthenticationService {
     private readonly lajiApiSevice: LajiApiService,
   ) {}
 
-  public getLoginUrl(): string {
-    return `${process.env.LAJI_AUTH_URL}?target=${process.env.SYSTEM_ID}&redirectMethod=GET&next=`;
+  public getLoginUrl(next = ''): string {
+    return `${process.env.LAJI_AUTH_URL}?target=${process.env.SYSTEM_ID}&redirectMethod=GET&next=${next}`;
   }
 
   public getProfile(token: string) {
@@ -27,6 +27,8 @@ export class AuthenticationService {
         if (res.data.target !== process.env['SYSTEM_ID']) {
           throw new UnauthorizedException('PersonToken for different system.');
         }
+
+        const next = res.data.next;
 
         return this.lajiApiSevice.get<any>(`person/${token}`).pipe(
           catchError((err) => { throw new UnauthorizedException('Error retrieving user profile from laji-auth.', err); }),
@@ -47,7 +49,8 @@ export class AuthenticationService {
           }),
           map(data => ({
             personToken: token,
-            profile: data
+            profile: data,
+            next
           })),
         );
       })

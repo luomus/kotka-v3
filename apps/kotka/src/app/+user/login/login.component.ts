@@ -23,8 +23,8 @@ export class LoginComponent implements OnInit {
       const token = params['token'];
       if (token) {
         this.userService.login(token).subscribe({
-          'next': () => {
-            this.router.navigate(['/']);
+          'next': next => {
+            this.router.navigate([next]);
           },
           'error': err => {
             this.errorMsg = err.status === 401 ? 'Missing access rights to application' : 'Unexpected error occurred';
