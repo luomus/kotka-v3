@@ -11,9 +11,10 @@ import { ToasterComponent } from './components/toaster/toaster.component';
 import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
 import { LabelPipe } from './pipes/label.pipe';
 import { OldKotkaUrlPipe } from './pipes/old-kotka-url.pipe';
+import { KotkaUiMainContentModule } from '../../../../../libs/kotka/ui/main-content/src';
 
 @NgModule({
-  imports: [CommonModule, RouterModule, CollapseModule, BsDropdownModule, NgbToastModule],
+    imports: [CommonModule, RouterModule, CollapseModule, BsDropdownModule, NgbToastModule, KotkaUiMainContentModule],
   declarations: [
     AppComponent,
     NavComponent,
