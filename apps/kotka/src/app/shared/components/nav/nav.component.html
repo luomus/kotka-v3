@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="main-nav" role="navigation">
   <div class="container-fluid">
     <div class="navbar-header me-3">
-      <a class="navbar-brand" href="/">Kotka</a>
+      <a class="navbar-brand" [href]="'/' | oldKotkaUrl">Kotka</a>
     </div>
 
     <button class="navbar-toggler" type="button" (click)="isCollapsed = !isCollapsed" aria-expanded="true">
@@ -47,8 +47,8 @@
           <li dropdown class="nav-item me-3 dropdown" routerLinkActive="active">
             <a class="nav-link" dropdownToggle id="datasets-menu">Tags <i class="fa fa-caret-down"></i></a>
             <ul class="dropdown-menu" *dropdownMenu role="menu" aria-labelledby="datasets-menu">
-              <li><a class="dropdown-item" routerLink="/datasets">All</a></li>
-              <li><a class="dropdown-item" routerLink="/datasets/add"><i class="fa fa-plus"></i> Add tag</a></li>
+              <li><a class="dropdown-item" routerLink="/tags">All</a></li>
+              <li><a class="dropdown-item" routerLink="/tags/add"><i class="fa fa-plus"></i> Add tag</a></li>
             </ul>
           </li>
 
