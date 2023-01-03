@@ -7,7 +7,7 @@ import { OnlyLoggedIn } from './shared/services/only-logged-in';
 const baseRoutes: Routes = [
   { path: 'user', loadChildren: () => import('./+user/user.module').then(m => m.UserModule), data: {preload: false} },
   { path: '', canActivate: [OnlyLoggedIn], children: [
-      { path: 'datasets', loadChildren: () => import('./+datasets/datasets.module').then(m => m.DatasetsModule), data: {preload: false}},
+      { path: 'tags', loadChildren: () => import('./+datasets/datasets.module').then(m => m.DatasetsModule), data: {preload: false}},
       { path: '**', pathMatch: 'full', component: NotFoundComponent }
     ]
   }

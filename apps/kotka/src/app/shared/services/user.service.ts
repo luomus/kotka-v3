@@ -4,6 +4,7 @@ import { BehaviorSubject, catchError, Observable, of, switchMap } from 'rxjs';
 import { map, tap, distinctUntilChanged } from 'rxjs/operators';
 import { WINDOW } from '@ng-toolkit/universal';
 import { Person } from '@kotka/shared/models';
+import { LoginResponse } from '@kotka/api-interfaces';
 
 export interface IUserServiceState {
   user: Person | null;
@@ -57,9 +58,10 @@ export class UserService {
     );
   }
 
-  login(token: string) {
-    return this.httpClient.post<Person>(authPath + 'login', { token }).pipe(
-      tap(user => this.updateUser(user)),
+  login(token: string): Observable<string> {
+    return this.httpClient.post<LoginResponse>(authPath + 'login', { token }).pipe(
+      tap(data => this.updateUser(data.profile)),
+      map(data => data.next)
     );
   }
 
@@ -77,8 +79,8 @@ export class UserService {
     this.store.next(_state = state);
   }
 
-  redirectToLogin(): void {
-    this.window.location.href = authPath + 'login';
+  redirectToLogin(next = ''): void {
+    this.window.location.href = `${authPath}login?next=${next}`;
   }
 
   formatUserName(fullName?: string) {

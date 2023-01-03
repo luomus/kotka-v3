@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  oldKotkaUrl: 'https://kotka.luomus.fi'
+  oldKotkaUrl: 'https://kotkatest.luomus.fi'
 };

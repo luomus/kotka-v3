@@ -1,6 +1,4 @@
-export interface Message {
-  message: string;
-}
+import { Person } from '@kotka/shared/models';
 
 export interface StoreGetQuery {
   query?: string,
@@ -8,4 +6,9 @@ export interface StoreGetQuery {
   page_size?: number,
   sort?: string,
   fields?: string
+}
+
+export interface LoginResponse {
+  profile: Person,
+  next: string
 }

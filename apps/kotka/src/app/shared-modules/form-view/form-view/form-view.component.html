@@ -16,9 +16,9 @@
       <ng-container *ngIf="(!routeParams.editMode || formParams.formData?.id) else notFound">
         <div *ngIf="routeParams.editMode && formParams.formData" class="mb-1">
           <strong class="d-block">Last edited by</strong>
-          <span>{{ (formParams.formData.creator || '') | label }} on {{ formParams.formData.dateEdited | date:'dd.MM.YYYY HH:mm' }}</span>
+          <span>{{ (formParams.formData.editor || '') | label }} on {{ formParams.formData.dateEdited | date:'dd.MM.YYYY HH:mm' }}</span>
           <strong class="d-block">Originally created by</strong>
-          <span>{{ (formParams.formData.editor || '') | label }} on {{ formParams.formData.dateCreated | date:'dd.MM.YYYY HH:mm' }}</span>
+          <span>{{ (formParams.formData.creator || '') | label }} on {{ formParams.formData.dateCreated | date:'dd.MM.YYYY HH:mm' }}</span>
         </div>
         <kui-laji-form
           [form]="formParams.form"

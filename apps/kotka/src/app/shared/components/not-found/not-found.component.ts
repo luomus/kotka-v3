@@ -3,20 +3,13 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 @Component({
   selector: 'kotka-not-found',
   template: `
-    <p>
-      Not found!
-    </p>
+    <kui-main-content [header]="'Page not found'">
+      <p>
+        Please check that you have entered the correct URL.
+      </p>
+    </kui-main-content>
+
   `,
-  styles: [
-    `
-      :host {
-        display: block;
-      }
-    `
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NotFoundComponent {
-
-
-}
+export class NotFoundComponent {}
