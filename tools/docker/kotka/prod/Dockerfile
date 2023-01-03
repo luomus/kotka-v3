@@ -1,3 +1,4 @@
+ARG TARGET
 FROM node:14 as builder
 ENV NODE_ENV build
 
@@ -52,3 +53,5 @@ RUN npm ci --ignore-scripts --only=production \
 EXPOSE 3333
 
 CMD [ "node", "main.js" ]
+
+FROM ${TARGET} as final

@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: BuildConfig
+metadata:
+  name: kotka-api
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: 'kotka-api:latest'        
+  runPolicy: Serial
+  source:
+    git:
+      uri: 'https://github.com/luomus/kotka-v3.git'
+      ref: 'development'
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerFilePath: tools/docker/kotka/prod/Dockerfile
+      build-args:
+        - name: TARGET
+          value: kotka-api
