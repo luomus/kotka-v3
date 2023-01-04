@@ -1,4 +1,4 @@
-apiVersion: v1
+apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   name: kotka
@@ -6,7 +6,12 @@ spec:
   output:
     to:
       kind: ImageStreamTag
-      name: 'kotka:latest'        
+      name: 'kotka:latest'
+  resources:
+    limits:
+      memory: 4Gi
+    requests:
+      memory: 4Gi         
   runPolicy: Serial
   source:
     git:
@@ -15,7 +20,7 @@ spec:
   strategy:
     type: Docker
     dockerStrategy:
-      dockerFilePath: tools/docker/kotka/prod/Dockerfile
-      build-args:
+      dockerfilePath: tools/docker/kotka/prod/Dockerfile
+      buildArgs:
         - name: TARGET
           value: kotka
