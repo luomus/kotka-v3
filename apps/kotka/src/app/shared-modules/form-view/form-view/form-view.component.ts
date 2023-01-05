@@ -3,18 +3,15 @@ import {
   ChangeDetectorRef,
   Component,
   Input,
-  OnInit,
-  OnChanges,
-  OnDestroy,
-  SimpleChanges,
   ViewChild,
   ContentChild,
-  TemplateRef
+  TemplateRef,
+  SimpleChanges
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormService } from '../../../shared/services/form.service';
 import { LajiForm, Person } from '@kotka/shared/models';
-import { combineLatest, Observable, of, ReplaySubject, Subscription, switchMap } from 'rxjs';
+import { combineLatest, from, Observable, of, ReplaySubject, switchMap } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DataObject, ApiService, DataType } from '../../../shared/services/api.service';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
@@ -30,14 +27,15 @@ import { DialogService } from '../../../shared/services/dialog.service';
   styleUrls: ['./form-view.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
+export class FormViewComponent {
   @Input() formId?: string;
   @Input() dataType?: DataType;
   @Input() dataTypeName?: string;
   @Input() getInitialFormDataFunc?: (user: Person) => Partial<DataObject>;
+  @Input() domain = 'http://tun.fi/';
 
+  inputs$: ReplaySubject<{formId: string, dataType: DataType}> = new ReplaySubject<{formId: string, dataType: DataType}>();
   routeParams$: Observable<{editMode: boolean, dataURI?: string}>;
-  formId$: ReplaySubject<string> = new ReplaySubject<string>();
   formParams$: Observable<{
     form: LajiForm.SchemaForm,
     formData?: Partial<DataObject>,
@@ -49,9 +47,6 @@ export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
   @ContentChild('headerTpl', {static: true}) formHeader?: TemplateRef<Element>;
-
-  private formData = new ReplaySubject<DataObject|undefined>(1);
-  private routeSub?: Subscription;
 
   constructor(
     public formApiClient: FormApiClient,
@@ -75,11 +70,23 @@ export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
       map(([editMode, dataURI]) => ({editMode, dataURI}))
     );
 
-    const form$ = this.formId$.pipe(
-      switchMap(formId => this.formService.getForm(formId))
+    const form$ = this.inputs$.pipe(
+      switchMap(inputs => this.formService.getForm(inputs.formId))
     );
 
-    this.formParams$ = combineLatest([form$, this.formData, this.userService.user$]).pipe(
+    const formData$ = combineLatest([this.routeParams$, this.inputs$]).pipe(
+      switchMap(([params, inputs]) => {
+        if (params.dataURI) {
+          const uriParts = params.dataURI.split('/');
+          const id = uriParts.pop() as string;
+          return this.apiService.getById(inputs.dataType, id);
+        } else {
+          return of(undefined);
+        }
+      })
+    );
+
+    this.formParams$ = combineLatest([form$, formData$, this.userService.user$]).pipe(
       map(([form, data, user]) => {
         if (!user) {
           throw new Error('Missing user information');
@@ -105,30 +112,12 @@ export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
     );
   }
 
-  ngOnInit() {
-    this.routeSub = this.routeParams$.pipe(
-      switchMap(params => {
-        if (params.dataURI && this.dataType) {
-          const uriParts = params.dataURI.split('/');
-          const id = uriParts.pop() as string;
-          return this.apiService.getById(this.dataType, id);
-        } else {
-          return of(undefined);
-        }
-      })
-    ).subscribe(
-      formData => this.formData.next(formData)
-    );
-  }
-
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['formId'] && this.formId) {
-      this.formId$.next(this.formId);
+    if (changes['formId'] || changes['dataType']) {
+      if (this.formId && this.dataType) {
+        this.inputs$.next({formId: this.formId, dataType: this.dataType});
+      }
     }
-  }
-
-  ngOnDestroy() {
-    this.routeSub?.unsubscribe();
   }
 
   onSubmit(data: DataObject) {
@@ -146,10 +135,14 @@ export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
     this.lajiForm?.block();
     saveData$.subscribe({
       'next': formData => {
-        this.formData.next(formData);
-        this.lajiForm?.unBlock();
-        this.notifier.showSuccess('Save success!');
-        this.cdr.markForCheck();
+        from(this.router.navigate(['..', 'edit'], {
+          relativeTo: this.activeRoute,
+          queryParams: {uri: this.domain + formData.id}
+        })).subscribe(() => {
+          this.lajiForm?.unBlock();
+          this.notifier.showSuccess('Save success!');
+          this.cdr.markForCheck();
+        });
       },
       'error': () => {
         this.lajiForm?.unBlock();
