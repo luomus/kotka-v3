@@ -24,11 +24,12 @@ RUN npm run ng -- build kotka-api \
 
 
 FROM nginxinc/nginx-unprivileged as kotka
+ARG CONFIGURATION=production
 
 USER nginx
 
 # Set default nginx config
-COPY --chown=nginx:nginx ./tools/docker/nginx/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --chown=nginx:nginx ./tools/docker/nginx/nginx-$CONFIGURATION.conf /etc/nginx/conf.d/default.conf
 RUN chmod a+r /etc/nginx/conf.d/default.conf
 
 COPY --chown=nginx:nginx --from=builder /app/dist/apps/kotka /usr/share/nginx/html/
