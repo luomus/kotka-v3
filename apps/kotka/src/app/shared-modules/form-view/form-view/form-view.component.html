@@ -10,7 +10,7 @@
 
       <ngb-alert *ngIf="formParams.disabled && !disabledAlertIsDismissed" [type]="'warning'" (closed)="disabledAlertIsDismissed = true">
         <strong>Note:</strong>
-        You can only view and copy this record. To be able to edit this record, you must belong to {{ formParams.formData?.owner | label }}
+        You can only view this record. To be able to edit this record, you must belong to {{ formParams.formData?.owner | label }}
       </ngb-alert>
 
       <ng-container *ngIf="(!routeParams.editMode || formParams.formData?.id) else notFound">
