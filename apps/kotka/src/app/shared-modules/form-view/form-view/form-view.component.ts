@@ -12,7 +12,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormService } from '../../../shared/services/form.service';
 import { LajiForm, Person } from '@kotka/shared/models';
 import { combineLatest, from, Observable, of, ReplaySubject, switchMap } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { DataObject, ApiService, DataType } from '../../../shared/services/api.service';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ToastService } from '../../../shared/services/toast.service';
@@ -20,6 +20,7 @@ import { UserService } from '../../../shared/services/user.service';
 import { FormApiClient } from '../../../shared/services/form-api-client';
 import { allowAccessByOrganization, allowAccessByTime } from '@kotka/utils';
 import { DialogService } from '../../../shared/services/dialog.service';
+import { ErrorMessages } from '@kotka/api-interfaces';
 
 @Component({
   selector: 'kotka-form-view',
@@ -34,6 +35,8 @@ export class FormViewComponent {
   @Input() getInitialFormDataFunc?: (user: Person) => Partial<DataObject>;
   @Input() domain = 'http://tun.fi/';
 
+  visibleDataTypeName?: string;
+
   inputs$: ReplaySubject<{formId: string, dataType: DataType}> = new ReplaySubject<{formId: string, dataType: DataType}>();
   routeParams$: Observable<{editMode: boolean, dataURI?: string}>;
   formParams$: Observable<{
@@ -43,7 +46,8 @@ export class FormViewComponent {
     showDeleteButton: boolean
   }>;
 
-  disabledAlertIsDismissed = false;
+  showDeleteTargetInUseAlert = false;
+  showDisabledAlert = false;
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
   @ContentChild('headerTpl', {static: true}) formHeader?: TemplateRef<Element>;
@@ -108,6 +112,9 @@ export class FormViewComponent {
         }
 
         return {form, formData, disabled, showDeleteButton};
+      }),
+      tap(params => {
+        this.showDisabledAlert = params.disabled;
       })
     );
   }
@@ -118,6 +125,7 @@ export class FormViewComponent {
         this.inputs$.next({formId: this.formId, dataType: this.dataType});
       }
     }
+    this.visibleDataTypeName = this.dataTypeName || this.dataType;
   }
 
   onSubmit(data: DataObject) {
@@ -153,8 +161,7 @@ export class FormViewComponent {
   }
 
   onDelete(data: DataObject) {
-    const name = (this.dataTypeName || this.dataType);
-    this.dialogService.confirm(`Are you sure you want to delete this ${name}?`).subscribe(confirm => {
+    this.dialogService.confirm(`Are you sure you want to delete this ${this.visibleDataTypeName}?`).subscribe(confirm => {
       if (confirm) {
         this.delete(data);
       }
@@ -173,9 +180,15 @@ export class FormViewComponent {
         this.notifier.showSuccess('Success!');
         this.navigateAway();
       },
-      'error': () => {
+      'error': err => {
         this.lajiForm?.unBlock();
-        this.notifier.showError('Delete failed!');
+
+        if (err?.error?.message === ErrorMessages.deletionTargetInUse) {
+          this.showDeleteTargetInUseAlert = true;
+        } else {
+          this.notifier.showError('Delete failed!');
+        }
+
         this.cdr.markForCheck();
       }
     });

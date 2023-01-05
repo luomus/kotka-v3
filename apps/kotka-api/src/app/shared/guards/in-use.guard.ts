@@ -6,6 +6,7 @@ import { LajiStoreService, TriplestoreService } from '@kotka/api-services';
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { lastValueFrom, Observable } from 'rxjs';
+import { ErrorMessages } from '@kotka/api-interfaces';
 
 @Injectable()
 export class InUseGuard implements CanActivate {
@@ -23,7 +24,7 @@ export class InUseGuard implements CanActivate {
     if (req.method !== 'DELETE') {
       return true;
     }
-  
+
     const type: string = this.reflector.get('controllerType', context.getClass());
     const inUseTypes: Array<string> = this.reflector.get('inUseTypes', context.getClass());
 
@@ -37,7 +38,7 @@ export class InUseGuard implements CanActivate {
     const data = Object.keys(res.data['rdf:RDF']).filter(key => inUseTypes.includes(key));
 
     if (data && data.length > 0) {
-      throw new ForbiddenException('Deletion target is in use.');
+      throw new ForbiddenException(ErrorMessages.deletionTargetInUse);
     }
 
     return true;

@@ -1,6 +1,6 @@
 <ng-container *ngIf="routeParams$ | async as routeParams else spinner">
   <kui-main-content
-    [header]="routeParams.editMode ? 'Edit ' + (dataTypeName || dataType) + ' ' + (routeParams.dataURI || ''): 'Add ' + (dataTypeName || dataType)"
+    [header]="routeParams.editMode ? 'Edit ' + visibleDataTypeName + ' ' + (routeParams.dataURI || ''): 'Add ' + visibleDataTypeName"
     [containerClass]="'container'"
   >
     <ng-container *ngIf="formParams$ | async as formParams else spinner">
@@ -8,9 +8,13 @@
         <ng-container *ngTemplateOutlet="formHeader; context:{formData: formParams.formData}"></ng-container>
       </ng-template>
 
-      <ngb-alert *ngIf="formParams.disabled && !disabledAlertIsDismissed" [type]="'warning'" (closed)="disabledAlertIsDismissed = true">
+      <ngb-alert *ngIf="showDeleteTargetInUseAlert" [type]="'danger'" (closed)="showDeleteTargetInUseAlert = true">
+        <strong>Delete failed:</strong>
+        This {{ visibleDataTypeName}} can't be deleted because there are resources that are attached to it.
+      </ngb-alert>
+      <ngb-alert *ngIf="showDisabledAlert" [type]="'warning'" (closed)="showDisabledAlert = false">
         <strong>Note:</strong>
-        You can only view this record. To be able to edit this record, you must belong to {{ formParams.formData?.owner | label }}
+        You can only view this {{ visibleDataTypeName }}. To be able to edit this {{ visibleDataTypeName }}, you must belong to {{ formParams.formData?.owner | label }}
       </ngb-alert>
 
       <ng-container *ngIf="(!routeParams.editMode || formParams.formData?.id) else notFound">
@@ -33,7 +37,7 @@
         </kui-laji-form>
       </ng-container>
       <ng-template #notFound>
-        {{ (dataTypeName || dataType) | titlecase }} <ng-container *ngIf="routeParams.dataURI">with URI {{ routeParams.dataURI }} </ng-container>was not found.
+        {{ visibleDataTypeName | titlecase }} <ng-container *ngIf="routeParams.dataURI">with URI {{ routeParams.dataURI }} </ng-container>was not found.
       </ng-template>
     </ng-container>
   </kui-main-content>
