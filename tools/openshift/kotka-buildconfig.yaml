@@ -11,7 +11,7 @@ spec:
     limits:
       memory: 4Gi
     requests:
-      memory: 4Gi         
+      memory: 2Gi
   runPolicy: Serial
   source:
     git:
@@ -24,3 +24,5 @@ spec:
       buildArgs:
         - name: TARGET
           value: kotka
+        - name: CONFIGURATION
+          value: beta

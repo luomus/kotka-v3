@@ -2,8 +2,10 @@ import { Test } from '@nestjs/testing';
 import { createMock } from '@golevelup/ts-jest';
 import { CallHandler, ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 import { ValidatorInterceptor } from './validator.interceptor';
-import { ApiServicesModule, FormService } from '@kotka/api-services';
+import { ApiServicesModule, FormService, LajiStoreService } from '@kotka/api-services';
 import { Reflector } from '@nestjs/core';
+import { ValidationService } from '../services/validation.service';
+import { of } from 'rxjs';
 
 const mockForm = {
   "schema": {
@@ -100,6 +102,9 @@ const mockForm = {
         "en": {
           "presence": {
             "message": "Required field."
+          },
+          "remote": {
+            "validator": "kotkaDatasetNameUnique"
           }
         }
       }
@@ -119,6 +124,7 @@ const mockForm = {
 
 describe('ValidationInterceptor', () => {
   let validatorInterceptor: ValidatorInterceptor;
+  let lajiStoreService: LajiStoreService;
   let formService: FormService;
   let reflector: Reflector;
 
@@ -126,15 +132,17 @@ describe('ValidationInterceptor', () => {
     const moduleRef = await Test.createTestingModule({
       imports: [ApiServicesModule],
       controllers: [],
-      providers: [ValidatorInterceptor, Reflector],
+      providers: [ValidatorInterceptor, ValidationService, Reflector],
     }).compile();
 
     validatorInterceptor = moduleRef.get<ValidatorInterceptor>(ValidatorInterceptor);
+    lajiStoreService = moduleRef.get<LajiStoreService>(LajiStoreService);
     formService = moduleRef.get<FormService>(FormService);
     reflector = moduleRef.get<Reflector>(Reflector);
 
     jest.spyOn(formService, 'getForm').mockImplementation((type) => new Promise((resolve, reject) => resolve(mockForm) ));
     jest.spyOn(reflector, 'get').mockImplementation((key, target) => 'GX.dataset');
+    jest.spyOn(lajiStoreService, 'search').mockImplementation((type, body) => { console.log(type, body); return of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [] }});});
   });
 
   it('Missing body in request results in error thrown in validator', async () => {
@@ -206,7 +214,7 @@ describe('ValidationInterceptor', () => {
      }
   });
 
-  it('Correct body results in no errors and a call to next handler.', async () => {
+  it('Error in overriden remote validation for datasetName uniquenenss results in error being thrown', async () => {
     const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
       getRequest: () => ({
         method: 'POST',
@@ -214,6 +222,33 @@ describe('ValidationInterceptor', () => {
           owner: 'MOS.1',
           datasetName: {
             en: 'Test'
+          },
+          personsResponsible: 'Tester'
+        }
+      })
+     })});
+
+     const mockNext = createMock<CallHandler>();
+     jest.spyOn(lajiStoreService, 'search').mockImplementation((type, body) => { console.log(type, body); return of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [{}] }});});
+     expect.assertions(3);
+
+     try {
+      await validatorInterceptor.intercept(mockContext, mockNext);
+     } catch (e) {
+      expect(lajiStoreService.search).toBeCalledTimes(1);
+      expect(JSON.stringify(e)).toContain('"datasetName":{"en":{"errors":["Dataset name must be unique."]}');
+      expect(mockNext.handle).toBeCalledTimes(0);
+     }
+  });
+
+  it('Correct body results in no errors and a call to next handler.', async () => {
+    const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+      getRequest: () => ({
+        method: 'POST',
+        body: {
+          owner: 'MOS.1',
+          datasetName: {
+            en: 'test'
           },
           personsResponsible: 'Tester'
         }

@@ -34,4 +34,8 @@ export class LajiStoreService {
   delete(type: string, id: string) {
     return this.httpService.delete(`${this.urlBase}${type}/${id}`, this.baseConfig);
   }
+
+  search(type: string, body: Record<string, unknown>) {
+    return this.httpService.post(`${this.urlBase}${type}/_search`, body, this.baseConfig);
+  }
 }

@@ -2,15 +2,14 @@
 https://docs.nestjs.com/modules
 */
 
+import { ApiServicesModule } from '@kotka/api-services';
 import { Module } from '@nestjs/common';
-import { ControllerType } from './decorators/controller-type.decorator';
-import { InUseTypesSet } from './decorators/in-use-types-set.decorator';
-import { TimedAccessSet } from './decorators/timed-access-set.decorator';
+import { ValidationService } from './services/validation.service';
 
 @Module({
-    imports: [],
+    imports: [ApiServicesModule],
     controllers: [],
-    providers: [],
-    exports: []
+    providers: [ValidationService],
+    exports: [ValidationService]
 })
 export class SharedModule {}

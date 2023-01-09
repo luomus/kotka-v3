@@ -13,6 +13,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import Ajv from 'ajv';
 import * as lajiValidate from 'laji-validate';
+import { ValidationService } from '../services/validation.service';
 
 @Injectable()
 export class ValidatorInterceptor implements NestInterceptor {
@@ -21,12 +22,20 @@ export class ValidatorInterceptor implements NestInterceptor {
 
   constructor (
     private readonly reflector: Reflector,
-    private readonly formService: FormService
+    private readonly formService: FormService,
+    private readonly validationService: ValidationService
   ) {
     this.ajv = new Ajv({ 
       allErrors: true,
     });
+
+    lajiValidate.extend(lajiValidate.validators.remote, {
+      fetch: (path, query, options) => {
+        return this.validationService.remoteValidate(query, options);
+      }
+    });
   }
+
   async intercept(context: ExecutionContext, next: CallHandler): Promise<any> {
     const req = context.switchToHttp().getRequest();
     const type: string = this.reflector.get('controllerType', context.getClass());
