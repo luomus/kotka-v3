@@ -11,7 +11,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormService } from '../../../shared/services/form.service';
 import { LajiForm, Person } from '@kotka/shared/models';
-import { combineLatest, from, Observable, of, ReplaySubject, switchMap } from 'rxjs';
+import { catchError, combineLatest, from, Observable, of, ReplaySubject, switchMap, throwError } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { DataObject, ApiService, DataType } from '../../../shared/services/api.service';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
@@ -21,6 +21,11 @@ import { FormApiClient } from '../../../shared/services/form-api-client';
 import { allowAccessByOrganization, allowAccessByTime } from '@kotka/utils';
 import { DialogService } from '../../../shared/services/dialog.service';
 import { ErrorMessages } from '@kotka/api-interfaces';
+
+enum FormErrorEnum {
+  dataNotFound = 'dataNotFound',
+  genericError = 'genericError'
+}
 
 @Component({
   selector: 'kotka-form-view',
@@ -37,17 +42,27 @@ export class FormViewComponent {
 
   visibleDataTypeName?: string;
 
-  inputs$: ReplaySubject<{formId: string, dataType: DataType}> = new ReplaySubject<{formId: string, dataType: DataType}>();
   routeParams$: Observable<{editMode: boolean, dataURI?: string}>;
   formParams$: Observable<{
     form: LajiForm.SchemaForm,
     formData?: Partial<DataObject>,
     disabled: boolean,
-    showDeleteButton: boolean
+    showDeleteButton: boolean,
+    errorType?: undefined
+  } | {
+    form?: undefined,
+    formData?: undefined,
+    disabled?: undefined,
+    showDeleteButton?: undefined,
+    errorType: FormErrorEnum
   }>;
 
   showDeleteTargetInUseAlert = false;
   showDisabledAlert = false;
+
+  formErrorEnum = FormErrorEnum;
+
+  private inputs$: ReplaySubject<{formId: string, dataType: DataType}> = new ReplaySubject<{formId: string, dataType: DataType}>();
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
   @ContentChild('headerTpl', {static: true}) formHeader?: TemplateRef<Element>;
@@ -80,10 +95,18 @@ export class FormViewComponent {
 
     const formData$ = combineLatest([this.routeParams$, this.inputs$]).pipe(
       switchMap(([params, inputs]) => {
-        if (params.dataURI) {
+        if (params.editMode) {
+          if (!params.dataURI) {
+            return throwError(() => new Error(FormErrorEnum.dataNotFound));
+          }
           const uriParts = params.dataURI.split('/');
           const id = uriParts.pop() as string;
-          return this.apiService.getById(inputs.dataType, id);
+          return this.apiService.getById(inputs.dataType, id).pipe(
+            catchError(err => {
+              err = err.status === 404 ? FormErrorEnum.dataNotFound : err;
+              return throwError(() => new Error(err));
+            })
+          );
         } else {
           return of(undefined);
         }
@@ -115,6 +138,10 @@ export class FormViewComponent {
       }),
       tap(params => {
         this.showDisabledAlert = params.disabled;
+      }),
+      catchError(err => {
+        const errorType = err.message === FormErrorEnum.dataNotFound ? FormErrorEnum.dataNotFound : FormErrorEnum.genericError;
+        return of({errorType});
       })
     );
   }
