@@ -65,7 +65,7 @@ export class TriplestoreMapperService implements OnModuleInit {
       parse(rdf, store, baseUrl, 'application/n-quads', (err, data) => {
 
         serialize(null, data, undefined, 'application/rdf+xml', (err, data) => {
-          data = data.replace(/IIII/g, '.').replace(/:tun/g, '').replace(/tun:/g, '');
+          data = data.replace(/IIII/g, '.').replace(/:tun/g, '').replace(/tun:/g, '').replace(/rdf:datatype="http:\/\/www.w3.org\/1999\/02\/22-rdf-syntax-ns#langString" /g, '');
           resolve(data);
         });
       });
