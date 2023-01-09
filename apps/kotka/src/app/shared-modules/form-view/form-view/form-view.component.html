@@ -1,19 +1,23 @@
 <ng-container *ngIf="routeParams$ | async as routeParams else spinner">
   <kui-main-content
-    [header]="routeParams.editMode ? 'Edit ' + (dataTypeName || dataType) + ' ' + (routeParams.dataURI || ''): 'Add ' + (dataTypeName || dataType)"
+    [header]="routeParams.editMode ? 'Edit ' + visibleDataTypeName + ' ' + (routeParams.dataURI || ''): 'Add ' + visibleDataTypeName"
     [containerClass]="'container'"
   >
     <ng-container *ngIf="formParams$ | async as formParams else spinner">
-      <ng-template #headerTpl *ngIf="formHeader">
-        <ng-container *ngTemplateOutlet="formHeader; context:{formData: formParams.formData}"></ng-container>
-      </ng-template>
+      <ng-container *ngIf="formParams.form else error">
+        <ng-template #headerTpl *ngIf="formHeader">
+          <ng-container *ngTemplateOutlet="formHeader; context:{formData: formParams.formData}"></ng-container>
+        </ng-template>
 
-      <ngb-alert *ngIf="formParams.disabled && !disabledAlertIsDismissed" [type]="'warning'" (closed)="disabledAlertIsDismissed = true">
-        <strong>Note:</strong>
-        You can only view and copy this record. To be able to edit this record, you must belong to {{ formParams.formData?.owner | label }}
-      </ngb-alert>
+        <ngb-alert *ngIf="showDeleteTargetInUseAlert" [type]="'danger'" (closed)="showDeleteTargetInUseAlert = true">
+          <strong>Delete failed:</strong>
+          This {{ visibleDataTypeName}} can't be deleted because there are resources that are attached to it.
+        </ngb-alert>
+        <ngb-alert *ngIf="showDisabledAlert" [type]="'warning'" (closed)="showDisabledAlert = false">
+          <strong>Note:</strong>
+          You can only view this {{ visibleDataTypeName }}. To be able to edit this {{ visibleDataTypeName }}, you must belong to {{ formParams.formData?.owner | label }}
+        </ngb-alert>
 
-      <ng-container *ngIf="(!routeParams.editMode || formParams.formData?.id) else notFound">
         <div *ngIf="routeParams.editMode && formParams.formData" class="mb-1">
           <strong class="d-block">Last edited by</strong>
           <span>{{ (formParams.formData.editor || '') | label }} on {{ formParams.formData.dateEdited | date:'dd.MM.YYYY HH:mm' }}</span>
@@ -32,8 +36,15 @@
         >
         </kui-laji-form>
       </ng-container>
-      <ng-template #notFound>
-        {{ (dataTypeName || dataType) | titlecase }} <ng-container *ngIf="routeParams.dataURI">with URI {{ routeParams.dataURI }} </ng-container>was not found.
+      <ng-template #error>
+        <ngb-alert [type]="'danger'" [dismissible]="false">
+          <ng-container *ngIf="formParams.errorType === formErrorEnum.dataNotFound else genericError">
+            {{ visibleDataTypeName | titlecase }} <ng-container *ngIf="routeParams.dataURI">with URI {{ routeParams.dataURI }} </ng-container>was not found.
+          </ng-container>
+          <ng-template #genericError>
+            Unexpected error occurred
+          </ng-template>
+        </ngb-alert>
       </ng-template>
     </ng-container>
   </kui-main-content>

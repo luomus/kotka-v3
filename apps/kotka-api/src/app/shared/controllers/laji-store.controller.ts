@@ -6,7 +6,20 @@ import { StoreGetQuery } from '@kotka/api-interfaces';
 import { lastValueFrom } from 'rxjs';
 import { LajiStoreService, TriplestoreService } from '@kotka/api-services';
 import { TriplestoreMapperService } from '@kotka/mappers';
-import { Body, Delete, Get, HttpCode, Param, Post, Put, Query, Req, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  NotFoundException,
+  Param,
+  Post,
+  Put,
+  Query,
+  Req,
+  UseInterceptors
+} from '@nestjs/common';
 import { StoreObject } from '@kotka/shared/models';
 import { cloneDeep } from 'lodash';
 import { UserInterceptor } from '../interceptors/user.interceptor';
@@ -21,7 +34,7 @@ export abstract class LajiStoreController {
     protected readonly type: string,
   ) {
   }
-  
+
   @Get()
   async getAll(@Query() query: StoreGetQuery) {
     try {
@@ -43,7 +56,7 @@ export abstract class LajiStoreController {
       const rdfXml = await this.triplestoreMapperService.jsonToTriplestore(cloneDeep(res.data), this.type);
 
       await lastValueFrom(this.triplestoreService.put(res.data.id, rdfXml));
-    
+
       return res.data;
     } catch (err) {
       console.error(err);
@@ -58,6 +71,9 @@ export abstract class LajiStoreController {
 
       return res.data;
     } catch (err) {
+      if (err.response.status === HttpStatus.NOT_FOUND) {
+        throw new NotFoundException();
+      }
       console.error(err);
       throw err;
     }
@@ -72,7 +88,7 @@ export abstract class LajiStoreController {
       const rdfXml = await this.triplestoreMapperService.jsonToTriplestore(cloneDeep(res.data), this.type);
 
       await lastValueFrom(this.triplestoreService.put(res.data.id, rdfXml));
-      
+
       return res.data;
     } catch (err) {
       console.error(err);

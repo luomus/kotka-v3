@@ -3,19 +3,16 @@ import {
   ChangeDetectorRef,
   Component,
   Input,
-  OnInit,
-  OnChanges,
-  OnDestroy,
-  SimpleChanges,
   ViewChild,
   ContentChild,
-  TemplateRef
+  TemplateRef,
+  SimpleChanges
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormService } from '../../../shared/services/form.service';
 import { LajiForm, Person } from '@kotka/shared/models';
-import { combineLatest, Observable, of, ReplaySubject, Subscription, switchMap } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { catchError, combineLatest, from, Observable, of, ReplaySubject, switchMap, throwError } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 import { DataObject, ApiService, DataType } from '../../../shared/services/api.service';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ToastService } from '../../../shared/services/toast.service';
@@ -23,6 +20,12 @@ import { UserService } from '../../../shared/services/user.service';
 import { FormApiClient } from '../../../shared/services/form-api-client';
 import { allowAccessByOrganization, allowAccessByTime } from '@kotka/utils';
 import { DialogService } from '../../../shared/services/dialog.service';
+import { ErrorMessages } from '@kotka/api-interfaces';
+
+enum FormErrorEnum {
+  dataNotFound = 'dataNotFound',
+  genericError = 'genericError'
+}
 
 @Component({
   selector: 'kotka-form-view',
@@ -30,28 +33,39 @@ import { DialogService } from '../../../shared/services/dialog.service';
   styleUrls: ['./form-view.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
+export class FormViewComponent {
   @Input() formId?: string;
   @Input() dataType?: DataType;
   @Input() dataTypeName?: string;
   @Input() getInitialFormDataFunc?: (user: Person) => Partial<DataObject>;
+  @Input() domain = 'http://tun.fi/';
+
+  visibleDataTypeName?: string;
 
   routeParams$: Observable<{editMode: boolean, dataURI?: string}>;
-  formId$: ReplaySubject<string> = new ReplaySubject<string>();
   formParams$: Observable<{
     form: LajiForm.SchemaForm,
     formData?: Partial<DataObject>,
     disabled: boolean,
-    showDeleteButton: boolean
+    showDeleteButton: boolean,
+    errorType?: undefined
+  } | {
+    form?: undefined,
+    formData?: undefined,
+    disabled?: undefined,
+    showDeleteButton?: undefined,
+    errorType: FormErrorEnum
   }>;
 
-  disabledAlertIsDismissed = false;
+  showDeleteTargetInUseAlert = false;
+  showDisabledAlert = false;
+
+  formErrorEnum = FormErrorEnum;
+
+  private inputs$: ReplaySubject<{formId: string, dataType: DataType}> = new ReplaySubject<{formId: string, dataType: DataType}>();
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
   @ContentChild('headerTpl', {static: true}) formHeader?: TemplateRef<Element>;
-
-  private formData = new ReplaySubject<DataObject|undefined>(1);
-  private routeSub?: Subscription;
 
   constructor(
     public formApiClient: FormApiClient,
@@ -75,11 +89,31 @@ export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
       map(([editMode, dataURI]) => ({editMode, dataURI}))
     );
 
-    const form$ = this.formId$.pipe(
-      switchMap(formId => this.formService.getForm(formId))
+    const form$ = this.inputs$.pipe(
+      switchMap(inputs => this.formService.getForm(inputs.formId))
     );
 
-    this.formParams$ = combineLatest([form$, this.formData, this.userService.user$]).pipe(
+    const formData$ = combineLatest([this.routeParams$, this.inputs$]).pipe(
+      switchMap(([params, inputs]) => {
+        if (params.editMode) {
+          if (!params.dataURI) {
+            return throwError(() => new Error(FormErrorEnum.dataNotFound));
+          }
+          const uriParts = params.dataURI.split('/');
+          const id = uriParts.pop() as string;
+          return this.apiService.getById(inputs.dataType, id).pipe(
+            catchError(err => {
+              err = err.status === 404 ? FormErrorEnum.dataNotFound : err;
+              return throwError(() => new Error(err));
+            })
+          );
+        } else {
+          return of(undefined);
+        }
+      })
+    );
+
+    this.formParams$ = combineLatest([form$, formData$, this.userService.user$]).pipe(
       map(([form, data, user]) => {
         if (!user) {
           throw new Error('Missing user information');
@@ -101,34 +135,24 @@ export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
         }
 
         return {form, formData, disabled, showDeleteButton};
+      }),
+      tap(params => {
+        this.showDisabledAlert = params.disabled;
+      }),
+      catchError(err => {
+        const errorType = err.message === FormErrorEnum.dataNotFound ? FormErrorEnum.dataNotFound : FormErrorEnum.genericError;
+        return of({errorType});
       })
-    );
-  }
-
-  ngOnInit() {
-    this.routeSub = this.routeParams$.pipe(
-      switchMap(params => {
-        if (params.dataURI && this.dataType) {
-          const uriParts = params.dataURI.split('/');
-          const id = uriParts.pop() as string;
-          return this.apiService.getById(this.dataType, id);
-        } else {
-          return of(undefined);
-        }
-      })
-    ).subscribe(
-      formData => this.formData.next(formData)
     );
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['formId'] && this.formId) {
-      this.formId$.next(this.formId);
+    if (changes['formId'] || changes['dataType']) {
+      if (this.formId && this.dataType) {
+        this.inputs$.next({formId: this.formId, dataType: this.dataType});
+      }
     }
-  }
-
-  ngOnDestroy() {
-    this.routeSub?.unsubscribe();
+    this.visibleDataTypeName = this.dataTypeName || this.dataType;
   }
 
   onSubmit(data: DataObject) {
@@ -146,10 +170,14 @@ export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
     this.lajiForm?.block();
     saveData$.subscribe({
       'next': formData => {
-        this.formData.next(formData);
-        this.lajiForm?.unBlock();
-        this.notifier.showSuccess('Save success!');
-        this.cdr.markForCheck();
+        from(this.router.navigate(['..', 'edit'], {
+          relativeTo: this.activeRoute,
+          queryParams: {uri: this.domain + formData.id}
+        })).subscribe(() => {
+          this.lajiForm?.unBlock();
+          this.notifier.showSuccess('Save success!');
+          this.cdr.markForCheck();
+        });
       },
       'error': () => {
         this.lajiForm?.unBlock();
@@ -160,8 +188,7 @@ export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   onDelete(data: DataObject) {
-    const name = (this.dataTypeName || this.dataType);
-    this.dialogService.confirm(`Are you sure you want to delete this ${name}?`).subscribe(confirm => {
+    this.dialogService.confirm(`Are you sure you want to delete this ${this.visibleDataTypeName}?`).subscribe(confirm => {
       if (confirm) {
         this.delete(data);
       }
@@ -180,9 +207,15 @@ export class FormViewComponent implements OnChanges, OnInit, OnDestroy {
         this.notifier.showSuccess('Success!');
         this.navigateAway();
       },
-      'error': () => {
+      'error': err => {
         this.lajiForm?.unBlock();
-        this.notifier.showError('Delete failed!');
+
+        if (err?.error?.message === ErrorMessages.deletionTargetInUse) {
+          this.showDeleteTargetInUseAlert = true;
+        } else {
+          this.notifier.showError('Delete failed!');
+        }
+
         this.cdr.markForCheck();
       }
     });

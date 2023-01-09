@@ -40,7 +40,7 @@ export class ToastService {
   }
 
   showError(message: string) {
-    this.show(message, { className: 'bg-danger text-light', autoHide: false });
+    this.show(message, { className: 'bg-danger text-light', delay: 7000 });
   }
 
   showInfo(message: string) {
