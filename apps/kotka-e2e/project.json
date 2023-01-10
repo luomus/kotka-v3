@@ -11,13 +11,8 @@
     "e2e": {
       "executor": "@nrwl/cypress:cypress",
       "options": {
-        "cypressConfig": "apps/kotka-e2e/cypress.json",
-        "devServerTarget": "kotka:serve:development"
-      },
-      "configurations": {
-        "production": {
-          "devServerTarget": "kotka:serve:production"
-        }
+        "baseUrl": "http://localhost:4200",
+        "cypressConfig": "apps/kotka-e2e/cypress.json"
       }
     },
     "lint": {

@@ -102,7 +102,7 @@
           <li dropdown class="nav-item dropdown" placement="bottom right" *ngIf="userService.user$ | async as user;">
             <a class="nav-link" dropdownToggle id="user-menu"><i class="fa fa-user"></i>&nbsp; {{ user.fullName }}</a>
             <ul class="dropdown-menu dropdown-menu-right" *dropdownMenu>
-              <li><a class="dropdown-item" routerLink="/user/logout"><i class="fa fa-power-off"></i> Logout</a></li>
+              <li><a class="dropdown-item" id="user-logout" routerLink="/user/logout"><i class="fa fa-power-off"></i> Logout</a></li>
             </ul>
           </li>
         </ng-container>
