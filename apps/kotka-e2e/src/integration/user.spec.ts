@@ -1,14 +1,16 @@
 describe('user', () => {
-  beforeEach(() => cy.visit('/tags'));
+  beforeEach(() => {
+    cy.logout();
+  });
 
   it('should automatically redirect to login page', () => {
+    cy.visit('/');
     cy.url().should('include', 'laji-auth');
   });
 
-  it('should login user', () => {
-    cy.login();
+  it('should show the correct page after login', () => {
+    cy.login(undefined, undefined, '/tags');
     cy.get('h1').should('contain', 'Tags');
-    cy.logout();
   });
 
   it('should redirect to login page after logout', () => {

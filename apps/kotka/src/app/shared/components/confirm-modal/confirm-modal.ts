@@ -8,12 +8,22 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
       <p>{{ message }}</p>
     </div>
     <div class="modal-footer">
-      <button type="button"
-              class="btn btn-primary text-light"
-              (click)="modal.close(true)">{{ confirmLabel }}</button>
-      <button type="button" *ngIf="showCancel"
-              class="btn btn-default"
-              (click)="modal.dismiss()">{{ cancelLabel }}</button>
+      <button
+        type="button"
+        class="btn btn-primary text-light"
+        (click)="modal.close(true)"
+        data-cy="confirm-ok"
+      >
+        {{ confirmLabel }}
+      </button>
+      <button
+        type="button"
+        *ngIf="showCancel"
+        class="btn btn-default"
+        (click)="modal.dismiss()"
+      >
+        {{ cancelLabel }}
+      </button>
     </div>
 	`,
 })
