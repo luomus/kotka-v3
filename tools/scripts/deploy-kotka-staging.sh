@@ -8,7 +8,7 @@ cd ${SCRIPT_PATH}
 ./_deploy.sh \
   "registry.ext.ocp-test-0.k8s.it.helsinki.fi/kotka" \
   "https://api.ocp-test-0.k8s.it.helsinki.fi:6443" \
-  "dev" \
+  "beta" \
   ${1}
 
 
