@@ -74,14 +74,4 @@ spec:
           resources: {}
       restartPolicy: Always
   test: false
-  triggers:
-    - type: ConfigChange
-    - imageChangeParams:
-        automatic: true
-        containerNames:
-          - kotka-api
-        from:
-          kind: ImageStreamTag
-          name: kotka-api:latest
-      type: ImageChange
 
