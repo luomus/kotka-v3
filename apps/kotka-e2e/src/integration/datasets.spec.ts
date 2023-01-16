@@ -4,13 +4,13 @@ describe('datasets', () => {
 
   it('should show the correct title when editing a dataset', () => {
     cy.get('.edit-button').first().click();
-    cy.get('h1').should('contain', 'Edit tag');
+    cy.get('[data-cy=main-header]').should('contain', 'Edit tag');
   });
 
   it('should show the correct title when adding a dataset', () => {
     cy.get('#datasets-menu').click();
     cy.get('[data-cy=datasets-add]').click();
-    cy.get('h1').should('contain', 'Add tag');
+    cy.get('[data-cy=main-header]').should('contain', 'Add tag');
   });
 
   describe('dataset form', () => {
@@ -34,7 +34,7 @@ describe('datasets', () => {
 
       cy.get('[data-cy=toast]').should('have.text', 'Save success!');
       cy.get('[data-cy=toast-close]').click();
-      cy.get('h1').should('contain', 'Edit tag');
+      cy.get('[data-cy=main-header]').should('contain', 'Edit tag');
 
       cy.get('[data-cy=form-delete]').click();
       cy.get('[data-cy=confirm-ok]').click();

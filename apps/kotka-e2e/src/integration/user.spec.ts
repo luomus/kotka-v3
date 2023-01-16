@@ -10,7 +10,7 @@ describe('user', () => {
 
   it('should show the correct page after login', () => {
     cy.login(undefined, undefined, '/tags');
-    cy.get('h1').should('contain', 'Tags');
+    cy.get('[data-cy=main-header]').should('contain', 'Tags');
   });
 
   it('should redirect to login page after logout', () => {

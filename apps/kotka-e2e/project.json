@@ -13,6 +13,11 @@
       "options": {
         "baseUrl": "http://localhost:4200",
         "cypressConfig": "apps/kotka-e2e/cypress.json"
+      },
+      "configurations": {
+        "docker": {
+          "devServerTarget": "kotka:serve:development"
+        }
       }
     },
     "lint": {

@@ -5,7 +5,7 @@ import { Component, ChangeDetectionStrategy, Input, ContentChild, TemplateRef, C
   template: `
     <main [class]="containerClass">
       <div *ngIf="header || _headerTpl" class="pb-2 mt-4 mb-2 border-bottom">
-        <h1 *ngIf="header">{{ header }}</h1>
+        <h1 *ngIf="header" data-cy="main-header">{{ header }}</h1>
         <ng-container *ngIf="_headerTpl">
           <ng-container *ngTemplateOutlet="_headerTpl"></ng-container>
         </ng-container>

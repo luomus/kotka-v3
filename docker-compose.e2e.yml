@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 services:
   redis:
     image: redis
@@ -18,17 +18,22 @@ services:
       - shared-volume:/app/node_modules
     ports:
       - 3333:3333
-  kotka:
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --silent --fail localhost:3333/api/status || exit 1" ]
+      start_period: 30s
+      interval: 10s
+      timeout: 10s
+      retries: 7
+  kotka-e2e:
+    depends_on:
+      kotka-api:
+        condition: service_healthy
     build:
       context: ./
-      dockerfile: ./tools/docker/kotka/dev/kotka/Dockerfile
+      dockerfile: ./tools/docker/kotka-e2e/Dockerfile
     volumes:
       - .:/app
       - shared-volume:/app/node_modules
-    ports:
-      - 4200:4200
-    links:
-     - kotka-api
 volumes:
   shared-volume:
   redis:

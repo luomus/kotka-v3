@@ -5,6 +5,7 @@ import { Module } from '@nestjs/common';
 
 import { ApiServicesModule } from '@kotka/api-services';
 import { DatasetModule } from './dataset/dataset.module';
+import { StatusModule } from './status/status.module';
 
 @Module({
   imports: [
@@ -12,7 +13,8 @@ import { DatasetModule } from './dataset/dataset.module';
     MappersModule,
     AuthenticationModule,
     ApiServicesModule,
-    DatasetModule
+    DatasetModule,
+    StatusModule
   ],
   controllers: [],
   providers: []
