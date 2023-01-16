@@ -65,7 +65,9 @@ spec:
                 secretKeyRef:
                   name: kotka-secret
                   key: TRIPLESTORE_AUTH
-          image: ' '
+          image: >-
+            image-registry.openshift-image-registry.svc:5000/kotka/kotka-api
+          imagePullPolicy: Always
           name: kotka-api
           ports:
             - containerPort: 3333
@@ -82,10 +84,4 @@ spec:
           kind: ImageStreamTag
           name: kotka-api:latest
       type: ImageChange
-status:
-  availableReplicas: 0
-  latestVersion: 0
-  observedGeneration: 0
-  replicas: 0
-  unavailableReplicas: 0
-  updatedReplicas: 0
+
