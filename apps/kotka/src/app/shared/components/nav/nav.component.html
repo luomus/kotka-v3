@@ -48,7 +48,7 @@
             <a class="nav-link" dropdownToggle id="datasets-menu">Tags <i class="fa fa-caret-down"></i></a>
             <ul class="dropdown-menu" *dropdownMenu role="menu" aria-labelledby="datasets-menu">
               <li><a class="dropdown-item" routerLink="/tags">All</a></li>
-              <li><a class="dropdown-item" routerLink="/tags/add"><i class="fa fa-plus"></i> Add tag</a></li>
+              <li><a class="dropdown-item" routerLink="/tags/add" data-cy="datasets-add"><i class="fa fa-plus"></i> Add tag</a></li>
             </ul>
           </li>
 
@@ -102,7 +102,7 @@
           <li dropdown class="nav-item dropdown" placement="bottom right" *ngIf="userService.user$ | async as user;">
             <a class="nav-link" dropdownToggle id="user-menu"><i class="fa fa-user"></i>&nbsp; {{ user.fullName }}</a>
             <ul class="dropdown-menu dropdown-menu-right" *dropdownMenu>
-              <li><a class="dropdown-item" routerLink="/user/logout"><i class="fa fa-power-off"></i> Logout</a></li>
+              <li><a class="dropdown-item" id="user-logout" routerLink="/user/logout"><i class="fa fa-power-off"></i> Logout</a></li>
             </ul>
           </li>
         </ng-container>

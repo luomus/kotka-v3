@@ -6,13 +6,13 @@ import { ICellRendererParams } from '@ag-grid-community/core';
   selector: 'uri-cell-renderer',
   template: `
     <div *ngIf="value" class="uri-cell-layout">
-      <a id="editButton" type="button" class="btn btn-info text-light" [routerLink]="['edit']" [queryParams]="{
+      <a type="button" class="btn btn-info text-light edit-button" [routerLink]="['edit']" [queryParams]="{
         uri: domain + value
       }">
         <i class="fa fa-pen-to-square"></i>
       </a>
-      <small id="domainValue">{{ domain }}</small>
-      <span id="idValue" title="{{ value }}">{{ value }}</span>
+      <small class="domain-value">{{ domain }}</small>
+      <span class="id-value" title="{{ value }}">{{ value }}</span>
     </div>
   `,
   styles: [`
@@ -25,15 +25,15 @@ import { ICellRendererParams } from '@ag-grid-community/core';
         "button id";
       column-gap: 2px;
     }
-    .uri-cell-layout #editButton {
+    .uri-cell-layout .edit-button {
       grid-area: button;
     }
-    .uri-cell-layout #domainValue {
+    .uri-cell-layout .domain-value {
       grid-area: domain;
       line-height: initial;
       font-size: 60%;
     }
-    .uri-cell-layout #idValue {
+    .uri-cell-layout .id-value {
       grid-area: id;
       line-height: initial;
     }
