@@ -1,6 +1,8 @@
 describe('datasets', () => {
-  before(() => cy.login());
-  beforeEach(() => cy.visit('/tags'));
+  beforeEach(() => {
+    cy.setUserAsLoggedIn();
+    cy.visit('/tags');
+  });
 
   it('should show the correct title when editing a dataset', () => {
     cy.get('.edit-button').first().click();

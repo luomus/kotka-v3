@@ -12,38 +12,40 @@
 declare namespace Cypress {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface Chainable<Subject> {
-    login(email?: string, password?: string, next?: string): void;
+    setUserAsLoggedIn(email?: string, password?: string): void;
+    login(email: string, password: string): void;
     logout(): void;
   }
 }
 
-Cypress.Commands.add('login', (email, password, next = '/') => {
-  cy.visit(next);
+Cypress.Commands.add('setUserAsLoggedIn', (email, password) => {
+  cy.fixture('test-user').then((defaultUser: { email: string, password: string }) => {
+    const userEmail = email || defaultUser.email;
+    const userPassword = password || defaultUser.password;
 
-  cy.get('#user-menu,#local-login').invoke('attr', 'id').then(idValue => {
-    if (idValue === 'local-login') {
-      cy.fixture('test-user').then((defaultUser: { email: string, password: string }) => {
-        email = email || defaultUser.email;
-        password = password || defaultUser.password;
-        cy.get('#local-login').click();
-        cy.get('[name="email"]').type(email);
-        cy.get('[name="password"]').type(password);
-        cy.get('button.submit').click();
-        cy.url().should('equal', Cypress.config('baseUrl') + next); // wait for login to complete
-      });
-    }
+    cy.session([userEmail, userPassword], () => {
+      cy.visit('/');
+      cy.login(userEmail, userPassword);
+      cy.url().should('equal', Cypress.config('baseUrl') + '/'); // wait for login to complete
+    },{
+      validate() {
+        cy.visit('/');
+        cy.get('#user-menu,#local-login').invoke('attr', 'id').should('eq', 'user-menu');
+      }
+    });
   });
 });
 
-Cypress.Commands.add('logout', () => {
-  cy.visit('/');
+Cypress.Commands.add('login', (email, password) => {
+  cy.get('#local-login').click();
+  cy.get('[name="email"]').type(email);
+  cy.get('[name="password"]').type(password);
+  cy.get('button.submit').click();
+});
 
-  cy.get('#user-menu,#local-login').invoke('attr', 'id').then(idValue => {
-    if (idValue === 'user-menu') {
-      cy.get('#user-menu').click();
-      cy.get('#user-logout').click();
-    }
-  });
+Cypress.Commands.add('logout', () => {
+  cy.get('#user-menu').click();
+  cy.get('#user-logout').click();
 });
 
 //
