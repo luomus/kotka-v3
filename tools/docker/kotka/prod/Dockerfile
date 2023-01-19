@@ -55,5 +55,3 @@ RUN npm ci --ignore-scripts --only=production \
 EXPOSE 3333
 
 CMD [ "node", "main.js" ]
-
-FROM ${TARGET} as final

@@ -75,15 +75,23 @@ async function bootstrap() {
   app.use(passport.session());
 
   const lajiApiBase = '/api/laji';
+  const lajiValidatePath = '/api/laji/documents/validate';
   const allowedPaths = ['/autocomplete', '/forms', '/organization', '/person'];
 
-  const proxyFilter = (pathname: string, req: Request) => {
+  const externalProxyFilter = (pathname: string, req: UserRequest) => {
     const path = pathname.replace(lajiApiBase, '');
-    const isAllowedPath = allowedPaths.some(allowedPath => path.startsWith(allowedPath));
-    return isAllowedPath && req.method === 'GET';
+    if (req.method === 'GET') {
+      return allowedPaths.some(allowedPath => path.startsWith(allowedPath));
+    }
+
+    return false;
   };
 
-  const proxyServer = createProxyMiddleware(proxyFilter, {
+  const internalValidateProxyFilter = (pathname: string, req: UserRequest) => {
+    return req.method === 'POST' && pathname.startsWith(lajiValidatePath);
+  };
+
+  const externalProxyServer = createProxyMiddleware(externalProxyFilter, {
     target: process.env['LAJI_API_URL'],
     changeOrigin: true,
     pathRewrite: (path: string, req: UserRequest) => {
@@ -107,8 +115,14 @@ async function bootstrap() {
       });
     },
   });
+  const internalProxyServer = createProxyMiddleware(internalValidateProxyFilter, {
+    target: `http://${host}:${port}`,
+    changeOrigin: true,
+    pathRewrite: {[lajiValidatePath]: '/api/validate'}
+  });
 
-  app.use(lajiApiBase, proxyServer);
+  app.use(lajiApiBase, externalProxyServer);
+  app.use(lajiValidatePath, internalProxyServer);
 
   const hostName = host !== 'localhost' ? host : undefined;
   await app.listen(port, hostName);

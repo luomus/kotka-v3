@@ -12,6 +12,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  InternalServerErrorException,
   NotFoundException,
   Param,
   Post,
@@ -43,7 +44,7 @@ export abstract class LajiStoreController {
       return res.data;
     } catch (err) {
       console.error(err);
-      throw err;
+      throw new InternalServerErrorException(err.message);
     }
   }
 
@@ -60,7 +61,7 @@ export abstract class LajiStoreController {
       return res.data;
     } catch (err) {
       console.error(err);
-      throw err;
+      throw new InternalServerErrorException(err.message);
     }
   }
 
@@ -75,7 +76,7 @@ export abstract class LajiStoreController {
         throw new NotFoundException();
       }
       console.error(err);
-      throw err;
+      throw new InternalServerErrorException(err.message);
     }
   }
 
@@ -92,7 +93,7 @@ export abstract class LajiStoreController {
       return res.data;
     } catch (err) {
       console.error(err);
-      throw err;
+      throw new InternalServerErrorException(err.message);
     }
   }
 
@@ -107,7 +108,7 @@ export abstract class LajiStoreController {
 
     } catch (err) {
       console.error(err);
-      throw err;
+      throw new InternalServerErrorException(err.message);
     }
   }
 }

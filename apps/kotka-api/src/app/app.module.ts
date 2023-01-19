@@ -1,3 +1,4 @@
+import { ValidateModule } from './validate/validate.module';
 import { SharedModule } from './shared/shared.module';
 import { MappersModule } from '@kotka/mappers';
 import { AuthenticationModule } from './authentication/authentication.module';
@@ -9,6 +10,7 @@ import { StatusModule } from './status/status.module';
 
 @Module({
   imports: [
+    ValidateModule,
     SharedModule,
     MappersModule,
     AuthenticationModule,
