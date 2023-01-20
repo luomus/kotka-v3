@@ -26,7 +26,7 @@ Cypress.Commands.add('setUserAsLoggedIn', (email, password) => {
     cy.session([userEmail, userPassword], () => {
       cy.visit('/');
       cy.login(userEmail, userPassword);
-      cy.url().should('equal', Cypress.config('baseUrl') + '/'); // wait for login to complete
+      cy.url({ timeout: 7000 }).should('equal', Cypress.config('baseUrl') + '/'); // wait for login to complete
     },{
       validate() {
         cy.visit('/');
