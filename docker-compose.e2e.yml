@@ -17,7 +17,7 @@ services:
       redis:
         condition: service_healthy
     env_file:
-      - .env
+      - .env.e2e
     build:
       context: ./
       dockerfile: ./tools/docker/kotka/dev/kotka-api/Dockerfile
