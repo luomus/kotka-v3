@@ -5,17 +5,7 @@ import { NavigationEnd, Router } from '@angular/router';
 @Component({
   selector: 'kotka-nav',
   templateUrl: './nav.component.html',
-  styles: [
-    `
-      :host {
-        display: block;
-      }
-      .nav-link {
-        cursor: pointer;
-        padding: 0.7rem 1rem;
-      }
-    `
-  ],
+  styleUrls: ['./nav.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NavComponent {
