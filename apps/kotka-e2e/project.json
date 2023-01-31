@@ -16,7 +16,8 @@
       },
       "configurations": {
         "docker": {
-          "devServerTarget": "kotka:serve:development"
+          "devServerTarget": "kotka:serve:development",
+          "cypressConfig": "apps/kotka-e2e/cypress.config.docker.js"
         }
       }
     },
