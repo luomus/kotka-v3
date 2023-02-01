@@ -81,12 +81,12 @@ export class DatatableDataService {
   private escapeFilterString(searchQuery: string): string {
     const escapedChars = ['\\', '*', '?', '+', '-', '&&', '||', '!', '(', ')', '{', '}', '[', ']', '^', '~', ':', '"', '=', '/', ' '];
     escapedChars.forEach(char => {
-      searchQuery = searchQuery.replace(char, '\\' + char);
+      searchQuery = searchQuery.split(char).join('\\' + char);
     });
 
     const removedChars = ['<', '>'];
     removedChars.forEach(char => {
-      searchQuery = searchQuery.replace(char, '');
+      searchQuery = searchQuery.split(char).join('');
     });
 
     return searchQuery;
