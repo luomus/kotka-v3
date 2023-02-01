@@ -18,7 +18,6 @@ export class DatatableDataService {
     const page = (startRow / pageSize) + 1;
     const sort = this.sortModelToSortString(sortModel);
     const searchQuery = this.filterModelToSearchQuery(filterModel);
-    console.log(searchQuery);
     return this.apiService.getData(dataType, page, pageSize, sort, searchQuery);
   }
 
