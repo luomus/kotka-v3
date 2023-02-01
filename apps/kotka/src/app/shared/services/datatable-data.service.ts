@@ -18,6 +18,7 @@ export class DatatableDataService {
     const page = (startRow / pageSize) + 1;
     const sort = this.sortModelToSortString(sortModel);
     const searchQuery = this.filterModelToSearchQuery(filterModel);
+    console.log(searchQuery);
     return this.apiService.getData(dataType, page, pageSize, sort, searchQuery);
   }
 
@@ -38,7 +39,7 @@ export class DatatableDataService {
 
     const type = filterModel['type'];
     if (type) {
-      const filter = filterModel['filter'];
+      const filter = this.escapeFilterString(filterModel['filter']);
       switch(type) {
         case 'contains': {
           return `${key}:(*${filter}*)`;
@@ -75,5 +76,19 @@ export class DatatableDataService {
     }
 
     return '';
+  }
+
+  private escapeFilterString(searchQuery: string): string {
+    const escapedChars = ['\\', '*', '?', '+', '-', '&&', '||', '!', '(', ')', '{', '}', '[', ']', '^', '~', ':', '"', '=', '/', ' '];
+    escapedChars.forEach(char => {
+      searchQuery = searchQuery.replace(char, '\\' + char);
+    });
+
+    const removedChars = ['<', '>'];
+    removedChars.forEach(char => {
+      searchQuery = searchQuery.replace(char, '');
+    });
+
+    return searchQuery;
   }
 }
