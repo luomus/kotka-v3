@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, Observable, of, switchMap } from 'rxjs';
-import { map, tap, distinctUntilChanged } from 'rxjs/operators';
+import { map, tap, distinctUntilChanged, share } from 'rxjs/operators';
 import { WINDOW } from '@ng-toolkit/universal';
 import { Person } from '@kotka/shared/models';
 import { LoginResponse } from '@kotka/api-interfaces';
@@ -33,11 +33,13 @@ export class UserService {
     @Inject(WINDOW) private window: Window,
     private httpClient: HttpClient
   ) {
+    const profile$ = this.getSessionProfile().pipe(share());
+
     this.isLoggedIn$ = this.state$.pipe(
       map(state => state.isLoggedIn),
       switchMap(isLoggedIn => {
         if (isLoggedIn === null) {
-          return this.getSessionProfile().pipe(
+          return profile$.pipe(
             switchMap(() => this.isLoggedIn$)
           );
         } else {
@@ -50,11 +52,10 @@ export class UserService {
 
   private getSessionProfile(): Observable<Person | null> {
     return this.httpClient.get<Person>(authPath + 'user').pipe(
-      tap(user => this.updateUser(user)),
       catchError(() => {
-        this.updateUser(null);
         return of(null);
-      })
+      }),
+      tap(user => this.updateUser(user))
     );
   }
 

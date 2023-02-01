@@ -1,6 +1,8 @@
 describe('datasets', () => {
-  before(() => cy.login());
-  beforeEach(() => cy.visit('/tags'));
+  beforeEach(() => {
+    cy.setUserAsLoggedIn();
+    cy.visit('/tags');
+  });
 
   it('should show the correct title when editing a dataset', () => {
     cy.get('.edit-button').first().click();
@@ -32,7 +34,7 @@ describe('datasets', () => {
       cy.get('#root_description_en').type('Desc');
       cy.get('form').submit();
 
-      cy.get('[data-cy=toast]').should('have.text', 'Save success!');
+      cy.get('[data-cy=toast]', { timeout: 30000 }).should('have.text', 'Save success!');
       cy.get('[data-cy=toast-close]').click();
       cy.get('[data-cy=main-header]').should('contain', 'Edit tag');
 

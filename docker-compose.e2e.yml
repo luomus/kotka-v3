@@ -7,9 +7,17 @@ services:
     command: redis-server --requirepass ${REDIS_PASSWORD}
     volumes:
       - redis:/data
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli -a ${REDIS_PASSWORD} ping | grep PONG" ]
+      interval: 1s
+      timeout: 3s
+      retries: 5
   kotka-api:
+    depends_on:
+      redis:
+        condition: service_healthy
     env_file:
-      - .env
+      - .env.e2e
     build:
       context: ./
       dockerfile: ./tools/docker/kotka/dev/kotka-api/Dockerfile

@@ -12,11 +12,12 @@
       "executor": "@nrwl/cypress:cypress",
       "options": {
         "baseUrl": "http://localhost:4200",
-        "cypressConfig": "apps/kotka-e2e/cypress.json"
+        "cypressConfig": "apps/kotka-e2e/cypress.config.js"
       },
       "configurations": {
         "docker": {
-          "devServerTarget": "kotka:serve:development"
+          "devServerTarget": "kotka:serve:development",
+          "cypressConfig": "apps/kotka-e2e/cypress.config.docker.js"
         }
       }
     },
