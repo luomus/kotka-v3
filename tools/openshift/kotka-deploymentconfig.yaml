@@ -1,76 +1,41 @@
-apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
+apiVersion: apps.openshift.io/v1
 metadata:
+  name: kotka
   creationTimestamp: null
   labels:
     io.kompose.service: kotka
-  name: kotka
 spec:
-  replicas: 1
-  selector:
-    io.kompose.service: kotka
   strategy:
-    resources: {}
     type: Recreate
+    resources: {}
+  replicas: 1
+  revisionHistoryLimit: 0
+  test: false
+  selector:
+    app: kotka
+    io.kompose.service: kotka
+    tier: frontend
   template:
     metadata:
       creationTimestamp: null
       labels:
+        app: kotka
         io.kompose.service: kotka
+        tier: frontend
     spec:
       containers:
-        - env:
-            - name: LAJI_API_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: kotka-secret
-                  key: LAJI_API_TOKEN
-            - name: LAJI_API_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: kotka-config
-                  key: LAJI_API_URL
-            - name: LAJI_AUTH_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: kotka-config
-                  key: LAJI_AUTH_URL
-            - name: LAJI_STORE_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: kotka-config
-                  key: LAJI_STORE_URL
-            - name: LAJI_STORE_AUTH
-              valueFrom:
-                secretKeyRef:
-                  name: kotka-secret
-                  key: LAJI_STORE_AUTH
-            - name: SESSION_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: kotka-secret
-                  key: SESSION_SECRET
+        - name: kotka
+          image: "image-registry.openshift-image-registry.svc:5000/kotka/kotka"
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
             - name: SYSTEM_ID
               valueFrom:
                 configMapKeyRef:
                   name: kotka-config
                   key: SYSTEM_ID
-            - name: TRIPLESTORE_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: kotka-config
-                  key: TRIPLESTORE_URL
-            - name: TRIPLSETORE_AUTH
-              valueFrom:
-                secretKeyRef:
-                  name: kotka-secret
-                  key: TRIPLESTORE_AUTH
-          image: >-
-            image-registry.openshift-image-registry.svc:5000/kotka/kotka
-          imagePullPolicy: Always
-          name: kotka
-          ports:
-            - containerPort: 8080
           resources: {}
+          imagePullPolicy: Always
       restartPolicy: Always
-  test: false

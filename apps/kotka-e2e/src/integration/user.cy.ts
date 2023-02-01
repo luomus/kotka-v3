@@ -13,10 +13,10 @@ describe('user', () => {
     });
   });
 
-  it('should redirect to login page after logout', () => {
+  it('should redirect to old kotka logout page after logout', () => {
     cy.setUserAsLoggedIn();
     cy.visit('/');
     cy.logout();
-    cy.url().should('include', 'laji-auth');
+    cy.url().should('include', '/user/logout');
   });
 });

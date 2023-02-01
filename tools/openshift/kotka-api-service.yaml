@@ -1,16 +1,20 @@
-apiVersion: v1
 kind: Service
+apiVersion: v1
 metadata:
+  name: kotka-api
+  namespace: kotka
   creationTimestamp: null
   labels:
     io.kompose.service: kotka-api
-  name: kotka-api
 spec:
   ports:
-    - name: "3333"
+    - name: '3333'
+      protocol: TCP
       port: 3333
       targetPort: 3333
   selector:
+    app: kotka
     io.kompose.service: kotka-api
+    tier: backend
 status:
   loadBalancer: {}

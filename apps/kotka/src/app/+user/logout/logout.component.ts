@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserService } from '../../shared/services/user.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'kotka-logout',
@@ -20,7 +21,11 @@ export class LogoutComponent implements OnInit {
   ngOnInit() {
     this.userService.logout().subscribe({
       'next': () => {
-        this.router.navigate(['/']);
+        if (environment.oldKotkaUrl) {
+          window.location.href = environment.oldKotkaUrl + '/user/logout?next=' + environment.oldKotkaUrl;
+        } else {
+          this.router.navigate(['/']);
+        }
       },
       'error': () => {
         this.errorMsg = 'Unexpected error occurred';
