@@ -1,22 +1,23 @@
-apiVersion: image.openshift.io/v1
 kind: ImageStream
+apiVersion: image.openshift.io/v1
 metadata:
+  name: kotka
   creationTimestamp: null
+  namespace: kotka
   labels:
     io.kompose.service: kotka
-  name: kotka
 spec:
   lookupPolicy:
     local: false
   tags:
-    - annotations: null
+    - name: latest
+      annotations: null
       from:
         kind: DockerImage
         name: kotka
       generation: null
       importPolicy: {}
-      name: latest
       referencePolicy:
         type: ""
 status:
-  dockerImageRepository: ""
+  dockerImageRepository: "image-registry.openshift-image-registry.svc:5000/kotka/kotka"

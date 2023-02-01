@@ -1,16 +1,20 @@
-apiVersion: v1
 kind: Service
+apiVersion: v1
 metadata:
+  name: kotka
+  namespace: kotka
   creationTimestamp: null
   labels:
     io.kompose.service: kotka
-  name: kotka
 spec:
   ports:
     - name: "4200"
-      port: 8080
-      targetPort: 4200
+      protocol: TCP
+      port: 4200
+      targetPort: 8080
   selector:
+    app: kotka
     io.kompose.service: kotka
+    tier: frontend
 status:
   loadBalancer: {}
