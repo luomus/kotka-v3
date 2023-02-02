@@ -15,7 +15,7 @@ const path = '/api/';
   providedIn: 'root'
 })
 
-export class ApiService {
+export class DataService {
   constructor(
     private httpClient: HttpClient
   ) {}

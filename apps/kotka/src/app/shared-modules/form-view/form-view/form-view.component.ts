@@ -13,7 +13,7 @@ import { FormService } from '../../../shared/services/form.service';
 import { LajiForm, Person } from '@kotka/shared/models';
 import { catchError, combineLatest, from, Observable, of, ReplaySubject, switchMap, throwError } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-import { DataObject, ApiService, DataType } from '../../../shared/services/api.service';
+import { DataObject, DataService, DataType } from '../../../shared/services/data.service';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ToastService } from '../../../shared/services/toast.service';
 import { UserService } from '../../../shared/services/user.service';
@@ -72,7 +72,7 @@ export class FormViewComponent {
     public notifier: ToastService,
     private activeRoute: ActivatedRoute,
     private formService: FormService,
-    private apiService: ApiService,
+    private dataService: DataService,
     private userService: UserService,
     private dialogService: DialogService,
     private router: Router,
@@ -101,7 +101,7 @@ export class FormViewComponent {
           }
           const uriParts = params.dataURI.split('/');
           const id = uriParts.pop() as string;
-          return this.apiService.getById(inputs.dataType, id).pipe(
+          return this.dataService.getById(inputs.dataType, id).pipe(
             catchError(err => {
               err = err.status === 404 ? FormErrorEnum.dataNotFound : err;
               return throwError(() => new Error(err));
@@ -162,9 +162,9 @@ export class FormViewComponent {
 
     let saveData$: Observable<DataObject>;
     if (data.id) {
-      saveData$ = this.apiService.update(this.dataType, data.id, data);
+      saveData$ = this.dataService.update(this.dataType, data.id, data);
     } else {
-      saveData$ = this.apiService.create(this.dataType, data);
+      saveData$ = this.dataService.create(this.dataType, data);
     }
 
     this.lajiForm?.block();
@@ -201,7 +201,7 @@ export class FormViewComponent {
     }
 
     this.lajiForm?.block();
-    this.apiService.delete(this.dataType, data.id).subscribe({
+    this.dataService.delete(this.dataType, data.id).subscribe({
       'next': () => {
         this.lajiForm?.unBlock();
         this.notifier.showSuccess('Success!');
