@@ -55,7 +55,7 @@ async function bootstrap() {
 
   app.use(
     session({
-      store: new RedisStore({ 
+      store: new RedisStore({
         client: redisClient,
         ttl: 14 * 24 * 3600
       }),
@@ -75,7 +75,6 @@ async function bootstrap() {
   app.use(passport.session());
 
   const lajiApiBase = '/api/laji';
-  const lajiValidatePath = '/api/laji/documents/validate';
   const allowedPaths = ['/autocomplete', '/forms', '/organization', '/person'];
 
   const externalProxyFilter = (pathname: string, req: UserRequest) => {
@@ -85,10 +84,6 @@ async function bootstrap() {
     }
 
     return false;
-  };
-
-  const internalValidateProxyFilter = (pathname: string, req: UserRequest) => {
-    return req.method === 'POST' && pathname.startsWith(lajiValidatePath);
   };
 
   const externalProxyServer = createProxyMiddleware(externalProxyFilter, {
@@ -115,14 +110,8 @@ async function bootstrap() {
       });
     },
   });
-  const internalProxyServer = createProxyMiddleware(internalValidateProxyFilter, {
-    target: `http://${host}:${port}`,
-    changeOrigin: true,
-    pathRewrite: {[lajiValidatePath]: '/api/validate'}
-  });
 
   app.use(lajiApiBase, externalProxyServer);
-  app.use(lajiValidatePath, internalProxyServer);
 
   const hostName = host !== 'localhost' ? host : undefined;
   await app.listen(port, hostName);

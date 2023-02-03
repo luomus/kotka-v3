@@ -4,12 +4,14 @@ import { catchError, map } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 const AUTOCOMPLETE_ORGANIZATION_RESOURCE = '/autocomplete/organization';
+const VALIDATE_RESOURCE = '/documents/validate';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FormApiClient {
-  private basePath = '/api/laji';
+  private apiPath = '/api';
+  private lajiApiPath = '/api/laji';
 
   constructor(
     private httpClient: HttpClient
@@ -20,7 +22,7 @@ export class FormApiClient {
     query: any,
     options?: {method?: string; body?: any; headers?: {[header: string]: string | string[]}}
   ): Promise<any> {
-    const path = this.basePath + resource;
+    let path = this.lajiApiPath + resource;
 
     const queryParameters = {...query};
 
@@ -31,6 +33,9 @@ export class FormApiClient {
     switch (resource) {
       case AUTOCOMPLETE_ORGANIZATION_RESOURCE:
         queryParameters['includePersonToken'] = true;
+        break;
+      case VALIDATE_RESOURCE:
+        path = this.apiPath + '/validate';
     }
 
     return this.httpClient.request(
