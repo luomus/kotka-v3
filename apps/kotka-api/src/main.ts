@@ -1,10 +1,15 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import session from 'express-session';
+import passport from 'passport';
 import { Request } from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { AppModule } from './app/app.module';
+import Redis from 'ioredis';
+import connectRedis from 'connect-redis';
 import { AuthenticationService } from './app/authentication/authentication.service';
 import { Person } from '@kotka/shared/models';
+import { REDIS } from './app/shared-modules/redis/redis.constants';
 
 interface UserRequest extends Request {
   user?: {
@@ -38,10 +43,35 @@ function getLajiApiQueryString(req: UserRequest): string {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const authService = app.get<AuthenticationService>(AuthenticationService);
+  const redisClient = app.get<Redis>(REDIS);
+
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
   const host = process.env.HOST || 'localhost';
   const port = process.env.PORT || 3333;
+
+  const RedisStore = connectRedis(session);
+
+  app.use(
+    session({
+      store: new RedisStore({
+        client: redisClient,
+        ttl: 14 * 24 * 3600
+      }),
+      secret: process.env.SESSION_SECRET,
+      resave: false,
+      saveUninitialized: false,
+      name: 'kotka',
+      cookie: {
+        sameSite: true,
+        secure: process.env['SECURE_COOKIE'] === 'true',
+        maxAge: 14 * 24 * 3600 * 1000
+      }
+    })
+  );
+
+  app.use(passport.initialize());
+  app.use(passport.session());
 
   const lajiApiBase = '/api/laji';
   const allowedPaths = ['/autocomplete', '/forms', '/organization', '/person'];
