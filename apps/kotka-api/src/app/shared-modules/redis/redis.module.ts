@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import Redis from 'ioredis';
 
 import { REDIS } from './redis.constants';
+import { RedisHealthIndicator } from './redis.health';
 
 @Module({
   providers: [
@@ -12,7 +13,8 @@ import { REDIS } from './redis.constants';
         password: process.env['REDIS_PASSWORD']
       }),
     },
+    RedisHealthIndicator
   ],
-  exports: [REDIS],
+  exports: [REDIS, RedisHealthIndicator],
 })
 export class RedisModule {}

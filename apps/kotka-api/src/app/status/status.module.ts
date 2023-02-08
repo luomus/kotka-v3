@@ -4,11 +4,11 @@ https://docs.nestjs.com/modules
 */
 
 import { Module } from '@nestjs/common';
-import { ApiServicesModule } from '@kotka/api-services';
+import { TerminusModule } from '@nestjs/terminus';
 import { RedisModule } from '../shared-modules/redis/redis.module';
 
 @Module({
-  imports: [ApiServicesModule, RedisModule],
+  imports: [TerminusModule, RedisModule],
   controllers: [StatusController],
   providers: []
 })
