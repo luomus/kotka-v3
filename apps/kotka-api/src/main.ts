@@ -74,12 +74,15 @@ async function bootstrap() {
   app.use(passport.session());
 
   const lajiApiBase = '/api/laji';
-  const allowedPaths = ['/autocomplete', '/forms', '/organization', '/person'];
+  const allowedGetPaths = ['/autocomplete', '/forms', '/organization', '/person'];
+  const allowedPostPaths = ['/logger'];
 
   const externalProxyFilter = (pathname: string, req: UserRequest) => {
     const path = pathname.replace(lajiApiBase, '');
     if (req.method === 'GET') {
-      return allowedPaths.some(allowedPath => path.startsWith(allowedPath));
+      return allowedGetPaths.some(allowedPath => path.startsWith(allowedPath));
+    } else if (req.method === 'POST') {
+      return allowedPostPaths.some(allowedPath => path.startsWith(allowedPath));
     }
 
     return false;
