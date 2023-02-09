@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { ToastService } from './toast.service';
 
 const AUTOCOMPLETE_ORGANIZATION_RESOURCE = '/autocomplete/organization';
 const VALIDATE_RESOURCE = '/documents/validate';
@@ -14,7 +15,8 @@ export class FormApiClient {
   private lajiApiPath = '/api/laji';
 
   constructor(
-    private httpClient: HttpClient
+    private httpClient: HttpClient,
+    private toastService: ToastService,
   ) { }
 
   public fetch(
@@ -49,7 +51,12 @@ export class FormApiClient {
       }
     ).pipe(
       map((response) => ({...response, json: () => response.body})),
-      catchError(err => of({...err, json: () => err.error}))
+      catchError(err => {
+        if (!(resource === VALIDATE_RESOURCE && err.status === 422)) {
+          this.toastService.showGenericError({pause: true});
+        }
+        return of({...err, json: () => err.error});
+      })
     ).toPromise(Promise);
   }
 }

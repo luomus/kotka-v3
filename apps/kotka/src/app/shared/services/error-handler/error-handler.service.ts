@@ -4,14 +4,12 @@ import { Logger } from '../logger/logger.service';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { RESPONSE } from '@nguniversal/express-engine/tokens';
 
-const pauseBeforeResendError = 30000;
 let errorSent = false;
 
 @Injectable()
 export class ErrorHandlerService extends ErrorHandler {
   private toastService?: ToastService;
   private logger?: Logger;
-  private pause = false;
 
   constructor(
     private injector: Injector,
@@ -21,7 +19,7 @@ export class ErrorHandlerService extends ErrorHandler {
   }
 
   override handleError(error: any) {
-    if (this.pause || !error || (typeof error === 'object' && typeof error.message === 'string' && error.message.length === 0)) {
+    if (!error || (typeof error === 'object' && typeof error.message === 'string' && error.message.length === 0)) {
       return super.handleError(error);
     }
 
@@ -32,8 +30,7 @@ export class ErrorHandlerService extends ErrorHandler {
     }
 
     if (this.isScheduled()) {
-      this.pauseMessage();
-      this.getToastsService().showWarning("The service is temporarily unavailable.");
+      this.getToastsService().showWarning("The service is temporarily unavailable.", {pause: true});
       return super.handleError(error);
     }
 
@@ -44,8 +41,7 @@ export class ErrorHandlerService extends ErrorHandler {
       this.getLogger().error('Unexpected error', {clientPath: url, error, errorMsg: error?.toString()});
     }
 
-    this.pauseMessage();
-    this.getToastsService().showError("An unexpected error occurred.");
+    this.getToastsService().showGenericError({pause: true});
     return super.handleError(error);
   }
 
@@ -58,13 +54,6 @@ export class ErrorHandlerService extends ErrorHandler {
       }
     }
     return false;
-  }
-
-  private pauseMessage() {
-    this.pause = true;
-    setTimeout(() => {
-      this.pause = false;
-    }, pauseBeforeResendError);
   }
 
   private getToastsService(): ToastService {
