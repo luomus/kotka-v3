@@ -3,8 +3,10 @@ import { TitleService } from '../../services/title.service';
 
 @Component({
   selector: 'kotka-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+  template: `
+    <router-outlet></router-outlet>
+  `,
+  styles: []
 })
 export class AppComponent {
   constructor(

@@ -13,9 +13,17 @@ import { LabelPipe } from './pipes/label.pipe';
 import { OldKotkaUrlPipe } from './pipes/old-kotka-url.pipe';
 import { KotkaUiMainContentModule } from '../../../../../libs/kotka/ui/main-content/src';
 import { ConfirmModalComponent } from './components/confirm-modal/confirm-modal';
+import { BaseComponent } from './components/base/base.component';
 
 @NgModule({
-  imports: [CommonModule, RouterModule, CollapseModule, BsDropdownModule, NgbToastModule, KotkaUiMainContentModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    CollapseModule,
+    BsDropdownModule,
+    NgbToastModule,
+    KotkaUiMainContentModule,
+  ],
   declarations: [
     AppComponent,
     NavComponent,
@@ -23,7 +31,8 @@ import { ConfirmModalComponent } from './components/confirm-modal/confirm-modal'
     ToasterComponent,
     LabelPipe,
     OldKotkaUrlPipe,
-    ConfirmModalComponent
+    ConfirmModalComponent,
+    BaseComponent,
   ],
   exports: [KotkaUiSpinnerModule, LabelPipe, OldKotkaUrlPipe],
 })

@@ -8,7 +8,6 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
         Please check that you have entered the correct URL.
       </p>
     </kui-main-content>
-
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })

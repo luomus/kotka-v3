@@ -1,7 +1,7 @@
 import { SortModel } from '../../../../../../libs/kotka/ui/datatable/src';
 import { Observable } from 'rxjs';
 import { Dataset, ListResponse } from '@kotka/shared/models';
-import { ApiService, DataType } from './api.service';
+import { DataService, DataType } from './data.service';
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 
 export class DatatableDataService {
   constructor(
-    private apiService: ApiService
+    private dataService: DataService
   ) {}
 
   getData(dataType: DataType, startRow: number, endRow: number, sortModel: SortModel[], filterModel: any): Observable<ListResponse<Dataset>> {
@@ -18,7 +18,7 @@ export class DatatableDataService {
     const page = (startRow / pageSize) + 1;
     const sort = this.sortModelToSortString(sortModel);
     const searchQuery = this.filterModelToSearchQuery(filterModel);
-    return this.apiService.getData(dataType, page, pageSize, sort, searchQuery);
+    return this.dataService.getData(dataType, page, pageSize, sort, searchQuery);
   }
 
   private sortModelToSortString(sortModel: SortModel[]): string {

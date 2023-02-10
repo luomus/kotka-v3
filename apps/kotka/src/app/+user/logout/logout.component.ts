@@ -28,7 +28,7 @@ export class LogoutComponent implements OnInit {
         }
       },
       'error': () => {
-        this.errorMsg = 'Unexpected error occurred';
+        this.errorMsg = 'An unexpected error occurred';
         this.cdr.markForCheck();
       }
     });

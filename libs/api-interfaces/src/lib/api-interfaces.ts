@@ -1,4 +1,5 @@
 import { Person } from '@kotka/shared/models';
+import { HealthCheckResult } from '@nestjs/terminus';
 
 export interface StoreGetQuery {
   query?: string,
@@ -16,3 +17,5 @@ export interface LoginResponse {
   profile: Person,
   next: string
 }
+
+export type StatusResponse = HealthCheckResult;

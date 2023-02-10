@@ -1,4 +1,4 @@
-import { Injectable, TemplateRef } from '@angular/core';
+import { Injectable, NgZone, TemplateRef } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { take } from 'rxjs/operators';
 
@@ -6,6 +6,8 @@ export interface ToastOptions {
   className?: string;
   delay?: number;
   autoHide?: boolean;
+  pause?: boolean;
+  pauseDuration?: number;
 }
 export interface ToastInfo extends ToastOptions {
   textOrTpl: string | TemplateRef<any>;
@@ -18,15 +20,29 @@ export class ToastService {
   toasts$: Observable<ToastInfo[]>;
   private toastsSubject = new BehaviorSubject<ToastInfo[]>([]);
 
-  constructor() {
+  private pausedToasts: (string | TemplateRef<any>)[] = [];
+
+  constructor(
+    private ngZone: NgZone
+  ) {
     this.toasts$ = this.toastsSubject.asObservable();
   }
 
   show(textOrTpl: string | TemplateRef<any>, options: ToastOptions = {}) {
+    if (this.pausedToasts.includes(textOrTpl)) {
+      return;
+    }
+
     const newToast = { textOrTpl, ...options };
-    this.toasts$.pipe(take(1)).subscribe(toasts => {
-      this.toastsSubject.next([...toasts, newToast]);
+    this.ngZone.run(() => {
+      this.toasts$.pipe(take(1)).subscribe(toasts => {
+        this.toastsSubject.next([...toasts, newToast]);
+      });
     });
+
+    if (options.pause) {
+      this.pauseToast(textOrTpl, options.pauseDuration);
+    }
   }
 
   remove(toast: ToastInfo) {
@@ -35,19 +51,35 @@ export class ToastService {
     });
   }
 
-  showSuccess(message: string) {
-    this.show(message, { className: 'bg-success text-light' });
+  showSuccess(message: string, options?: ToastOptions) {
+    this.show(message, { ...options, className: 'bg-success text-light' });
   }
 
-  showError(message: string) {
-    this.show(message, { className: 'bg-danger text-light', delay: 7000 });
+  showError(message: string, options?: ToastOptions) {
+    options = options || {};
+    if (!options.delay) {
+      options.delay = 7000;
+    }
+    this.show(message, { ...options, className: 'bg-danger text-light' });
   }
 
-  showInfo(message: string) {
-    this.show(message, { className: 'bg-info text-light' });
+  showInfo(message: string, options?: ToastOptions) {
+    this.show(message, { ...options, className: 'bg-info text-light' });
   }
 
-  showWarning(message: string) {
-    this.show(message, { className: 'bg-warning text-light' });
+  showWarning(message: string, options?: ToastOptions) {
+    this.show(message, { ...options, className: 'bg-warning text-light' });
+  }
+
+  showGenericError(options?: ToastOptions) {
+    const message = 'An unexpected error occurred.';
+    this.showError(message, options);
+  }
+
+  private pauseToast(textOrTpl: string | TemplateRef<any>, pauseDuration = 10000) {
+    this.pausedToasts.push(textOrTpl);
+    setTimeout(() => {
+      this.pausedToasts = this.pausedToasts.filter(t => t !== textOrTpl);
+    }, pauseDuration);
   }
 }

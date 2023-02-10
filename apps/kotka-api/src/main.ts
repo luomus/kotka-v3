@@ -9,6 +9,7 @@ import Redis from 'ioredis';
 import connectRedis from 'connect-redis';
 import { AuthenticationService } from './app/authentication/authentication.service';
 import { Person } from '@kotka/shared/models';
+import { REDIS } from './app/shared-modules/redis/redis.constants';
 
 interface UserRequest extends Request {
   user?: {
@@ -42,20 +43,18 @@ function getLajiApiQueryString(req: UserRequest): string {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const authService = app.get<AuthenticationService>(AuthenticationService);
+  const redisClient = app.get<Redis>(REDIS);
+
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
   const host = process.env.HOST || 'localhost';
   const port = process.env.PORT || 3333;
 
   const RedisStore = connectRedis(session);
-  const redisClient = new Redis({
-    host: 'redis',
-    password: process.env['REDIS_PASSWORD']
-  });
 
   app.use(
     session({
-      store: new RedisStore({ 
+      store: new RedisStore({
         client: redisClient,
         ttl: 14 * 24 * 3600
       }),
@@ -75,20 +74,18 @@ async function bootstrap() {
   app.use(passport.session());
 
   const lajiApiBase = '/api/laji';
-  const lajiValidatePath = '/api/laji/documents/validate';
-  const allowedPaths = ['/autocomplete', '/forms', '/organization', '/person'];
+  const allowedGetPaths = ['/autocomplete', '/forms', '/organization', '/person'];
+  const allowedPostPaths = ['/logger'];
 
   const externalProxyFilter = (pathname: string, req: UserRequest) => {
     const path = pathname.replace(lajiApiBase, '');
     if (req.method === 'GET') {
-      return allowedPaths.some(allowedPath => path.startsWith(allowedPath));
+      return allowedGetPaths.some(allowedPath => path.startsWith(allowedPath));
+    } else if (req.method === 'POST') {
+      return allowedPostPaths.some(allowedPath => path.startsWith(allowedPath));
     }
 
     return false;
-  };
-
-  const internalValidateProxyFilter = (pathname: string, req: UserRequest) => {
-    return req.method === 'POST' && pathname.startsWith(lajiValidatePath);
   };
 
   const externalProxyServer = createProxyMiddleware(externalProxyFilter, {
@@ -115,14 +112,8 @@ async function bootstrap() {
       });
     },
   });
-  const internalProxyServer = createProxyMiddleware(internalValidateProxyFilter, {
-    target: `http://${host}:${port}`,
-    changeOrigin: true,
-    pathRewrite: {[lajiValidatePath]: '/api/validate'}
-  });
 
   app.use(lajiApiBase, externalProxyServer);
-  app.use(lajiValidatePath, internalProxyServer);
 
   const hostName = host !== 'localhost' ? host : undefined;
   await app.listen(port, hostName);
