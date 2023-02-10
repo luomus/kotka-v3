@@ -122,6 +122,22 @@ export class MigrateCommand {
           offset += limit;
         }
 
+        const migrateDatasetType = (data) => {
+          if (!data['datasetType'] || data['datasetType'] === '') {
+            data['datasetType'] = 'GX.datasetTypeBasic';
+          }
+        };
+
+        if (type.includes('dataset')) {
+          if (Array.isArray(jsonData)) {
+            jsonData.forEach(data => {
+              migrateDatasetType(data);
+            });
+          } else {
+            migrateDatasetType(jsonData);
+          }
+        }
+
         if (options['seq']) {
           const tempMaxSeq = this.findMaxID(jsonData);
 

@@ -28,12 +28,19 @@ export class AuthenticationController {
 
   @Post('login')
   @UseGuards(AuthenticatePersonTokenGuard)
-  loginUser(@Req() request): LoginResponse {
-    return {
-      profile: request.user?.profile,
-      next: request.user?.next
-    };
+  @Redirect()
+  loginUser(@Query('next') next = '') {
+    return { url: `/user/login?next=${next}` };
   }
+
+  @Get('postLogin')
+  @UseGuards(AuthenticateCookieGuard)
+  postLoginUser(@Req() request) {
+    return {
+      profile: request.user.profile,
+      next: request.user.next
+    };
+ }
 
   @UseGuards(AuthenticateCookieGuard)
   @Get('logout')

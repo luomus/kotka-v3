@@ -59,8 +59,8 @@ export class UserService {
     );
   }
 
-  login(token: string): Observable<string> {
-    return this.httpClient.post<LoginResponse>(authPath + 'login', { token }).pipe(
+  login(): Observable<string> {
+    return this.httpClient.get<LoginResponse>(authPath + 'postLogin').pipe(
       tap(data => this.updateUser(data.profile)),
       map(data => data.next)
     );

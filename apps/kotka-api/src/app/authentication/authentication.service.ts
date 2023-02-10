@@ -17,12 +17,12 @@ export class AuthenticationService {
   ) {}
 
   public getLoginUrl(next = ''): string {
-    return `${process.env.LAJI_AUTH_URL}?target=${process.env.SYSTEM_ID}&redirectMethod=GET&next=${next}`;
+    return `${process.env.LAJI_AUTH_URL}?target=${process.env.SYSTEM_ID}&redirectMethod=POST&next=${next}`;
   }
 
   public getProfile(token: string) {
     const $person = this.lajiApiSevice.get<any>(`person-token/${token}`).pipe(
-      catchError((err) => { throw new UnauthorizedException('Error retrieving personToken information from laji-auth.', err); }),
+      catchError((err) => { throw new UnauthorizedException('Error retrieving personToken information from laji-auth.', err.message); }),
       mergeMap((res) => {
         if (res.data.target !== process.env['SYSTEM_ID']) {
           throw new UnauthorizedException('PersonToken for different system.');
@@ -31,7 +31,7 @@ export class AuthenticationService {
         const next = res.data.next;
 
         return this.lajiApiSevice.get<any>(`person/${token}`).pipe(
-          catchError((err) => { throw new UnauthorizedException('Error retrieving user profile from laji-auth.', err); }),
+          catchError((err) => { throw new UnauthorizedException('Error retrieving user profile from laji-auth.', err.message); }),
           map(res => res.data),
           map(data => {
             if (!data) {
