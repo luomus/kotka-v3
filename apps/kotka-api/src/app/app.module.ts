@@ -18,7 +18,7 @@ import { RedisModule } from './shared-modules/redis/redis.module';
     AuthenticationModule,
     ApiServicesModule,
     DatasetModule,
-    StatusModule,
+    StatusModule
   ],
   controllers: [],
   providers: []

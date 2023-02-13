@@ -1,9 +1,10 @@
-import { Controller, Get, InternalServerErrorException, Post, Query, Redirect, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, InternalServerErrorException, Post, Query, Redirect, Req, UseFilters, UseGuards } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { AuthenticateCookieGuard } from './authenticateCookie.guard';
 import { AuthenticatePersonTokenGuard } from './authenticatePersonToken.guard';
 import { AuthenticationService } from './authentication.service';
 import { LoginResponse } from '@kotka/api-interfaces';
+import { LoginExceptionsFilter } from './loginExceptions.filter';
 
 @Controller('auth')
 export class AuthenticationController {
@@ -28,6 +29,7 @@ export class AuthenticationController {
 
   @Post('login')
   @UseGuards(AuthenticatePersonTokenGuard)
+  @UseFilters(LoginExceptionsFilter)
   @Redirect()
   loginUser(@Query('next') next = '') {
     return { url: `/user/login?next=${next}` };

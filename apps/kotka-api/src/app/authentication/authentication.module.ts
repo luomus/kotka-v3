@@ -6,6 +6,7 @@ import { AuthenticationController } from './authentication.controller';
 import { AuthenticationService } from './authentication.service';
 import { CustomSerializer } from './custom.serializer';
 import { LajiAuthStrategy } from './laji-auth.strategy';
+import { LoginExceptionsFilter } from './loginExceptions.filter';
 
 @Module({
     imports: [
@@ -19,7 +20,8 @@ import { LajiAuthStrategy } from './laji-auth.strategy';
       CustomSerializer,
       AuthenticatePersonTokenGuard,
       AuthenticateCookieGuard,
-      LajiAuthStrategy
+      LajiAuthStrategy,
+      LoginExceptionsFilter
     ],
     exports: [
       AuthenticatePersonTokenGuard

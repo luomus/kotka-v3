@@ -19,20 +19,34 @@ export class LoginComponent implements OnInit {
     ) {}
 
   ngOnInit() {
-    this.userService.login().subscribe({
-      'next': next => {
-        this.router.navigate([next]);
-      },
-      'error': err => {
-        this.errorMsg = err.status === 401 ? 'Missing access rights to application' : 'Unexpected error occurred';
-        this.cdr.markForCheck();
+    this.route.queryParams.subscribe(params => {
+      const error = params['error'];
+      const next = params['next'];
 
+      if (next) {
+        this.userService.login().subscribe({
+          'next': next => {
+            this.router.navigate([next]);
+          },
+          'error': err => {
+            this.errorMsg = err.status === 401 ? 'Missing access rights to application' : 'Unexpected error occurred';
+            this.cdr.markForCheck();
+            this.router.navigate([], {
+              relativeTo: this.route,
+              queryParams: {}
+            });
+          }
+        });
+      } else if (error) {
+        this.errorMsg = error === 401 ? 'Missing access rights to application' : 'Unexpected error occurred';
+        this.cdr.markForCheck();
         this.router.navigate([], {
           relativeTo: this.route,
           queryParams: {}
         });
+      }else if (!this.errorMsg) {
+        this.router.navigate(['/']);
       }
     });
   }
-
 }
