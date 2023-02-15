@@ -31,8 +31,8 @@ export class AuthenticationController {
   @UseGuards(AuthenticatePersonTokenGuard)
   @UseFilters(LoginExceptionsFilter)
   @Redirect()
-  loginUser(@Query('next') next = '') {
-    return { url: `/user/login?next=${next}` };
+  loginUser(@Req() request) {
+    return { url: `/user/login?next=${request.user.next}` };
   }
 
   @Get('postLogin')
