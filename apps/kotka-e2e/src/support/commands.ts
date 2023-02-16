@@ -15,6 +15,7 @@ declare namespace Cypress {
     setUserAsLoggedIn(email?: string, password?: string): void;
     login(email: string, password: string): void;
     logout(): void;
+    disableSameSiteCookieRestrictions(): void;
   }
 }
 
@@ -37,6 +38,7 @@ Cypress.Commands.add('setUserAsLoggedIn', (email, password) => {
 });
 
 Cypress.Commands.add('login', (email, password) => {
+  cy.disableSameSiteCookieRestrictions();
   cy.get('#local-login').click();
   cy.get('[name="email"]').type(email);
   cy.get('[name="password"]').type(password);
@@ -46,6 +48,26 @@ Cypress.Commands.add('login', (email, password) => {
 Cypress.Commands.add('logout', () => {
   cy.get('#user-menu').click();
   cy.get('#user-logout').click();
+});
+
+Cypress.Commands.add('disableSameSiteCookieRestrictions', () => {
+  cy.intercept('*', (req) => {
+    req.on('response', (res) => {
+      if (!res.headers['set-cookie']) {
+        return;
+      }
+
+      const disableSameSite = (headerContent: string): string => {
+        return headerContent.replace(/samesite=(lax|strict)/ig, 'samesite=none; secure');
+      };
+
+      if (Array.isArray(res.headers['set-cookie'])) {
+        res.headers['set-cookie'] = res.headers['set-cookie'].map(disableSameSite);
+      } else {
+        res.headers['set-cookie'] = disableSameSite(res.headers['set-cookie']);
+      }
+    });
+  });
 });
 
 //
