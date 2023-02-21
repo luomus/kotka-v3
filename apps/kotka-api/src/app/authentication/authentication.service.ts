@@ -63,7 +63,7 @@ export class AuthenticationService {
     return this.lajiApiSevice.delete(`person-token/${request.user?.personToken}`).pipe(
       tap(() => this.invalidateSession(request)),
       catchError((err) => {
-        throw new InternalServerErrorException('Error terminating user laji-auth login.', err);
+        throw new InternalServerErrorException('Error terminating user laji-auth login.', err.message);
       }),
     );
   }
@@ -73,10 +73,10 @@ export class AuthenticationService {
       catchError((err) => {
         if (err.response?.data?.error?.message && err.response?.data?.error?.message.includes('INVALID TOKEN')) {
           this.invalidateSession(request);
-          throw new UnauthorizedException('Person token invalid, teriminating session.');
+          throw new UnauthorizedException('Person token invalid, terminating session.');
         }
 
-        throw new InternalServerErrorException('Error validating user personToken.', err);
+        throw new InternalServerErrorException('Error validating user personToken.', err.message);
       }),
     );
   }
