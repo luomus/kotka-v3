@@ -118,7 +118,7 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
               warning: (msg: string) => this.notifier?.showWarning(msg),
               error: (msg: string) => this.notifier?.showError(msg),
             },
-            onError: this.onError,
+            onError: this.onError.bind(this),
             onComponentDidMount: onReady ? onReady() : () => undefined,
             optimizeOnChange: true,
             disabled: this.disabled
