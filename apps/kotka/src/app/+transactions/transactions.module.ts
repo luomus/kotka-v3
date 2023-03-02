@@ -1,0 +1,23 @@
+import { NgModule } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { routing } from './transactions.routes';
+import { KotkaUiMainContentModule } from '../../../../../libs/kotka/ui/main-content/src';
+import { KotkaUiDatatableModule } from '../../../../../libs/kotka/ui/datatable/src';
+import { TransactionFormComponent } from './transaction-form/transaction-form.component';
+import { FormViewModule } from '../shared-modules/form-view/form-view.module';
+import { SharedModule } from '../shared/shared.module';
+
+@NgModule({
+  imports: [
+    routing,
+    RouterModule,
+    CommonModule,
+    SharedModule,
+    KotkaUiMainContentModule,
+    KotkaUiDatatableModule,
+    FormViewModule
+  ],
+  declarations: [TransactionFormComponent],
+})
+export class TransactionsModule {}

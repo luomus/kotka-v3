@@ -1,13 +1,14 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Dataset, ListResponse } from '@kotka/shared/models';
+import { Dataset, ListResponse, Transaction } from '@kotka/shared/models';
 import { Observable } from 'rxjs';
 
 export enum DataType {
-  dataset = 'dataset'
+  dataset = 'dataset',
+  transaction = 'transaction'
 }
 
-export type DataObject = Dataset;
+export type DataObject = Dataset | Transaction;
 
 const path = '/api/';
 
@@ -20,27 +21,22 @@ export class DataService {
     private httpClient: HttpClient
   ) {}
 
-  getById(type: DataType.dataset, id: string): Observable<Dataset>;
   getById(type: DataType, id: string): Observable<DataObject> {
     return this.httpClient.get<DataObject>(path + type + '/' + id);
   }
 
-  create(type: DataType.dataset, data: Dataset): Observable<Dataset>;
-  create(type: DataType, data: Dataset): Observable<DataObject> {
+  create(type: DataType, data: DataObject): Observable<DataObject> {
     return this.httpClient.post<DataObject>(path + type, data);
   }
 
-  update(type: DataType.dataset, id: string, data: Dataset): Observable<Dataset>;
-  update(type: DataType, id: string, data: Dataset): Observable<DataObject> {
+  update(type: DataType, id: string, data: DataObject): Observable<DataObject> {
     return this.httpClient.put<DataObject>(path + type + '/' + id, data);
   }
 
-  delete(type: DataType.dataset, id: string): Observable<null>;
   delete(type: DataType, id: string): Observable<null> {
     return this.httpClient.delete<null>(path + type + '/' + id);
   }
 
-  getData(type: DataType.dataset, page?: number, pageSize?: number, sort?: string, searchQuery?: string): Observable<ListResponse<Dataset>>;
   getData(type: DataType, page=1, pageSize=100, sort?: string, searchQuery?: string): Observable<ListResponse<DataObject>> {
     let params = new HttpParams().set('page', page).set('page_size', pageSize);
     if (sort) {

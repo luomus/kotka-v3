@@ -9,6 +9,7 @@ const baseRoutes: Routes = [
   { path: 'user', loadChildren: () => import('./+user/user.module').then(m => m.UserModule), data: {preload: false} },
   { path: '', canActivate: [OnlyLoggedInGuard], children: [
       { path: 'tags', loadChildren: () => import('./+datasets/datasets.module').then(m => m.DatasetsModule), data: {preload: false} },
+      { path: 'transactions', loadChildren: () => import('./+transactions/transactions.module').then(m => m.TransactionsModule), data: {preload: false} },
       { path: '**', pathMatch: 'full', component: NotFoundComponent }
     ]
   }
