@@ -1,0 +1,10 @@
+@import "variables";
+@import "node_modules/bootstrap/scss/variables";
+
+.laji-form {
+  legend {
+    margin-top: map-get($spacers, 2);
+    font-size: $h2-font-size;
+    border-bottom: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color);
+  }
+}

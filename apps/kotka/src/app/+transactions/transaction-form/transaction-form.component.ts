@@ -5,7 +5,7 @@ import { Dataset, Person } from '@kotka/shared/models';
 @Component({
   selector: 'kotka-transaction-form',
   templateUrl: './transaction-form.component.html',
-  styleUrls: ['./trasaction-form.component.scss'],
+  styleUrls: ['./transaction-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransactionFormComponent {
