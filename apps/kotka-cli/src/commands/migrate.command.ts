@@ -106,6 +106,7 @@ export class MigrateCommand {
     let offset = this.parseOptionToInt(options.offset);
     let stop = false;
     let maxSeq = 0;
+    let count = 0;
 
     const spin = createSpinner();
     spin.start('Transfering items from Triplestore to laji-store');
@@ -144,6 +145,8 @@ export class MigrateCommand {
           if (tempMaxSeq > maxSeq) maxSeq = tempMaxSeq;
         }
 
+        count += Array.isArray(jsonData) ? jsonData.length : 1;
+
         if (options['dryRun']) {
           if (Array.isArray(jsonData)) {
             jsonData.forEach(data => {
@@ -176,9 +179,9 @@ export class MigrateCommand {
     } while (!stop);
 
     if (options.seq) {
-      spin.succeed(`Transfer done, maximum sequence: ${maxSeq}`);
+      spin.succeed(`Transfer done, maximum sequence: ${maxSeq}, ${count} documents moved`);
       return;
     }
-    spin.succeed('Transfer done');
+    spin.succeed(`Transfer done, ${count} documents moved`);
   }
 }
