@@ -159,6 +159,8 @@ import { Validator } from './Validator'
 export type { Validator }
 import { Video } from './Video'
 export type { Video }
+import { PagedResult } from './PagedResult';
+export type { PagedResult }
 
 export type StoreObject = BibliographicResource
    | Concept

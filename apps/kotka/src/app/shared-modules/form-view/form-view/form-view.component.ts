@@ -37,6 +37,7 @@ export class FormViewComponent {
   @Input() formId?: string;
   @Input() dataType?: DataType;
   @Input() dataTypeName?: string;
+  @Input() augmentFormFunc?: (form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>;
   @Input() getInitialFormDataFunc?: (user: Person) => Partial<DataObject>;
   @Input() domain = 'http://tun.fi/';
 
@@ -90,7 +91,8 @@ export class FormViewComponent {
     );
 
     const form$ = this.inputs$.pipe(
-      switchMap(inputs => this.formService.getForm(inputs.formId))
+      switchMap(inputs => this.formService.getForm(inputs.formId)),
+      switchMap(form => this.augmentFormFunc ? this.augmentFormFunc(form) : of(form))
     );
 
     const formData$ = combineLatest([this.routeParams$, this.inputs$]).pipe(

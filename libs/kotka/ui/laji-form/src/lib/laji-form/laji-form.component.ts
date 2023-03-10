@@ -106,7 +106,7 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
             validators: form.validators,
             warnings: form.warnings,
             onSubmit: this.onSubmit.bind(this),
-            // onChange: this._onChange.bind(this),
+            onChange: this.onChange.bind(this),
             apiClient: this.apiClient,
             lang: 'en',
             renderSubmit: false,
@@ -149,5 +149,9 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
     this.ngZone.run(() => {
       this.formSubmit.emit(data.formData);
     });
+  }
+
+  private onChange(data: any) {
+
   }
 }
