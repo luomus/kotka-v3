@@ -31,6 +31,8 @@
           [showDeleteButton]="formParams.showDeleteButton"
           [apiClient]="formApiClient"
           [notifier]="notifier"
+          (formReady)="onChange($event)"
+          (formChange)="onChange($event)"
           (formSubmit)="onSubmit($event)"
           (delete)="onDelete($event)"
         >

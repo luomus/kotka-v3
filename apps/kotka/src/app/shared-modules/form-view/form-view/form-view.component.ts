@@ -6,7 +6,9 @@ import {
   ViewChild,
   ContentChild,
   TemplateRef,
-  SimpleChanges
+  SimpleChanges,
+  EventEmitter,
+  Output
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormService } from '../../../shared/services/form.service';
@@ -62,6 +64,8 @@ export class FormViewComponent {
   showDisabledAlert = false;
 
   formErrorEnum = FormErrorEnum;
+
+  @Output() formDataChange = new EventEmitter<Partial<DataObject>>();
 
   private inputs$: ReplaySubject<{formId: string, dataType: DataType}> = new ReplaySubject<{formId: string, dataType: DataType}>();
 
@@ -195,6 +199,10 @@ export class FormViewComponent {
         this.delete(data);
       }
     });
+  }
+
+  onChange(data: Partial<DataObject>) {
+    this.formDataChange.emit(data);
   }
 
   private delete(data: DataObject) {

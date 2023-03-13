@@ -35,6 +35,8 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
   private lajiFormTheme?: LajiFormTheme;
   private isBlocked = false;
 
+  @Output() formReady: EventEmitter<any> = new EventEmitter<any>();
+  @Output() formChange: EventEmitter<any> = new EventEmitter<any>();
   @Output() formSubmit: EventEmitter<any> = new EventEmitter<any>();
   @Output() delete: EventEmitter<any> = new EventEmitter<any>();
 
@@ -85,6 +87,12 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
       this.lajiFormTheme = themePackage.default;
       this.createNewLajiForm(() => {
         this.lajiFormWrapper?.invalidateSize();
+
+        setTimeout(() => {
+          this.ngZone.run(() => {
+            this.formReady.emit(this.formData);
+          });
+        }, 0);
       });
     });
   }
@@ -152,6 +160,8 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
   }
 
   private onChange(data: any) {
-
+    this.ngZone.run(() => {
+      this.formChange.emit(data);
+    });
   }
 }

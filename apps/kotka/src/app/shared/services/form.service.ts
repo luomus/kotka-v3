@@ -4,7 +4,7 @@ import { Observable, shareReplay } from 'rxjs';
 import { LajiForm, Area, PagedResult } from '@kotka/shared/models';
 import { map } from 'rxjs/operators';
 
-export type EnumOption = { const: string, value: string };
+export type EnumOption = { const: string, title: string };
 
 const path = '/api/laji/';
 
@@ -28,9 +28,11 @@ export class FormService {
       const params = new HttpParams().set('type', 'country').set('pageSize', 1000).set('lang', 'en');
       this.countryOptions$ = this.httpClient.get<PagedResult<Area>>(`${path}areas`, { params }).pipe(
         map(data => {
-          const result: EnumOption[] = [{ const: "", value: "" }];
+          const result: EnumOption[] = [{ const: "", title: "" }];
           data.results.forEach(area => {
-            result.push({ const: area.name as string, value: area.id as string });
+            if (area.countryCodeISOalpha2) {
+              result.push({ const: area.countryCodeISOalpha2, title: area.name as string });
+            }
           });
           return result;
         }),
