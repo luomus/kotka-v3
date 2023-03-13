@@ -8,12 +8,12 @@
 </kotka-form-view>
 
 <ng-template #permitsInfo let-country="country" let-countryLinks="countryLinks">
-  <div id="permitsInfo" class="col-lg-6 col-md-5 col-sm-4 hidden-xs p-3">
+  <div id="permitsInfo" class="col-lg-6 col-md-5 col-sm-4 d-none d-sm-block ps-4 pe-4" style="padding-top: 20px">
     In this section it is possible to fill in the information about permits, agreements and other such documentation
     related to the specimens in the transaction (for example Nagoya protocol).  More information about the Nagoya protocol:
     <a href="https://absch.cbd.int/" target="_blank">absch.cbd.int</a> and
     <a target="_blank" href="https://www.biodiversity.fi/geneticresources/home">biodiversity.fi/geneticresources/home</a>.
-    <div *ngIf="country">
+    <div *ngIf="country" class="mt-2">
       ABSCH links
       <ul>
         <li><a target="_blank" href="https://absch.cbd.int/countries/{{ country }}">Country profile page</a></li>
