@@ -46,7 +46,7 @@ describe('datasets', () => {
     it('should show form validations', () => {
       cy.get('#root_datasetName_en').type(tagName);
       cy.get('#root_personsResponsible').type(personsResponsible);
-      cy.get('form').submit();
+      cy.get('[data-cy=form-submit]').click();
       cy.get('.laji-form-error-list').should('be.visible');
     });
 
@@ -54,7 +54,7 @@ describe('datasets', () => {
       cy.get('#root_datasetName_en').type(tagName);
       cy.get('#root_personsResponsible').type(personsResponsible);
       cy.get('#root_description_en').type('Test');
-      cy.get('form').submit();
+      cy.get('[data-cy=form-submit]').click();
 
       cy.get('[data-cy=toast]', { timeout: 40000 }).should('have.text', 'Save success!');
       cy.get('[data-cy=toast-close]').click();
