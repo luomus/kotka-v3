@@ -37,13 +37,13 @@ export function createLoggerLoader(httpClient: HttpClient): ILogger {
     BsDropdownModule.forRoot()
   ],
   providers: [
-    {provide: ErrorHandler, useClass: ErrorHandlerService},
-    {provide: LocationStrategy, useClass: PathLocationStrategy},
+    { provide: ErrorHandler, useClass: ErrorHandlerService },
+    { provide: LocationStrategy, useClass: PathLocationStrategy },
     {
       provide: Logger,
       deps: [HttpClient],
       useFactory: createLoggerLoader
-    },
+    }
   ],
   bootstrap: [AppComponent]
 })

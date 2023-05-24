@@ -8,6 +8,8 @@ import { ApiServicesModule } from '@kotka/api-services';
 import { DatasetModule } from './dataset/dataset.module';
 import { StatusModule } from './status/status.module';
 import { RedisModule } from './shared-modules/redis/redis.module';
+import { SpecimenModule } from './specimen/specimen.module';
+import { TransactionModule } from './transaction/transaction.module';
 
 @Module({
   imports: [
@@ -18,7 +20,9 @@ import { RedisModule } from './shared-modules/redis/redis.module';
     AuthenticationModule,
     ApiServicesModule,
     DatasetModule,
-    StatusModule
+    StatusModule,
+    SpecimenModule,
+    TransactionModule
   ],
   controllers: [],
   providers: []
