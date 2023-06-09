@@ -86,8 +86,6 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
       this.lajiFormWrapperProto = formPackage.default;
       this.lajiFormTheme = themePackage.default;
       this.createNewLajiForm(() => {
-        this.lajiFormWrapper?.invalidateSize();
-
         setTimeout(() => {
           this.ngZone.run(() => {
             this.formReady.emit(this.formData);

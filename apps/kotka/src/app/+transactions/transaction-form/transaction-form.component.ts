@@ -133,7 +133,7 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
   private updatePermitsInfo(country?: string, countryLinks?: LinkData[]) {
     const oldElem: HTMLElement|null|undefined = this.document.getElementById("permitsInfo");
     const parentElem: HTMLElement|null|undefined = oldElem?.parentElement ||
-      this.document.getElementsByClassName("permit-fields")?.[0]?.parentElement?.parentElement;
+      this.document.getElementsByClassName("nagoya-fields")?.[0]?.parentElement?.parentElement;
 
     if (!parentElem) {
       return;
