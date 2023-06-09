@@ -5,6 +5,7 @@ import { LajiStoreService } from './laji-store.service';
 import { SchemaService } from './schema.service';
 import { TriplestoreService } from './triplestore.service';
 import { FormService } from './form.service';
+import { OldKotkaApiService } from './old-kotka-api.service';
 
 @Module({
   imports: [
@@ -16,14 +17,16 @@ import { FormService } from './form.service';
     LajiStoreService,
     TriplestoreService,
     SchemaService,
-    FormService
+    FormService,
+    OldKotkaApiService
   ],
   exports: [
     LajiApiService,
     LajiStoreService,
     TriplestoreService,
     SchemaService,
-    FormService
+    FormService,
+    OldKotkaApiService
   ],
 })
 export class ApiServicesModule {}
