@@ -9,7 +9,7 @@ import {
   ViewChild
 } from '@angular/core';
 import { DataType } from '../../shared/services/data.service';
-import { LajiForm, Person, Transaction } from '@kotka/shared/models';
+import { LajiForm, Person, SpecimenTransaction } from '@kotka/shared/models';
 import { Observable, of, ReplaySubject, Subscription, switchMap } from 'rxjs';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 import { FormService } from '../../shared/services/form.service';
@@ -81,15 +81,15 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
     }));
   }
 
-  getInitialFormData(user: Person): Partial<Transaction> {
-    const formData: Partial<Transaction> = {};
+  getInitialFormData(user: Person): Partial<SpecimenTransaction> {
+    const formData: Partial<SpecimenTransaction> = {};
     if (user?.organisation && user.organisation.length === 1) {
       formData.owner = user.organisation[0];
     }
     return formData;
   }
 
-  onFormDataChange(formData: Partial<Transaction>) {
+  onFormDataChange(formData: Partial<SpecimenTransaction>) {
     this.geneticResourceAcquisitionCountrySubject.next(formData.geneticResourceAcquisitionCountry);
   }
 

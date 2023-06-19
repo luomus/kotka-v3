@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Dataset, ListResponse, Transaction } from '@kotka/shared/models';
+import { Dataset, ListResponse, SpecimenTransaction } from '@kotka/shared/models';
 import { Observable } from 'rxjs';
 
 export enum DataType {
@@ -8,7 +8,7 @@ export enum DataType {
   transaction = 'transaction'
 }
 
-export type DataObject = Dataset | Transaction;
+export type DataObject = Dataset | SpecimenTransaction;
 
 const path = '/api/';
 

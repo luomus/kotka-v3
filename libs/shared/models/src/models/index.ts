@@ -123,6 +123,10 @@ import { Reserve } from './Reserve'
 export type { Reserve }
 import { Sample } from './Sample'
 export type { Sample }
+import { SpecimenTransaction } from './SpecimenTransaction'
+export type { SpecimenTransaction }
+import { SpecimenTransactionEvent } from './SpecimenTransactionEvent'
+export type { SpecimenTransactionEvent }
 import { SubUnit } from './SubUnit'
 export type { SubUnit }
 import { Tag } from './Tag'
@@ -224,6 +228,8 @@ export type StoreObject = BibliographicResource
    | RegionalStatus
    | Reserve
    | Sample
+   | SpecimenTransaction
+   | SpecimenTransactionEvent
    | SubUnit
    | Tag
    | Taxon
@@ -248,7 +254,7 @@ export type StoreObject = BibliographicResource
    | Document
    | Organization
    | Sample
-   | Transaction
+   | SpecimenTransaction
 
 export type KeyOfUnion<K extends StoreObject> = K extends keyof K ? K : never;
 
@@ -573,6 +579,16 @@ export function isReserve(data: unknown): data is Reserve {
 export function isSample(data: unknown): data is Sample {
   return !!(
     data && typeof data === 'object' && '@type' in data && (data as StoreObject)['@type'] === 'MF.sample'
+  );
+}
+export function isSpecimenTransaction(data: unknown): data is SpecimenTransaction {
+  return !!(
+    data && typeof data === 'object' && '@type' in data && (data as StoreObject)['@type'] === 'HRX.specimenTransaction'
+  );
+}
+export function isSpecimenTransactionEvent(data: unknown): data is SpecimenTransactionEvent {
+  return !!(
+    data && typeof data === 'object' && '@type' in data && (data as StoreObject)['@type'] === 'HRX.specimenTransactionEvent'
   );
 }
 export function isSubUnit(data: unknown): data is SubUnit {
