@@ -13,7 +13,7 @@ import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.gu
 import { TimedDocumentAccessGuard } from '../shared/guards/timed-document-access.guard';
 import { OrganizationGuard } from '../shared/guards/organization.guard';
 
-const type = 'HRX.transactionClass';
+const type = 'HRX.specimenTransaction';
 const useTriplestore = false;
 
 @Controller('transaction')
