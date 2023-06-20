@@ -4,13 +4,14 @@ import { catchError, Observable, of, switchMap, isObservable } from 'rxjs';
 import { map, tap, share } from 'rxjs/operators';
 import { Person } from '@kotka/shared/models';
 import { UserService } from './user.service';
+import { lajiApiBase } from './constants';
 
 interface OrganizationResponse {
   fullName: string;
 }
 
-const personPath = '/api/laji/person/by-id/';
-const organizationPath = '/api/laji/organization/by-id/';
+const personPath = `${lajiApiBase}/person/by-id/`;
+const organizationPath = `${lajiApiBase}/organization/by-id/`;
 
 const cache: Record<string, string|Observable<string>> = {};
 

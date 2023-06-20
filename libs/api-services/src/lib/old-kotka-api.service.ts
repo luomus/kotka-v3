@@ -4,8 +4,9 @@ https://docs.nestjs.com/providers#services
 
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { AxiosResponse } from 'axios';
+import { RangeResponse } from '@kotka/api-interfaces';
 
 @Injectable()
 export class OldKotkaApiService {
@@ -15,6 +16,9 @@ export class OldKotkaApiService {
 
   private baseUrl = process.env['OLD_KOTKA_URL'] + 'api';
 
-  public getRange<T>(params = {}): Observable<AxiosResponse<T>> {
-    return this.httpService.get(this.baseUrl + '/range', { params });
-  }}
+  public getRange(range: string): Observable<AxiosResponse<RangeResponse>> {
+    return this.httpService.get(`${this.baseUrl}/range/${range}`).pipe(
+      map(result => result['data'])
+    );
+  }
+}

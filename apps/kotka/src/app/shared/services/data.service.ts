@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Dataset, ListResponse, SpecimenTransaction } from '@kotka/shared/models';
 import { Observable } from 'rxjs';
+import { apiBase } from './constants';
 
 export enum DataType {
   dataset = 'dataset',
@@ -10,7 +11,7 @@ export enum DataType {
 
 export type DataObject = Dataset | SpecimenTransaction;
 
-const path = '/api/';
+const path = apiBase + '/';
 
 @Injectable({
   providedIn: 'root'

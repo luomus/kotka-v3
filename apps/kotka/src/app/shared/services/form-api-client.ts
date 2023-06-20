@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ToastService } from './toast.service';
+import { apiBase, lajiApiBase } from './constants';
 
 const AUTOCOMPLETE_ORGANIZATION_RESOURCE = '/autocomplete/organization';
 const VALIDATE_RESOURCE = '/documents/validate';
@@ -11,9 +12,6 @@ const VALIDATE_RESOURCE = '/documents/validate';
   providedIn: 'root'
 })
 export class FormApiClient {
-  private apiPath = '/api';
-  private lajiApiPath = '/api/laji';
-
   constructor(
     private httpClient: HttpClient,
     private toastService: ToastService,
@@ -24,7 +22,7 @@ export class FormApiClient {
     query: any,
     options?: {method?: string; body?: any; headers?: {[header: string]: string | string[]}}
   ): Promise<any> {
-    let path = this.lajiApiPath + resource;
+    let path = lajiApiBase + resource;
 
     const queryParameters = {...query};
 
@@ -37,7 +35,7 @@ export class FormApiClient {
         queryParameters['includePersonToken'] = true;
         break;
       case VALIDATE_RESOURCE:
-        path = this.apiPath + '/validate';
+        path = apiBase + '/validate';
     }
 
     return this.httpClient.request(

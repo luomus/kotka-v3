@@ -48,8 +48,10 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
 
   @ViewChild(FormViewComponent, { static: true }) formView!: FormViewComponent;
   @ViewChild('permitsInfo', { static: true }) permitsInfoTpl!: TemplateRef<any>;
+  @ViewChild('specimenRangeSelect', { static: true }) specimenRangeSelectTpl!: TemplateRef<any>;
 
-  private permitsInfoSub?: Subscription;
+  private subscription = new Subscription();
+  private formData?: Partial<SpecimenTransaction>;
 
   private cbdUrl = 'https://api.cbd.int/api/v2013/index/select?fl=id,+identifier_s,+uniqueIdentifier_s,+url_ss,+government_s,rec_countryName:government_EN_t,+rec_title:title_EN_t,+rec_summary:description_t,rec_type:type_EN_t,+entryIntoForce_dt,adoption_dt,retired_dt,limitedApplication_dt&group=true&group.field=governmentSchemaIdentifier_s&group.limit=10&group.ngroups=true&q=(realm_ss:abs)+AND+NOT+version_s:*+AND+schema_s:(authority+absProcedure+absNationalReport)+AND+government_s:%country%&rows=500&start=0&wt=json';
   private maxCountryLinks = 3;
@@ -64,11 +66,11 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.permitsInfoSub = this.getPermitsInfoSub();
+    this.initSubscriptions();
   }
 
   ngOnDestroy() {
-    this.permitsInfoSub?.unsubscribe();
+    this.subscription.unsubscribe();
   }
 
   augmentForm(form: LajiForm.SchemaForm): Observable<LajiForm.SchemaForm> {
@@ -86,20 +88,29 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
     return formData;
   }
 
-  private getPermitsInfoSub(): Subscription {
-    return this.formView.formDataChange.pipe(
-      map((data: Partial<SpecimenTransaction>) => data.geneticResourceAcquisitionCountry),
-      tap((country) => {
-        if (country && !this.countryLinksCache[country]) {
-          this.updatePermitsInfo(); // show the info without the country while the country links are loading
-        }
-      }),
-      switchMap(country => this.getCountryLinks(country).pipe(
-        map(countryLinks => ({ country, countryLinks }))
-      ))
-    ).subscribe(({ country, countryLinks }) => {
-      this.updatePermitsInfo(country, countryLinks);
-    });
+  private initSubscriptions() {
+    this.subscription.add(
+      this.formView.formDataChange.subscribe(formData => {
+        this.formData = formData;
+        this.addSpecimenRangeSelect();
+      })
+    );
+
+    this.subscription.add(
+      this.formView.formDataChange.pipe(
+        map((data: Partial<SpecimenTransaction>) => data.geneticResourceAcquisitionCountry),
+        tap((country) => {
+          if (country && !this.countryLinksCache[country]) {
+            this.updatePermitsInfo(); // show the info without the country while the country links are loading
+          }
+        }),
+        switchMap(country => this.getCountryLinks(country).pipe(
+          map(countryLinks => ({ country, countryLinks }))
+        ))
+      ).subscribe(({ country, countryLinks }) => {
+        this.updatePermitsInfo(country, countryLinks);
+      })
+    );
   }
 
   private getCountryLinks(country?: string): Observable<LinkData[]> {
@@ -134,29 +145,62 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
   }
 
   private updatePermitsInfo(country?: string, countryLinks?: LinkData[]) {
-    const { oldElem, parentElem } = this.getPermitsInfoElems();
+    const oldElem: HTMLElement|null = this.document.getElementById("permitsInfo");
+    const parentElem: HTMLElement|null|undefined = oldElem?.parentElement ||
+      this.document.getElementsByClassName("nagoya-fields")?.[0]?.parentElement?.parentElement;
 
     if (!parentElem || (oldElem && this.prevCountry === country)) {
       return;
     }
     this.prevCountry = country;
 
-    const view = this.permitsInfoTpl.createEmbeddedView({ country, countryLinks });
+    const newElem = this.createElementFromTemplate(this.permitsInfoTpl, { country, countryLinks });
+    this.appendElement(parentElem, newElem, oldElem);
+  }
+
+  private addSpecimenRangeSelect() {
+    const oldElem: HTMLElement|null = this.document.getElementById("specimenRangeSelect");
+    if (oldElem) {
+      return;
+    }
+
+    const parentElem: HTMLElement|undefined = this.document.getElementsByClassName("specimen-id-fields")?.[0] as HTMLElement;
+    if (!parentElem) {
+      return;
+    }
+
+    const newElem = this.createElementFromTemplate(this.specimenRangeSelectTpl, {});
+    this.appendElement(parentElem, newElem);
+    this.document.getElementById("specimenRangeBtn")?.addEventListener('click', this.specimenRangeClick.bind(this));
+  }
+
+  private specimenRangeClick() {
+    const range: string = (this.document.getElementById("specimenRangeInput") as HTMLInputElement)?.value || '';
+    if (!range) {
+      return;
+    }
+
+    this.formService.getSpecimenRange(range).subscribe(result => {
+      if (result.status === 'ok') {
+        const formData = this.formData || {};
+        formData.awayIDs = (formData.awayIDs || []).concat(result.items || []);
+        this.formView.setFormData({...formData});
+      }
+    });
+  }
+
+  private createElementFromTemplate<T>(tpl: TemplateRef<T>, context: T): HTMLElement {
+    const view = tpl.createEmbeddedView(context);
     view.detectChanges();
     const newElem = view.rootNodes[0].cloneNode(true);
     view.destroy();
+    return newElem;
+  }
 
+  private appendElement(parentElem: HTMLElement, newElem: HTMLElement, oldElem?: HTMLElement|null) {
     if (oldElem) {
       this.renderer.removeChild(parentElem, oldElem);
     }
     this.renderer.appendChild(parentElem, newElem);
-  }
-
-  private getPermitsInfoElems() {
-    const oldElem: HTMLElement|null|undefined = this.document.getElementById("permitsInfo");
-    const parentElem: HTMLElement|null|undefined = oldElem?.parentElement ||
-      this.document.getElementsByClassName("nagoya-fields")?.[0]?.parentElement?.parentElement;
-
-    return { oldElem, parentElem };
   }
 }

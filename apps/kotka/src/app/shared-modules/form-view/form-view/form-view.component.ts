@@ -8,12 +8,24 @@ import {
   TemplateRef,
   SimpleChanges,
   EventEmitter,
-  Output
+  Output,
+  OnChanges,
+  OnDestroy
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormService } from '../../../shared/services/form.service';
 import { LajiForm, Person } from '@kotka/shared/models';
-import { catchError, combineLatest, from, Observable, of, ReplaySubject, switchMap, throwError } from 'rxjs';
+import {
+  catchError,
+  combineLatest,
+  from,
+  Observable,
+  of,
+  ReplaySubject,
+  Subscription,
+  switchMap,
+  throwError
+} from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { DataObject, DataService, DataType } from '../../../shared/services/data.service';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
@@ -35,7 +47,7 @@ enum FormErrorEnum {
   styleUrls: ['./form-view.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormViewComponent {
+export class FormViewComponent implements OnChanges, OnDestroy {
   @Input() formId?: string;
   @Input() dataType?: DataType;
   @Input() dataTypeName?: string;
@@ -67,7 +79,10 @@ export class FormViewComponent {
 
   @Output() formDataChange = new EventEmitter<Partial<DataObject>>();
 
-  private inputs$: ReplaySubject<{formId: string, dataType: DataType}> = new ReplaySubject<{formId: string, dataType: DataType}>();
+  private formData$ = new ReplaySubject<Partial<DataObject>>();
+  private inputs$ = new ReplaySubject<{formId: string, dataType: DataType}>();
+
+  private formDataFromParamsSub: Subscription;
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
   @ContentChild('headerTpl', {static: true}) formHeader?: TemplateRef<Element>;
@@ -94,60 +109,52 @@ export class FormViewComponent {
       map(([editMode, dataURI]) => ({editMode, dataURI}))
     );
 
-    const form$ = this.inputs$.pipe(
-      switchMap(inputs => this.formService.getForm(inputs.formId)),
-      switchMap(form => this.augmentFormFunc ? this.augmentFormFunc(form) : of(form))
+    const user$ = this.userService.user$.pipe(map(user => {
+      if (!user) {
+        throw new Error('Missing user information!');
+      }
+      return user;
+    }));
+
+    const form$ = combineLatest([this.inputs$, user$]).pipe(
+      switchMap(([inputs, user]) => this.formService.getForm(inputs.formId).pipe(
+        switchMap(form => this.augmentFormFunc ? this.augmentFormFunc(form) : of(form)),
+        map(form => {
+          form.uiSchemaContext = {
+            userName: this.userService.formatUserName(user?.fullName),
+            ...form.uiSchemaContext
+          };
+          return form;
+        })
+      ))
     );
 
-    const formData$ = combineLatest([this.routeParams$, this.inputs$]).pipe(
-      switchMap(([params, inputs]) => {
+    this.formDataFromParamsSub = combineLatest([this.routeParams$, this.inputs$, user$]).pipe(
+      switchMap(([params, inputs, user]) => {
         if (params.editMode) {
-          if (!params.dataURI) {
-            return throwError(() => new Error(FormErrorEnum.dataNotFound));
-          }
-          const uriParts = params.dataURI.split('/');
-          const id = uriParts.pop() as string;
-          return this.dataService.getById(inputs.dataType, id).pipe(
-            catchError(err => {
-              err = err.status === 404 ? FormErrorEnum.dataNotFound : err;
-              return throwError(() => new Error(err));
-            })
-          );
+          return this.getFormData(inputs.dataType, params.dataURI);
+        } else if (this.getInitialFormDataFunc) {
+          return of(this.getInitialFormDataFunc(user));
         } else {
-          return of(undefined);
+          return of({});
         }
       })
-    );
+    ).subscribe(formData => this.formData$.next(formData));
 
-    this.formParams$ = combineLatest([form$, formData$, this.userService.user$]).pipe(
-      map(([form, data, user]) => {
-        if (!user) {
-          throw new Error('Missing user information');
-        }
-
+    this.formParams$ = combineLatest([this.routeParams$, form$, this.formData$, user$]).pipe(
+      map(([routeParams, form, formData, user]) => {
         const isAdmin = this.userService.isICTAdmin(user);
-        const isEditMode = !!data;
-        const disabled = isEditMode && !isAdmin && !allowAccessByOrganization(data, user);
-        const showDeleteButton = isEditMode && (isAdmin || (!disabled && allowAccessByTime(data, {'d': 14})));
-
-        form.uiSchemaContext = {
-          userName: this.userService.formatUserName(user?.fullName),
-          ...form.uiSchemaContext
-        };
-
-        let formData: Partial<DataObject>|undefined = data;
-        if (!formData && this.getInitialFormDataFunc) {
-          formData = this.getInitialFormDataFunc(user);
-        }
-
-        return {form, formData, disabled, showDeleteButton};
+        const isEditMode =  routeParams.editMode;
+        const disabled = isEditMode && !isAdmin && !allowAccessByOrganization(formData as DataObject, user);
+        const showDeleteButton = isEditMode && (isAdmin || (!disabled && allowAccessByTime(formData as DataObject, {'d': 14})));
+        return { form, formData, disabled, showDeleteButton };
       }),
       tap(params => {
         this.showDisabledAlert = params.disabled;
       }),
       catchError(err => {
         const errorType = err.message === FormErrorEnum.dataNotFound ? FormErrorEnum.dataNotFound : FormErrorEnum.genericError;
-        return of({errorType});
+        return of({ errorType });
       })
     );
   }
@@ -159,6 +166,10 @@ export class FormViewComponent {
       }
     }
     this.visibleDataTypeName = this.dataTypeName || this.dataType;
+  }
+
+  ngOnDestroy() {
+    this.formDataFromParamsSub.unsubscribe();
   }
 
   onSubmit(data: DataObject) {
@@ -205,6 +216,10 @@ export class FormViewComponent {
     this.formDataChange.emit(data);
   }
 
+  setFormData(data: Partial<DataObject>) {
+    this.formData$.next(data);
+  }
+
   private delete(data: DataObject) {
     if (!this.dataType || !data.id) {
       return;
@@ -233,5 +248,19 @@ export class FormViewComponent {
 
   private navigateAway() {
     this.router.navigate(['..'], {relativeTo: this.activeRoute});
+  }
+
+  private getFormData(dataType: DataType, dataURI?: string): Observable<Partial<DataObject>> {
+    if (!dataURI) {
+      return throwError(() => new Error(FormErrorEnum.dataNotFound));
+    }
+    const uriParts = dataURI.split('/');
+    const id = uriParts.pop() as string;
+    return this.dataService.getById(dataType, id).pipe(
+      catchError(err => {
+        err = err.status === 404 ? FormErrorEnum.dataNotFound : err;
+        return throwError(() => new Error(err));
+      })
+    );
   }
 }

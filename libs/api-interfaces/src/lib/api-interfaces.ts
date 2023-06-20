@@ -18,4 +18,9 @@ export interface LoginResponse {
   next: string
 }
 
+export interface RangeResponse {
+  status: string;
+  items?: string[];
+}
+
 export type StatusResponse = HealthCheckResult;

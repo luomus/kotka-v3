@@ -3,10 +3,10 @@ import { Injectable } from '@angular/core';
 import { Observable, shareReplay } from 'rxjs';
 import { LajiForm, Area, PagedResult } from '@kotka/shared/models';
 import { map } from 'rxjs/operators';
+import { RangeResponse } from '@kotka/api-interfaces';
+import { apiBase, lajiApiBase } from './constants';
 
 export type EnumOption = { const: string, title: string };
-
-const path = '/api/laji/';
 
 @Injectable({
   providedIn: 'root'
@@ -20,13 +20,13 @@ export class FormService {
   ) {}
 
   getForm(formId: string): Observable<LajiForm.SchemaForm> {
-    return this.httpClient.get<LajiForm.SchemaForm>(`${path}forms/${formId}`);
+    return this.httpClient.get<LajiForm.SchemaForm>(`${lajiApiBase}/forms/${formId}`);
   }
 
   getAllCountryOptions(): Observable<EnumOption[]> {
     if (!this.countryOptions$) {
       const params = new HttpParams().set('type', 'country').set('pageSize', 1000).set('lang', 'en');
-      this.countryOptions$ = this.httpClient.get<PagedResult<Area>>(`${path}areas`, { params }).pipe(
+      this.countryOptions$ = this.httpClient.get<PagedResult<Area>>(`${lajiApiBase}/areas`, { params }).pipe(
         map(data => {
           const result: EnumOption[] = [{ const: "", title: "" }];
           data.results.forEach(area => {
@@ -41,5 +41,9 @@ export class FormService {
     }
 
     return this.countryOptions$;
+  }
+
+  getSpecimenRange(range: string): Observable<RangeResponse> {
+    return this.httpClient.get<RangeResponse>(`${apiBase}/specimen/range/${range}`);
   }
 }

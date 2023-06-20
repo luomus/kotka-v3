@@ -8,6 +8,7 @@ import {
   NgZone,
   EventEmitter,
   Output,
+  OnChanges, SimpleChanges,
 } from '@angular/core';
 import LajiForm from 'laji-form/lib/index';
 import { Theme as LajiFormTheme } from 'laji-form/lib/themes/theme';
@@ -20,7 +21,7 @@ import { Notifier } from '../models';
   templateUrl: './laji-form.component.html',
   styleUrls: ['./laji-form.component.scss'],
 })
-export class LajiFormComponent implements AfterViewInit, OnDestroy {
+export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
   static TOP_OFFSET = 0;
   static BOTTOM_OFFSET = 50;
   @Input() form: LajiFormModel.SchemaForm | null = null;
@@ -48,6 +49,28 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     this.mount();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (!this.lajiFormWrapper || !this.form) {
+      return;
+    }
+
+    if (changes['form'] || changes['formData']) {
+      /* const form = this.form as LajiFormModel.SchemaForm;
+
+      this.ngZone.runOutsideAngular(() => {
+        this.lajiFormWrapper?.setState({
+          schema: form?.schema,
+          uiSchema: form.uiSchema,
+          formData: this.formData,
+          validators: form.validators,
+          warnings: form.warnings
+        });
+      });*/
+      this.unMount();
+      this.mount();
+    }
   }
 
   ngOnDestroy() {

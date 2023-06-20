@@ -5,13 +5,14 @@ import { map, tap, distinctUntilChanged, share } from 'rxjs/operators';
 import { WINDOW } from '@ng-toolkit/universal';
 import { Person } from '@kotka/shared/models';
 import { LoginResponse } from '@kotka/api-interfaces';
+import { apiBase } from './constants';
 
 export interface IUserServiceState {
   user: Person | null;
   isLoggedIn: boolean | null;
 }
 
-const authPath = '/api/auth/';
+const authPath = `${apiBase}/auth/`;
 
 let _state: IUserServiceState = {
   user: null,

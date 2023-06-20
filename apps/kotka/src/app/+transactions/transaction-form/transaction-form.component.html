@@ -23,3 +23,18 @@
     </div>
   </div>
 </ng-template>
+
+<ng-template #specimenRangeSelect>
+  <div id="specimenRangeSelect">
+    Add specimens to the transaction by <strong>either</strong> writing (or copying) their ID's above, one per row or
+    comma separated<br><strong>or</strong> giving range here, and clicking add:
+    <div class="row">
+      <div class="col-md-6 col-lg-6">
+        <div class="input-group">
+          <input id="specimenRangeInput" type="text" class="form-control" placeholder="ex: HT.120-300">
+          <button id="specimenRangeBtn" class="btn btn-success text-white">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
