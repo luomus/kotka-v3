@@ -1,16 +1,16 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
-import { DatatableColumn, DatatableSource, GetRowsParams} from '../../../../../libs/kotka/ui/datatable/src';
-import { URICellRenderer } from '../../../../../libs/kotka/ui/datatable/src/lib/renderers/uri-cell-renderer';
-import { DataType } from '../shared/services/data.service';
-import { DatatableDataService } from '../shared/services/datatable-data.service';
+import { DatatableColumn, DatatableSource, GetRowsParams} from '../../../../../../libs/kotka/ui/datatable/src';
+import { URICellRenderer } from '../../../../../../libs/kotka/ui/datatable/src/lib/renderers/uri-cell-renderer';
+import { DataType } from '../../shared/services/data.service';
+import { DatatableDataService } from '../../shared/services/datatable-data.service';
 
 @Component({
-  selector: 'kotka-datasets',
-  templateUrl: './datasets.component.html',
-  styleUrls: ['./datasets.component.scss'],
+  selector: 'kotka-dataset-table',
+  templateUrl: './dataset-table.component.html',
+  styleUrls: ['./dataset-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DatasetsComponent {
+export class DatasetTableComponent {
   columns: DatatableColumn[] = [{
     headerName: 'URI',
     field: 'id',

@@ -1,13 +1,13 @@
 import { RouterModule, Routes } from '@angular/router';
 import { ModuleWithProviders } from '@angular/core';
-import { DatasetsComponent } from './datasets.component';
+import { DatasetTableComponent } from './dataset-table/dataset-table.component';
 import { DatasetFormComponent } from './dataset-form/dataset-form.component';
 
 export const datasetsRoutes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    component: DatasetsComponent,
+    component: DatasetTableComponent,
     data: { title: 'Tags' }
   },
   {
