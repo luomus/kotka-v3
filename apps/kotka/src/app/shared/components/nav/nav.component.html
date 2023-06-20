@@ -64,7 +64,7 @@
             <li dropdown class="nav-item me-3 dropdown" routerLinkActive="active">
               <a class="nav-link" dropdownToggle id="transactions-link">Transactions <i class="fa fa-caret-down"></i></a>
               <ul class="dropdown-menu" *dropdownMenu role="menu" aria-labelledby="transactions-link">
-                <li><a class="dropdown-item" [href]="'/transactions' | oldKotkaUrl">All</a></li>
+                <li><a class="dropdown-item" routerLink="/transactions">All</a></li>
                 <li><a class="dropdown-item" routerLink="/transactions/add"><i class="fa fa-plus"></i> Add transaction</a></li>
                 <li><a class="dropdown-item" [href]="'/reports/transaction' | oldKotkaUrl">Yearly report</a></li>
               </ul>

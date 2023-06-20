@@ -1,0 +1,10 @@
+<kui-main-content [header]="'Transactions'">
+  <span *ngIf="totalCount !== undefined"><span data-cy="transaction-count">{{ totalCount }}</span> transactions found</span>
+  <kui-datatable
+    style="height: calc(100vh - 190px)"
+    [columns]="columns"
+    [datasource]="datasource"
+    [loading]="loading"
+  >
+  </kui-datatable>
+</kui-main-content>

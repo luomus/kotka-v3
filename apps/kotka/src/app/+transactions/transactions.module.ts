@@ -7,6 +7,7 @@ import { KotkaUiDatatableModule } from '../../../../../libs/kotka/ui/datatable/s
 import { TransactionFormComponent } from './transaction-form/transaction-form.component';
 import { FormViewModule } from '../shared-modules/form-view/form-view.module';
 import { SharedModule } from '../shared/shared.module';
+import { TransactionTableComponent } from './transaction-table/transaction-table.component';
 
 @NgModule({
   imports: [
@@ -16,8 +17,11 @@ import { SharedModule } from '../shared/shared.module';
     SharedModule,
     KotkaUiMainContentModule,
     KotkaUiDatatableModule,
-    FormViewModule
+    FormViewModule,
   ],
-  declarations: [TransactionFormComponent],
+  declarations: [
+    TransactionFormComponent,
+    TransactionTableComponent,
+  ],
 })
 export class TransactionsModule {}
