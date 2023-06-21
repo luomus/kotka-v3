@@ -83,8 +83,9 @@ export class LajiFormComponent implements AfterViewInit, OnDestroy {
     ]).subscribe(([formPackage, themePackage]) => {
       this.lajiFormWrapperProto = formPackage.default;
       this.lajiFormTheme = themePackage.default;
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       this.createNewLajiForm(() => {
-        this.lajiFormWrapper?.invalidateSize();
+
       });
     });
   }
