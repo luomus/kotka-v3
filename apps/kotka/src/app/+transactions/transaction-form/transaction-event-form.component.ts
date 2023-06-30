@@ -32,7 +32,7 @@ import { LajiFormComponent } from '@kotka/ui/laji-form';
         (click)="onAddClick()"
         data-cy="confirm-ok"
       >
-        Add
+        OK
       </button>
       <button
         type="button"

@@ -9,8 +9,13 @@ import {
   ViewChild
 } from '@angular/core';
 import { DataType } from '../../shared/services/data.service';
-import { LajiForm, Person, SpecimenTransaction } from '@kotka/shared/models';
-import { catchError, from, Observable, of, shareReplay, Subscription, switchMap } from 'rxjs';
+import {
+  LajiForm,
+  Person,
+  SpecimenTransaction,
+  SpecimenTransactionEvent
+} from '@kotka/shared/models';
+import { from, Observable, of, shareReplay, Subscription, switchMap } from 'rxjs';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 import { FormService } from '../../shared/services/form.service';
 import { DOCUMENT } from '@angular/common';
@@ -38,6 +43,8 @@ interface LinkData {
   url: string;
   text: string;
 }
+
+type SpecimenIdKey = keyof Pick<SpecimenTransaction, 'awayIDs'|'returnedIDs'|'missingIDs'|'damagedIDs'>;
 
 @Component({
   selector: 'kotka-transaction-form',
@@ -136,13 +143,30 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
     });
 
     from(modalRef.result).subscribe({
-      'next': result => {
-        const transactionEvents = [...(this.formData?.transactionEvents || []), result];
-        const formData = { ...this.formData || {}, transactionEvents };
-        this.formView.setFormData(formData);
-      },
+      'next': result => this.addTransactionEvent(result),
       'error': () => undefined
     });
+  }
+
+  private addTransactionEvent(transactionEvent: SpecimenTransactionEvent) {
+    let formData = { ...this.formData || {} };
+
+    const transactionEvents = [...(this.formData?.transactionEvents || []), transactionEvent];
+    formData = { ...formData, transactionEvents };
+
+    // const markAs = result.markAs TODO schema changes
+    // const eventIds = transactionEvent.eventDocumentIDs || [];
+    const markAs = 'returned';
+    const eventIds = ['a', 'b', 'c'];
+
+    const specimenIdFields: SpecimenIdKey[] = ['awayIDs', 'returnedIDs', 'missingIDs', 'damagedIDs'];
+    specimenIdFields.forEach(field => {
+      formData[field] = (formData[field] || []).filter(id => !eventIds.includes(id));
+    });
+    const key: SpecimenIdKey = (markAs + 'IDs') as SpecimenIdKey;
+    formData[key] = [...(formData[key] || []), ...eventIds];
+
+    this.formView.setFormData(formData);
   }
 
   private getCountryLinks(country?: string): Observable<LinkData[]> {
