@@ -23,6 +23,7 @@ import { HttpClient } from '@angular/common/http';
 import { FormViewComponent } from '../../shared-modules/form-view/form-view/form-view.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TransactionEventFormComponent } from './transaction-event-form.component';
+import { DialogService } from '../../shared/services/dialog.service';
 
 interface CbdResult {
   grouped?: {
@@ -72,7 +73,8 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
     private formService: FormService,
     private renderer: Renderer2,
     private httpClient: HttpClient,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private dialogService: DialogService
   ) {}
 
   ngOnInit() {
@@ -231,16 +233,35 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
   }
 
   private specimenRangeClick() {
-    const range: string = (this.document.getElementById("specimenRangeInput") as HTMLInputElement)?.value || '';
+    const specimenRangeInput = this.document.getElementById("specimenRangeInput") as HTMLInputElement|null;
+    const range: string = specimenRangeInput?.value || '';
     if (!range) {
       return;
     }
+    if (!/^([A-Z0-9]+\.)?[0-9]+-[0-9]+$/g.test(range)) {
+      this.dialogService.alert('Incorrect range format');
+      return;
+    }
 
-    this.formService.getSpecimenRange(range).subscribe(result => {
-      if (result.status === 'ok') {
-        const awayIDs = [...(this.formData?.awayIDs || []), ...(result.items || [])];
-        const formData = { ...this.formData || {}, awayIDs };
-        this.formView.setFormData(formData);
+    this.formView.lajiForm?.block();
+    this.formService.getSpecimenRange(range).subscribe({
+      'next': result => {
+        if (result.status === 'ok') {
+          const awayIDs = [...(this.formData?.awayIDs || []), ...(result.items || [])];
+          const formData = {...this.formData || {}, awayIDs};
+          this.formView.setFormData(formData);
+
+          if (specimenRangeInput) {
+            specimenRangeInput.value = '';
+          }
+        } else {
+          this.dialogService.alert(result.status);
+        }
+        this.formView.lajiForm?.unBlock();
+      },
+      'error': () => {
+        this.dialogService.alert('An unexpected error occurred.');
+        this.formView.lajiForm?.unBlock();
       }
     });
   }
