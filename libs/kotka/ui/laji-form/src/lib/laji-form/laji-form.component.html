@@ -1,5 +1,6 @@
-<div #lajiForm style="margin-bottom: 60px"></div>
+<div #lajiForm [ngClass]="{'form-with-footer': showFooter}"></div>
 <kui-form-footer
+  *ngIf="showFooter"
   [disabled]="disabled"
   [showDeleteButton]="showDeleteButton"
   (saveForm)="saveFormClicked()"

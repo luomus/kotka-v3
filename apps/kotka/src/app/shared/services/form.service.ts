@@ -13,6 +13,7 @@ export type EnumOption = { const: string, title: string };
 })
 
 export class FormService {
+  private formById$: Record<string, Observable<LajiForm.SchemaForm>> = {};
   private countryOptions$?: Observable<EnumOption[]>;
 
   constructor(
@@ -20,7 +21,12 @@ export class FormService {
   ) {}
 
   getForm(formId: string): Observable<LajiForm.SchemaForm> {
-    return this.httpClient.get<LajiForm.SchemaForm>(`${lajiApiBase}/forms/${formId}`);
+    if (!this.formById$[formId]) {
+      this.formById$[formId] = this.httpClient.get<LajiForm.SchemaForm>(`${lajiApiBase}/forms/${formId}`).pipe(
+        shareReplay(1)
+      );
+    }
+    return this.formById$[formId];
   }
 
   getAllCountryOptions(): Observable<EnumOption[]> {

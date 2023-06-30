@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { DataType } from '../../shared/services/data.service';
 import { LajiForm, Person, SpecimenTransaction } from '@kotka/shared/models';
-import { Observable, of, shareReplay, Subscription, switchMap } from 'rxjs';
+import { catchError, from, Observable, of, shareReplay, Subscription, switchMap } from 'rxjs';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 import { FormService } from '../../shared/services/form.service';
 import { DOCUMENT } from '@angular/common';
@@ -129,9 +129,19 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
 
   private addTransactionEventButtonClick(event: MouseEvent) {
     event.stopPropagation();
-    this.modalService.open(TransactionEventFormComponent, {
+
+    const modalRef = this.modalService.open(TransactionEventFormComponent, {
       backdrop: 'static',
-      size: 'sm'
+      size: 'lg'
+    });
+
+    from(modalRef.result).subscribe({
+      'next': result => {
+        const transactionEvents = [...(this.formData?.transactionEvents || []), result];
+        const formData = { ...this.formData || {}, transactionEvents };
+        this.formView.setFormData(formData);
+      },
+      'error': () => undefined
     });
   }
 

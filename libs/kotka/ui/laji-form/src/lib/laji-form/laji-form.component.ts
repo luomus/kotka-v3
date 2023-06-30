@@ -30,6 +30,7 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Input() showDeleteButton = false;
   @Input() apiClient?: any;
   @Input() notifier?: Notifier;
+  @Input() showFooter = true;
 
   private lajiFormWrapper?: LajiForm;
   private lajiFormWrapperProto?: any;
