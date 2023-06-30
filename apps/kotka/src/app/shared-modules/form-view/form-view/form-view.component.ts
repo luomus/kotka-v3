@@ -122,6 +122,7 @@ export class FormViewComponent implements OnChanges, OnDestroy {
         map(form => {
           form.uiSchemaContext = {
             userName: this.userService.formatUserName(user?.fullName),
+            userEmail: user.emailAddress,
             ...form.uiSchemaContext
           };
           return form;
