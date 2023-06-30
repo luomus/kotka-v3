@@ -8,7 +8,7 @@ import {
   NgZone,
   EventEmitter,
   Output,
-  OnChanges, SimpleChanges,
+  OnChanges, SimpleChanges, ChangeDetectorRef,
 } from '@angular/core';
 import LajiForm from 'laji-form/lib/index';
 import { Theme as LajiFormTheme } from 'laji-form/lib/themes/theme';
@@ -57,19 +57,17 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
 
     if (changes['form'] || changes['formData']) {
-      /* const form = this.form as LajiFormModel.SchemaForm;
+      const form = this.form as LajiFormModel.SchemaForm;
 
       this.ngZone.runOutsideAngular(() => {
         this.lajiFormWrapper?.setState({
-          schema: form?.schema,
+          schema: form.schema,
           uiSchema: form.uiSchema,
-          formData: this.formData,
+          formData: {...this.formData},
           validators: form.validators,
           warnings: form.warnings
         });
-      });*/
-      this.unMount();
-      this.mount();
+      });
     }
   }
 

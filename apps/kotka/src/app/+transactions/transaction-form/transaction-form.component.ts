@@ -182,9 +182,9 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
 
     this.formService.getSpecimenRange(range).subscribe(result => {
       if (result.status === 'ok') {
-        const formData = this.formData || {};
-        formData.awayIDs = (formData.awayIDs || []).concat(result.items || []);
-        this.formView.setFormData({...formData});
+        const awayIDs = [...(this.formData?.awayIDs || []), ...(result.items || [])];
+        const formData = { ...this.formData || {}, awayIDs };
+        this.formView.setFormData(formData);
       }
     });
   }
