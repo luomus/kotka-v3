@@ -11,11 +11,13 @@ import {
 import { DataType } from '../../shared/services/data.service';
 import { LajiForm, Person, SpecimenTransaction } from '@kotka/shared/models';
 import { Observable, of, shareReplay, Subscription, switchMap } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 import { FormService } from '../../shared/services/form.service';
 import { DOCUMENT } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormViewComponent } from '../../shared-modules/form-view/form-view/form-view.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { TransactionEventFormComponent } from './transaction-event-form.component';
 
 interface CbdResult {
   grouped?: {
@@ -62,7 +64,8 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
     @Inject(DOCUMENT) private document: Document,
     private formService: FormService,
     private renderer: Renderer2,
-    private httpClient: HttpClient
+    private httpClient: HttpClient,
+    private modalService: NgbModal
   ) {}
 
   ngOnInit() {
@@ -111,6 +114,25 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
         this.updatePermitsInfo(country, countryLinks);
       })
     );
+
+    this.subscription.add(
+      this.formView.formDataChange.pipe(
+        map(() => this.document.getElementById('root_transactionEvents-add')),
+        distinctUntilChanged()
+      ).subscribe((addButton) => {
+        if (addButton) {
+          addButton.onclick = this.addTransactionEventButtonClick.bind(this);
+        }
+      })
+    );
+  }
+
+  private addTransactionEventButtonClick(event: MouseEvent) {
+    event.stopPropagation();
+    this.modalService.open(TransactionEventFormComponent, {
+      backdrop: 'static',
+      size: 'sm'
+    });
   }
 
   private getCountryLinks(country?: string): Observable<LinkData[]> {

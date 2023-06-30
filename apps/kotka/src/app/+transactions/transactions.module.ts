@@ -8,6 +8,7 @@ import { TransactionFormComponent } from './transaction-form/transaction-form.co
 import { FormViewModule } from '../shared-modules/form-view/form-view.module';
 import { SharedModule } from '../shared/shared.module';
 import { TransactionTableComponent } from './transaction-table/transaction-table.component';
+import { TransactionEventFormComponent } from './transaction-form/transaction-event-form.component';
 
 @NgModule({
   imports: [
@@ -22,6 +23,7 @@ import { TransactionTableComponent } from './transaction-table/transaction-table
   declarations: [
     TransactionFormComponent,
     TransactionTableComponent,
+    TransactionEventFormComponent
   ],
 })
 export class TransactionsModule {}
