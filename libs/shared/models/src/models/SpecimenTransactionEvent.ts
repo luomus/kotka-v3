@@ -10,7 +10,7 @@ export interface SpecimenTransactionEvent {
   id?: string;
   "@type"?: string;
   eventDate?: string;
-  eventDocumentIDs?: string;
+  eventDocumentIDs?: string[];
   eventHandler?: string;
   eventNotes?: string;
 }

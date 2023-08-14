@@ -157,7 +157,7 @@ export interface SpecimenTransaction {
   status?: "" | "HRX.statusInProcess" | "HRX.statusOutstanding" | "HRX.statusClosed";
   transactionEvents?: {
     eventDate?: string;
-    eventDocumentIDs?: string;
+    eventDocumentIDs?: string[];
     eventHandler?: string;
     eventNotes?: string;
   }[];

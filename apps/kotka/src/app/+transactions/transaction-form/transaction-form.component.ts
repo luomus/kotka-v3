@@ -156,10 +156,9 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
     const transactionEvents = [...(this.formData?.transactionEvents || []), transactionEvent];
     formData = { ...formData, transactionEvents };
 
-    // const markAs = result.markAs TODO schema changes
-    // const eventIds = transactionEvent.eventDocumentIDs || [];
+    // const markAs = transactionEvent.markAs TODO schema changes
     const markAs = 'returned';
-    const eventIds = ['a', 'b', 'c'];
+    const eventIds = transactionEvent.eventDocumentIDs || [];
 
     const specimenIdFields: SpecimenIdKey[] = ['awayIDs', 'returnedIDs', 'missingIDs', 'damagedIDs'];
     specimenIdFields.forEach(field => {
