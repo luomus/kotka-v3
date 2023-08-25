@@ -8,7 +8,7 @@ export const datasetsRoutes: Routes = [
     path: '',
     pathMatch: 'full',
     component: TransactionTableComponent,
-    data: { title: 'Tags' }
+    data: { title: 'Transactions' }
   },
   {
     path: 'add',
