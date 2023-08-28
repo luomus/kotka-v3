@@ -227,7 +227,7 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
     }
 
     const newElem = this.createElementFromTemplate(this.specimenRangeSelectTpl, {});
-    this.appendElement(parentElem, newElem);
+    this.appendElement(parentElem, newElem, undefined, true);
     this.document.getElementById("specimenRangeBtn")?.addEventListener('click', this.specimenRangeClick.bind(this));
   }
 
@@ -273,10 +273,15 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
     return newElem;
   }
 
-  private appendElement(parentElem: HTMLElement, newElem: HTMLElement, oldElem?: HTMLElement|null) {
+  private appendElement(parentElem: HTMLElement, newElem: HTMLElement, oldElem?: HTMLElement|null, asFirst = false) {
     if (oldElem) {
       this.renderer.removeChild(parentElem, oldElem);
     }
-    this.renderer.appendChild(parentElem, newElem);
+
+    if (asFirst) {
+      this.renderer.insertBefore(parentElem, newElem, parentElem.firstChild);
+    } else {
+      this.renderer.appendChild(parentElem, newElem);
+    }
   }
 }
