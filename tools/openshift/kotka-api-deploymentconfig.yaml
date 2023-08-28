@@ -92,6 +92,11 @@ spec:
                 configMapKeyRef:
                   name: kotka-config
                   key: SECURE_COOKIE
+            - name: OLD_KOTKA_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: kotka-config
+                  key: OLD_KOTKA_URL
           resources: {}
           imagePullPolicy: Always
       restartPolicy: Always

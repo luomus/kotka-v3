@@ -5,6 +5,7 @@ data:
   LAJI_STORE_URL: https://store-dev.luomus.fi
   SYSTEM_ID: KE.1383
   TRIPLESTORE_URL: https://fmnh-legacy-test-21.it.helsinki.fi/triplestore/
+  OLD_KOTKA_URL: https://kotkatest.luomus.fi/
 kind: ConfigMap
 metadata:
   creationTimestamp: null
