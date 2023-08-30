@@ -28,7 +28,7 @@ import { LajiFormComponent } from '@kotka/ui/laji-form';
     <div class="modal-footer">
       <button
         type="button"
-        class="btn btn-primary text-light"
+        class="btn btn-primary"
         (click)="onAddClick()"
         data-cy="confirm-ok"
       >

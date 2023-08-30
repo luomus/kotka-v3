@@ -10,7 +10,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
     <div class="modal-footer">
       <button
         type="button"
-        class="btn btn-primary text-light"
+        class="btn btn-primary"
         (click)="modal.close(true)"
         data-cy="confirm-ok"
       >
