@@ -16,6 +16,7 @@ import {
 })
 export class FormFooterComponent {
   @Input() disabled = false;
+  @Input() disableSaveButton = false;
   @Input() showDeleteButton = false;
 
   @Output() saveForm: EventEmitter<void> = new EventEmitter<void>();

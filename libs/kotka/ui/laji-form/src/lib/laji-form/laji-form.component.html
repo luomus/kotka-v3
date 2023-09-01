@@ -2,6 +2,7 @@
 <kui-form-footer
   *ngIf="showFooter"
   [disabled]="disabled"
+  [disableSaveButton]="disableSaveButton"
   [showDeleteButton]="showDeleteButton"
   (saveForm)="saveFormClicked()"
   (delete)="delete.emit(formData)"

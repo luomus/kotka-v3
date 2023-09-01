@@ -32,6 +32,8 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Input() notifier?: Notifier;
   @Input() showFooter = true;
 
+  disableSaveButton = false;
+
   private lajiFormWrapper?: LajiForm;
   private lajiFormWrapperProto?: any;
   private lajiFormTheme?: LajiFormTheme;
@@ -45,7 +47,8 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
   @ViewChild('lajiForm', { static: true }) lajiFormRoot!: ElementRef;
 
   constructor(
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngAfterViewInit() {
@@ -135,6 +138,7 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
             warnings: form.warnings,
             onSubmit: this.onSubmit.bind(this),
             onChange: this.onChange.bind(this),
+            onValidationError: this.onValidationError.bind(this),
             apiClient: this.apiClient,
             lang: 'en',
             renderSubmit: false,
@@ -181,7 +185,25 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
 
   private onChange(data: any) {
     this.ngZone.run(() => {
+      this.disableSaveButton = false;
       this.formChange.emit(data);
+      this.cdr.markForCheck();
     });
+  }
+
+  private onValidationError(errors: any) {
+    this.ngZone.run(() => {
+      if (this.hasOnlyWarnings(errors)) {
+        this.disableSaveButton = true;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  private hasOnlyWarnings(errors: any): boolean {
+    if (errors.__errors?.length > 0 && errors.__errors.every((e: string) => e.indexOf('[warning]') === 0)) {
+      return true;
+    }
+    return Object.keys(errors).length > 0 && Object.keys(errors).every(key => key !== '__errors' && this.hasOnlyWarnings(errors[key]));
   }
 }
