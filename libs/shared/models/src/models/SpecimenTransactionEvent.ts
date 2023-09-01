@@ -13,4 +13,5 @@ export interface SpecimenTransactionEvent {
   eventDocumentIDs?: string[];
   eventHandler?: string;
   eventNotes?: string;
+  eventType?: "" | "HRX.eventTypeReturn" | "HRX.eventTypeAddition";
 }

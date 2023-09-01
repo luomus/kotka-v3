@@ -68,6 +68,12 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
   private countryLinksCache: Record<string, Observable<LinkData[]>> = {};
   private prevCountry?: string;
 
+  private eventTypeSpecimenIdFieldMap: Record<string, SpecimenIdKey|undefined> = {
+    '': undefined,
+    'HRX.eventTypeReturn': 'returnedIDs',
+    'HRX.eventTypeAddition': 'awayIDs'
+  };
+
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private formService: FormService,
@@ -152,22 +158,22 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
 
   private addTransactionEvent(transactionEvent: SpecimenTransactionEvent) {
     let formData = { ...this.formData || {} };
-
-    const transactionEvents = [...(this.formData?.transactionEvents || []), transactionEvent];
+    const transactionEvents = [...(formData.transactionEvents || []), transactionEvent];
     formData = { ...formData, transactionEvents };
 
-    // const markAs = transactionEvent.markAs TODO schema changes
-    const markAs = 'returned';
+    const specimenIdField = this.eventTypeSpecimenIdFieldMap[transactionEvent.eventType || ''];
     const eventIds = transactionEvent.eventDocumentIDs || [];
 
-    const specimenIdFields: SpecimenIdKey[] = ['awayIDs', 'returnedIDs', 'missingIDs', 'damagedIDs'];
-    specimenIdFields.forEach(field => {
-      formData[field] = (formData[field] || []).filter(id => !eventIds.includes(id));
-    });
-    const key: SpecimenIdKey = (markAs + 'IDs') as SpecimenIdKey;
-    formData[key] = [...(formData[key] || []), ...eventIds];
+    if (specimenIdField) {
+      const specimenIdFields: SpecimenIdKey[] = ['awayIDs', 'returnedIDs', 'missingIDs'];
+      specimenIdFields.forEach(field => {
+        formData[field] = (formData[field] || []).filter(id => !eventIds.includes(id));
+      });
+      formData[specimenIdField] = [...(formData[specimenIdField] || []), ...eventIds];
+    }
 
     this.formView.setFormData(formData);
+    this.formData = formData;
   }
 
   private getCountryLinks(country?: string): Observable<LinkData[]> {
