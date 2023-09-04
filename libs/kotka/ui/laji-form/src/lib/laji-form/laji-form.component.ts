@@ -8,13 +8,15 @@ import {
   NgZone,
   EventEmitter,
   Output,
-  OnChanges, SimpleChanges, ChangeDetectorRef,
+  OnChanges, SimpleChanges, ChangeDetectorRef, Inject,
 } from '@angular/core';
 import LajiForm from 'laji-form/lib/index';
 import { Theme as LajiFormTheme } from 'laji-form/lib/themes/theme';
+import { scrollIntoViewIfNeeded } from 'laji-form/lib/utils';
 import { LajiForm as LajiFormModel } from '@kotka/shared/models';
 import { combineLatest } from 'rxjs';
 import { Notifier } from '../models';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'kui-laji-form',
@@ -32,7 +34,7 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Input() notifier?: Notifier;
   @Input() showFooter = true;
 
-  disableSaveButton = false;
+  hasOnlyWarnings = false;
 
   private lajiFormWrapper?: LajiForm;
   private lajiFormWrapperProto?: any;
@@ -47,6 +49,7 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
   @ViewChild('lajiForm', { static: true }) lajiFormRoot!: ElementRef;
 
   constructor(
+    @Inject(DOCUMENT) private document: Document,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef
   ) {}
@@ -100,6 +103,16 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
   saveFormClicked() {
     this.ngZone.runOutsideAngular(() => {
       this.lajiFormWrapper?.submit();
+    });
+  }
+
+  highlightErrors() {
+    this.ngZone.runOutsideAngular(() => {
+      this.lajiFormWrapper?.lajiForm.popErrorListIfNeeded();
+      const errorListElem: HTMLElement|null = this.document.querySelector('.laji-form-error-list');
+      if (errorListElem) {
+        scrollIntoViewIfNeeded(errorListElem, LajiFormComponent.TOP_OFFSET, LajiFormComponent.BOTTOM_OFFSET);
+      }
     });
   }
 
@@ -179,13 +192,15 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
 
   private onSubmit(data: any) {
     this.ngZone.run(() => {
+      this.hasOnlyWarnings = false;
       this.formSubmit.emit(data.formData);
+      this.cdr.markForCheck();
     });
   }
 
   private onChange(data: any) {
     this.ngZone.run(() => {
-      this.disableSaveButton = false;
+      this.hasOnlyWarnings = false;
       this.formChange.emit(data);
       this.cdr.markForCheck();
     });
@@ -193,17 +208,17 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
 
   private onValidationError(errors: any) {
     this.ngZone.run(() => {
-      if (this.hasOnlyWarnings(errors)) {
-        this.disableSaveButton = true;
+      if (this.onlyWarnings(errors)) {
+        this.hasOnlyWarnings = true;
         this.cdr.markForCheck();
       }
     });
   }
 
-  private hasOnlyWarnings(errors: any): boolean {
+  private onlyWarnings(errors: any): boolean {
     if (errors.__errors?.length > 0 && errors.__errors.every((e: string) => e.indexOf('[warning]') === 0)) {
       return true;
     }
-    return Object.keys(errors).length > 0 && Object.keys(errors).every(key => key !== '__errors' && this.hasOnlyWarnings(errors[key]));
+    return Object.keys(errors).length > 0 && Object.keys(errors).every(key => key !== '__errors' && this.onlyWarnings(errors[key]));
   }
 }
