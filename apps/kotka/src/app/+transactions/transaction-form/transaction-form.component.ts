@@ -68,7 +68,7 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
   private countryLinksCache: Record<string, Observable<LinkData[]>> = {};
   private prevCountry?: string;
 
-  private eventTypeSpecimenIdFieldMap: Record<string, SpecimenIdKey|undefined> = {
+  private eventTypeSpecimenIdFieldMap: Record<Exclude<SpecimenTransactionEvent['eventType'], undefined>, SpecimenIdKey|undefined> = {
     '': undefined,
     'HRX.eventTypeReturn': 'returnedIDs',
     'HRX.eventTypeAddition': 'awayIDs'
@@ -149,6 +149,7 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
       backdrop: 'static',
       size: 'lg'
     });
+    modalRef.componentInstance.transactionType = this.formData?.type;
 
     from(modalRef.result).subscribe({
       'next': result => this.addTransactionEvent(result),
