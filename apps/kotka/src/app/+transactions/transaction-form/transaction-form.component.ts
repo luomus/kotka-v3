@@ -172,8 +172,7 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
       formData[specimenIdField] = [...(formData[specimenIdField] || []), ...eventIds];
     }
 
-    this.formView.setFormData(formData);
-    this.formData = formData;
+    this.setFormData(formData);
   }
 
   private getCountryLinks(country?: string): Observable<LinkData[]> {
@@ -254,7 +253,7 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
         if (result.status === 'ok') {
           const awayIDs = [...(this.formData?.awayIDs || []), ...(result.items || [])];
           const formData = {...this.formData || {}, awayIDs};
-          this.formView.setFormData(formData);
+          this.setFormData(formData);
 
           if (specimenRangeInput) {
             specimenRangeInput.value = '';
@@ -289,5 +288,10 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
     } else {
       this.renderer.appendChild(parentElem, newElem);
     }
+  }
+
+  private setFormData(formData: Partial<SpecimenTransaction>) {
+    this.formData = formData;
+    this.formView.setFormData(formData);
   }
 }
