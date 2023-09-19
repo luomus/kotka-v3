@@ -155,8 +155,6 @@ export abstract class LajiStoreController {
     let firstDoc;
     let lastDoc;
 
-    console.error(ver1, ver2);
-
     try {
       firstDoc = (await lastValueFrom(this.lajiStoreService.getVersion(this.type, id, ver1))).data;
       lastDoc = (await lastValueFrom(this.lajiStoreService.getVersion(this.type, id, ver2))).data;
@@ -164,8 +162,6 @@ export abstract class LajiStoreController {
       console.error(err);
       throw new InternalServerErrorException(err.message);
     }
-
-    console.error(firstDoc, lastDoc);
 
     if (!firstDoc) {
       throw new InternalServerErrorException(`Could not find version ${ver1} for ${this.type} ${id}`);
