@@ -1,6 +1,6 @@
 import { SortModel } from '../../../../../../libs/kotka/ui/datatable/src';
 import { Observable } from 'rxjs';
-import { Dataset, ListResponse } from '@kotka/shared/models';
+import { ListResponse } from '@kotka/shared/models';
 import { DataObject, DataService, DataType } from './data.service';
 import { Injectable } from '@angular/core';
 

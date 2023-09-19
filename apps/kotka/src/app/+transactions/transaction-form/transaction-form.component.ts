@@ -68,7 +68,7 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
   private countryLinksCache: Record<string, Observable<LinkData[]>> = {};
   private prevCountry?: string;
 
-  private eventTypeSpecimenIdFieldMap: Record<string, SpecimenIdKey|undefined> = {
+  private eventTypeSpecimenIdFieldMap: Record<Exclude<SpecimenTransactionEvent['eventType'], undefined>, SpecimenIdKey|undefined> = {
     '': undefined,
     'HRX.eventTypeReturn': 'returnedIDs',
     'HRX.eventTypeAddition': 'awayIDs'
@@ -149,6 +149,7 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
       backdrop: 'static',
       size: 'lg'
     });
+    modalRef.componentInstance.transactionType = this.formData?.type;
 
     from(modalRef.result).subscribe({
       'next': result => this.addTransactionEvent(result),
@@ -172,8 +173,7 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
       formData[specimenIdField] = [...(formData[specimenIdField] || []), ...eventIds];
     }
 
-    this.formView.setFormData(formData);
-    this.formData = formData;
+    this.setFormData(formData);
   }
 
   private getCountryLinks(country?: string): Observable<LinkData[]> {
@@ -254,7 +254,7 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
         if (result.status === 'ok') {
           const awayIDs = [...(this.formData?.awayIDs || []), ...(result.items || [])];
           const formData = {...this.formData || {}, awayIDs};
-          this.formView.setFormData(formData);
+          this.setFormData(formData);
 
           if (specimenRangeInput) {
             specimenRangeInput.value = '';
@@ -289,5 +289,10 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
     } else {
       this.renderer.appendChild(parentElem, newElem);
     }
+  }
+
+  private setFormData(formData: Partial<SpecimenTransaction>) {
+    this.formData = formData;
+    this.formView.setFormData(formData);
   }
 }
