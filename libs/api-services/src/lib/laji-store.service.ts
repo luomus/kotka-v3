@@ -38,4 +38,12 @@ export class LajiStoreService {
   search(type: string, body: Record<string, unknown>) {
     return this.httpService.post(`${this.urlBase}${type}/_search`, body, this.baseConfig);
   }
+
+  getVersionHistory(type: string, id: string, includeDiff: boolean = false) {
+    return this.httpService.get(`${this.urlBase}${type}/${id}/_ver`, Object.assign({ params: { include_diff: includeDiff }}, this.baseConfig));
+  }
+
+  getVersion(type: string, id: string, ver: string) {
+    return this.httpService.get(`${this.urlBase}${type}/${id}/_ver/${ver}`, this.baseConfig);
+  }
 }
