@@ -59,19 +59,14 @@ export class ValidationService {
     if (!value) {
       return;
     }
-    if (!value.match(/^ABSCH-IRCC-[A-Z]{2}-([0-9]{6,7})-[1-9]$/)) {
-      return this.getError(field, "Invalid IRCC number \"%{value}\" given.", value);
-    }
 
-    let isValid: boolean;
     try {
-      isValid = await this.abschService.checkIRCCNumberIsValid(value);
+      const isValid = await this.abschService.checkIRCCNumberIsValid(value);
+      if (!isValid) {
+        return this.getError(field, "Invalid IRCC number \"%{value}\" given.", value);
+      }
     } catch (e) {
       return this.getError(field, "ABSCH API didn't respond in time.");
-    }
-
-    if (!isValid) {
-      return this.getError(field, "Invalid IRCC number \"%{value}\" given.", value);
     }
 
     return {};

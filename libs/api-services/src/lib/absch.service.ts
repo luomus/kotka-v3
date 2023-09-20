@@ -11,7 +11,12 @@ export class AbschService {
   private baseUrl = "https://api.cbd.int/api/v2013/";
 
   public async checkIRCCNumberIsValid(IRCCNumber: string): Promise<boolean> {
-    const url = `${this.baseUrl}documents/${IRCCNumber}?include-deleted=true`;
+    const match = IRCCNumber.match(/^ABSCH-IRCC-[A-Z]{2}-([0-9]{6,7})-[1-9]$/);
+    if (!match) {
+      return false;
+    }
+
+    const url = `${this.baseUrl}documents/${match[1]}?include-deleted=true`;
     try {
       await lastValueFrom(this.httpService.get(url, { timeout: 30000 }));
     } catch (e: any) {
