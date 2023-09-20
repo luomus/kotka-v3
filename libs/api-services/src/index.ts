@@ -5,3 +5,4 @@ export * from './lib/triplestore.service';
 export * from './lib/schema.service';
 export * from './lib/form.service';
 export * from './lib/old-kotka-api.service';
+export * from './lib/absch.service';
