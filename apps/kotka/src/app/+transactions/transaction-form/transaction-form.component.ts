@@ -8,7 +8,7 @@ import {
   TemplateRef,
   ViewChild
 } from '@angular/core';
-import { DataType } from '../../shared/services/data.service';
+import { DataType } from '../../shared/services/api-services/data.service';
 import {
   LajiForm, Organization,
   Person,
@@ -17,7 +17,7 @@ import {
 } from '@kotka/shared/models';
 import { from, Observable, of, shareReplay, Subscription, switchMap } from 'rxjs';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
-import { FormService } from '../../shared/services/form.service';
+import { FormService } from '../../shared/services/api-services/form.service';
 import { DOCUMENT } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormViewComponent } from '../../shared-modules/form-view/form-view/form-view.component';

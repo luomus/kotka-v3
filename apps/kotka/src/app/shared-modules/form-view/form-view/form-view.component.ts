@@ -13,7 +13,7 @@ import {
   OnDestroy
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormService } from '../../../shared/services/form.service';
+import { FormService } from '../../../shared/services/api-services/form.service';
 import { LajiForm, Person } from '@kotka/shared/models';
 import {
   catchError,
@@ -27,11 +27,11 @@ import {
   throwError
 } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-import { DataObject, DataService, DataType } from '../../../shared/services/data.service';
+import { DataObject, DataService, DataType } from '../../../shared/services/api-services/data.service';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ToastService } from '../../../shared/services/toast.service';
-import { UserService } from '../../../shared/services/user.service';
-import { FormApiClient } from '../../../shared/services/form-api-client';
+import { UserService } from '../../../shared/services/api-services/user.service';
+import { FormApiClient } from '../../../shared/services/api-services/form-api-client';
 import { allowAccessByOrganization, allowAccessByTime } from '@kotka/utils';
 import { DialogService } from '../../../shared/services/dialog.service';
 import { ErrorMessages } from '@kotka/api-interfaces';

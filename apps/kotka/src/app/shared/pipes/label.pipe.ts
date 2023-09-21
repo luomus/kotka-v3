@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Pipe, PipeTransform } from '@angular/core';
 import { forkJoin, Observable } from 'rxjs';
-import { LabelService } from '../services/label.service';
+import { LabelService } from '../services/api-services/label.service';
 
 @Pipe({
   name: 'label',

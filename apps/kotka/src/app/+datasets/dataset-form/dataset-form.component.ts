@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { DataType } from '../../shared/services/data.service';
+import { DataType } from '../../shared/services/api-services/data.service';
 import { Dataset, Person, isDataset } from '@kotka/shared/models';
 
 @Component({
