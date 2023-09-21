@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { DataType } from '../../shared/services/data.service';
 import {
-  LajiForm,
+  LajiForm, Organization,
   Person,
   SpecimenTransaction,
   SpecimenTransactionEvent
@@ -57,11 +57,14 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
   dataType = DataType.transaction;
 
   @ViewChild(FormViewComponent, { static: true }) formView!: FormViewComponent;
+  @ViewChild('organizationAddress', { static: true }) organizationAddressTpl!: TemplateRef<any>;
   @ViewChild('permitsInfo', { static: true }) permitsInfoTpl!: TemplateRef<any>;
   @ViewChild('specimenRangeSelect', { static: true }) specimenRangeSelectTpl!: TemplateRef<any>;
 
   private subscription = new Subscription();
   private formData?: Partial<SpecimenTransaction>;
+
+  private prevOrganizationId?: string;
 
   private cbdUrl = 'https://api.cbd.int/api/v2013/index/select?fl=id,+identifier_s,+uniqueIdentifier_s,+url_ss,+government_s,rec_countryName:government_EN_t,+rec_title:title_EN_t,+rec_summary:description_t,rec_type:type_EN_t,+entryIntoForce_dt,adoption_dt,retired_dt,limitedApplication_dt&group=true&group.field=governmentSchemaIdentifier_s&group.limit=10&group.ngroups=true&q=(realm_ss:abs)+AND+NOT+version_s:*+AND+schema_s:(authority+absProcedure+absNationalReport)+AND+government_s:%country%&rows=500&start=0&wt=json';
   private maxCountryLinks = 3;
@@ -111,6 +114,17 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
       this.formView.formDataChange.subscribe(formData => {
         this.formData = formData;
         this.addSpecimenRangeSelect();
+      })
+    );
+
+    this.subscription.add(
+      this.formView.formDataChange.pipe(
+        map((data: Partial<SpecimenTransaction>) => (
+          /^MOS\.\d+/.test(data.correspondentOrganization || '') ? data.correspondentOrganization : undefined
+        )),
+        switchMap(organization => this.getOrganization(organization))
+      ).subscribe((data) => {
+        this.updateOrganizationAddress(data);
       })
     );
 
@@ -176,6 +190,13 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
     this.setFormData(formData);
   }
 
+  private getOrganization(organizationId?: string): Observable<Organization|undefined> {
+    if (!organizationId) {
+      return of(undefined);
+    }
+    return this.formService.getOrganization(organizationId);
+  }
+
   private getCountryLinks(country?: string): Observable<LinkData[]> {
     if (!country) {
       return of([]);
@@ -205,6 +226,20 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
     }
 
     return this.countryLinksCache[country];
+  }
+
+  private updateOrganizationAddress(data?: Organization) {
+    const oldElem: HTMLElement|null = this.document.getElementById("organizationAddress");
+    const organizationElem: HTMLElement|null|undefined = this.document.getElementsByClassName(
+      "correspondent-organization")?.[0] as HTMLElement|null|undefined;
+
+    if (!organizationElem || (oldElem && this.prevOrganizationId === data?.id)) {
+      return;
+    }
+    this.prevOrganizationId = data?.id;
+
+    const newElem = this.createElementFromTemplate(this.organizationAddressTpl, { data });
+    this.appendElementAfter(organizationElem, newElem, oldElem);
   }
 
   private updatePermitsInfo(country?: string, countryLinks?: LinkData[]) {
@@ -289,6 +324,15 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
     } else {
       this.renderer.appendChild(parentElem, newElem);
     }
+  }
+
+  private appendElementAfter(elem: HTMLElement, newElem: HTMLElement, oldElem?: HTMLElement|null) {
+    const parentElem = elem.parentElement;
+
+    if (oldElem) {
+      this.renderer.removeChild(parentElem, oldElem);
+    }
+    this.renderer.insertBefore(parentElem, newElem, elem.nextSibling);
   }
 
   private setFormData(formData: Partial<SpecimenTransaction>) {

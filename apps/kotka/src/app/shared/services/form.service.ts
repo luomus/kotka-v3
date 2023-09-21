@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, shareReplay } from 'rxjs';
-import { LajiForm, Area, PagedResult } from '@kotka/shared/models';
+import { LajiForm, Area, PagedResult, Organization } from '@kotka/shared/models';
 import { map } from 'rxjs/operators';
 import { RangeResponse } from '@kotka/api-interfaces';
 import { apiBase, lajiApiBase } from './constants';
@@ -51,5 +51,9 @@ export class FormService {
 
   getSpecimenRange(range: string): Observable<RangeResponse> {
     return this.httpClient.get<RangeResponse>(`${apiBase}/specimen/range/${range}`);
+  }
+
+  getOrganization(id: string): Observable<Organization> {
+    return this.httpClient.get<Organization>(`${lajiApiBase}/organization/by-id/${id}`);
   }
 }
