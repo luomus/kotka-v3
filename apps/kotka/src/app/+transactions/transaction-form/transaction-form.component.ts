@@ -15,7 +15,7 @@ import {
   SpecimenTransaction,
   SpecimenTransactionEvent
 } from '@kotka/shared/models';
-import { from, Observable, of, shareReplay, Subscription, switchMap } from 'rxjs';
+import { from, Observable, of, Subscription, switchMap } from 'rxjs';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 import { FormService } from '../../shared/services/api-services/form.service';
 import { DOCUMENT } from '@angular/common';
@@ -24,26 +24,7 @@ import { FormViewComponent } from '../../shared-modules/form-view/form-view/form
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TransactionEventFormComponent } from './transaction-event-form.component';
 import { DialogService } from '../../shared/services/dialog.service';
-
-interface CbdResult {
-  grouped?: {
-    governmentSchemaIdentifier_s?: {
-      groups?: {
-        doclist?: {
-          docs?: {
-            rec_title?: string;
-            url_ss?: string[];
-          }[]
-        }
-      }[]
-    }
-  }
-}
-
-interface LinkData {
-  url: string;
-  text: string;
-}
+import { AbschService, LinkData } from '../../shared/services/api-services/absch.service';
 
 type SpecimenIdKey = keyof Pick<SpecimenTransaction, 'awayIDs'|'returnedIDs'|'missingIDs'|'damagedIDs'>;
 
@@ -64,11 +45,9 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
   private subscription = new Subscription();
   private formData?: Partial<SpecimenTransaction>;
 
-  private prevOrganizationId?: string;
+  private permitsInfoElem?: HTMLElement|null;
 
-  private cbdUrl = 'https://api.cbd.int/api/v2013/index/select?fl=id,+identifier_s,+uniqueIdentifier_s,+url_ss,+government_s,rec_countryName:government_EN_t,+rec_title:title_EN_t,+rec_summary:description_t,rec_type:type_EN_t,+entryIntoForce_dt,adoption_dt,retired_dt,limitedApplication_dt&group=true&group.field=governmentSchemaIdentifier_s&group.limit=10&group.ngroups=true&q=(realm_ss:abs)+AND+NOT+version_s:*+AND+schema_s:(authority+absProcedure+absNationalReport)+AND+government_s:%country%&rows=500&start=0&wt=json';
-  private maxCountryLinks = 3;
-  private countryLinksCache: Record<string, Observable<LinkData[]>> = {};
+  private prevOrganizationId?: string;
   private prevCountry?: string;
 
   private eventTypeSpecimenIdFieldMap: Record<Exclude<SpecimenTransactionEvent['eventType'], undefined>, SpecimenIdKey|undefined> = {
@@ -83,7 +62,8 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
     private renderer: Renderer2,
     private httpClient: HttpClient,
     private modalService: NgbModal,
-    private dialogService: DialogService
+    private dialogService: DialogService,
+    private abschService: AbschService
   ) {}
 
   ngOnInit() {
@@ -132,11 +112,11 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
       this.formView.formDataChange.pipe(
         map((data: Partial<SpecimenTransaction>) => data.geneticResourceAcquisitionCountry),
         tap((country) => {
-          if (country && !this.countryLinksCache[country]) {
+          if (country) {
             this.updatePermitsInfo(); // show the info without the country while the country links are loading
           }
         }),
-        switchMap(country => this.getCountryLinks(country).pipe(
+        switchMap(country => this.abschService.getCountryLinks(country).pipe(
           map(countryLinks => ({ country, countryLinks }))
         ))
       ).subscribe(({ country, countryLinks }) => {
@@ -197,37 +177,6 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
     return this.formService.getOrganization(organizationId);
   }
 
-  private getCountryLinks(country?: string): Observable<LinkData[]> {
-    if (!country) {
-      return of([]);
-    }
-
-    if (!this.countryLinksCache[country]) {
-      const url = this.cbdUrl.replace('%country%', country.toLocaleLowerCase());
-      this.countryLinksCache[country] = this.httpClient.get<CbdResult>(url).pipe(
-        map(result => {
-          const countryLinks: LinkData[] = [];
-
-          (result.grouped?.governmentSchemaIdentifier_s?.groups || []).forEach(data => {
-            (data.doclist?.docs || []).forEach(doc => {
-              if (countryLinks.length >= this.maxCountryLinks) {
-                return;
-              }
-              if (doc.rec_title && doc.url_ss?.[0]) {
-                countryLinks.push({url: doc.url_ss[0], text: doc.rec_title});
-              }
-            });
-          });
-
-          return countryLinks;
-        }),
-        shareReplay(1)
-      );
-    }
-
-    return this.countryLinksCache[country];
-  }
-
   private updateOrganizationAddress(data?: Organization) {
     const oldElem: HTMLElement|null = this.document.getElementById("organizationAddress");
     const organizationElem: HTMLElement|null|undefined = this.document.getElementsByClassName(
@@ -243,7 +192,7 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
   }
 
   private updatePermitsInfo(country?: string, countryLinks?: LinkData[]) {
-    const oldElem: HTMLElement|null = this.document.getElementById("permitsInfo");
+    const oldElem: HTMLElement|null|undefined = this.permitsInfoElem;
     const parentElem: HTMLElement|null|undefined = oldElem?.parentElement ||
       this.document.getElementsByClassName("nagoya-fields")?.[0]?.parentElement?.parentElement;
 
@@ -254,6 +203,7 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
 
     const newElem = this.createElementFromTemplate(this.permitsInfoTpl, { country, countryLinks });
     this.appendElement(parentElem, newElem, oldElem);
+    this.permitsInfoElem = newElem;
   }
 
   private addSpecimenRangeSelect() {
