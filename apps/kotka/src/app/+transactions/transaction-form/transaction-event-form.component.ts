@@ -6,6 +6,7 @@ import { LajiForm, SpecimenTransaction, SpecimenTransactionEvent } from '@kotka/
 import { EnumOption, FormService } from '../../shared/services/form.service';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { map } from 'rxjs/operators';
+import { UserService } from '../../shared/services/user.service';
 
 @Component({
   selector: 'kotka-transaction-event-form',
@@ -64,7 +65,7 @@ export class TransactionEventFormComponent {
     public notifier: ToastService,
     private formService: FormService
   ) {
-    this.form$ = this.formService.getForm('MHL.1060').pipe(
+    this.form$ = this.formService.getFormWithUserContext('MHL.1060').pipe(
       map(form => {
         const eventTypeBlacklist = this.eventTypeBlacklistByType[this.transactionType] || [];
         const eventTypeOptions = form.schema.properties.eventType.oneOf.filter((value: EnumOption) => (

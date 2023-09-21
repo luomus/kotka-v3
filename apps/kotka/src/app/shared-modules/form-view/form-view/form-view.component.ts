@@ -116,18 +116,9 @@ export class FormViewComponent implements OnChanges, OnDestroy {
       return user;
     }));
 
-    const form$ = combineLatest([this.inputs$, user$]).pipe(
-      switchMap(([inputs, user]) => this.formService.getForm(inputs.formId).pipe(
-        switchMap(form => this.augmentFormFunc ? this.augmentFormFunc(form) : of(form)),
-        map(form => {
-          form.uiSchemaContext = {
-            userName: this.userService.formatUserName(user?.fullName),
-            userEmail: user.emailAddress,
-            ...form.uiSchemaContext
-          };
-          return form;
-        })
-      ))
+    const form$ = this.inputs$.pipe(
+      switchMap((inputs) => this.formService.getFormWithUserContext(inputs.formId)),
+      switchMap(form => this.augmentFormFunc ? this.augmentFormFunc(form) : of(form))
     );
 
     this.formDataFromParamsSub = combineLatest([this.routeParams$, this.inputs$, user$]).pipe(

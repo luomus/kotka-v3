@@ -1,10 +1,11 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, shareReplay } from 'rxjs';
+import { combineLatest, Observable, shareReplay } from 'rxjs';
 import { LajiForm, Area, PagedResult, Organization } from '@kotka/shared/models';
 import { map } from 'rxjs/operators';
 import { RangeResponse } from '@kotka/api-interfaces';
 import { apiBase, lajiApiBase } from './constants';
+import { UserService } from './user.service';
 
 export type EnumOption = { const: string, title: string };
 
@@ -17,7 +18,8 @@ export class FormService {
   private countryOptions$?: Observable<EnumOption[]>;
 
   constructor(
-    private httpClient: HttpClient
+    private httpClient: HttpClient,
+    private userService: UserService
   ) {}
 
   getForm(formId: string): Observable<LajiForm.SchemaForm> {
@@ -27,6 +29,19 @@ export class FormService {
       );
     }
     return this.formById$[formId];
+  }
+
+  getFormWithUserContext(formId: string): Observable<LajiForm.SchemaForm> {
+    return combineLatest([this.getForm(formId), this.userService.user$]).pipe(
+      map(([form, user]) => ({
+        ...form,
+        uiSchemaContext: {
+          userName: this.userService.formatUserName(user?.fullName),
+          userEmail: user?.emailAddress,
+          ...form.uiSchemaContext
+        }
+      }))
+    );
   }
 
   getAllCountryOptions(): Observable<EnumOption[]> {
