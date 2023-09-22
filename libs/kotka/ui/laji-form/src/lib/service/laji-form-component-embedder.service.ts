@@ -60,8 +60,6 @@ export class LajiFormComponentEmbedderService {
   updateAfterDomChange(data: EmbeddedComponentData) {
     if (data.anchorElem && this.document.body.contains(data.anchorElem)) {
       return;
-    } else {
-      data.anchorElem = undefined;
     }
     this.updateEmbeddedTemplate(data);
   }
@@ -77,10 +75,10 @@ export class LajiFormComponentEmbedderService {
     }
 
     const anchorElem: HTMLElement|null|undefined = this.document.getElementsByClassName(data.options.anchorClassName)?.[0] as HTMLElement|null|undefined;
+    data.anchorElem = anchorElem;
     if (!anchorElem) {
       return;
     }
-    data.anchorElem = anchorElem;
 
     const newElem = this.createElementFromTemplate(data.template, data.templateContext);
     this.appendElement(anchorElem, newElem, data.options.positionToAnchor);
