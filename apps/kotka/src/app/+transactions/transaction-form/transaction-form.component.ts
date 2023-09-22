@@ -1,30 +1,31 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Inject,
-  OnDestroy,
-  OnInit,
-  Renderer2,
-  TemplateRef,
+  ComponentRef, OnDestroy,
   ViewChild
 } from '@angular/core';
 import { DataType } from '../../shared/services/api-services/data.service';
 import {
-  LajiForm, Organization,
+  LajiForm,
   Person,
   SpecimenTransaction,
   SpecimenTransactionEvent
 } from '@kotka/shared/models';
 import { from, Observable, of, Subscription, switchMap } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 import { FormService } from '../../shared/services/api-services/form.service';
-import { DOCUMENT } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { FormViewComponent } from '../../shared-modules/form-view/form-view/form-view.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TransactionEventFormComponent } from './transaction-event-form.component';
 import { DialogService } from '../../shared/services/dialog.service';
-import { AbschService, LinkData } from '../../shared/services/api-services/absch.service';
+import { OrganizationAddressEmbedComponent } from '../transaction-form-embed/organization-address-embed';
+import { PermitsInfoEmbedComponent } from '../transaction-form-embed/permits-info-embed';
+import { SpecimenRangeSelectEmbedComponent } from '../transaction-form-embed/specimen-range-select-embed';
+import {
+  LajiFormComponent,
+  LajiFormComponentEmbedderService,
+  LajiFormEmbedService,
+  LajiFormEventListenerEmbedderService
+} from '@kotka/ui/laji-form';
 
 type SpecimenIdKey = keyof Pick<SpecimenTransaction, 'awayIDs'|'returnedIDs'|'missingIDs'|'damagedIDs'>;
 
@@ -34,21 +35,20 @@ type SpecimenIdKey = keyof Pick<SpecimenTransaction, 'awayIDs'|'returnedIDs'|'mi
   styleUrls: ['./transaction-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TransactionFormComponent implements OnInit, OnDestroy {
+export class TransactionFormComponent implements OnDestroy {
   dataType = DataType.transaction;
 
   @ViewChild(FormViewComponent, { static: true }) formView!: FormViewComponent;
-  @ViewChild('organizationAddress', { static: true }) organizationAddressTpl!: TemplateRef<any>;
-  @ViewChild('permitsInfo', { static: true }) permitsInfoTpl!: TemplateRef<any>;
-  @ViewChild('specimenRangeSelect', { static: true }) specimenRangeSelectTpl!: TemplateRef<any>;
 
-  private subscription = new Subscription();
   private formData?: Partial<SpecimenTransaction>;
+  private correspondentOrganization?: string;
+  private geneticResourceAcquisitionCountry?: string;
 
-  private permitsInfoElem?: HTMLElement|null;
+  private organizationAddressRef?: ComponentRef<OrganizationAddressEmbedComponent>;
+  private permitsInfoRef?: ComponentRef<PermitsInfoEmbedComponent>;
+  private specimenRangeSelectRef?: ComponentRef<SpecimenRangeSelectEmbedComponent>;
 
-  private prevOrganizationId?: string;
-  private prevCountry?: string;
+  private specimenRangeButtonClickSubscription?: Subscription;
 
   private eventTypeSpecimenIdFieldMap: Record<Exclude<SpecimenTransactionEvent['eventType'], undefined>, SpecimenIdKey|undefined> = {
     '': undefined,
@@ -57,21 +57,15 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
   };
 
   constructor(
-    @Inject(DOCUMENT) private document: Document,
     private formService: FormService,
-    private renderer: Renderer2,
-    private httpClient: HttpClient,
     private modalService: NgbModal,
     private dialogService: DialogService,
-    private abschService: AbschService
+    private lajiFormComponentEmbedderService: LajiFormComponentEmbedderService,
+    private lajiFormEventListenerEmbedderService: LajiFormEventListenerEmbedderService
   ) {}
 
-  ngOnInit() {
-    this.initSubscriptions();
-  }
-
   ngOnDestroy() {
-    this.subscription.unsubscribe();
+    this.specimenRangeButtonClickSubscription?.unsubscribe();
   }
 
   augmentForm(form: LajiForm.SchemaForm): Observable<LajiForm.SchemaForm> {
@@ -89,54 +83,60 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
     return formData;
   }
 
-  private initSubscriptions() {
-    this.subscription.add(
-      this.formView.formDataChange.subscribe(formData => {
-        this.formData = formData;
-        this.addSpecimenRangeSelect();
-      })
+  onFormReady() {
+    const lajiFormEmbedService = new LajiFormEmbedService(
+      this.lajiFormComponentEmbedderService,
+      this.lajiFormEventListenerEmbedderService,
+      this.formView.lajiForm as LajiFormComponent
     );
 
-    this.subscription.add(
-      this.formView.formDataChange.pipe(
-        map((data: Partial<SpecimenTransaction>) => (
-          /^MOS\.\d+/.test(data.correspondentOrganization || '') ? data.correspondentOrganization : undefined
-        )),
-        switchMap(organization => this.getOrganization(organization))
-      ).subscribe((data) => {
-        this.updateOrganizationAddress(data);
-      })
-    );
-
-    this.subscription.add(
-      this.formView.formDataChange.pipe(
-        map((data: Partial<SpecimenTransaction>) => data.geneticResourceAcquisitionCountry),
-        tap((country) => {
-          if (country) {
-            this.updatePermitsInfo(); // show the info without the country while the country links are loading
-          }
-        }),
-        switchMap(country => this.abschService.getCountryLinks(country).pipe(
-          map(countryLinks => ({ country, countryLinks }))
-        ))
-      ).subscribe(({ country, countryLinks }) => {
-        this.updatePermitsInfo(country, countryLinks);
-      })
-    );
-
-    this.subscription.add(
-      this.formView.formDataChange.pipe(
-        map(() => this.document.getElementById('root_transactionEvents-add')),
-        distinctUntilChanged()
-      ).subscribe((addButton) => {
-        if (addButton) {
-          addButton.onclick = this.addTransactionEventButtonClick.bind(this);
-        }
-      })
+    this.initEmbeddedComponents(lajiFormEmbedService);
+    lajiFormEmbedService.addOnClickEventListener(
+      'root_transactionEvents-add',
+      this.onAddTransactionEventButtonClick.bind(this)
     );
   }
 
-  private addTransactionEventButtonClick(event: MouseEvent) {
+  onFormDataChange(formData: Partial<SpecimenTransaction>) {
+    this.formData = formData;
+    this.updateEmbeddedComponents(formData);
+  }
+
+  private initEmbeddedComponents(lajiFormEmbedService: LajiFormEmbedService) {
+    this.organizationAddressRef = lajiFormEmbedService.embedComponent(OrganizationAddressEmbedComponent, {
+      anchorClassName: 'correspondent-organization',
+      positionToAnchor: 'nextSibling'
+    });
+    this.organizationAddressRef.instance.organization = this.correspondentOrganization;
+
+    this.permitsInfoRef = lajiFormEmbedService.embedComponent(PermitsInfoEmbedComponent, {
+      anchorClassName: 'nagoya-fields',
+      positionToAnchor: 'parentNextSibling'
+    });
+    this.permitsInfoRef.instance.country = this.geneticResourceAcquisitionCountry;
+
+    this.specimenRangeSelectRef = lajiFormEmbedService.embedComponent(SpecimenRangeSelectEmbedComponent, {
+      anchorClassName: 'specimen-id-fields',
+      positionToAnchor: 'firstChild'
+    });
+    this.specimenRangeButtonClickSubscription = this.specimenRangeSelectRef.instance.specimenRangeClick.subscribe(range => {
+      this.specimenRangeClick(range);
+    });
+  }
+
+  private updateEmbeddedComponents(formData: Partial<SpecimenTransaction>) {
+    const correspondentOrganization = this.getValidOrganizationId(formData.correspondentOrganization);
+    if (this.organizationAddressRef) {
+      this.organizationAddressRef.instance.organization = correspondentOrganization;
+    }
+
+    const geneticResourceAcquisitionCountry = formData.geneticResourceAcquisitionCountry;
+    if (this.permitsInfoRef) {
+      this.permitsInfoRef.instance.country = geneticResourceAcquisitionCountry;
+    }
+  }
+
+  private onAddTransactionEventButtonClick(event: MouseEvent) {
     event.stopPropagation();
 
     const modalRef = this.modalService.open(TransactionEventFormComponent, {
@@ -170,61 +170,7 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
     this.setFormData(formData);
   }
 
-  private getOrganization(organizationId?: string): Observable<Organization|undefined> {
-    if (!organizationId) {
-      return of(undefined);
-    }
-    return this.formService.getOrganization(organizationId);
-  }
-
-  private updateOrganizationAddress(data?: Organization) {
-    const oldElem: HTMLElement|null = this.document.getElementById("organizationAddress");
-    const organizationElem: HTMLElement|null|undefined = this.document.getElementsByClassName(
-      "correspondent-organization")?.[0] as HTMLElement|null|undefined;
-
-    if (!organizationElem || (oldElem && this.prevOrganizationId === data?.id)) {
-      return;
-    }
-    this.prevOrganizationId = data?.id;
-
-    const newElem = this.createElementFromTemplate(this.organizationAddressTpl, { data });
-    this.appendElementAfter(organizationElem, newElem, oldElem);
-  }
-
-  private updatePermitsInfo(country?: string, countryLinks?: LinkData[]) {
-    const oldElem: HTMLElement|null|undefined = this.permitsInfoElem;
-    const parentElem: HTMLElement|null|undefined = oldElem?.parentElement ||
-      this.document.getElementsByClassName("nagoya-fields")?.[0]?.parentElement?.parentElement;
-
-    if (!parentElem || (oldElem && this.prevCountry === country)) {
-      return;
-    }
-    this.prevCountry = country;
-
-    const newElem = this.createElementFromTemplate(this.permitsInfoTpl, { country, countryLinks });
-    this.appendElement(parentElem, newElem, oldElem);
-    this.permitsInfoElem = newElem;
-  }
-
-  private addSpecimenRangeSelect() {
-    const oldElem: HTMLElement|null = this.document.getElementById("specimenRangeSelect");
-    if (oldElem) {
-      return;
-    }
-
-    const parentElem: HTMLElement|undefined = this.document.getElementsByClassName("specimen-id-fields")?.[0] as HTMLElement;
-    if (!parentElem) {
-      return;
-    }
-
-    const newElem = this.createElementFromTemplate(this.specimenRangeSelectTpl, {});
-    this.appendElement(parentElem, newElem, undefined, true);
-    this.document.getElementById("specimenRangeBtn")?.addEventListener('click', this.specimenRangeClick.bind(this));
-  }
-
-  private specimenRangeClick() {
-    const specimenRangeInput = this.document.getElementById("specimenRangeInput") as HTMLInputElement|null;
-    const range: string = specimenRangeInput?.value || '';
+  specimenRangeClick(range: string) {
     if (!range) {
       return;
     }
@@ -241,9 +187,7 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
           const formData = {...this.formData || {}, awayIDs};
           this.setFormData(formData);
 
-          if (specimenRangeInput) {
-            specimenRangeInput.value = '';
-          }
+          this.specimenRangeSelectRef?.instance.clearSpecimenRangeInput();
         } else {
           this.dialogService.alert(result.status);
         }
@@ -256,37 +200,12 @@ export class TransactionFormComponent implements OnInit, OnDestroy {
     });
   }
 
-  private createElementFromTemplate<T>(tpl: TemplateRef<T>, context: T): HTMLElement {
-    const view = tpl.createEmbeddedView(context);
-    view.detectChanges();
-    const newElem = view.rootNodes[0].cloneNode(true);
-    view.destroy();
-    return newElem;
-  }
-
-  private appendElement(parentElem: HTMLElement, newElem: HTMLElement, oldElem?: HTMLElement|null, asFirst = false) {
-    if (oldElem) {
-      this.renderer.removeChild(parentElem, oldElem);
-    }
-
-    if (asFirst) {
-      this.renderer.insertBefore(parentElem, newElem, parentElem.firstChild);
-    } else {
-      this.renderer.appendChild(parentElem, newElem);
-    }
-  }
-
-  private appendElementAfter(elem: HTMLElement, newElem: HTMLElement, oldElem?: HTMLElement|null) {
-    const parentElem = elem.parentElement;
-
-    if (oldElem) {
-      this.renderer.removeChild(parentElem, oldElem);
-    }
-    this.renderer.insertBefore(parentElem, newElem, elem.nextSibling);
-  }
-
   private setFormData(formData: Partial<SpecimenTransaction>) {
     this.formData = formData;
     this.formView.setFormData(formData);
+  }
+
+  private getValidOrganizationId(organizationId?: string): string|undefined {
+    return organizationId && /^MOS\.\d+/.test(organizationId) ? organizationId : undefined;
   }
 }

@@ -78,6 +78,7 @@ export class FormViewComponent implements OnChanges, OnDestroy {
   formErrorEnum = FormErrorEnum;
 
   @Output() formDataChange = new EventEmitter<Partial<DataObject>>();
+  @Output() formReady = new EventEmitter<void>();
 
   private formData$ = new ReplaySubject<Partial<DataObject>>();
   private inputs$ = new ReplaySubject<{formId: string, dataType: DataType}>();
@@ -196,16 +197,20 @@ export class FormViewComponent implements OnChanges, OnDestroy {
     });
   }
 
+  onFormReady() {
+    this.formReady.emit();
+  }
+
+  onChange(data: Partial<DataObject>) {
+    this.formDataChange.emit(data);
+  }
+
   onDelete(data: DataObject) {
     this.dialogService.confirm(`Are you sure you want to delete this ${this.visibleDataTypeName}?`).subscribe(confirm => {
       if (confirm) {
         this.delete(data);
       }
     });
-  }
-
-  onChange(data: Partial<DataObject>) {
-    this.formDataChange.emit(data);
   }
 
   setFormData(data: Partial<DataObject>) {

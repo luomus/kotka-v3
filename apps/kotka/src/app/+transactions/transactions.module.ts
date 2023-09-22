@@ -10,6 +10,9 @@ import { SharedModule } from '../shared/shared.module';
 import { TransactionTableComponent } from './transaction-table/transaction-table.component';
 import { TransactionEventFormComponent } from './transaction-form/transaction-event-form.component';
 import { KotkaUiLajiFormModule } from '@kotka/ui/laji-form';
+import { OrganizationAddressEmbedComponent } from './transaction-form-embed/organization-address-embed';
+import { PermitsInfoEmbedComponent } from './transaction-form-embed/permits-info-embed';
+import { SpecimenRangeSelectEmbedComponent } from './transaction-form-embed/specimen-range-select-embed';
 
 @NgModule({
   imports: [
@@ -25,7 +28,10 @@ import { KotkaUiLajiFormModule } from '@kotka/ui/laji-form';
   declarations: [
     TransactionFormComponent,
     TransactionTableComponent,
-    TransactionEventFormComponent
+    TransactionEventFormComponent,
+    OrganizationAddressEmbedComponent,
+    PermitsInfoEmbedComponent,
+    SpecimenRangeSelectEmbedComponent
   ],
 })
 export class TransactionsModule {}
