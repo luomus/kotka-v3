@@ -24,7 +24,7 @@ export class LajiFormEmbedService {
   }
 
   init() {
-    this.lajiForm.formChange.subscribe(() => {
+    this.formChangeSubscription = this.lajiForm.formChange.subscribe(() => {
       this.componentData.forEach(d => {
         this.componentEmbedder.updateAfterDomChange(d);
       });

@@ -25,7 +25,7 @@ export interface EmbeddedComponentData {
   template: TemplateRef<any>;
   templateContext?: any;
   anchorElem?: HTMLElement|null;
-  oldElem?: HTMLElement|null;
+  elem?: HTMLElement|null;
   contextSubscription?: Subscription;
 }
 
@@ -58,16 +58,16 @@ export class LajiFormComponentEmbedderService {
   }
 
   updateAfterDomChange(data: EmbeddedComponentData) {
-    if (data.anchorElem && this.document.body.contains(data.anchorElem)) {
+    if (data.elem && this.document.body.contains(data.elem)) {
       return;
     }
     this.updateEmbeddedTemplate(data);
   }
 
   private updateEmbeddedTemplate(data: EmbeddedComponentData) {
-    if (data.oldElem) {
-      this.removeElement(data.oldElem);
-      data.oldElem = undefined;
+    if (data.elem) {
+      this.removeElement(data.elem);
+      data.elem = undefined;
     }
 
     if (!data.templateContext) {
@@ -80,9 +80,9 @@ export class LajiFormComponentEmbedderService {
       return;
     }
 
-    const newElem = this.createElementFromTemplate(data.template, data.templateContext);
-    this.appendElement(anchorElem, newElem, data.options.positionToAnchor);
-    data.oldElem = newElem;
+    const elem = this.createElementFromTemplate(data.template, data.templateContext);
+    this.appendElement(anchorElem, elem, data.options.positionToAnchor);
+    data.elem = elem;
     data.componentRef.instance.onTemplateEmbed?.();
   }
 
