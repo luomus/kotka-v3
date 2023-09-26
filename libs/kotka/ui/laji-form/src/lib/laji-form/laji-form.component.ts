@@ -29,10 +29,11 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Input() form: LajiFormModel.SchemaForm | null = null;
   @Input() formData: any = {};
   @Input() disabled = false;
-  @Input() showDeleteButton = false;
   @Input() apiClient?: any;
   @Input() notifier?: Notifier;
   @Input() showFooter = true;
+  @Input() showDeleteButton = false;
+  @Input() showCopyButton = false;
 
   hasOnlyWarnings = false;
 
@@ -47,6 +48,7 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Output() formChange: EventEmitter<any> = new EventEmitter<any>();
   @Output() formSubmit: EventEmitter<any> = new EventEmitter<any>();
   @Output() delete: EventEmitter<any> = new EventEmitter<any>();
+  @Output() formCopy: EventEmitter<any> = new EventEmitter<any>();
 
   @ViewChild('lajiForm', { static: true }) lajiFormRoot!: ElementRef;
 

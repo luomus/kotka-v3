@@ -1,55 +1,58 @@
-<ng-container *ngIf="routeParams$ | async as routeParams else spinner">
+<ng-container *ngIf="vm$ | async as vm else spinner">
   <kui-main-content
-    [header]="routeParams.editMode ? 'Edit ' + visibleDataTypeName + ' ' + (routeParams.dataURI || ''): 'Add ' + visibleDataTypeName"
+    [header]="vm.routeParams.editMode ? 'Edit ' + visibleDataTypeName + ' ' + (vm.routeParams.dataURI || ''): 'Add ' + visibleDataTypeName"
     [containerClass]="'container'"
   >
-    <ng-container *ngIf="formParams$ | async as formParams else spinner">
-      <ng-container *ngIf="formParams.form else error">
+    <ng-container *ngIf="!isErrorViewModel(vm) else error">
+      <ng-container *ngIf="vm.form && vm.formData && vm.state else spinner">
         <ng-template #headerTpl *ngIf="formHeader">
-          <ng-container *ngTemplateOutlet="formHeader; context:{formData: formParams.formData}"></ng-container>
+          <ng-container *ngTemplateOutlet="formHeader; context:{ formData: vm.formData }"></ng-container>
         </ng-template>
 
         <ngb-alert *ngIf="showDeleteTargetInUseAlert" [type]="'danger'" (closed)="showDeleteTargetInUseAlert = true">
           <strong>Delete failed:</strong>
           This {{ visibleDataTypeName}} can't be deleted because there are resources that are attached to it.
         </ngb-alert>
-        <ngb-alert *ngIf="showDisabledAlert" [type]="'warning'" (closed)="showDisabledAlert = false">
+        <ngb-alert *ngIf="vm.state.disabled && !disabledAlertDismissed" [type]="'warning'" (closed)="disabledAlertDismissed = true">
           <strong>Note:</strong>
-          You can only view this {{ visibleDataTypeName }}. To be able to edit this {{ visibleDataTypeName }}, you must belong to {{ formParams.formData?.owner | label }}
+          You can only view this {{ visibleDataTypeName }}. To be able to edit this {{ visibleDataTypeName }}, you must belong to {{ vm.formData.owner | label }}
         </ngb-alert>
 
-        <div *ngIf="routeParams.editMode && formParams.formData" class="mb-1">
+        <div *ngIf="vm.routeParams.editMode && vm.formData" class="mb-1">
           <strong class="d-block">Last edited by</strong>
-          <span>{{ (formParams.formData.editor || '') | label }} on {{ formParams.formData.dateEdited | date:'dd.MM.YYYY HH:mm' }}</span>
+          <span>{{ (vm.formData.editor || '') | label }} on {{ vm.formData.dateEdited | date:'dd.MM.YYYY HH:mm' }}</span>
           <strong class="d-block">Originally created by</strong>
-          <span>{{ (formParams.formData.creator || '') | label }} on {{ formParams.formData.dateCreated | date:'dd.MM.YYYY HH:mm' }}</span>
+          <span>{{ (vm.formData.creator || '') | label }} on {{ vm.formData.dateCreated | date:'dd.MM.YYYY HH:mm' }}</span>
         </div>
         <kui-laji-form
-          [form]="formParams.form"
-          [formData]="formParams.formData"
-          [disabled]="formParams.disabled"
-          [showDeleteButton]="formParams.showDeleteButton"
+          [form]="vm.form"
+          [formData]="vm.formData"
+          [disabled]="vm.state.disabled"
+          [showDeleteButton]="vm.state.showDeleteButton"
+          [showCopyButton]="vm.state.showCopyButton"
           [apiClient]="formApiClient"
           [notifier]="notifier"
-          (formReady)="onFormReady()"
-          (formChange)="onChange($event)"
+          (formReady)="formReady.emit()"
+          (formChange)="formDataChange.emit($event)"
           (formSubmit)="onSubmit($event)"
           (delete)="onDelete($event)"
+          (formCopy)="onCopy($event)"
         >
         </kui-laji-form>
       </ng-container>
-      <ng-template #error>
-        <ngb-alert [type]="'danger'" [dismissible]="false">
-          <ng-container *ngIf="formParams.errorType === formErrorEnum.dataNotFound else genericError">
-            {{ visibleDataTypeName | titlecase }} <ng-container *ngIf="routeParams.dataURI">with URI {{ routeParams.dataURI }} </ng-container>was not found.
-          </ng-container>
-          <ng-template #genericError>
-            An unexpected error occurred
-          </ng-template>
-        </ngb-alert>
-      </ng-template>
     </ng-container>
   </kui-main-content>
+
+  <ng-template #error>
+    <ngb-alert [type]="'danger'" [dismissible]="false">
+      <ng-container *ngIf="asErrorViewModel(vm).errorType === formErrorEnum.dataNotFound else genericError">
+        {{ visibleDataTypeName | titlecase }} <ng-container *ngIf="vm.routeParams.dataURI">with URI {{ vm.routeParams.dataURI }} </ng-container>was not found.
+      </ng-container>
+      <ng-template #genericError>
+        An unexpected error occurred
+      </ng-template>
+    </ngb-alert>
+  </ng-template>
 </ng-container>
 
 <ng-template #spinner>

@@ -4,7 +4,9 @@
   [disabled]="disabled"
   [hasOnlyWarnings]="hasOnlyWarnings"
   [showDeleteButton]="showDeleteButton"
+  [showCopyButton]="showCopyButton"
   (saveForm)="saveFormClicked()"
   (highlightErrors)="highlightErrors()"
   (delete)="delete.emit(formData)"
+  (copyForm)="formCopy.emit(formData)"
 ></kui-form-footer>

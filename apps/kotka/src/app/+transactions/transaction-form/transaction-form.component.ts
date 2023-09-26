@@ -37,6 +37,7 @@ type SpecimenIdKey = keyof Pick<SpecimenTransaction, 'awayIDs'|'returnedIDs'|'mi
 })
 export class TransactionFormComponent implements OnDestroy {
   dataType = DataType.transaction;
+  augmentFormFunc = this.augmentForm.bind(this);
 
   @ViewChild(FormViewComponent, { static: true }) formView!: FormViewComponent;
 
@@ -68,13 +69,6 @@ export class TransactionFormComponent implements OnDestroy {
     this.specimenRangeButtonClickSubscription?.unsubscribe();
   }
 
-  augmentForm(form: LajiForm.SchemaForm): Observable<LajiForm.SchemaForm> {
-    return this.formService.getAllCountryOptions().pipe(switchMap(countries => {
-      form.schema.properties.geneticResourceAcquisitionCountry.oneOf = countries;
-      return of(form);
-    }));
-  }
-
   getInitialFormData(user: Person): Partial<SpecimenTransaction> {
     const formData: Partial<SpecimenTransaction> = {};
     if (user?.organisation && user.organisation.length === 1) {
@@ -100,6 +94,13 @@ export class TransactionFormComponent implements OnDestroy {
   onFormDataChange(formData: Partial<SpecimenTransaction>) {
     this.formData = formData;
     this.updateEmbeddedComponents(formData);
+  }
+
+  private augmentForm(form: LajiForm.SchemaForm): Observable<LajiForm.SchemaForm> {
+    return this.formService.getAllCountryOptions().pipe(switchMap(countries => {
+      form.schema.properties.geneticResourceAcquisitionCountry.oneOf = countries;
+      return of(form);
+    }));
   }
 
   private initEmbeddedComponents(lajiFormEmbedService: LajiFormEmbedService) {
