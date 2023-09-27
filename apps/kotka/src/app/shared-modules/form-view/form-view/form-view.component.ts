@@ -14,7 +14,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormService } from '../../../shared/services/api-services/form.service';
 import { LajiForm, Person } from '@kotka/shared/models';
-import { from, Observable } from 'rxjs';
+import { from, Observable, switchMap } from 'rxjs';
 import { DataObject, DataService, DataType } from '../../../shared/services/api-services/data.service';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ToastService } from '../../../shared/services/toast.service';
@@ -28,8 +28,11 @@ import {
   SuccessViewModel,
   FormViewFacade,
   isErrorViewModel,
-  asErrorViewModel
+  asErrorViewModel,
+  isSuccessViewModel
 } from './form-view.facade';
+import { take } from 'rxjs/operators';
+import { FormViewUtils } from './form-view-utils';
 
 @Component({
   selector: 'kotka-form-view',
@@ -133,8 +136,21 @@ export class FormViewComponent implements OnChanges {
     });
   }
 
-  onCopy(data: DataObject) {
-    console.log(data);
+  onCopy(data: Partial<DataObject>) {
+    const navigate$ = from(this.router.navigate(['..', 'add'], {
+      relativeTo: this.activeRoute
+    }));
+
+    this.lajiForm?.block();
+    navigate$.pipe(switchMap(() => this.vm$), take(1)).subscribe(vm => {
+      if (isSuccessViewModel(vm)) {
+        data = FormViewUtils.removeMetaAndExcludedFields(data, vm.form?.excludeFromCopy);
+        this.setFormData(data);
+
+        this.lajiForm?.unBlock();
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   setFormData(data: Partial<DataObject>) {

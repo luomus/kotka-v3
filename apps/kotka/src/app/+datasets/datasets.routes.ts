@@ -2,6 +2,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { ModuleWithProviders } from '@angular/core';
 import { DatasetTableComponent } from './dataset-table/dataset-table.component';
 import { DatasetFormComponent } from './dataset-form/dataset-form.component';
+import { RoutingUtils } from '../shared/services/routing-utils';
 
 export const datasetsRoutes: Routes = [
   {
@@ -11,16 +12,12 @@ export const datasetsRoutes: Routes = [
     data: { title: 'Tags' }
   },
   {
-    path: 'add',
-    pathMatch: 'full',
+    matcher: RoutingUtils.formMatcher,
     component: DatasetFormComponent,
-    data: { title: 'Add tag' }
-  },
-  {
-    path: 'edit',
-    pathMatch: 'full',
-    component: DatasetFormComponent,
-    data: { title: 'Edit tag', addUriToTitle: true }
+    data: {
+      add: { title: 'Add tag' },
+      edit: { title: 'Edit tag', addUriToTitle: true }
+    }
   }
 ];
 

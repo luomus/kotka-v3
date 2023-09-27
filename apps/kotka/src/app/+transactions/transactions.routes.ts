@@ -2,6 +2,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { ModuleWithProviders } from '@angular/core';
 import { TransactionFormComponent } from './transaction-form/transaction-form.component';
 import { TransactionTableComponent } from './transaction-table/transaction-table.component';
+import { RoutingUtils } from '../shared/services/routing-utils';
 
 export const datasetsRoutes: Routes = [
   {
@@ -11,16 +12,12 @@ export const datasetsRoutes: Routes = [
     data: { title: 'Transactions' }
   },
   {
-    path: 'add',
-    pathMatch: 'full',
+    matcher: RoutingUtils.formMatcher,
     component: TransactionFormComponent,
-    data: { title: 'Add transaction' }
-  },
-  {
-    path: 'edit',
-    pathMatch: 'full',
-    component: TransactionFormComponent,
-    data: { title: 'Edit transaction', addUriToTitle: true }
+    data: {
+      add: { title: 'Add transaction' },
+      edit: { title: 'Edit transaction', addUriToTitle: true }
+    }
   }
 ];
 

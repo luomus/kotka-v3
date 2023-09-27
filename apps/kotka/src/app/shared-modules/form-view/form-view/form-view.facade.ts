@@ -5,18 +5,19 @@ import { UserService } from '../../../shared/services/api-services/user.service'
 import {
   catchError,
   combineLatest,
+  concat,
   Observable,
   of,
   ReplaySubject,
-  startWith,
+  shareReplay,
   Subscription,
   switchMap,
   throwError
 } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import { allowAccessByOrganization, allowAccessByTime } from '@kotka/utils';
 import { LajiForm, Person } from '@kotka/shared/models';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 
 export enum FormErrorEnum {
   dataNotFound = 'dataNotFound',
@@ -55,6 +56,9 @@ export interface ErrorViewModel {
 
 export type ViewModel = SuccessViewModel | ErrorViewModel;
 
+export function isSuccessViewModel(any: ViewModel): any is SuccessViewModel {
+  return !isErrorViewModel(any);
+}
 export function isErrorViewModel(any: ViewModel): any is ErrorViewModel {
   return 'errorType' in any;
 }
@@ -67,11 +71,12 @@ export class FormViewFacade implements OnDestroy {
   vm$: Observable<ViewModel>;
 
   private inputs$ = new ReplaySubject<FormInputs>();
-  private formData$ = new ReplaySubject<Partial<DataObject>>();
+  private formData$ = new ReplaySubject<Partial<DataObject>|undefined>();
 
   private initialFormDataSub?: Subscription;
 
   constructor(
+    private router: Router,
     private activeRoute: ActivatedRoute,
     private userService: UserService,
     private formService: FormService,
@@ -95,20 +100,26 @@ export class FormViewFacade implements OnDestroy {
   private getVm$(): Observable<ViewModel> {
     const routeParams$ = this.getRouteParams$();
     const user$ = this.getUser$();
-    const form$ = this.inputs$.pipe(switchMap((inputs) => this.getForm$(inputs)));
+    const form$: Observable<LajiForm.SchemaForm|undefined> = this.inputs$.pipe(switchMap((inputs) => concat(
+      of(undefined), this.getForm$(inputs)))
+    );
 
     this.initialFormDataSub = combineLatest([routeParams$, this.inputs$, user$]).pipe(
-      switchMap(([params, inputs, user]) => this.getInitialFormData$(params, inputs, user))
-    ).subscribe(formData => this.formData$.next(formData));
+      switchMap(([params, inputs, user]) => concat(
+        of(undefined), this.getInitialFormData$(params, inputs, user))
+      )
+    ).subscribe({
+      'next': formData => this.formData$.next(formData),
+      'error': err => this.formData$.error(err)
+    });
 
     return combineLatest([
       routeParams$,
-      form$.pipe(startWith(undefined)),
-      this.formData$.pipe(startWith(undefined)),
+      form$,
+      this.formData$,
       user$
     ]).pipe(
       map(([routeParams, form, formData, user]) => {
-        console.log(routeParams);
         const state = form && formData ? this.getFormState(routeParams, form, formData, user) : undefined;
         return { routeParams, form, formData, state };
       }),
@@ -122,15 +133,14 @@ export class FormViewFacade implements OnDestroy {
   }
 
   private getRouteParams$(): Observable<RouteParams> {
-    return combineLatest([
-      this.activeRoute.url.pipe(
-        map(url => url[0].path === 'edit')
-      ),
-      this.activeRoute.queryParams.pipe(
-        map(queryParams => queryParams['uri'])
-      )
-    ]).pipe(
-      map(([editMode, dataURI]) => ({ editMode, dataURI }))
+    return this.router.events.pipe(
+      filter((event) => event instanceof NavigationEnd),
+      map(() => {
+        const editMode = this.activeRoute.snapshot.url[0].path === 'edit';
+        const dataURI = this.activeRoute.snapshot.queryParams['uri'];
+        return { editMode, dataURI };
+      }),
+      shareReplay()
     );
   }
 
@@ -149,7 +159,7 @@ export class FormViewFacade implements OnDestroy {
     );
   }
 
-  private getInitialFormData$(routeParams: RouteParams, inputs: FormInputs, user: Person) {
+  private getInitialFormData$(routeParams: RouteParams, inputs: FormInputs, user: Person): Observable<Partial<DataObject>> {
     if (routeParams.editMode) {
       return this.getFormData$(inputs.dataType, routeParams.dataURI);
     } else {
@@ -176,7 +186,7 @@ export class FormViewFacade implements OnDestroy {
     const isEditMode =  routeParams.editMode;
     const disabled = isEditMode && !isAdmin && !allowAccessByOrganization(formData as DataObject, user);
     const showDeleteButton = isEditMode && (isAdmin || (!disabled && allowAccessByTime(formData as DataObject, {'d': 14})));
-    const showCopyButton = !!form.options?.allowTemplate;
+    const showCopyButton = isEditMode && !!form.options?.allowTemplate;
 
     return { disabled, showDeleteButton, showCopyButton };
   }

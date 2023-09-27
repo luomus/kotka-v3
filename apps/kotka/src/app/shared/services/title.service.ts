@@ -26,15 +26,24 @@ export class TitleService {
           while (route.firstChild) {
             route = route.firstChild;
           }
-          if (route.snapshot.data['title']) {
-            routeTitle = route.snapshot.data['title'];
-            if (route.snapshot.data['addUriToTitle']) {
+
+          let data = route.snapshot.data;
+          route.snapshot.url.forEach(url => {
+            if (data[url.path]) {
+              data = data[url.path];
+            }
+          });
+
+          if (data['title']) {
+            routeTitle = data['title'];
+            if (data['addUriToTitle']) {
               const uri = route.snapshot.queryParams['uri'];
               if (uri) {
                 routeTitle += ` ${uri}`;
               }
             }
           }
+
           return routeTitle;
         })
       )
