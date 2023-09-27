@@ -35,7 +35,7 @@ export class OrganizationAddressEmbedComponent implements LajiFormEmbedComponent
 
   @ViewChild('template', { static: true }) template!: TemplateRef<any>;
 
-  private organizationSubject = new ReplaySubject<string|null|undefined>();
+  private organizationSubject = new ReplaySubject<string|null|undefined>(1);
   private organization$ = this.organizationSubject.asObservable().pipe(distinctUntilChanged());
 
   constructor(

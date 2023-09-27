@@ -70,8 +70,8 @@ export function asErrorViewModel(any: ViewModel): ErrorViewModel {
 export class FormViewFacade implements OnDestroy {
   vm$: Observable<ViewModel>;
 
-  private inputs$ = new ReplaySubject<FormInputs>();
-  private formData$ = new ReplaySubject<Partial<DataObject>|undefined>();
+  private inputs$ = new ReplaySubject<FormInputs>(1);
+  private formData$ = new ReplaySubject<Partial<DataObject>|undefined>(1);
 
   private initialFormDataSub?: Subscription;
 
@@ -100,14 +100,14 @@ export class FormViewFacade implements OnDestroy {
   private getVm$(): Observable<ViewModel> {
     const routeParams$ = this.getRouteParams$();
     const user$ = this.getUser$();
-    const form$: Observable<LajiForm.SchemaForm|undefined> = this.inputs$.pipe(switchMap((inputs) => concat(
-      of(undefined), this.getForm$(inputs)))
+    const form$: Observable<LajiForm.SchemaForm|undefined> = this.inputs$.pipe(
+      switchMap((inputs) => concat(of(undefined), this.getForm$(inputs)))
     );
 
     this.initialFormDataSub = combineLatest([routeParams$, this.inputs$, user$]).pipe(
       switchMap(([params, inputs, user]) => concat(
-        of(undefined), this.getInitialFormData$(params, inputs, user))
-      )
+        of(undefined), this.getInitialFormData$(params, inputs, user)
+      ))
     ).subscribe({
       'next': formData => this.formData$.next(formData),
       'error': err => this.formData$.error(err)
@@ -128,7 +128,8 @@ export class FormViewFacade implements OnDestroy {
         return routeParams$.pipe(
           map(routeParams => ({ routeParams, errorType }))
         );
-      })
+      }),
+      shareReplay(1)
     );
   }
 
@@ -140,7 +141,7 @@ export class FormViewFacade implements OnDestroy {
         const dataURI = this.activeRoute.snapshot.queryParams['uri'];
         return { editMode, dataURI };
       }),
-      shareReplay()
+      shareReplay(1)
     );
   }
 

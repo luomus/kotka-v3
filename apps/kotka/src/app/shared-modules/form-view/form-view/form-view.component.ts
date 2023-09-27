@@ -142,7 +142,7 @@ export class FormViewComponent implements OnChanges {
     }));
 
     this.lajiForm?.block();
-    navigate$.pipe(switchMap(() => this.vm$), take(1)).subscribe(vm => {
+    navigate$.pipe(switchMap(() => this.vm$.pipe(take(1)))).subscribe(vm => {
       if (isSuccessViewModel(vm)) {
         data = FormViewUtils.removeMetaAndExcludedFields(data, vm.form?.excludeFromCopy);
         this.setFormData(data);

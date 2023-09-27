@@ -39,7 +39,7 @@ export class PermitsInfoEmbedComponent implements LajiFormEmbedComponent {
 
   @ViewChild('template', { static: true }) template!: TemplateRef<any>;
 
-  private countrySubject = new ReplaySubject<string|null|undefined>();
+  private countrySubject = new ReplaySubject<string|null|undefined>(1);
   private country$ = this.countrySubject.asObservable().pipe(distinctUntilChanged());
 
   constructor(
