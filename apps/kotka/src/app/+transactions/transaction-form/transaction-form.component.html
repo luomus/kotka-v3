@@ -3,7 +3,7 @@
   [dataType]="dataType"
   [augmentFormFunc]="augmentFormFunc"
   [getInitialFormDataFunc]="getInitialFormData"
-  (formReady)="onFormReady()"
+  (formReady)="onFormReady($event)"
   (formDataChange)="onFormDataChange($event)"
 >
 </kotka-form-view>

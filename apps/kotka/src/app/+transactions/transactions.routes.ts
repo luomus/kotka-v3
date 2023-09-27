@@ -3,6 +3,7 @@ import { ModuleWithProviders } from '@angular/core';
 import { TransactionFormComponent } from './transaction-form/transaction-form.component';
 import { TransactionTableComponent } from './transaction-table/transaction-table.component';
 import { RoutingUtils } from '../shared/services/routing-utils';
+import { ComponentCanDeactivateGuard } from '../shared/services/guards/component-can-deactivate.guard';
 
 export const datasetsRoutes: Routes = [
   {
@@ -17,7 +18,8 @@ export const datasetsRoutes: Routes = [
     data: {
       add: { title: 'Add transaction' },
       edit: { title: 'Edit transaction', addUriToTitle: true }
-    }
+    },
+    canDeactivate: [ ComponentCanDeactivateGuard ]
   }
 ];
 

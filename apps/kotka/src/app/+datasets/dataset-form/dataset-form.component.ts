@@ -1,6 +1,9 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { DataType } from '../../shared/services/api-services/data.service';
 import { Dataset, Person, isDataset } from '@kotka/shared/models';
+import { FormViewComponent } from '../../shared-modules/form-view/form-view/form-view.component';
+import { ComponentCanDeactivate } from '../../shared/services/guards/component-can-deactivate.guard';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'kotka-dataset-form',
@@ -8,8 +11,14 @@ import { Dataset, Person, isDataset } from '@kotka/shared/models';
   styleUrls: ['./dataset-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DatasetFormComponent {
+export class DatasetFormComponent implements ComponentCanDeactivate {
   dataType = DataType.dataset;
+
+  @ViewChild(FormViewComponent, { static: true }) formView!: FormViewComponent;
+
+  canDeactivate(): Observable<boolean> {
+    return this.formView.canDeactivate();
+  }
 
   getInitialFormData(user: Person): Partial<Dataset> {
     const formData: Partial<Dataset> = {};

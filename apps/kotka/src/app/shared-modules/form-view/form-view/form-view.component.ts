@@ -9,12 +9,13 @@ import {
   SimpleChanges,
   EventEmitter,
   Output,
-  OnChanges
+  OnChanges,
+  HostListener
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormService } from '../../../shared/services/api-services/form.service';
 import { LajiForm, Person } from '@kotka/shared/models';
-import { from, Observable, switchMap } from 'rxjs';
+import { from, Observable, of, switchMap } from 'rxjs';
 import { DataObject, DataService, DataType } from '../../../shared/services/api-services/data.service';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ToastService } from '../../../shared/services/toast.service';
@@ -28,10 +29,10 @@ import {
   SuccessViewModel,
   FormViewFacade,
   isErrorViewModel,
-  asErrorViewModel,
-  isSuccessViewModel
+  asErrorViewModel
 } from './form-view.facade';
-import { take } from 'rxjs/operators';
+import { take, tap } from 'rxjs/operators';
+import { ComponentCanDeactivate } from '../../../shared/services/guards/component-can-deactivate.guard';
 import { FormViewUtils } from './form-view-utils';
 
 @Component({
@@ -41,7 +42,7 @@ import { FormViewUtils } from './form-view-utils';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [FormViewFacade]
 })
-export class FormViewComponent implements OnChanges {
+export class FormViewComponent implements OnChanges, ComponentCanDeactivate {
   @Input() formId?: string;
   @Input() dataType?: DataType;
   @Input() dataTypeName?: string;
@@ -52,8 +53,10 @@ export class FormViewComponent implements OnChanges {
   vm$: Observable<SuccessViewModel | ErrorViewModel>;
 
   visibleDataTypeName?: string;
+
   showDeleteTargetInUseAlert = false;
   disabledAlertDismissed = false;
+  formHasChanges = false;
 
   formErrorEnum = FormErrorEnum;
 
@@ -61,7 +64,7 @@ export class FormViewComponent implements OnChanges {
   asErrorViewModel = asErrorViewModel;
 
   @Output() formDataChange = new EventEmitter<Partial<DataObject>>();
-  @Output() formReady = new EventEmitter<void>();
+  @Output() formReady = new EventEmitter<Partial<DataObject>>();
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
   @ContentChild('headerTpl', {static: true}) formHeader?: TemplateRef<Element>;
@@ -96,6 +99,20 @@ export class FormViewComponent implements OnChanges {
     this.visibleDataTypeName = this.dataTypeName || this.dataType;
   }
 
+  @HostListener('window:beforeunload', ['$event'])
+  preventLeave($event: any) {
+    if (this.formHasChanges) {
+      $event.returnValue = false;
+    }
+  }
+
+  canDeactivate(): Observable<boolean> {
+    if (!this.formHasChanges) {
+      return of(true);
+    }
+    return this.dialogService.confirm('Are you sure you want to leave and discard unsaved changes?');
+  }
+
   onSubmit(data: DataObject) {
     if (!this.dataType) {
       return;
@@ -111,9 +128,10 @@ export class FormViewComponent implements OnChanges {
     this.lajiForm?.block();
     saveData$.subscribe({
       'next': formData => {
+        this.formHasChanges = false;
         from(this.router.navigate(['..', 'edit'], {
           relativeTo: this.activeRoute,
-          queryParams: {uri: this.domain + formData.id}
+          queryParams: { uri: this.domain + formData.id }
         })).subscribe(() => {
           this.lajiForm?.unBlock();
           this.notifier.showSuccess('Save success!');
@@ -136,21 +154,33 @@ export class FormViewComponent implements OnChanges {
     });
   }
 
+  onChange(data: Partial<DataObject>) {
+    this.formHasChanges = true;
+    this.formDataChange.emit(data);
+  }
+
   onCopy(data: Partial<DataObject>) {
+    if (this.formHasChanges) {
+      this.dialogService.alert('The form has unsaved changes.');
+      return;
+    }
+
     const navigate$ = from(this.router.navigate(['..', 'add'], {
       relativeTo: this.activeRoute
     }));
 
     this.lajiForm?.block();
-    navigate$.pipe(switchMap(() => this.vm$.pipe(take(1)))).subscribe(vm => {
-      if (isSuccessViewModel(vm)) {
-        data = FormViewUtils.removeMetaAndExcludedFields(data, vm.form?.excludeFromCopy);
-        this.setFormData(data);
 
-        this.lajiForm?.unBlock();
-        this.cdr.markForCheck();
-      }
-    });
+    this.vm$.pipe(take(1), switchMap((vm: SuccessViewModel) => {
+      data = FormViewUtils.removeMetaAndExcludedFields(data, vm.form?.excludeFromCopy);
+
+      return navigate$.pipe(
+        tap(() => {
+          this.setFormData(data);
+          this.lajiForm?.unBlock();
+        })
+      );
+    })).subscribe();
   }
 
   setFormData(data: Partial<DataObject>) {
@@ -165,6 +195,7 @@ export class FormViewComponent implements OnChanges {
     this.lajiForm?.block();
     this.dataService.delete(this.dataType, data.id).subscribe({
       'next': () => {
+        this.formHasChanges = false;
         this.lajiForm?.unBlock();
         this.notifier.showSuccess('Success!');
         this.navigateAway();
@@ -184,6 +215,6 @@ export class FormViewComponent implements OnChanges {
   }
 
   private navigateAway() {
-    this.router.navigate(['..'], {relativeTo: this.activeRoute});
+    this.router.navigate(['..'], { relativeTo: this.activeRoute });
   }
 }
