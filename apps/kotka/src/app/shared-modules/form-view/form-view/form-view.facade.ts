@@ -18,6 +18,7 @@ import { filter, map } from 'rxjs/operators';
 import { allowAccessByOrganization, allowAccessByTime } from '@kotka/utils';
 import { LajiForm, Person } from '@kotka/shared/models';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { StoreVersion } from '@kotka/api-interfaces';
 
 export enum FormErrorEnum {
   dataNotFound = 'dataNotFound',
@@ -47,6 +48,7 @@ export interface SuccessViewModel {
   form?: LajiForm.SchemaForm;
   formData?: Partial<DataObject>;
   state?: FormState;
+  versionHistory?: StoreVersion[];
 }
 
 export interface ErrorViewModel {
@@ -113,15 +115,24 @@ export class FormViewFacade implements OnDestroy {
       'error': err => this.formData$.error(err)
     });
 
+    const state$: Observable<FormState|undefined> = combineLatest([
+      routeParams$, form$, this.formData$, user$
+    ]).pipe(map(([routeParams, form, formData, user]) => (
+        form && formData ? this.getFormState(routeParams, form, formData, user) : undefined
+      )
+    ));
+
+    const versionHistory$: Observable<StoreVersion[]|undefined> = combineLatest([routeParams$, this.inputs$]).pipe(
+      switchMap(([params, inputs]) => concat(
+        of(undefined), this.getVersionHistory$(inputs.dataType, params.dataURI)
+      ))
+    );
+
     return combineLatest([
-      routeParams$,
-      form$,
-      this.formData$,
-      user$
+      routeParams$, form$, this.formData$, state$, versionHistory$
     ]).pipe(
-      map(([routeParams, form, formData, user]) => {
-        const state = form && formData ? this.getFormState(routeParams, form, formData, user) : undefined;
-        return { routeParams, form, formData, state };
+      map(([routeParams, form, formData, state, versionHistory]) => {
+        return { routeParams, form, formData, state, versionHistory };
       }),
       catchError(err => {
         const errorType = err.message === FormErrorEnum.dataNotFound ? FormErrorEnum.dataNotFound : FormErrorEnum.genericError;
@@ -175,6 +186,20 @@ export class FormViewFacade implements OnDestroy {
     const uriParts = dataURI.split('/');
     const id = uriParts.pop() as string;
     return this.dataService.getById(dataType, id).pipe(
+      catchError(err => {
+        err = err.status === 404 ? FormErrorEnum.dataNotFound : err;
+        return throwError(() => new Error(err));
+      })
+    );
+  }
+
+  private getVersionHistory$(dataType: DataType, dataURI?: string): Observable<StoreVersion[]> {
+    if (!dataURI) {
+      return of([]);
+    }
+    const uriParts = dataURI.split('/');
+    const id = uriParts.pop() as string;
+    return this.dataService.getVersionsById(dataType, id).pipe(
       catchError(err => {
         err = err.status === 404 ? FormErrorEnum.dataNotFound : err;
         return throwError(() => new Error(err));

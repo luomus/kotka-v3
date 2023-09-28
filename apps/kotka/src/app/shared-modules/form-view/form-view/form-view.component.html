@@ -18,6 +18,12 @@
           You can only view this {{ visibleDataTypeName }}. To be able to edit this {{ visibleDataTypeName }}, you must belong to {{ vm.formData.owner | label }}
         </ngb-alert>
 
+        <!--select *ngIf="vm.versionHistory else spinner" class="form-select">
+          <option *ngFor="let version of vm.versionHistory">
+            {{ version.version }} {{ version.created }}
+          </option>
+        </select-->
+
         <div *ngIf="vm.routeParams.editMode && vm.formData" class="mb-1">
           <strong class="d-block">Last edited by</strong>
           <span>{{ (vm.formData.editor || '') | label }} on {{ vm.formData.dateEdited | date:'dd.MM.YYYY HH:mm' }}</span>

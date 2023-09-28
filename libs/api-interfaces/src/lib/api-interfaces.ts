@@ -9,6 +9,11 @@ export interface StoreGetQuery {
   fields?: string
 }
 
+export interface StoreVersion {
+  version: number;
+  created: string;
+}
+
 export enum ErrorMessages {
   deletionTargetInUse = 'Deletion target is in use.'
 }
