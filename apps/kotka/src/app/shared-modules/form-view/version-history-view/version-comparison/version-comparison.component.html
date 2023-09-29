@@ -1,0 +1,9 @@
+<kotka-viewer
+  *ngIf="form && data else spinner"
+  [form]="form"
+  [data]="data.original"
+></kotka-viewer>
+
+<ng-template #spinner>
+  <kui-spinner></kui-spinner>
+</ng-template>

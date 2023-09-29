@@ -5,18 +5,27 @@ import { KotkaUiMainContentModule } from '../../../../../../libs/kotka/ui/main-c
 import { KotkaUiLajiFormModule } from '@kotka/ui/laji-form';
 import { SharedModule } from '../../shared/shared.module';
 import { NgbAlertModule } from '@ng-bootstrap/ng-bootstrap';
+import { ViewerModule } from '../viewer/viewer.module';
+import { VersionHistoryViewComponent } from './version-history-view/version-history-view.component';
+import { VersionComparisonComponent } from './version-history-view/version-comparison/version-comparison.component';
 
 @NgModule({
-  declarations: [FormViewComponent],
+  declarations: [
+    FormViewComponent,
+    VersionHistoryViewComponent,
+    VersionComparisonComponent,
+  ],
   imports: [
     CommonModule,
     SharedModule,
     KotkaUiMainContentModule,
     KotkaUiLajiFormModule,
-    NgbAlertModule
+    NgbAlertModule,
+    ViewerModule,
   ],
   exports: [
-    FormViewComponent
-  ]
+    FormViewComponent,
+    VersionHistoryViewComponent
+  ],
 })
 export class FormViewModule {}

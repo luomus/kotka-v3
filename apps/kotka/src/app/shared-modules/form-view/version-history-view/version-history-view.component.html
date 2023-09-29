@@ -1,0 +1,28 @@
+<ng-container *ngIf="vm$ | async as vm else spinner">
+  <kui-main-content
+    [containerClass]="'container'"
+    [header]="(visibleDataTypeName | titlecase) + (vm.routeParams.dataURI ? (' ' + vm.routeParams.dataURI) : '')"
+  >
+    <ng-container *ngIf="!isErrorViewModel(vm) else error">
+      <kotka-version-comparison
+        [form]="vm.form"
+        [data]="vm.data"
+      ></kotka-version-comparison>
+    </ng-container>
+  </kui-main-content>
+
+  <ng-template #error>
+    <ngb-alert [type]="'danger'" [dismissible]="false">
+      <ng-container *ngIf="asErrorViewModel(vm).errorType === versionHistoryErrorEnum.dataNotFound else genericError">
+        {{ visibleDataTypeName | titlecase }} <ng-container *ngIf="vm.routeParams.dataURI">with URI {{ vm.routeParams.dataURI }} </ng-container>was not found.
+      </ng-container>
+      <ng-template #genericError>
+        An unexpected error occurred
+      </ng-template>
+    </ngb-alert>
+  </ng-template>
+</ng-container>
+
+<ng-template #spinner>
+  <kui-spinner></kui-spinner>
+</ng-template>

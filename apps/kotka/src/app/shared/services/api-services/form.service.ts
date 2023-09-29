@@ -31,6 +31,11 @@ export class FormService {
     return this.formById$[formId];
   }
 
+  getFormInJsonFormat(formId: string): Observable<LajiForm.JsonForm> {
+    const params = new HttpParams().set('format', 'json');
+    return this.httpClient.get<LajiForm.JsonForm>(`${lajiApiBase}/forms/${formId}`, { params });
+  }
+
   getFormWithUserContext(formId: string): Observable<LajiForm.SchemaForm> {
     return combineLatest([this.getForm(formId), this.userService.user$]).pipe(
       map(([form, user]) => ({

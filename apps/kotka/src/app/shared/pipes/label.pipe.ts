@@ -15,6 +15,8 @@ export class LabelPipe implements PipeTransform {
     private cdr: ChangeDetectorRef
   ) {}
 
+  transform(value?: string): string;
+  transform(value?: string[]): string[];
   transform(value?: string|string[]): string|string[] {
     if (!value || value.length === 0) {
       return '';

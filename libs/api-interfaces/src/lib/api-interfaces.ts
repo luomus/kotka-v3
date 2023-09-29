@@ -1,4 +1,4 @@
-import { Person } from '@kotka/shared/models';
+import { Person, StoreObject } from '@kotka/shared/models';
 import { HealthCheckResult } from '@nestjs/terminus';
 
 export interface StoreGetQuery {
@@ -12,6 +12,15 @@ export interface StoreGetQuery {
 export interface StoreVersion {
   version: number;
   created: string;
+}
+
+export interface StoreVersionDifference {
+  original: StoreObject;
+  patch: {
+    op: 'add'|'replace';
+    path: string;
+    value: string|number|boolean;
+  }[];
 }
 
 export enum ErrorMessages {

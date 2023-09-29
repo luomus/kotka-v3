@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Dataset, ListResponse, SpecimenTransaction } from '@kotka/shared/models';
 import { Observable } from 'rxjs';
 import { apiBase } from './constants';
-import { StoreVersion } from '@kotka/api-interfaces';
+import { StoreVersion, StoreVersionDifference } from '@kotka/api-interfaces';
 
 export enum DataType {
   dataset = 'dataset',
@@ -29,6 +29,10 @@ export class DataService {
 
   getVersionsById(type: DataType, id: string): Observable<StoreVersion[]> {
     return this.httpClient.get<StoreVersion[]>(path + type + '/' + id + '/_ver');
+  }
+
+  getVersionDifference(type: DataType, id: string, version1: string, version2: string): Observable<StoreVersionDifference> {
+    return this.httpClient.get<StoreVersionDifference>(path + type + '/' + id + '/_ver/' + version1 + '/diff/' + version2);
   }
 
   create(type: DataType, data: DataObject): Observable<DataObject> {

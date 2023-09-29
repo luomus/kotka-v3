@@ -1,0 +1,39 @@
+<ng-container *ngIf="fields && data">
+  <ng-container *ngTemplateOutlet="fieldset; context: { fields: fields, data: data }"></ng-container>
+</ng-container>
+
+<ng-template #fieldset let-fields="fields" let-data="data">
+  <ng-container *ngFor="let field of fields">
+    <div *ngIf="data[field.name] && (field.type !== 'collection' || data[field.name]?.length)">
+      <div class="row mt-3 mb-3" *ngIf="field.type === 'collection' && field.fields else simpleField">
+        <div class="col-12">
+          <h2>{{ field.label }}</h2>
+          <div class="card card-body bg-light" *ngFor="let dataItem of data[field.name]">
+            <ng-container *ngTemplateOutlet="fieldset; context: { fields: field.fields, data: dataItem }"></ng-container>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #simpleField>
+        <div class="row mb-1">
+          <div class="col-sm-3">
+            <label><strong>{{ field.label }}:</strong></label><br>
+          </div>
+          <div class="col-sm-9">
+            <ng-container *ngIf="field.type === 'select' else arrayField">
+              {{ field.options?.value_options?.[data[field.name] || ''] }}
+            </ng-container>
+            <ng-template #arrayField>
+              <ng-container *ngIf="field.type === 'collection' else defaultField">
+                {{ asArray(data[field.name]) | label | join }}
+              </ng-container>
+            </ng-template>
+            <ng-template #defaultField>
+              {{ data[field.name] | label }}
+            </ng-template>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </ng-container>
+</ng-template>

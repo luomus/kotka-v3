@@ -13,6 +13,7 @@ import { KotkaUiLajiFormModule } from '@kotka/ui/laji-form';
 import { OrganizationAddressEmbedComponent } from './transaction-form-embed/organization-address-embed';
 import { PermitsInfoEmbedComponent } from './transaction-form-embed/permits-info-embed';
 import { SpecimenRangeSelectEmbedComponent } from './transaction-form-embed/specimen-range-select-embed';
+import { TransactionVersionHistoryComponent } from './transaction-version-history/transaction-version-history.component';
 
 @NgModule({
   imports: [
@@ -31,7 +32,8 @@ import { SpecimenRangeSelectEmbedComponent } from './transaction-form-embed/spec
     TransactionEventFormComponent,
     OrganizationAddressEmbedComponent,
     PermitsInfoEmbedComponent,
-    SpecimenRangeSelectEmbedComponent
+    SpecimenRangeSelectEmbedComponent,
+    TransactionVersionHistoryComponent,
   ],
 })
 export class TransactionsModule {}

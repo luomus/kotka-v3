@@ -4,6 +4,7 @@ import { TransactionFormComponent } from './transaction-form/transaction-form.co
 import { TransactionTableComponent } from './transaction-table/transaction-table.component';
 import { RoutingUtils } from '../shared/services/routing-utils';
 import { ComponentCanDeactivateGuard } from '../shared/services/guards/component-can-deactivate.guard';
+import { TransactionVersionHistoryComponent } from './transaction-version-history/transaction-version-history.component';
 
 export const datasetsRoutes: Routes = [
   {
@@ -20,6 +21,11 @@ export const datasetsRoutes: Routes = [
       edit: { title: 'Edit transaction', addUriToTitle: true }
     },
     canDeactivate: [ ComponentCanDeactivateGuard ]
+  },
+  {
+    path: 'history',
+    pathMatch: 'full',
+    component: TransactionVersionHistoryComponent
   }
 ];
 
