@@ -1,5 +1,6 @@
 <ng-container *ngIf="vm$ | async as vm else spinner">
   <kui-main-content
+    class="mb-5"
     [containerClass]="'container'"
     [header]="(visibleDataTypeName | titlecase) + (vm.routeParams.dataURI ? (' ' + vm.routeParams.dataURI) : '')"
   >

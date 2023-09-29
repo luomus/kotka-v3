@@ -5,6 +5,11 @@ import {
 } from '@angular/core';
 import { LajiForm, StoreObject } from '@kotka/shared/models';
 import { DataObject } from '../../../shared/services/api-services/data.service';
+import { StorePatch } from '@kotka/api-interfaces';
+
+export interface DifferenceObject {
+  [key: string]: DifferenceObject|Omit<StorePatch, 'path'>;
+}
 
 interface Field {
   name: keyof DataObject;
@@ -29,6 +34,7 @@ export class ViewerComponent {
     }
   };
   @Input() data?: StoreObject;
+  @Input() differenceData: DifferenceObject = {};
 
   fields?: Field[];
 
@@ -50,7 +56,8 @@ export class ViewerComponent {
     type: 'text'
   }];
 
-  asArray(value: any): Array<any> {
-    return value as Array<any>;
+  getIndexRangeForArrayValue(value: Array<any>, differenceData: Array<any>): number[] {
+    const arrayLength = Math.max(value?.length || 0, differenceData?.length || 0);
+    return Array(arrayLength).fill(undefined).map((x, i) => i);
   }
 }

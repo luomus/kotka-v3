@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DataService, DataType } from '../../../shared/services/api-services/data.service';
+import { DataObject, DataService, DataType } from '../../../shared/services/api-services/data.service';
 import { FormService } from '../../../shared/services/api-services/form.service';
 import { UserService } from '../../../shared/services/api-services/user.service';
 import {
@@ -16,8 +16,9 @@ import {
 import { filter, map, take } from 'rxjs/operators';
 import { LajiForm } from '@kotka/shared/models';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { StoreVersionDifference } from '@kotka/api-interfaces';
 import { FormErrorEnum } from '../form-view/form-view.facade';
+import { set } from 'lodash';
+import { DifferenceObject } from '../../viewer/viewer/viewer.component';
 
 export enum VersionHistoryErrorEnum {
   dataNotFound = 'dataNotFound',
@@ -34,10 +35,15 @@ export interface VersionHistoryInputs {
   dataType: DataType;
 }
 
+export interface VersionDifference {
+  original: DataObject;
+  diff: DifferenceObject;
+}
+
 export interface SuccessViewModel {
   routeParams: RouteParams;
   form?: LajiForm.JsonForm;
-  data?: StoreVersionDifference;
+  data?: VersionDifference;
 }
 
 export interface ErrorViewModel {
@@ -85,7 +91,7 @@ export class VersionHistoryViewFacade {
       switchMap((inputs) => concat(of(undefined), this.getForm$(inputs)))
     );
 
-    const data$: Observable<StoreVersionDifference|undefined> = combineLatest([routeParams$, this.inputs$]).pipe(
+    const data$: Observable<VersionDifference|undefined> = combineLatest([routeParams$, this.inputs$]).pipe(
       switchMap(([params, inputs]) => concat(
         of(undefined), this.getVersionDifference$(inputs.dataType, params.dataURI, params.versions)
       ))
@@ -123,12 +129,26 @@ export class VersionHistoryViewFacade {
     return this.formService.getFormInJsonFormat(inputs.formId);
   }
 
-  private getVersionDifference$(dataType: DataType, dataURI?: string, versions?: string[]): Observable<StoreVersionDifference> {
+  private getVersionDifference$(dataType: DataType, dataURI?: string, versions?: string[]): Observable<VersionDifference> {
     if (!dataURI || !versions || versions.length !== 2) {
       return throwError(() => new Error(FormErrorEnum.dataNotFound));
     }
 
     const id: string = dataURI.split('/').pop() as string;
-    return this.dataService.getVersionDifference(dataType, id, versions[0], versions[1]);
+    return this.dataService.getVersionDifference(dataType, id, versions[0], versions[1]).pipe(
+      map(data => {
+        const diff = {};
+
+        data.patch.forEach(patch => {
+          const path = patch.path.split('/').filter(value => !!value);
+          set(diff, path, { op: patch.op, value: patch.value });
+        });
+
+        return {
+          original: data.original as DataObject,
+          diff
+        };
+      })
+    );
   }
 }

@@ -2,6 +2,7 @@
   *ngIf="form && data else spinner"
   [form]="form"
   [data]="data.original"
+  [differenceData]="data.diff"
 ></kotka-viewer>
 
 <ng-template #spinner>

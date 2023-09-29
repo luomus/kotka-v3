@@ -14,13 +14,15 @@ export interface StoreVersion {
   created: string;
 }
 
+export interface StorePatch {
+  op: 'add'|'replace'|'remove';
+  path: string;
+  value: string|number|boolean;
+}
+
 export interface StoreVersionDifference {
   original: StoreObject;
-  patch: {
-    op: 'add'|'replace';
-    path: string;
-    value: string|number|boolean;
-  }[];
+  patch: StorePatch[];
 }
 
 export enum ErrorMessages {

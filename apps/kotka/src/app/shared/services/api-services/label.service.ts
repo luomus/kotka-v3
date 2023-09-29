@@ -6,6 +6,8 @@ import { Person } from '@kotka/shared/models';
 import { UserService } from './user.service';
 import { lajiApiBase } from './constants';
 
+export type LabelKey = string|number|boolean;
+
 interface OrganizationResponse {
   fullName: string;
 }
@@ -25,8 +27,15 @@ export class LabelService {
     private httpClient: HttpClient
   ) {}
 
-  getLabel(id: string): Observable<string> {
-    if (!id || !(id.startsWith('MA.') || id.startsWith('MOS.'))) {
+  getLabel(id: LabelKey): Observable<string> {
+    if (id == null || typeof id === 'number') {
+      return of(id + '');
+    }
+    if (typeof id === 'boolean') {
+      return of(id ? 'Yes' : 'No');
+    }
+
+    if (!/^(MA)|(MOS)\.\d+$/.test(id)) {
       return of(id);
     }
 

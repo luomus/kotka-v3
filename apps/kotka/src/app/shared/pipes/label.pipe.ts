@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Pipe, PipeTransform } from '@angular/core';
 import { forkJoin, Observable } from 'rxjs';
-import { LabelService } from '../services/api-services/label.service';
+import { LabelKey, LabelService } from '../services/api-services/label.service';
 
 @Pipe({
   name: 'label',
@@ -8,17 +8,17 @@ import { LabelService } from '../services/api-services/label.service';
 })
 export class LabelPipe implements PipeTransform {
   value: string|string[] = '';
-  lastId?: string|string[];
+  lastId?: LabelKey|LabelKey[];
 
   constructor(
     private labelService: LabelService,
     private cdr: ChangeDetectorRef
   ) {}
 
-  transform(value?: string): string;
-  transform(value?: string[]): string[];
-  transform(value?: string|string[]): string|string[] {
-    if (!value || value.length === 0) {
+  transform(value?: LabelKey): string;
+  transform(value?: LabelKey[]): string[];
+  transform(value?: LabelKey|LabelKey[]): string|string[] {
+    if (value == null || (Array.isArray(value) && value.length === 0)) {
       return '';
     }
 
@@ -32,7 +32,7 @@ export class LabelPipe implements PipeTransform {
     return this.value;
   }
 
-  private updateValue(id: string|string[]): void {
+  private updateValue(id: LabelKey|LabelKey[]): void {
     const label$: Observable<string|string[]> = Array.isArray(id) ?
       forkJoin(id.map(_id => this.labelService.getLabel(_id))) :
       this.labelService.getLabel(id);

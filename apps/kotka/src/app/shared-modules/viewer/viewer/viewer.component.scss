@@ -1,0 +1,16 @@
+.fieldset-removed {
+  background-color: rgb(231, 118, 129, 0.2) !important;
+}
+.fieldset-added {
+  background-color: rgb(37, 200, 124, 0.2) !important;
+}
+
+.field-value {
+  &.field-value-removed {
+    background-color: rgb(231, 118, 129, 0.2);
+    text-decoration: line-through;
+  }
+  &.field-value-added {
+    background-color: rgb(37, 200, 124, 0.2);
+  }
+}

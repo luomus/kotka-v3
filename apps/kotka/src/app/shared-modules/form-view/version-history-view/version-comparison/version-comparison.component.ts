@@ -4,7 +4,7 @@ import {
   Input,
 } from '@angular/core';
 import { LajiForm } from '@kotka/shared/models';
-import { StoreVersionDifference } from '@kotka/api-interfaces';
+import { VersionDifference } from '../version-history-view.facade';
 
 @Component({
   selector: 'kotka-version-comparison',
@@ -14,5 +14,5 @@ import { StoreVersionDifference } from '@kotka/api-interfaces';
 })
 export class VersionComparisonComponent{
   @Input() form?: LajiForm.JsonForm;
-  @Input() data?: StoreVersionDifference;
+  @Input() data?: VersionDifference;
 }
