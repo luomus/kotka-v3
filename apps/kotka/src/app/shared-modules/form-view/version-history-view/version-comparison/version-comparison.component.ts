@@ -4,7 +4,7 @@ import {
   Input,
 } from '@angular/core';
 import { LajiForm } from '@kotka/shared/models';
-import { VersionDifference } from '../version-history-view.facade';
+import { VersionDifference } from '../../../../shared/services/api-services/data.service';
 
 @Component({
   selector: 'kotka-version-comparison',

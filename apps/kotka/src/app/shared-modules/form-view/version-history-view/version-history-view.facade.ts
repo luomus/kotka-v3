@@ -1,5 +1,9 @@
 import { Injectable } from '@angular/core';
-import { DataObject, DataService, DataType } from '../../../shared/services/api-services/data.service';
+import {
+  DataService,
+  DataType,
+  VersionDifference
+} from '../../../shared/services/api-services/data.service';
 import { FormService } from '../../../shared/services/api-services/form.service';
 import { UserService } from '../../../shared/services/api-services/user.service';
 import {
@@ -18,7 +22,6 @@ import { LajiForm } from '@kotka/shared/models';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { FormErrorEnum } from '../form-view/form-view.facade';
 import { set } from 'lodash';
-import { DifferenceObject } from '../../viewer/viewer/viewer.component';
 
 export enum VersionHistoryErrorEnum {
   dataNotFound = 'dataNotFound',
@@ -33,11 +36,6 @@ export interface RouteParams {
 export interface VersionHistoryInputs {
   formId: string;
   dataType: DataType;
-}
-
-export interface VersionDifference {
-  original: DataObject;
-  diff: DifferenceObject;
 }
 
 export interface SuccessViewModel {
@@ -135,20 +133,6 @@ export class VersionHistoryViewFacade {
     }
 
     const id: string = dataURI.split('/').pop() as string;
-    return this.dataService.getVersionDifference(dataType, id, versions[0], versions[1]).pipe(
-      map(data => {
-        const diff = {};
-
-        data.patch.forEach(patch => {
-          const path = patch.path.split('/').filter(value => !!value);
-          set(diff, path, { op: patch.op, value: patch.value });
-        });
-
-        return {
-          original: data.original as DataObject,
-          diff
-        };
-      })
-    );
+    return this.dataService.getVersionDifference(dataType, id, versions[0], versions[1]);
   }
 }

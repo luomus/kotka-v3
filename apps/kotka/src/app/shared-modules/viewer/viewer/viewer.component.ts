@@ -4,12 +4,7 @@ import {
   Input,
 } from '@angular/core';
 import { LajiForm, StoreObject } from '@kotka/shared/models';
-import { DataObject } from '../../../shared/services/api-services/data.service';
-import { StorePatch } from '@kotka/api-interfaces';
-
-export interface DifferenceObject {
-  [key: string]: DifferenceObject|Omit<StorePatch, 'path'>;
-}
+import { DataObject, DifferenceObject } from '../../../shared/services/api-services/data.service';
 
 interface Field {
   name: keyof DataObject;

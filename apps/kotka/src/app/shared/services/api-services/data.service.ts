@@ -3,7 +3,9 @@ import { Injectable } from '@angular/core';
 import { Dataset, ListResponse, SpecimenTransaction } from '@kotka/shared/models';
 import { Observable } from 'rxjs';
 import { apiBase } from './constants';
-import { StoreVersion, StoreVersionDifference } from '@kotka/api-interfaces';
+import { StorePatch, StoreVersion, StoreVersionDifference } from '@kotka/api-interfaces';
+import { map } from 'rxjs/operators';
+import { set } from 'lodash';
 
 export enum DataType {
   dataset = 'dataset',
@@ -11,6 +13,15 @@ export enum DataType {
 }
 
 export type DataObject = Dataset | SpecimenTransaction;
+
+export interface DifferenceObject {
+  [key: string]: DifferenceObject|Omit<StorePatch, 'path'>;
+}
+
+export interface VersionDifference {
+  original: DataObject;
+  diff: DifferenceObject;
+}
 
 const path = apiBase + '/';
 
@@ -31,8 +42,10 @@ export class DataService {
     return this.httpClient.get<StoreVersion[]>(path + type + '/' + id + '/_ver');
   }
 
-  getVersionDifference(type: DataType, id: string, version1: string, version2: string): Observable<StoreVersionDifference> {
-    return this.httpClient.get<StoreVersionDifference>(path + type + '/' + id + '/_ver/' + version1 + '/diff/' + version2);
+  getVersionDifference(type: DataType, id: string, version1: string, version2: string): Observable<VersionDifference> {
+    return this.httpClient.get<StoreVersionDifference>(path + type + '/' + id + '/_ver/' + version1 + '/diff/' + version2).pipe(
+      map(data => this.convertVersionHistoryFormat(data))
+    );
   }
 
   create(type: DataType, data: DataObject): Observable<DataObject> {
@@ -70,4 +83,18 @@ export class DataService {
       })
     );
   }*/
+
+  private convertVersionHistoryFormat(data: StoreVersionDifference): VersionDifference {
+    const diff = {};
+
+    data.patch.forEach(patch => {
+      const path = patch.path.split('/').filter(value => !!value);
+      set(diff, path, { op: patch.op, value: patch.value });
+    });
+
+    return {
+      original: data.original as DataObject,
+      diff
+    };
+  }
 }
