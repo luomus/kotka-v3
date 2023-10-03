@@ -8,12 +8,15 @@ import { NgbAlertModule } from '@ng-bootstrap/ng-bootstrap';
 import { ViewerModule } from '../viewer/viewer.module';
 import { VersionHistoryViewComponent } from './version-history-view/version-history-view.component';
 import { VersionComparisonComponent } from './version-history-view/version-comparison/version-comparison.component';
+import { RouterModule } from '@angular/router';
+import { VersionListComponent } from './version-history-view/version-list/version-list.component';
 
 @NgModule({
   declarations: [
     FormViewComponent,
     VersionHistoryViewComponent,
     VersionComparisonComponent,
+    VersionListComponent,
   ],
   imports: [
     CommonModule,
@@ -22,10 +25,8 @@ import { VersionComparisonComponent } from './version-history-view/version-compa
     KotkaUiLajiFormModule,
     NgbAlertModule,
     ViewerModule,
+    RouterModule,
   ],
-  exports: [
-    FormViewComponent,
-    VersionHistoryViewComponent
-  ],
+  exports: [FormViewComponent, VersionHistoryViewComponent],
 })
 export class FormViewModule {}

@@ -58,14 +58,11 @@ export interface ErrorViewModel {
 
 export type ViewModel = SuccessViewModel | ErrorViewModel;
 
-export function isSuccessViewModel(any: ViewModel): any is SuccessViewModel {
-  return !isErrorViewModel(any);
+export function isSuccessViewModel(viewModel: ViewModel): viewModel is SuccessViewModel {
+  return !isErrorViewModel(viewModel);
 }
-export function isErrorViewModel(any: ViewModel): any is ErrorViewModel {
-  return 'errorType' in any;
-}
-export function asErrorViewModel(any: ViewModel): ErrorViewModel {
-  return any as ErrorViewModel;
+export function isErrorViewModel(viewModel: ViewModel): viewModel is ErrorViewModel {
+  return 'errorType' in viewModel;
 }
 
 @Injectable()
@@ -122,17 +119,11 @@ export class FormViewFacade implements OnDestroy {
       )
     ));
 
-    const versionHistory$: Observable<StoreVersion[]|undefined> = combineLatest([routeParams$, this.inputs$]).pipe(
-      switchMap(([params, inputs]) => concat(
-        of(undefined), this.getVersionHistory$(inputs.dataType, params.dataURI)
-      ))
-    );
-
     return combineLatest([
-      routeParams$, form$, this.formData$, state$, versionHistory$
+      routeParams$, form$, this.formData$, state$
     ]).pipe(
-      map(([routeParams, form, formData, state, versionHistory]) => {
-        return { routeParams, form, formData, state, versionHistory };
+      map(([routeParams, form, formData, state]) => {
+        return { routeParams, form, formData, state };
       }),
       catchError(err => {
         const errorType = err.message === FormErrorEnum.dataNotFound ? FormErrorEnum.dataNotFound : FormErrorEnum.genericError;
@@ -186,20 +177,6 @@ export class FormViewFacade implements OnDestroy {
     const uriParts = dataURI.split('/');
     const id = uriParts.pop() as string;
     return this.dataService.getById(dataType, id).pipe(
-      catchError(err => {
-        err = err.status === 404 ? FormErrorEnum.dataNotFound : err;
-        return throwError(() => new Error(err));
-      })
-    );
-  }
-
-  private getVersionHistory$(dataType: DataType, dataURI?: string): Observable<StoreVersion[]> {
-    if (!dataURI) {
-      return of([]);
-    }
-    const uriParts = dataURI.split('/');
-    const id = uriParts.pop() as string;
-    return this.dataService.getVersionsById(dataType, id).pipe(
       catchError(err => {
         err = err.status === 404 ? FormErrorEnum.dataNotFound : err;
         return throwError(() => new Error(err));

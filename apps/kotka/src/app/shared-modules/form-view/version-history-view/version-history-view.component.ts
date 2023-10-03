@@ -6,9 +6,17 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { DataType } from '../../../shared/services/api-services/data.service';
-import { VersionHistoryErrorEnum, VersionHistoryViewFacade } from './version-history-view.facade';
+import {
+  isVersionComparisonViewData,
+  isVersionListViewData,
+  VersionHistoryErrorEnum,
+  VersionHistoryViewFacade,
+  ErrorViewModel,
+  SuccessViewModel,
+  isErrorViewModel,
+  isSuccessViewModel
+} from './version-history-view.facade';
 import { Observable } from 'rxjs';
-import { ErrorViewModel, SuccessViewModel, isErrorViewModel, asErrorViewModel } from './version-history-view.facade';
 
 @Component({
   selector: 'kotka-version-history-view',
@@ -27,7 +35,9 @@ export class VersionHistoryViewComponent implements OnChanges {
   visibleDataTypeName?: string;
 
   isErrorViewModel = isErrorViewModel;
-  asErrorViewModel = asErrorViewModel;
+  isSuccessViewModel = isSuccessViewModel;
+  isVersionListViewData = isVersionListViewData;
+  isVersionComparisonViewData = isVersionComparisonViewData;
 
   versionHistoryErrorEnum = VersionHistoryErrorEnum;
 

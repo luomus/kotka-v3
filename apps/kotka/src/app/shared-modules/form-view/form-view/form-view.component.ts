@@ -29,7 +29,7 @@ import {
   SuccessViewModel,
   FormViewFacade,
   isErrorViewModel,
-  asErrorViewModel
+  isSuccessViewModel
 } from './form-view.facade';
 import { take, tap } from 'rxjs/operators';
 import { ComponentCanDeactivate } from '../../../shared/services/guards/component-can-deactivate.guard';
@@ -61,7 +61,7 @@ export class FormViewComponent implements OnChanges, ComponentCanDeactivate {
   formErrorEnum = FormErrorEnum;
 
   isErrorViewModel = isErrorViewModel;
-  asErrorViewModel = asErrorViewModel;
+  isSuccessViewModel = isSuccessViewModel;
 
   @Output() formDataChange = new EventEmitter<Partial<DataObject>>();
   @Output() formReady = new EventEmitter<Partial<DataObject>>();

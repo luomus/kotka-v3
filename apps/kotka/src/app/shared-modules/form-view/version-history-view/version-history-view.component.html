@@ -4,24 +4,27 @@
     [containerClass]="'container'"
     [header]="(visibleDataTypeName | titlecase) + (vm.routeParams.dataURI ? (' ' + vm.routeParams.dataURI) : '')"
   >
-    <ng-container *ngIf="!isErrorViewModel(vm) else error">
-      <kotka-version-comparison
-        [form]="vm.form"
-        [data]="vm.data"
-      ></kotka-version-comparison>
-    </ng-container>
-  </kui-main-content>
-
-  <ng-template #error>
-    <ngb-alert [type]="'danger'" [dismissible]="false">
-      <ng-container *ngIf="asErrorViewModel(vm).errorType === versionHistoryErrorEnum.dataNotFound else genericError">
+    <ngb-alert *ngIf="isErrorViewModel(vm)" [type]="'danger'" [dismissible]="false">
+      <ng-container *ngIf="vm.errorType === versionHistoryErrorEnum.dataNotFound else genericError">
         {{ visibleDataTypeName | titlecase }} <ng-container *ngIf="vm.routeParams.dataURI">with URI {{ vm.routeParams.dataURI }} </ng-container>was not found.
       </ng-container>
       <ng-template #genericError>
         An unexpected error occurred
       </ng-template>
     </ngb-alert>
-  </ng-template>
+
+    <ng-container *ngIf="isSuccessViewModel(vm)">
+      <ng-container *ngIf="vm.viewData as viewData else spinner">
+        <kotka-version-list *ngIf="isVersionListViewData(viewData)"
+        ></kotka-version-list>
+        <kotka-version-comparison
+          *ngIf="isVersionComparisonViewData(viewData)"
+          [form]="viewData.form"
+          [data]="viewData.data"
+        ></kotka-version-comparison>
+      </ng-container>
+    </ng-container>
+  </kui-main-content>
 </ng-container>
 
 <ng-template #spinner>
