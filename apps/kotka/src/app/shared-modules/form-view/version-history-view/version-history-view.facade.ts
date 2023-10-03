@@ -40,12 +40,12 @@ export interface VersionHistoryInputs {
 
 interface VersionListViewData {
   type: 'versionList';
-  data?: StoreVersion[];
+  data: StoreVersion[];
 }
 interface VersionComparisonViewData {
   type: 'comparison';
-  form?: LajiForm.JsonForm;
-  data?: VersionDifference;
+  form: LajiForm.JsonForm;
+  data: VersionDifference;
 }
 
 export type ViewData = VersionListViewData | VersionComparisonViewData;

@@ -1,1 +1,19 @@
-<p>version-list works!</p>
+<button class="btn btn-secondary" (click)="onCompareVersionsClick()">
+  Compare selected versions
+</button>
+<table class="table">
+  <thead>
+  <tr>
+    <th></th>
+    <th>Version</th>
+    <th>Created</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let version of (data | reverse)">
+      <td><input type="checkbox" id="version_{{ version.version }}" name="selectedVersions" [checked]="checkedVersions[version.version]" (click)="checkboxClick($event, version.version)"/></td>
+      <td><a [routerLink]="[]" [queryParams]="{ version: version.version }" queryParamsHandling="merge">v. {{ version.version }}</a></td>
+      <td>{{ version.created | date:'dd.MM.YYYY HH:mm' }}</td>
+    </tr>
+  </tbody>
+</table>

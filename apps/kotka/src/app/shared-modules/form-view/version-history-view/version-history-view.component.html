@@ -15,7 +15,10 @@
 
     <ng-container *ngIf="isSuccessViewModel(vm)">
       <ng-container *ngIf="vm.viewData as viewData else spinner">
-        <kotka-version-list *ngIf="isVersionListViewData(viewData)"
+        <kotka-version-list
+          *ngIf="isVersionListViewData(viewData)"
+          [data]="viewData.data"
+          (compareVersionsClick)="onCompareVersionsClick($event)"
         ></kotka-version-list>
         <kotka-version-comparison
           *ngIf="isVersionComparisonViewData(viewData)"

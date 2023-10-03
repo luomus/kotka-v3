@@ -14,6 +14,7 @@ import { OldKotkaUrlPipe } from './pipes/old-kotka-url.pipe';
 import { KotkaUiMainContentModule } from '../../../../../libs/kotka/ui/main-content/src';
 import { ConfirmModalComponent } from './components/confirm-modal/confirm-modal';
 import { BaseComponent } from './components/base/base.component';
+import { ReversePipe } from './pipes/reverse.pipe';
 
 @NgModule({
   imports: [
@@ -31,10 +32,11 @@ import { BaseComponent } from './components/base/base.component';
     ToasterComponent,
     LabelPipe,
     OldKotkaUrlPipe,
+    ReversePipe,
     ConfirmModalComponent,
     BaseComponent
   ],
-  exports: [KotkaUiSpinnerModule, LabelPipe, OldKotkaUrlPipe],
+  exports: [KotkaUiSpinnerModule, LabelPipe, OldKotkaUrlPipe, ReversePipe],
 })
 export class SharedModule {
   static forRoot(): ModuleWithProviders<SharedModule> {

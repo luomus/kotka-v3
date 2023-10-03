@@ -17,6 +17,7 @@ import {
   isSuccessViewModel
 } from './version-history-view.facade';
 import { Observable } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'kotka-version-history-view',
@@ -42,7 +43,8 @@ export class VersionHistoryViewComponent implements OnChanges {
   versionHistoryErrorEnum = VersionHistoryErrorEnum;
 
   constructor(
-    private versionHistoryFacade: VersionHistoryViewFacade
+    private versionHistoryFacade: VersionHistoryViewFacade,
+    private router: Router
   ) {
     this.vm$ = this.versionHistoryFacade.vm$;
   }
@@ -58,5 +60,9 @@ export class VersionHistoryViewComponent implements OnChanges {
     }
 
     this.visibleDataTypeName = this.dataTypeName || this.dataType;
+  }
+
+  onCompareVersionsClick(versions: number[]) {
+    this.router.navigate([], { queryParams: { version: versions }, queryParamsHandling: 'merge' });
   }
 }
