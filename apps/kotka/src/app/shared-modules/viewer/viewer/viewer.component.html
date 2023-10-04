@@ -5,7 +5,7 @@
 <ng-template #fieldset let-fields="fields" let-data="data" let-differenceData="differenceData">
   <ng-container *ngFor="let field of fields">
     <div *ngIf="(data[field.name] !== undefined && (field.type !== 'collection' || data[field.name]?.length)) || differenceData[field.name]">
-      <div class="row mt-3 mb-1" *ngIf="field.type === 'collection' && field.fields else basicField">
+      <div class="row mt-3 mb-1" *ngIf="field.type === 'collection' && field.fields else nonCollectionField">
         <div class="col-12">
           <h2>{{ field.label }}</h2>
           <div class="card card-body bg-light mb-2" [ngClass]="{'fielset-removed': differenceData[field.name]?.[i]?.op === 'remove', 'fieldset-added': differenceData[field.name]?.[i]?.op === 'add'}" *ngFor="let i of getIndexRangeForArrayValue(data[field.name], differenceData[field.name])">
@@ -15,42 +15,53 @@
       </div>
     </div>
 
-    <ng-template #basicField>
-      <div class="row mb-1">
-        <div class="col-sm-3">
-          <label><strong>{{ field.label }}:</strong></label><br>
-        </div>
-        <div class="col-sm-9">
-          <div *ngIf="field.type === 'collection' else nonArrayFieldValue" class="array-field">
-            <ng-container *ngFor="let i of getIndexRangeForArrayValue(data[field.name], differenceData[field.name]); last as last">
-              <ng-container *ngTemplateOutlet="fieldValue; context: { value: data[field.name][i], differenceData: differenceData[field.name]?.[i] }"></ng-container>
-              <span *ngIf="!last">, </span>
-            </ng-container>
-          </div>
-        </div>
-      </div>
-    </ng-template>
-
-    <ng-template #nonArrayFieldValue>
-      <ng-container *ngTemplateOutlet="fieldValue; context: { value: data[field.name], differenceData: differenceData[field.name] }"></ng-container>
-    </ng-template>
-
-    <ng-template #fieldValue let-value="value" let-differenceData="differenceData">
-      <span *ngIf="value !== undefined" class="field-value" [ngClass]="{'field-value-removed': differenceData?.op === 'remove' || differenceData?.op === 'replace' }">
-        <ng-container *ngTemplateOutlet="simpleFieldValue; context: { value: value }"></ng-container>
-      </span>
-      <span *ngIf="differenceData?.value !== undefined && differenceData?.value !== null" class="field-value" [ngClass]="{'field-value-added': differenceData?.op === 'add' || differenceData?.op === 'replace' }">
-        <ng-container *ngTemplateOutlet="simpleFieldValue; context: { value: differenceData?.value }"></ng-container>
-      </span>
-    </ng-template>
-
-    <ng-template #simpleFieldValue let-value="value">
-      <ng-container *ngIf="field.type === 'select' else defaultFieldValue">
-        {{ field.options?.value_options?.[value || ''] }}
-      </ng-container>
-      <ng-template #defaultFieldValue>
-        {{ value | label }}
-      </ng-template>
+    <ng-template #nonCollectionField>
+      <ng-container *ngTemplateOutlet="isMultiLangField(field, data[field.name], differenceData[field.name]?.value) ? multiLangField : basicField; context: { field, label: field.label, value: data[field.name], differenceData: differenceData[field.name] }"></ng-container>
     </ng-template>
   </ng-container>
+</ng-template>
+
+<ng-template #multiLangField let-field="field" let-label="label" let-value="value" let-differenceData="differenceData">
+  <ng-container *ngFor="let lang of ['en', 'fi', 'sv']">
+    <ng-container *ngIf="value?.[lang] || differenceData?.[lang] || differenceData?.value?.[lang]">
+      <ng-container *ngTemplateOutlet="basicField; context: { field, label: label + ' (' + lang + ')', value: value?.[lang], differenceData: differenceData?.[lang] || { op: differenceData?.op, value: differenceData?.value?.[lang] } }"></ng-container>
+    </ng-container>
+  </ng-container>
+</ng-template>
+
+<ng-template #basicField let-field="field" let-label="label" let-value="value" let-differenceData="differenceData">
+  <div class="row mb-1">
+    <div class="col-sm-3">
+      <label><strong>{{ label }}:</strong></label><br>
+    </div>
+    <div class="col-sm-9">
+      <div *ngIf="field.type === 'collection'" class="array-field">
+        <ng-container *ngFor="let i of getIndexRangeForArrayValue(value, differenceData); last as last">
+          <ng-container *ngTemplateOutlet="fieldValue; context: { field, value: value?.[i], differenceData: differenceData?.[i] }"></ng-container>
+          <span *ngIf="!last">, </span>
+        </ng-container>
+      </div>
+      <ng-container *ngIf="field.type !== 'collection'">
+        <ng-container *ngTemplateOutlet="fieldValue; context: { field, value, differenceData }"></ng-container>
+      </ng-container>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #fieldValue let-field="field" let-value="value" let-differenceData="differenceData">
+  <span *ngIf="value !== undefined" class="field-value" [ngClass]="{'field-value-removed': differenceData?.op === 'remove' || differenceData?.op === 'replace' }">
+    <ng-container *ngTemplateOutlet="simpleFieldValue; context: { field, value }"></ng-container>
+  </span>
+  <span *ngIf="differenceData?.value !== undefined && differenceData?.value !== null" class="field-value" [ngClass]="{'field-value-added': differenceData?.op === 'add' || differenceData?.op === 'replace' }">
+    <ng-container *ngTemplateOutlet="simpleFieldValue; context: { field, value: differenceData?.value }"></ng-container>
+  </span>
+</ng-template>
+
+<ng-template #simpleFieldValue let-field="field" let-value="value">
+  <ng-container *ngIf="field.type === 'select' else defaultFieldValue">
+    {{ field.options?.value_options?.[value || ''] }}
+  </ng-container>
+  <ng-template #defaultFieldValue>
+    {{ value | label }}
+  </ng-template>
 </ng-template>

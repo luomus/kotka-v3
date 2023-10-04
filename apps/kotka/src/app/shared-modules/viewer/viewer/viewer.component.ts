@@ -51,6 +51,10 @@ export class ViewerComponent {
     type: 'text'
   }];
 
+  isMultiLangField(field: Field, data?: any, differenceData?: any): boolean {
+    return field.type === 'text' && typeof data !== 'string' && typeof differenceData !== 'string';
+  }
+
   getIndexRangeForArrayValue(value: Array<any>, differenceData: Array<any>): number[] {
     const arrayLength = Math.max(value?.length || 0, differenceData?.length || 0);
     return Array(arrayLength).fill(undefined).map((x, i) => i);
