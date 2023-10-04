@@ -8,6 +8,7 @@ import { KotkaUiDatatableModule } from '../../../../../libs/kotka/ui/datatable/s
 import { DatasetFormComponent } from './dataset-form/dataset-form.component';
 import { FormViewModule } from '../shared-modules/form-view/form-view.module';
 import { SharedModule } from '../shared/shared.module';
+import { DatasetVersionHistoryComponent } from './dataset-version-history/dataset-version-history.component';
 
 @NgModule({
   imports: [
@@ -19,6 +20,6 @@ import { SharedModule } from '../shared/shared.module';
     KotkaUiDatatableModule,
     FormViewModule
   ],
-  declarations: [DatasetTableComponent, DatasetFormComponent],
+  declarations: [DatasetTableComponent, DatasetFormComponent, DatasetVersionHistoryComponent],
 })
 export class DatasetsModule {}

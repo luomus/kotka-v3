@@ -4,6 +4,7 @@ import { DatasetTableComponent } from './dataset-table/dataset-table.component';
 import { DatasetFormComponent } from './dataset-form/dataset-form.component';
 import { RoutingUtils } from '../shared/services/routing-utils';
 import { ComponentCanDeactivateGuard } from '../shared/services/guards/component-can-deactivate.guard';
+import { DatasetVersionHistoryComponent } from './dataset-version-history/dataset-version-history.component';
 
 export const datasetsRoutes: Routes = [
   {
@@ -20,6 +21,11 @@ export const datasetsRoutes: Routes = [
       edit: { title: 'Edit tag', addUriToTitle: true }
     },
     canDeactivate: [ ComponentCanDeactivateGuard ]
+  },
+  {
+    path: 'history',
+    pathMatch: 'full',
+    component: DatasetVersionHistoryComponent
   }
 ];
 
