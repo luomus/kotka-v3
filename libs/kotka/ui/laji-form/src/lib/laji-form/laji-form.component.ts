@@ -151,7 +151,7 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
             rootElem: this.lajiFormRoot.nativeElement,
             theme: this.lajiFormTheme,
             schema: form.schema,
-            uiSchema: form.uiSchema,
+            uiSchema: { ...form.uiSchema, 'ui:readonly': this.disabled },
             uiSchemaContext: form.uiSchemaContext,
             formData: this.formData,
             validators: form.validators,
@@ -172,8 +172,7 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
             },
             onError: this.onError.bind(this),
             onComponentDidMount: onReady ? onReady() : () => undefined,
-            optimizeOnChange: true,
-            disabled: this.disabled
+            optimizeOnChange: true
           });
         });
       } catch (err) {
