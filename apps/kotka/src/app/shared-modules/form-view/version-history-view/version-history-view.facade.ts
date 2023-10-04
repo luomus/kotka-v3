@@ -61,7 +61,8 @@ export interface VersionViewModel extends BaseViewModel {
 }
 export interface VersionComparisonViewModel extends BaseViewModel {
   form?: LajiForm.JsonForm;
-  diffData?: VersionDifference
+  diffData?: VersionDifference;
+  versionList?: StoreVersion[];
 }
 
 export type SuccessViewModel = VersionListViewModel | VersionViewModel | VersionComparisonViewModel;
@@ -173,7 +174,7 @@ export class VersionHistoryViewFacade {
     } else {
       const form$ = this.getFormInJsonFormat$(inputs);
       const versionDifference$ = this.getVersionDifference$(inputs.dataType, params.dataURI, params.versions);
-      return combineLatest([form$, versionDifference$]).pipe(map(([form, diffData]) => ({ form, diffData })));
+      return combineLatest([form$, versionDifference$, versionList$]).pipe(map(([form, diffData, versionList]) => ({ form, diffData, versionList })));
     }
   }
 

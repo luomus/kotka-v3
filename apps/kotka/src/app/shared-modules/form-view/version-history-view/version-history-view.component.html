@@ -29,6 +29,8 @@
       ></kotka-version>
       <kotka-version-comparison
         *ngIf="isVersionComparisonViewModel(vm)"
+        [versions]="vm.routeParams.versions"
+        [versionList]="vm.versionList"
         [form]="vm.form"
         [data]="vm.diffData"
       ></kotka-version-comparison>
