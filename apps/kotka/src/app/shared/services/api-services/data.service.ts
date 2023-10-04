@@ -38,16 +38,6 @@ export class DataService {
     return this.httpClient.get<DataObject>(path + type + '/' + id);
   }
 
-  getVersionsById(type: DataType, id: string): Observable<StoreVersion[]> {
-    return this.httpClient.get<StoreVersion[]>(path + type + '/' + id + '/_ver');
-  }
-
-  getVersionDifference(type: DataType, id: string, version1: string, version2: string): Observable<VersionDifference> {
-    return this.httpClient.get<StoreVersionDifference>(path + type + '/' + id + '/_ver/' + version1 + '/diff/' + version2).pipe(
-      map(data => this.convertVersionHistoryFormat(data))
-    );
-  }
-
   create(type: DataType, data: DataObject): Observable<DataObject> {
     return this.httpClient.post<DataObject>(path + type, data);
   }
@@ -71,18 +61,19 @@ export class DataService {
     return this.httpClient.get<ListResponse<DataObject>>(path + type, {params});
   }
 
-  /*private getAll(type: DataType.dataset, page?: number, pageSize?: number, results?: Dataset[]): Observable<Dataset[]>;
-  private getAll(type: DataType, page=1, pageSize=100, results: DataObject[]=[]): Observable<DataObject[]> {
-    return this.getData(type, page, pageSize).pipe(
-      switchMap(result => {
-        results = results.concat(result.member);
-        if (result.currentPage < result.lastPage) {
-          return this.getAll(type, page + 1, pageSize, results);
-        }
-        return of(results);
-      })
+  getVersionList(type: DataType, id: string): Observable<StoreVersion[]> {
+    return this.httpClient.get<StoreVersion[]>(path + type + '/' + id + '/_ver');
+  }
+
+  getVersionData(type: DataType, id: string, version: string): Observable<DataObject> {
+    return this.httpClient.get<DataObject>(path + type + '/' + id + '/_ver/' + version);
+  }
+
+  getVersionDifference(type: DataType, id: string, version1: string, version2: string): Observable<VersionDifference> {
+    return this.httpClient.get<StoreVersionDifference>(path + type + '/' + id + '/_ver/' + version1 + '/diff/' + version2).pipe(
+      map(data => this.convertVersionHistoryFormat(data))
     );
-  }*/
+  }
 
   private convertVersionHistoryFormat(data: StoreVersionDifference): VersionDifference {
     const diff = {};

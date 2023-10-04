@@ -10,6 +10,7 @@ import { VersionHistoryViewComponent } from './version-history-view/version-hist
 import { VersionComparisonComponent } from './version-history-view/version-comparison/version-comparison.component';
 import { RouterModule } from '@angular/router';
 import { VersionListComponent } from './version-history-view/version-list/version-list.component';
+import { VersionComponent } from './version-history-view/version/version.component';
 
 @NgModule({
   declarations: [
@@ -17,6 +18,7 @@ import { VersionListComponent } from './version-history-view/version-list/versio
     VersionHistoryViewComponent,
     VersionComparisonComponent,
     VersionListComponent,
+    VersionComponent,
   ],
   imports: [
     CommonModule,

@@ -14,7 +14,8 @@ import {
   ErrorViewModel,
   SuccessViewModel,
   isErrorViewModel,
-  isSuccessViewModel
+  isSuccessViewModel,
+  isVersionViewData
 } from './version-history-view.facade';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
@@ -38,6 +39,7 @@ export class VersionHistoryViewComponent implements OnChanges {
   isErrorViewModel = isErrorViewModel;
   isSuccessViewModel = isSuccessViewModel;
   isVersionListViewData = isVersionListViewData;
+  isVersionViewData = isVersionViewData;
   isVersionComparisonViewData = isVersionComparisonViewData;
 
   versionHistoryErrorEnum = VersionHistoryErrorEnum;

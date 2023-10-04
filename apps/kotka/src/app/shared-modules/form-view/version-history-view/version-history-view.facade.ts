@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import {
+  DataObject,
   DataService,
   DataType,
   VersionDifference
@@ -20,7 +21,7 @@ import {
 import { filter, map, take } from 'rxjs/operators';
 import { LajiForm } from '@kotka/shared/models';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { FormErrorEnum } from '../form-view/form-view.facade';
+import { FormErrorEnum, FormInputs } from '../form-view/form-view.facade';
 import { StoreVersion } from '@kotka/api-interfaces';
 
 export enum VersionHistoryErrorEnum {
@@ -30,7 +31,7 @@ export enum VersionHistoryErrorEnum {
 
 export interface RouteParams {
   dataURI?: string;
-  versions?: string[];
+  version?: string|string[];
 }
 
 export interface VersionHistoryInputs {
@@ -42,16 +43,24 @@ interface VersionListViewData {
   type: 'versionList';
   data: StoreVersion[];
 }
+interface VersionViewData {
+  type: 'version';
+  form: LajiForm.SchemaForm;
+  data: DataObject;
+}
 interface VersionComparisonViewData {
   type: 'comparison';
   form: LajiForm.JsonForm;
   data: VersionDifference;
 }
 
-export type ViewData = VersionListViewData | VersionComparisonViewData;
+export type ViewData = VersionListViewData | VersionViewData | VersionComparisonViewData;
 
 export function isVersionListViewData(viewData: ViewData): viewData is VersionListViewData {
   return viewData?.type === 'versionList';
+}
+export function isVersionViewData(viewData: ViewData): viewData is VersionViewData {
+  return viewData?.type === 'version';
 }
 export function isVersionComparisonViewData(viewData: ViewData): viewData is VersionComparisonViewData {
   return viewData?.type === 'comparison';
@@ -126,8 +135,8 @@ export class VersionHistoryViewFacade {
       filter((event) => event instanceof NavigationEnd),
       map(() => {
         const dataURI = this.activeRoute.snapshot.queryParams['uri'];
-        const versions = this.activeRoute.snapshot.queryParams['version'];
-        return { dataURI, versions };
+        const version = this.activeRoute.snapshot.queryParams['version'];
+        return { dataURI, version };
       }),
       shareReplay(1)
     );
@@ -138,26 +147,48 @@ export class VersionHistoryViewFacade {
       return throwError(() => new Error(FormErrorEnum.dataNotFound));
     }
 
-    if (!params.versions) {
-      return this.getVersionHistory$(inputs.dataType, params.dataURI).pipe(map(data => ({ type: 'versionList', data })));
-    } else {
+    if (!params.version) {
+      return this.getVersionList$(inputs.dataType, params.dataURI).pipe(map(data => ({ type: 'versionList', data })));
+    } else if (!Array.isArray(params.version)) {
       const form$ = this.getForm$(inputs);
-      const versionDifference$ = this.getVersionDifference$(inputs.dataType, params.dataURI, params.versions);
+      const data$ = this.getVersionData$(inputs.dataType, params.dataURI, params.version);
+      return combineLatest([form$, data$]).pipe(map(([form, data]) => ({ type: 'version', form, data })));
+    } else {
+      const form$ = this.getFormInJsonFormat$(inputs);
+      const versionDifference$ = this.getVersionDifference$(inputs.dataType, params.dataURI, params.version);
       return combineLatest([form$, versionDifference$]).pipe(map(([form, data]) => ({ type: 'comparison', form, data })));
     }
   }
 
-  private getForm$(inputs: VersionHistoryInputs): Observable<LajiForm.JsonForm> {
+  private getForm$(inputs: FormInputs): Observable<LajiForm.SchemaForm> {
+    return this.formService.getFormWithUserContext(inputs.formId);
+  }
+
+  private getFormInJsonFormat$(inputs: VersionHistoryInputs): Observable<LajiForm.JsonForm> {
     return this.formService.getFormInJsonFormat(inputs.formId);
   }
 
-  private getVersionHistory$(dataType: DataType, dataURI?: string): Observable<StoreVersion[]> {
+  private getVersionList$(dataType: DataType, dataURI?: string): Observable<StoreVersion[]> {
     if (!dataURI) {
       return of([]);
     }
     const uriParts = dataURI.split('/');
     const id = uriParts.pop() as string;
-    return this.dataService.getVersionsById(dataType, id).pipe(
+    return this.dataService.getVersionList(dataType, id).pipe(
+      catchError(err => {
+        err = err.status === 404 ? FormErrorEnum.dataNotFound : err;
+        return throwError(() => new Error(err));
+      })
+    );
+  }
+
+  private getVersionData$(dataType: DataType, dataURI?: string, version?: string): Observable<DataObject> {
+    if (!dataURI || !version) {
+      return throwError(() => new Error(FormErrorEnum.dataNotFound));
+    }
+
+    const id: string = dataURI.split('/').pop() as string;
+    return this.dataService.getVersionData(dataType, id, version).pipe(
       catchError(err => {
         err = err.status === 404 ? FormErrorEnum.dataNotFound : err;
         return throwError(() => new Error(err));

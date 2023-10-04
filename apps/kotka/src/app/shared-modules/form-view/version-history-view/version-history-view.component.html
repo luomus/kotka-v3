@@ -20,6 +20,11 @@
           [data]="viewData.data"
           (compareVersionsClick)="onCompareVersionsClick($event)"
         ></kotka-version-list>
+        <kotka-version
+          *ngIf="isVersionViewData(viewData)"
+          [form]="viewData.form"
+          [data]="viewData.data"
+        ></kotka-version>
         <kotka-version-comparison
           *ngIf="isVersionComparisonViewData(viewData)"
           [form]="viewData.form"
