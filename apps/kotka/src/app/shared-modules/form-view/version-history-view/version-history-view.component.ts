@@ -7,15 +7,15 @@ import {
 } from '@angular/core';
 import { DataType } from '../../../shared/services/api-services/data.service';
 import {
-  isVersionComparisonViewData,
-  isVersionListViewData,
   VersionHistoryErrorEnum,
   VersionHistoryViewFacade,
   ErrorViewModel,
   SuccessViewModel,
   isErrorViewModel,
   isSuccessViewModel,
-  isVersionViewData
+  isVersionListViewModel,
+  isVersionViewModel,
+  isVersionComparisonViewModel
 } from './version-history-view.facade';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
@@ -38,9 +38,9 @@ export class VersionHistoryViewComponent implements OnChanges {
 
   isErrorViewModel = isErrorViewModel;
   isSuccessViewModel = isSuccessViewModel;
-  isVersionListViewData = isVersionListViewData;
-  isVersionViewData = isVersionViewData;
-  isVersionComparisonViewData = isVersionComparisonViewData;
+  isVersionListViewModel = isVersionListViewModel;
+  isVersionViewModel = isVersionViewModel;
+  isVersionComparisonViewModel = isVersionComparisonViewModel;
 
   versionHistoryErrorEnum = VersionHistoryErrorEnum;
 

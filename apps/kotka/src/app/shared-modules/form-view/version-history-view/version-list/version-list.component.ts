@@ -15,7 +15,7 @@ import { StoreVersion } from '@kotka/api-interfaces';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VersionListComponent implements OnChanges {
-  @Input() data: StoreVersion[] = [];
+  @Input() data?: StoreVersion[];
 
   checkedVersions: Record<string, boolean> = {};
 
@@ -23,7 +23,7 @@ export class VersionListComponent implements OnChanges {
 
   ngOnChanges() {
     this.checkedVersions = {};
-    this.data.forEach(version => {
+    (this.data || []).forEach(version => {
       this.checkedVersions[version.version] = false;
     });
   }

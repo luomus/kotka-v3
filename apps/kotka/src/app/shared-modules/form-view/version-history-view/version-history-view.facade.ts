@@ -29,9 +29,17 @@ export enum VersionHistoryErrorEnum {
   genericError = 'genericError'
 }
 
+export enum VersionHistoryViewEnum {
+  versionList = 'versionList',
+  version = 'version',
+  versionComparison = 'versionComparison'
+}
+
 export interface RouteParams {
   dataURI?: string;
-  version?: string|string[];
+  version?: string;
+  versions?: string[];
+  view?: VersionHistoryViewEnum;
 }
 
 export interface VersionHistoryInputs {
@@ -39,39 +47,26 @@ export interface VersionHistoryInputs {
   dataType: DataType;
 }
 
-interface VersionListViewData {
-  type: 'versionList';
-  data: StoreVersion[];
-}
-interface VersionViewData {
-  type: 'version';
-  form: LajiForm.SchemaForm;
-  data: DataObject;
-}
-interface VersionComparisonViewData {
-  type: 'comparison';
-  form: LajiForm.JsonForm;
-  data: VersionDifference;
-}
-
-export type ViewData = VersionListViewData | VersionViewData | VersionComparisonViewData;
-
-export function isVersionListViewData(viewData: ViewData): viewData is VersionListViewData {
-  return viewData?.type === 'versionList';
-}
-export function isVersionViewData(viewData: ViewData): viewData is VersionViewData {
-  return viewData?.type === 'version';
-}
-export function isVersionComparisonViewData(viewData: ViewData): viewData is VersionComparisonViewData {
-  return viewData?.type === 'comparison';
-}
-
-export interface SuccessViewModel {
+export interface BaseViewModel {
   routeParams: RouteParams;
-  viewData?: ViewData;
 }
-export interface ErrorViewModel {
-  routeParams: RouteParams;
+
+export interface VersionListViewModel extends BaseViewModel {
+  versionList?: StoreVersion[];
+}
+export interface VersionViewModel extends BaseViewModel {
+  form?: LajiForm.SchemaForm;
+  data?: DataObject;
+  versionList?: StoreVersion[];
+}
+export interface VersionComparisonViewModel extends BaseViewModel {
+  form?: LajiForm.JsonForm;
+  diffData?: VersionDifference
+}
+
+export type SuccessViewModel = VersionListViewModel | VersionViewModel | VersionComparisonViewModel;
+
+export interface ErrorViewModel extends BaseViewModel {
   errorType: VersionHistoryErrorEnum;
 }
 
@@ -82,6 +77,15 @@ export function isSuccessViewModel(viewModel: ViewModel): viewModel is SuccessVi
 }
 export function isErrorViewModel(viewModel: ViewModel): viewModel is ErrorViewModel {
   return 'errorType' in viewModel;
+}
+export function isVersionListViewModel(viewModel: SuccessViewModel): viewModel is VersionListViewModel {
+  return viewModel?.routeParams.view === VersionHistoryViewEnum.versionList;
+}
+export function isVersionViewModel(viewModel: SuccessViewModel): viewModel is VersionViewModel {
+  return viewModel?.routeParams.view === VersionHistoryViewEnum.version;
+}
+export function isVersionComparisonViewModel(viewModel: SuccessViewModel): viewModel is VersionComparisonViewModel {
+  return viewModel?.routeParams.view === VersionHistoryViewEnum.versionComparison;
 }
 
 @Injectable()
@@ -118,7 +122,7 @@ export class VersionHistoryViewFacade {
       routeParams$, viewData$
     ]).pipe(
       map(([routeParams, viewData]) => {
-        return { routeParams, viewData };
+        return { routeParams, ...viewData };
       }),
       catchError(err => {
         const errorType = err.message === VersionHistoryErrorEnum.dataNotFound ? VersionHistoryErrorEnum.dataNotFound : VersionHistoryErrorEnum.genericError;
@@ -135,28 +139,41 @@ export class VersionHistoryViewFacade {
       filter((event) => event instanceof NavigationEnd),
       map(() => {
         const dataURI = this.activeRoute.snapshot.queryParams['uri'];
-        const version = this.activeRoute.snapshot.queryParams['version'];
-        return { dataURI, version };
+        let version = this.activeRoute.snapshot.queryParams['version'];
+        let versions = undefined;
+
+        if (Array.isArray(version)) {
+          versions = version;
+          version = undefined;
+        }
+
+        const view = version ? VersionHistoryViewEnum.version : (
+          versions ? VersionHistoryViewEnum.versionComparison : VersionHistoryViewEnum.versionList
+        );
+
+        return { dataURI, version, versions, view };
       }),
       shareReplay(1)
     );
   }
 
-  private getViewData$(params: RouteParams, inputs: VersionHistoryInputs): Observable<ViewData> {
+  private getViewData$(params: RouteParams, inputs: VersionHistoryInputs): Observable<Omit<SuccessViewModel, 'routeParams'>> {
     if (!params.dataURI) {
       return throwError(() => new Error(FormErrorEnum.dataNotFound));
     }
 
-    if (!params.version) {
-      return this.getVersionList$(inputs.dataType, params.dataURI).pipe(map(data => ({ type: 'versionList', data })));
-    } else if (!Array.isArray(params.version)) {
+    const versionList$ = this.getVersionList$(inputs.dataType, params.dataURI);
+
+    if (params.view === VersionHistoryViewEnum.versionList) {
+      return versionList$.pipe(map(versionList => ({ versionList })));
+    } else if (params.view === VersionHistoryViewEnum.version) {
       const form$ = this.getForm$(inputs);
       const data$ = this.getVersionData$(inputs.dataType, params.dataURI, params.version);
-      return combineLatest([form$, data$]).pipe(map(([form, data]) => ({ type: 'version', form, data })));
+      return combineLatest([form$, data$, versionList$]).pipe(map(([form, data, versionList]) => ({ form, data, versionList })));
     } else {
       const form$ = this.getFormInJsonFormat$(inputs);
-      const versionDifference$ = this.getVersionDifference$(inputs.dataType, params.dataURI, params.version);
-      return combineLatest([form$, versionDifference$]).pipe(map(([form, data]) => ({ type: 'comparison', form, data })));
+      const versionDifference$ = this.getVersionDifference$(inputs.dataType, params.dataURI, params.versions);
+      return combineLatest([form$, versionDifference$]).pipe(map(([form, diffData]) => ({ form, diffData })));
     }
   }
 

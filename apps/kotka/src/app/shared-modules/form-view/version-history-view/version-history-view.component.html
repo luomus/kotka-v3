@@ -14,23 +14,24 @@
     </ngb-alert>
 
     <ng-container *ngIf="isSuccessViewModel(vm)">
-      <ng-container *ngIf="vm.viewData as viewData else spinner">
-        <kotka-version-list
-          *ngIf="isVersionListViewData(viewData)"
-          [data]="viewData.data"
-          (compareVersionsClick)="onCompareVersionsClick($event)"
-        ></kotka-version-list>
-        <kotka-version
-          *ngIf="isVersionViewData(viewData)"
-          [form]="viewData.form"
-          [data]="viewData.data"
-        ></kotka-version>
-        <kotka-version-comparison
-          *ngIf="isVersionComparisonViewData(viewData)"
-          [form]="viewData.form"
-          [data]="viewData.data"
-        ></kotka-version-comparison>
-      </ng-container>
+      <kotka-version-list
+        *ngIf="isVersionListViewModel(vm)"
+        [data]="vm.versionList"
+        (compareVersionsClick)="onCompareVersionsClick($event)"
+      ></kotka-version-list>
+      <kotka-version
+        *ngIf="isVersionViewModel(vm)"
+        [visibleDataTypeName]="visibleDataTypeName"
+        [version]="vm.routeParams.version"
+        [versionList]="vm.versionList"
+        [form]="vm.form"
+        [data]="vm.data"
+      ></kotka-version>
+      <kotka-version-comparison
+        *ngIf="isVersionComparisonViewModel(vm)"
+        [form]="vm.form"
+        [data]="vm.diffData"
+      ></kotka-version-comparison>
     </ng-container>
   </kui-main-content>
 </ng-container>

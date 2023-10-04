@@ -1,3 +1,19 @@
+<ngb-alert [type]="'warning'" [dismissible]="false">
+  <span>
+    <strong>You are viewing an old version of this {{ visibleDataTypeName }}. </strong>
+    <a [routerLink]="[]" [queryParams]="{ version: undefined }" queryParamsHandling="merge">View history</a>
+  </span>
+  <div class="version-pagination mt-2">
+    <button class="btn btn-light" [routerLink]="[]" [queryParams]="{ version: previousVersion }" queryParamsHandling="merge" [disabled]="previousVersion === undefined">
+      <i class="fa fa-angle-left"></i> Previous
+    </button>
+    <span class="ms-2 me-2"><strong>Version {{ version }}</strong></span>
+    <button class="btn btn-light" [routerLink]="[]" [queryParams]="{ version: nextVersion }" queryParamsHandling="merge" [disabled]="nextVersion === undefined">
+      Next <i class="fa fa-angle-right"></i>
+    </button>
+  </div>
+</ngb-alert>
+
 <kui-laji-form
   *ngIf="form && data"
   [form]="form"
