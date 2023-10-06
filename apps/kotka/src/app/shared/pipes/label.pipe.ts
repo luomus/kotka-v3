@@ -32,10 +32,10 @@ export class LabelPipe implements PipeTransform {
     return this.value;
   }
 
-  private updateValue(id: LabelKey|LabelKey[]): void {
-    const label$: Observable<string|string[]> = Array.isArray(id) ?
-      forkJoin(id.map(_id => this.labelService.getLabel(_id))) :
-      this.labelService.getLabel(id);
+  private updateValue(value: LabelKey|LabelKey[]): void {
+    const label$: Observable<string|string[]> = Array.isArray(value) ?
+      forkJoin(value.map(_value => this.labelService.getLabel(_value))) :
+      this.labelService.getLabel(value);
 
     label$.subscribe(label => {
       this.value = label;
