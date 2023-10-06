@@ -14,13 +14,15 @@
   </div>
 </ngb-alert>
 
-<kui-laji-form
-  *ngIf="form && data"
-  [form]="form"
-  [formData]="data"
-  [disabled]="true"
-  [showFooter]="false"
-  [apiClient]="formApiClient"
-  [notifier]="notifier"
->
-</kui-laji-form>
+<kui-spinner [spinning]="!form || !data">
+  <kui-laji-form
+    *ngIf="form && data"
+    [form]="form"
+    [formData]="data"
+    [disabled]="true"
+    [showFooter]="false"
+    [apiClient]="formApiClient"
+    [notifier]="notifier"
+  >
+  </kui-laji-form>
+</kui-spinner>

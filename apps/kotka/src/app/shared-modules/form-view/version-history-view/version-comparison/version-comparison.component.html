@@ -1,29 +1,33 @@
 <h2>Versions compared</h2>
-<div class="version-navigation mt-2" *ngIf="versions && versionData">
-  <button class="btn btn-light" [routerLink]="[]" [queryParams]="{ version: [previousVersion, versions[0]] }" queryParamsHandling="merge" [disabled]="previousVersion === undefined">
-    <i class="fa fa-angle-left"></i> Previous
-  </button>
-  <div class="card d-inline-block ms-2 me-2">
-    <div class="card-body">
-      <h5 class="card-title"><a [routerLink]="[]" [queryParams]="{ version: versions[0] }" queryParamsHandling="merge">Version {{ versions[0] }}</a></h5>
-      <h6 class="card-subtitle mb-2 text-muted">{{ versionData[0].created | date:'dd.MM.YYYY HH:mm' }}</h6>
+<kui-spinner [spinning]="!versions || !versionData">
+  <div class="version-navigation mt-2" *ngIf="versions && versionData">
+    <button class="btn btn-light" [routerLink]="[]" [queryParams]="{ version: [previousVersion, versions[0]] }" queryParamsHandling="merge" [disabled]="previousVersion === undefined">
+      <i class="fa fa-angle-left"></i> Previous
+    </button>
+    <div class="card d-inline-block ms-2 me-2">
+      <div class="card-body">
+        <h5 class="card-title"><a [routerLink]="[]" [queryParams]="{ version: versions[0] }" queryParamsHandling="merge">Version {{ versions[0] }}</a></h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{ versionData[0].created | date:'dd.MM.YYYY HH:mm' }}</h6>
+      </div>
     </div>
-  </div>
-  <div class="card d-inline-block ms-2 me-2">
-    <div class="card-body">
-      <h5 class="card-title"><a [routerLink]="[]" [queryParams]="{ version: versions[1] }" queryParamsHandling="merge">Version {{ versions[1] }}</a></h5>
-      <h6 class="card-subtitle mb-2 text-muted">{{ versionData[1].created | date:'dd.MM.YYYY HH:mm' }}</h6>
+    <div class="card d-inline-block ms-2 me-2">
+      <div class="card-body">
+        <h5 class="card-title"><a [routerLink]="[]" [queryParams]="{ version: versions[1] }" queryParamsHandling="merge">Version {{ versions[1] }}</a></h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{ versionData[1].created | date:'dd.MM.YYYY HH:mm' }}</h6>
+      </div>
     </div>
+    <button class="btn btn-light" [routerLink]="[]" [queryParams]="{ version: [versions[1], nextVersion] }" queryParamsHandling="merge" [disabled]="nextVersion === undefined">
+      Next <i class="fa fa-angle-right"></i>
+    </button>
   </div>
-  <button class="btn btn-light" [routerLink]="[]" [queryParams]="{ version: [versions[1], nextVersion] }" queryParamsHandling="merge" [disabled]="nextVersion === undefined">
-    Next <i class="fa fa-angle-right"></i>
-  </button>
-</div>
+</kui-spinner>
 <hr>
 
-<kotka-viewer
-  *ngIf="form && data"
-  [form]="form"
-  [data]="data.original"
-  [differenceData]="data.diff"
-></kotka-viewer>
+<kui-spinner [spinning]="!form || !data">
+  <kotka-viewer
+    *ngIf="form && data"
+    [form]="form"
+    [data]="data.original"
+    [differenceData]="data.diff"
+  ></kotka-viewer>
+</kui-spinner>

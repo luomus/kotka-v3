@@ -112,9 +112,7 @@ export class VersionHistoryViewFacade {
     routeParams$.pipe(take(1)).subscribe(); // TODO refactor so that this is not needed
 
     const viewData$ = combineLatest([routeParams$, this.inputs$]).pipe(
-      switchMap(([params, inputs]) => concat(
-        of(undefined), this.getViewData$(params, inputs)
-      ))
+      switchMap(([params, inputs]) => this.getViewData$(params, inputs))
     );
 
     return combineLatest([
@@ -161,17 +159,19 @@ export class VersionHistoryViewFacade {
       return throwError(() => new Error(FormErrorEnum.dataNotFound));
     }
 
-    const versionList$ = this.getVersionList$(inputs.dataType, params.dataURI);
+    const versionList$ = concat(of(undefined), this.getVersionList$(inputs.dataType, params.dataURI));
 
     if (params.view === VersionHistoryViewEnum.versionList) {
       return versionList$.pipe(map(versionList => ({ versionList })));
     } else if (params.view === VersionHistoryViewEnum.version) {
-      const form$ = this.getForm$(inputs);
-      const data$ = this.getVersionData$(inputs.dataType, params.dataURI, params.version);
+      const form$ = concat(of(undefined), this.getForm$(inputs));
+      const data$ = concat(of(undefined), this.getVersionData$(inputs.dataType, params.dataURI, params.version));
+
       return combineLatest([form$, data$, versionList$]).pipe(map(([form, data, versionList]) => ({ form, data, versionList })));
     } else {
-      const form$ = this.getFormInJsonFormat$(inputs);
-      const versionDifference$ = this.getVersionDifference$(inputs.dataType, params.dataURI, params.versions);
+      const form$ = concat(of(undefined), this.getFormInJsonFormat$(inputs));
+      const versionDifference$ = concat(of(undefined), this.getVersionDifference$(inputs.dataType, params.dataURI, params.versions));
+
       return combineLatest([form$, versionDifference$, versionList$]).pipe(map(([form, diffData, versionList]) => ({ form, diffData, versionList })));
     }
   }
