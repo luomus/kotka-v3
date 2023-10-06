@@ -4,7 +4,6 @@ import {
   ComponentRef, OnDestroy,
   ViewChild
 } from '@angular/core';
-import { DataType } from '../../shared/services/api-services/data.service';
 import {
   LajiForm,
   Person,
@@ -12,7 +11,7 @@ import {
   SpecimenTransactionEvent
 } from '@kotka/shared/models';
 import { from, Observable, of, Subscription, switchMap } from 'rxjs';
-import { FormService } from '../../shared/services/api-services/form.service';
+import { FormService } from '../../shared/services/form.service';
 import { FormViewComponent } from '../../shared-modules/form-view/form-view/form-view.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TransactionEventFormComponent } from './transaction-event-form.component';
@@ -27,6 +26,8 @@ import {
   LajiFormEventListenerEmbedderService
 } from '@kotka/ui/laji-form';
 import { ComponentCanDeactivate } from '../../shared/services/guards/component-can-deactivate.guard';
+import { KotkaDocumentType } from '@kotka/api-interfaces';
+import { ApiClient } from '../../shared/services/api-services/api-client';
 
 type SpecimenIdKey = keyof Pick<SpecimenTransaction, 'awayIDs'|'returnedIDs'|'missingIDs'|'damagedIDs'>;
 
@@ -37,10 +38,10 @@ type SpecimenIdKey = keyof Pick<SpecimenTransaction, 'awayIDs'|'returnedIDs'|'mi
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransactionFormComponent implements OnDestroy, ComponentCanDeactivate {
-  dataType = DataType.transaction;
+  dataType = KotkaDocumentType.transaction;
   augmentFormFunc = this.augmentForm.bind(this);
 
-  @ViewChild(FormViewComponent, { static: true }) formView!: FormViewComponent;
+  @ViewChild(FormViewComponent, { static: true }) formView!: FormViewComponent<KotkaDocumentType.transaction>;
 
   private formData?: Partial<SpecimenTransaction>;
 
@@ -57,6 +58,7 @@ export class TransactionFormComponent implements OnDestroy, ComponentCanDeactiva
   };
 
   constructor(
+    private apiClient: ApiClient,
     private formService: FormService,
     private modalService: NgbModal,
     private dialogService: DialogService,
@@ -187,7 +189,7 @@ export class TransactionFormComponent implements OnDestroy, ComponentCanDeactiva
     }
 
     this.formView.lajiForm?.block();
-    this.formService.getSpecimenRange(range).subscribe({
+    this.apiClient.getSpecimenRange(range).subscribe({
       'next': result => {
         if (result.status === 'ok') {
           const awayIDs = [...(this.formData?.awayIDs || []), ...(result.items || [])];

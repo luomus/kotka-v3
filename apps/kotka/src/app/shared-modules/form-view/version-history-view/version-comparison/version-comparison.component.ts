@@ -5,7 +5,7 @@ import {
   OnChanges
 } from '@angular/core';
 import { LajiForm } from '@kotka/shared/models';
-import { VersionDifference } from '../../../../shared/services/api-services/data.service';
+import { VersionDifference } from '../../../../shared/services/data.service';
 import { StoreVersion } from '@kotka/api-interfaces';
 
 @Component({
@@ -19,7 +19,7 @@ export class VersionComparisonComponent implements OnChanges {
   @Input() versionList?: StoreVersion[];
 
   @Input() form?: LajiForm.JsonForm;
-  @Input() data?: VersionDifference;
+  @Input() data?: VersionDifference<any>;
 
   versionData?: StoreVersion[];
   previousVersion?: number;

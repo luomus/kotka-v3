@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { DataObject, DataService, DataType } from '../../../shared/services/api-services/data.service';
-import { FormService } from '../../../shared/services/api-services/form.service';
-import { UserService } from '../../../shared/services/api-services/user.service';
+import { DataService } from '../../../shared/services/data.service';
+import { FormService } from '../../../shared/services/form.service';
+import { UserService } from '../../../shared/services/user.service';
 import {
   catchError,
   combineLatest,
@@ -16,9 +16,9 @@ import {
 } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { allowAccessByOrganization, allowAccessByTime } from '@kotka/utils';
-import { LajiForm, Person } from '@kotka/shared/models';
+import { KotkaDocumentObject, LajiForm, Person } from '@kotka/shared/models';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { StoreVersion } from '@kotka/api-interfaces';
+import { DocumentObject, KotkaDocumentType, StoreVersion } from '@kotka/api-interfaces';
 
 export enum FormErrorEnum {
   dataNotFound = 'dataNotFound',
@@ -32,9 +32,9 @@ export interface RouteParams {
 
 export interface FormInputs {
   formId: string;
-  dataType: DataType;
+  dataType: KotkaDocumentType;
   augmentFormFunc?: (form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>;
-  getInitialFormDataFunc?: (user: Person) => Partial<DataObject>;
+  getInitialFormDataFunc?: (user: Person) => Partial<KotkaDocumentObject>;
 }
 
 export interface FormState {
@@ -46,7 +46,7 @@ export interface FormState {
 export interface SuccessViewModel {
   routeParams: RouteParams;
   form?: LajiForm.SchemaForm;
-  formData?: Partial<DataObject>;
+  formData?: Partial<KotkaDocumentObject>;
   state?: FormState;
   versionHistory?: StoreVersion[];
 }
@@ -70,7 +70,7 @@ export class FormViewFacade implements OnDestroy {
   vm$: Observable<ViewModel>;
 
   private inputs$ = new ReplaySubject<FormInputs>(1);
-  private formData$ = new ReplaySubject<Partial<DataObject>|undefined>(1);
+  private formData$ = new ReplaySubject<Partial<KotkaDocumentObject>|undefined>(1);
 
   private initialFormDataSub?: Subscription;
 
@@ -92,7 +92,7 @@ export class FormViewFacade implements OnDestroy {
     this.inputs$.next(inputs);
   }
 
-  setFormData(formData: Partial<DataObject>) {
+  setFormData(formData: Partial<KotkaDocumentObject>) {
     this.formData$.next(formData);
   }
 
@@ -162,7 +162,7 @@ export class FormViewFacade implements OnDestroy {
     );
   }
 
-  private getInitialFormData$(routeParams: RouteParams, inputs: FormInputs, user: Person): Observable<Partial<DataObject>> {
+  private getInitialFormData$(routeParams: RouteParams, inputs: FormInputs, user: Person): Observable<Partial<KotkaDocumentObject>> {
     if (routeParams.editMode) {
       return this.getFormData$(inputs.dataType, routeParams.dataURI);
     } else {
@@ -170,7 +170,7 @@ export class FormViewFacade implements OnDestroy {
     }
   }
 
-  private getFormData$(dataType: DataType, dataURI?: string): Observable<Partial<DataObject>> {
+  private getFormData$<T extends KotkaDocumentType>(dataType: T, dataURI?: string): Observable<Partial<DocumentObject<T>>> {
     if (!dataURI) {
       return throwError(() => new Error(FormErrorEnum.dataNotFound));
     }
@@ -184,11 +184,11 @@ export class FormViewFacade implements OnDestroy {
     );
   }
 
-  private getFormState(routeParams: RouteParams, form: LajiForm.SchemaForm, formData: Partial<DataObject>, user: Person): FormState {
+  private getFormState(routeParams: RouteParams, form: LajiForm.SchemaForm, formData: Partial<KotkaDocumentObject>, user: Person): FormState {
     const isAdmin = this.userService.isICTAdmin(user);
     const isEditMode =  routeParams.editMode;
-    const disabled = isEditMode && !isAdmin && !allowAccessByOrganization(formData as DataObject, user);
-    const showDeleteButton = isEditMode && (isAdmin || (!disabled && allowAccessByTime(formData as DataObject, {'d': 14})));
+    const disabled = isEditMode && !isAdmin && !allowAccessByOrganization(formData as KotkaDocumentObject, user);
+    const showDeleteButton = isEditMode && (isAdmin || (!disabled && allowAccessByTime(formData as KotkaDocumentObject, {'d': 14})));
     const showCopyButton = isEditMode && !!form.options?.allowTemplate;
 
     return { disabled, showDeleteButton, showCopyButton };

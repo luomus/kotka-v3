@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { UserService } from '../../shared/services/api-services/user.service';
+import { UserService } from '../../shared/services/user.service';
 
 @Component({
   selector: 'kotka-login',

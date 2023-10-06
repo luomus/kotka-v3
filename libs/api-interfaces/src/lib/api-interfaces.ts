@@ -1,5 +1,14 @@
-import { Person, StoreObject } from '@kotka/shared/models';
+import { Dataset, KotkaDocumentObject, Person, SpecimenTransaction } from '@kotka/shared/models';
 import { HealthCheckResult } from '@nestjs/terminus';
+
+export enum KotkaDocumentType {
+  dataset = 'dataset',
+  transaction = 'transaction'
+}
+
+export type DocumentObject<T extends KotkaDocumentType> = T extends KotkaDocumentType.dataset
+  ? Dataset
+  : SpecimenTransaction
 
 export interface StoreGetQuery {
   query?: string,
@@ -20,8 +29,8 @@ export interface StorePatch {
   value: string|number|boolean;
 }
 
-export interface StoreVersionDifference {
-  original: StoreObject;
+export interface KotkaVersionDifference {
+  original: KotkaDocumentObject;
   patch: StorePatch[];
 }
 

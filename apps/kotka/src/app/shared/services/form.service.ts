@@ -1,11 +1,9 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { combineLatest, Observable, shareReplay } from 'rxjs';
-import { LajiForm, Area, PagedResult, Organization } from '@kotka/shared/models';
+import { LajiForm } from '@kotka/shared/models';
 import { map } from 'rxjs/operators';
-import { RangeResponse } from '@kotka/api-interfaces';
-import { apiBase, lajiApiBase } from './constants';
 import { UserService } from './user.service';
+import { ApiClient } from './api-services/api-client';
 
 export type EnumOption = { const: string, title: string };
 
@@ -18,13 +16,13 @@ export class FormService {
   private countryOptions$?: Observable<EnumOption[]>;
 
   constructor(
-    private httpClient: HttpClient,
+    private apiClient: ApiClient,
     private userService: UserService
   ) {}
 
   getForm(formId: string): Observable<LajiForm.SchemaForm> {
     if (!this.formById$[formId]) {
-      this.formById$[formId] = this.httpClient.get<LajiForm.SchemaForm>(`${lajiApiBase}/forms/${formId}`).pipe(
+      this.formById$[formId] = this.apiClient.getForm(formId).pipe(
         shareReplay(1)
       );
     }
@@ -32,8 +30,7 @@ export class FormService {
   }
 
   getFormInJsonFormat(formId: string): Observable<LajiForm.JsonForm> {
-    const params = new HttpParams().set('format', 'json');
-    return this.httpClient.get<LajiForm.JsonForm>(`${lajiApiBase}/forms/${formId}`, { params });
+    return this.apiClient.getFormInJsonFormat(formId);
   }
 
   getFormWithUserContext(formId: string): Observable<LajiForm.SchemaForm> {
@@ -51,8 +48,7 @@ export class FormService {
 
   getAllCountryOptions(): Observable<EnumOption[]> {
     if (!this.countryOptions$) {
-      const params = new HttpParams().set('type', 'country').set('pageSize', 1000).set('lang', 'en');
-      this.countryOptions$ = this.httpClient.get<PagedResult<Area>>(`${lajiApiBase}/areas`, { params }).pipe(
+      this.countryOptions$ = this.apiClient.getCountryList().pipe(
         map(data => {
           const result: EnumOption[] = [{ const: "", title: "" }];
           data.results.forEach(area => {
@@ -67,13 +63,5 @@ export class FormService {
     }
 
     return this.countryOptions$;
-  }
-
-  getSpecimenRange(range: string): Observable<RangeResponse> {
-    return this.httpClient.get<RangeResponse>(`${apiBase}/specimen/range/${range}`);
-  }
-
-  getOrganization(id: string): Observable<Organization> {
-    return this.httpClient.get<Organization>(`${lajiApiBase}/organization/by-id/${id}`);
   }
 }

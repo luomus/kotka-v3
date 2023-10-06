@@ -3,11 +3,11 @@ import {
   Component,
   Input,
 } from '@angular/core';
-import { LajiForm, StoreObject } from '@kotka/shared/models';
-import { DataObject, DifferenceObject } from '../../../shared/services/api-services/data.service';
+import { KotkaDocumentObject, LajiForm, StoreObject } from '@kotka/shared/models';
+import { DifferenceObject } from '../../../shared/services/data.service';
 
 interface Field {
-  name: keyof DataObject;
+  name: keyof KotkaDocumentObject;
   label: string;
   type: 'text'|'checkbox'|'select'|'collection'|string;
   options?: { value_options?: Record<string, string> },

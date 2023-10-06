@@ -4,8 +4,7 @@ import {
   Input,
   OnChanges
 } from '@angular/core';
-import { LajiForm } from '@kotka/shared/models';
-import { DataObject } from '../../../../shared/services/api-services/data.service';
+import { KotkaDocumentObject, LajiForm } from '@kotka/shared/models';
 import { FormApiClient } from '../../../../shared/services/api-services/form-api-client';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { StoreVersion } from '@kotka/api-interfaces';
@@ -23,7 +22,7 @@ export class VersionComponent implements OnChanges {
   @Input() versionList?: StoreVersion[];
 
   @Input() form?: LajiForm.SchemaForm;
-  @Input() data?: DataObject;
+  @Input() data?: KotkaDocumentObject;
 
   previousVersion?: number;
   nextVersion?: number;

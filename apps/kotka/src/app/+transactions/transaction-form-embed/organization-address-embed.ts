@@ -4,10 +4,10 @@ import {
   ViewChild
 } from '@angular/core';
 import { Observable, of, ReplaySubject, switchMap } from 'rxjs';
-import { Organization } from '@kotka/shared/models';
-import { FormService } from '../../shared/services/api-services/form.service';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { LajiFormEmbedComponent } from '@kotka/ui/laji-form';
+import { ApiClient } from '../../shared/services/api-services/api-client';
+import { LajiOrganization } from '@kotka/shared/models';
 
 @Component({
   selector: 'kotka-organization-address-embed',
@@ -39,7 +39,7 @@ export class OrganizationAddressEmbedComponent implements LajiFormEmbedComponent
   private organization$ = this.organizationSubject.asObservable().pipe(distinctUntilChanged());
 
   constructor(
-    private formService: FormService
+    private apiClient: ApiClient
   ) {
     this.templateContext$ = this.organization$.pipe(
       switchMap(organizationId => this.getOrganization(organizationId)),
@@ -47,10 +47,10 @@ export class OrganizationAddressEmbedComponent implements LajiFormEmbedComponent
     );
   }
 
-  private getOrganization(organizationId?: string|null): Observable<Organization|undefined> {
+  private getOrganization(organizationId?: string|null): Observable<LajiOrganization|undefined> {
     if (!organizationId) {
       return of(undefined);
     }
-    return this.formService.getOrganization(organizationId);
+    return this.apiClient.getOrganization(organizationId);
   }
 }

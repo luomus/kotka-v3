@@ -1,11 +1,10 @@
-import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, Observable, of, switchMap } from 'rxjs';
 import { map, tap, distinctUntilChanged, share } from 'rxjs/operators';
 import { WINDOW } from '@ng-toolkit/universal';
 import { Person } from '@kotka/shared/models';
-import { LoginResponse } from '@kotka/api-interfaces';
-import { apiBase } from './constants';
+import { apiBase } from './api-services/constants';
+import { ApiClient } from './api-services/api-client';
 
 export interface IUserServiceState {
   user: Person | null;
@@ -32,7 +31,7 @@ export class UserService {
 
   constructor(
     @Inject(WINDOW) private window: Window,
-    private httpClient: HttpClient
+    private apiClient: ApiClient
   ) {
     const profile$ = this.getSessionProfile().pipe(share());
 
@@ -52,7 +51,7 @@ export class UserService {
   }
 
   private getSessionProfile(): Observable<Person | null> {
-    return this.httpClient.get<Person>(authPath + 'user').pipe(
+    return this.apiClient.getSessionProfile().pipe(
       catchError(() => {
         return of(null);
       }),
@@ -61,14 +60,14 @@ export class UserService {
   }
 
   login(): Observable<string> {
-    return this.httpClient.get<LoginResponse>(authPath + 'postLogin').pipe(
+    return this.apiClient.login().pipe(
       tap(data => this.updateUser(data.profile)),
       map(data => data.next)
     );
   }
 
   logout() {
-    return this.httpClient.get(authPath + 'logout').pipe(
+    return this.apiClient.logout().pipe(
       tap(() => this.updateUser(null)),
     );
   }

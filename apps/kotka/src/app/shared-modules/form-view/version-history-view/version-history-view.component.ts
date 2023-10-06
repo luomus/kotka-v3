@@ -5,7 +5,6 @@ import {
   OnChanges,
   SimpleChanges,
 } from '@angular/core';
-import { DataType } from '../../../shared/services/api-services/data.service';
 import {
   VersionHistoryErrorEnum,
   VersionHistoryViewFacade,
@@ -19,6 +18,7 @@ import {
 } from './version-history-view.facade';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
+import { KotkaDocumentType } from '@kotka/api-interfaces';
 
 @Component({
   selector: 'kotka-version-history-view',
@@ -29,7 +29,7 @@ import { Router } from '@angular/router';
 })
 export class VersionHistoryViewComponent implements OnChanges {
   @Input() formId?: string;
-  @Input() dataType?: DataType;
+  @Input() dataType?: KotkaDocumentType;
   @Input() dataTypeName?: string;
 
   vm$: Observable<SuccessViewModel | ErrorViewModel>;

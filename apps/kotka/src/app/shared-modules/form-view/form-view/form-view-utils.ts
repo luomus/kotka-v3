@@ -1,9 +1,9 @@
 import { JSONPath } from 'jsonpath-plus';
 import { cloneDeep } from 'lodash';
-import { DataObject } from '../../../shared/services/api-services/data.service';
+import { KotkaDocumentObject } from '@kotka/shared/models';
 
 export class FormViewUtils {
-  static removeMetaAndExcludedFields(data: Partial<DataObject>, excludedFields: string[] = []): Partial<DataObject> {
+  static removeMetaAndExcludedFields<T extends KotkaDocumentObject>(data: Partial<T>, excludedFields: string[] = []): Partial<T> {
     data = cloneDeep(data);
 
     let removedFields = ['$.id', '$.dateCreated', '$.dateEdited', '$.creator', '$.editor'];

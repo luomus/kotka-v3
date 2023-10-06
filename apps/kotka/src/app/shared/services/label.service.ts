@@ -1,17 +1,13 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, Observable, of, switchMap, isObservable } from 'rxjs';
 import { map, tap, share } from 'rxjs/operators';
 import { Person } from '@kotka/shared/models';
 import { UserService } from './user.service';
-import { lajiApiBase } from './constants';
+import { lajiApiBase } from './api-services/constants';
 import { DatePipe } from '@angular/common';
+import { ApiClient } from './api-services/api-client';
 
 export type LabelKey = string|number|boolean;
-
-interface OrganizationResponse {
-  fullName: string;
-}
 
 const personPath = `${lajiApiBase}/person/by-id/`;
 const organizationPath = `${lajiApiBase}/organization/by-id/`;
@@ -25,7 +21,7 @@ const cache: Record<string, string|Observable<string>> = {};
 export class LabelService {
   constructor(
     private userService: UserService,
-    private httpClient: HttpClient,
+    private apiCient: ApiClient,
     private datePipe: DatePipe
   ) {}
 
@@ -68,14 +64,14 @@ export class LabelService {
           if (user && user.id === key) {
             return of(user.fullName);
           } else {
-            return this.httpClient.get<Person>(personPath + key).pipe(
+            return this.apiCient.getPerson(key).pipe(
               map(person => person.fullName)
             );
           }
         })
       );
     } else {
-      observable = this.httpClient.get<OrganizationResponse>(organizationPath + key).pipe(
+      observable = this.apiCient.getOrganization(key).pipe(
         map(organization => organization.fullName)
       );
     }

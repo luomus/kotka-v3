@@ -13,16 +13,15 @@ import {
   HostListener
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormService } from '../../../shared/services/api-services/form.service';
+import { FormService } from '../../../shared/services/form.service';
 import { LajiForm, Person } from '@kotka/shared/models';
 import { from, Observable, of, switchMap } from 'rxjs';
-import { DataObject, DataService, DataType } from '../../../shared/services/api-services/data.service';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ToastService } from '../../../shared/services/toast.service';
-import { UserService } from '../../../shared/services/api-services/user.service';
+import { UserService } from '../../../shared/services/user.service';
 import { FormApiClient } from '../../../shared/services/api-services/form-api-client';
 import { DialogService } from '../../../shared/services/dialog.service';
-import { ErrorMessages } from '@kotka/api-interfaces';
+import { DocumentObject, ErrorMessages, KotkaDocumentType } from '@kotka/api-interfaces';
 import {
   FormErrorEnum,
   ErrorViewModel,
@@ -34,6 +33,7 @@ import {
 import { take, tap } from 'rxjs/operators';
 import { ComponentCanDeactivate } from '../../../shared/services/guards/component-can-deactivate.guard';
 import { FormViewUtils } from './form-view-utils';
+import { DataService } from '../../../shared/services/data.service';
 
 @Component({
   selector: 'kotka-form-view',
@@ -42,12 +42,12 @@ import { FormViewUtils } from './form-view-utils';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [FormViewFacade]
 })
-export class FormViewComponent implements OnChanges, ComponentCanDeactivate {
+export class FormViewComponent<T extends KotkaDocumentType> implements OnChanges, ComponentCanDeactivate {
   @Input() formId?: string;
-  @Input() dataType?: DataType;
+  @Input() dataType?: T;
   @Input() dataTypeName?: string;
   @Input() augmentFormFunc?: (form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>;
-  @Input() getInitialFormDataFunc?: (user: Person) => Partial<DataObject>;
+  @Input() getInitialFormDataFunc?: (user: Person) => Partial<DocumentObject<T>>;
   @Input() domain = 'http://tun.fi/';
 
   vm$: Observable<SuccessViewModel | ErrorViewModel>;
@@ -63,8 +63,8 @@ export class FormViewComponent implements OnChanges, ComponentCanDeactivate {
   isErrorViewModel = isErrorViewModel;
   isSuccessViewModel = isSuccessViewModel;
 
-  @Output() formDataChange = new EventEmitter<Partial<DataObject>>();
-  @Output() formReady = new EventEmitter<Partial<DataObject>>();
+  @Output() formDataChange = new EventEmitter<Partial<DocumentObject<T>>>();
+  @Output() formReady = new EventEmitter<Partial<DocumentObject<T>>>();
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
   @ContentChild('headerTpl', {static: true}) formHeader?: TemplateRef<Element>;
@@ -113,12 +113,12 @@ export class FormViewComponent implements OnChanges, ComponentCanDeactivate {
     return this.dialogService.confirm('Are you sure you want to leave and discard unsaved changes?');
   }
 
-  onSubmit(data: DataObject) {
+  onSubmit(data: DocumentObject<T>) {
     if (!this.dataType) {
       return;
     }
 
-    let saveData$: Observable<DataObject>;
+    let saveData$: Observable<DocumentObject<T>>;
     if (data.id) {
       saveData$ = this.dataService.update(this.dataType, data.id, data);
     } else {
@@ -146,7 +146,7 @@ export class FormViewComponent implements OnChanges, ComponentCanDeactivate {
     });
   }
 
-  onDelete(data: DataObject) {
+  onDelete(data: DocumentObject<T>) {
     this.dialogService.confirm(`Are you sure you want to delete this ${this.visibleDataTypeName}?`).subscribe(confirm => {
       if (confirm) {
         this.delete(data);
@@ -154,12 +154,12 @@ export class FormViewComponent implements OnChanges, ComponentCanDeactivate {
     });
   }
 
-  onChange(data: Partial<DataObject>) {
+  onChange(data: Partial<DocumentObject<T>>) {
     this.formHasChanges = true;
     this.formDataChange.emit(data);
   }
 
-  onCopy(data: Partial<DataObject>) {
+  onCopy(data: Partial<DocumentObject<T>>) {
     if (this.formHasChanges) {
       this.dialogService.alert('The form has unsaved changes.');
       return;
@@ -183,11 +183,11 @@ export class FormViewComponent implements OnChanges, ComponentCanDeactivate {
     })).subscribe();
   }
 
-  setFormData(data: Partial<DataObject>) {
+  setFormData(data: Partial<DocumentObject<T>>) {
     this.formViewFacade.setFormData(data);
   }
 
-  private delete(data: DataObject) {
+  private delete(data: DocumentObject<T>) {
     if (!this.dataType || !data.id) {
       return;
     }
