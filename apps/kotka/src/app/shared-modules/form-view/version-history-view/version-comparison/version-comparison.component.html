@@ -2,7 +2,7 @@
 <kui-spinner [spinning]="!versions || !versionData">
   <div class="version-navigation mt-2" *ngIf="versions && versionData">
     <button class="btn btn-light" [routerLink]="[]" [queryParams]="{ version: [previousVersion, versions[0]] }" queryParamsHandling="merge" [disabled]="previousVersion === undefined">
-      <i class="fa fa-angle-left"></i> Previous
+      <i class="fa fa-angle-left"></i>
     </button>
     <div class="card d-inline-block ms-2 me-2">
       <div class="card-body">
@@ -17,8 +17,11 @@
       </div>
     </div>
     <button class="btn btn-light" [routerLink]="[]" [queryParams]="{ version: [versions[1], nextVersion] }" queryParamsHandling="merge" [disabled]="nextVersion === undefined">
-      Next <i class="fa fa-angle-right"></i>
+      <i class="fa fa-angle-right"></i>
     </button>
+  </div>
+  <div class="mt-2">
+    <a [routerLink]="[]" [queryParams]="{ version: undefined }" queryParamsHandling="merge">View history</a>
   </div>
 </kui-spinner>
 <hr>
