@@ -117,29 +117,27 @@ export class VersionHistoryViewFacade {
       )),
       switchMap(([params, inputs]) => concat(
         of(undefined), this.getVersionList$(inputs.dataType, params.dataURI))
-      )
+      ),
+      shareReplay(1)
     );
 
-    const viewData$ = combineLatest([routeParams$, this.inputs$]).pipe(
-      switchMap(([params, inputs]) => this.getViewData$(params, inputs))
-    );
-
-    return combineLatest([
-      routeParams$, versionList$, viewData$
-    ]).pipe(
-      map(([routeParams, versionList, viewData]) => {
-        const currentVersion = versionList ? versionList[versionList.length - 1].version + '' : undefined;
-        if (routeParams.view === VersionHistoryViewEnum.version && routeParams.version === currentVersion) {
-          throw new Error(VersionHistoryErrorEnum.genericError);
-        }
-        return { routeParams, versionList, ...viewData };
-      }),
-      catchError(err => {
-        const errorType = err.message === VersionHistoryErrorEnum.dataNotFound ? VersionHistoryErrorEnum.dataNotFound : VersionHistoryErrorEnum.genericError;
-        return routeParams$.pipe(
-          map(routeParams => ({ routeParams, errorType }))
-        );
-      }),
+    return combineLatest([routeParams$, this.inputs$]).pipe(
+      switchMap(([routeParams, inputs]) => combineLatest([
+        versionList$,
+        this.getViewData$(routeParams, inputs)
+      ]).pipe(
+        map(([versionList, viewData]) => {
+          const currentVersion = versionList ? versionList[versionList.length - 1].version + '' : undefined;
+          if (routeParams.view === VersionHistoryViewEnum.version && routeParams.version === currentVersion) {
+            throw new Error(VersionHistoryErrorEnum.genericError);
+          }
+          return { routeParams, versionList, ...viewData };
+        }),
+        catchError(err => {
+          const errorType = err.message === VersionHistoryErrorEnum.dataNotFound ? VersionHistoryErrorEnum.dataNotFound : VersionHistoryErrorEnum.genericError;
+          return of({ routeParams, errorType });
+        }))
+      ),
       shareReplay(1)
     );
   }

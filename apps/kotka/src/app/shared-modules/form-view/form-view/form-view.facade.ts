@@ -100,7 +100,8 @@ export class FormViewFacade implements OnDestroy {
     const routeParams$ = this.getRouteParams$();
     const user$ = this.getUser$();
     const form$: Observable<LajiForm.SchemaForm|undefined> = this.inputs$.pipe(
-      switchMap((inputs) => concat(of(undefined), this.getForm$(inputs)))
+      switchMap((inputs) => concat(of(undefined), this.getForm$(inputs))),
+      shareReplay(1)
     );
 
     this.initialFormDataSub = combineLatest([routeParams$, this.inputs$, user$]).pipe(
@@ -119,18 +120,18 @@ export class FormViewFacade implements OnDestroy {
       )
     ));
 
-    return combineLatest([
-      routeParams$, form$, this.formData$, state$
-    ]).pipe(
-      map(([routeParams, form, formData, state]) => {
-        return { routeParams, form, formData, state };
-      }),
-      catchError(err => {
-        const errorType = err.message === FormErrorEnum.dataNotFound ? FormErrorEnum.dataNotFound : FormErrorEnum.genericError;
-        return routeParams$.pipe(
-          map(routeParams => ({ routeParams, errorType }))
-        );
-      }),
+    return routeParams$.pipe(
+      switchMap(routeParams => combineLatest([
+        form$, this.formData$, state$
+      ]).pipe(
+        map(([form, formData, state]) => {
+          return { routeParams, form, formData, state };
+        }),
+        catchError(err => {
+          const errorType = err.message === FormErrorEnum.dataNotFound ? FormErrorEnum.dataNotFound : FormErrorEnum.genericError;
+          return of({ routeParams, errorType });
+        }))
+      ),
       shareReplay(1)
     );
   }
