@@ -29,7 +29,10 @@ export class VersionListComponent implements OnChanges {
   }
 
   onCompareVersionsClick() {
-    this.compareVersionsClick.emit(this.getSelectedVersions());
+    const selectedVersions = this.getSelectedVersions();
+    if (selectedVersions.length === 2) {
+      this.compareVersionsClick.emit(this.getSelectedVersions());
+    }
   }
 
   checkboxClick(e: Event, version: number) {
