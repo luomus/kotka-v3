@@ -25,7 +25,11 @@ export const datasetsRoutes: Routes = [
   {
     path: 'history',
     pathMatch: 'full',
-    component: DatasetVersionHistoryComponent
+    component: DatasetVersionHistoryComponent,
+    data: {
+      title: 'Transaction',
+      addUriToTitle: true
+    }
   }
 ];
 
