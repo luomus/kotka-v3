@@ -3,7 +3,7 @@ import {
   Component,
   Input,
 } from '@angular/core';
-import { KotkaDocumentObject, LajiForm, StoreObject } from '@kotka/shared/models';
+import { KotkaDocumentObject, LajiForm } from '@kotka/shared/models';
 import { DifferenceObject } from '../../../shared/services/data.service';
 
 interface Field {
@@ -28,7 +28,7 @@ export class ViewerComponent {
       this.fields = undefined;
     }
   };
-  @Input() data?: StoreObject;
+  @Input() data?: KotkaDocumentObject;
   @Input() differenceData: DifferenceObject = {};
 
   fields?: Field[];

@@ -16,7 +16,7 @@ import {
 } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { allowAccessByOrganization, allowAccessByTime } from '@kotka/utils';
-import { KotkaDocumentObject, LajiForm, Person } from '@kotka/shared/models';
+import { LajiForm, Person } from '@kotka/shared/models';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { DocumentObject, KotkaDocumentType, StoreVersion } from '@kotka/api-interfaces';
 
@@ -30,11 +30,11 @@ export interface RouteParams {
   dataURI?: string;
 }
 
-export interface FormInputs {
+export interface FormInputs<T extends KotkaDocumentType> {
   formId: string;
-  dataType: KotkaDocumentType;
+  dataType: T;
   augmentFormFunc?: (form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>;
-  getInitialFormDataFunc?: (user: Person) => Partial<KotkaDocumentObject>;
+  getInitialFormDataFunc?: (user: Person) => Partial<DocumentObject<T>>;
 }
 
 export interface FormState {
@@ -43,10 +43,10 @@ export interface FormState {
   showCopyButton: boolean;
 }
 
-export interface SuccessViewModel {
+export interface SuccessViewModel<T extends KotkaDocumentType> {
   routeParams: RouteParams;
   form?: LajiForm.SchemaForm;
-  formData?: Partial<KotkaDocumentObject>;
+  formData?: Partial<DocumentObject<T>>;
   state?: FormState;
   versionHistory?: StoreVersion[];
 }
@@ -56,21 +56,21 @@ export interface ErrorViewModel {
   errorType: FormErrorEnum;
 }
 
-export type ViewModel = SuccessViewModel | ErrorViewModel;
+export type ViewModel<T extends KotkaDocumentType> = SuccessViewModel<T> | ErrorViewModel;
 
-export function isSuccessViewModel(viewModel: ViewModel): viewModel is SuccessViewModel {
+export function isSuccessViewModel<T extends KotkaDocumentType>(viewModel: ViewModel<T>): viewModel is SuccessViewModel<T> {
   return !isErrorViewModel(viewModel);
 }
-export function isErrorViewModel(viewModel: ViewModel): viewModel is ErrorViewModel {
+export function isErrorViewModel<T extends KotkaDocumentType>(viewModel: ViewModel<T>): viewModel is ErrorViewModel {
   return 'errorType' in viewModel;
 }
 
 @Injectable()
-export class FormViewFacade implements OnDestroy {
-  vm$: Observable<ViewModel>;
+export class FormViewFacade<T extends KotkaDocumentType> implements OnDestroy {
+  vm$: Observable<ViewModel<T>>;
 
-  private inputs$ = new ReplaySubject<FormInputs>(1);
-  private formData$ = new ReplaySubject<Partial<KotkaDocumentObject>|undefined>(1);
+  private inputs$ = new ReplaySubject<FormInputs<T>>(1);
+  private formData$ = new ReplaySubject<Partial<DocumentObject<T>>|undefined>(1);
 
   private initialFormDataSub?: Subscription;
 
@@ -88,15 +88,15 @@ export class FormViewFacade implements OnDestroy {
     this.initialFormDataSub?.unsubscribe();
   }
 
-  setInputs(inputs: FormInputs) {
+  setInputs(inputs: FormInputs<T>) {
     this.inputs$.next(inputs);
   }
 
-  setFormData(formData: Partial<KotkaDocumentObject>) {
+  setFormData(formData: Partial<DocumentObject<T>>) {
     this.formData$.next(formData);
   }
 
-  private getVm$(): Observable<ViewModel> {
+  private getVm$(): Observable<ViewModel<T>> {
     const routeParams$ = this.getRouteParams$();
     const user$ = this.getUser$();
     const form$: Observable<LajiForm.SchemaForm|undefined> = this.inputs$.pipe(
@@ -157,13 +157,13 @@ export class FormViewFacade implements OnDestroy {
     }));
   }
 
-  private getForm$(inputs: FormInputs): Observable<LajiForm.SchemaForm> {
+  private getForm$(inputs: FormInputs<T>): Observable<LajiForm.SchemaForm> {
     return this.formService.getFormWithUserContext(inputs.formId).pipe(
       switchMap(form => inputs.augmentFormFunc ? inputs.augmentFormFunc(form) : of(form))
     );
   }
 
-  private getInitialFormData$(routeParams: RouteParams, inputs: FormInputs, user: Person): Observable<Partial<KotkaDocumentObject>> {
+  private getInitialFormData$(routeParams: RouteParams, inputs: FormInputs<T>, user: Person): Observable<Partial<DocumentObject<T>>> {
     if (routeParams.editMode) {
       return this.getFormData$(inputs.dataType, routeParams.dataURI);
     } else {
@@ -171,7 +171,7 @@ export class FormViewFacade implements OnDestroy {
     }
   }
 
-  private getFormData$<T extends KotkaDocumentType>(dataType: T, dataURI?: string): Observable<Partial<DocumentObject<T>>> {
+  private getFormData$(dataType: T, dataURI?: string): Observable<Partial<DocumentObject<T>>> {
     if (!dataURI) {
       return throwError(() => new Error(FormErrorEnum.dataNotFound));
     }
@@ -185,11 +185,11 @@ export class FormViewFacade implements OnDestroy {
     );
   }
 
-  private getFormState(routeParams: RouteParams, form: LajiForm.SchemaForm, formData: Partial<KotkaDocumentObject>, user: Person): FormState {
+  private getFormState(routeParams: RouteParams, form: LajiForm.SchemaForm, formData: Partial<DocumentObject<T>>, user: Person): FormState {
     const isAdmin = this.userService.isICTAdmin(user);
     const isEditMode =  routeParams.editMode;
-    const disabled = isEditMode && !isAdmin && !allowAccessByOrganization(formData as KotkaDocumentObject, user);
-    const showDeleteButton = isEditMode && (isAdmin || (!disabled && allowAccessByTime(formData as KotkaDocumentObject, {'d': 14})));
+    const disabled = isEditMode && !isAdmin && !allowAccessByOrganization(formData, user);
+    const showDeleteButton = isEditMode && (isAdmin || (!disabled && allowAccessByTime(formData, {'d': 14})));
     const showCopyButton = isEditMode && !!form.options?.allowTemplate;
 
     return { disabled, showDeleteButton, showCopyButton };

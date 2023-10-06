@@ -1,10 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { VersionHistoryViewComponent } from './version-history-view.component';
+import { KotkaDocumentType } from '@kotka/api-interfaces';
 
 describe('VersionHistoryViewComponent', () => {
-  let component: VersionHistoryViewComponent;
-  let fixture: ComponentFixture<VersionHistoryViewComponent>;
+  let component: VersionHistoryViewComponent<KotkaDocumentType>;
+  let fixture: ComponentFixture<VersionHistoryViewComponent<KotkaDocumentType>>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({

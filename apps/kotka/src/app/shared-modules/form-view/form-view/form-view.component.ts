@@ -50,7 +50,7 @@ export class FormViewComponent<T extends KotkaDocumentType> implements OnChanges
   @Input() getInitialFormDataFunc?: (user: Person) => Partial<DocumentObject<T>>;
   @Input() domain = 'http://tun.fi/';
 
-  vm$: Observable<SuccessViewModel | ErrorViewModel>;
+  vm$: Observable<SuccessViewModel<T> | ErrorViewModel>;
 
   visibleDataTypeName?: string;
 
@@ -78,7 +78,7 @@ export class FormViewComponent<T extends KotkaDocumentType> implements OnChanges
     private userService: UserService,
     private dialogService: DialogService,
     private router: Router,
-    private formViewFacade: FormViewFacade,
+    private formViewFacade: FormViewFacade<T>,
     private cdr: ChangeDetectorRef
   ) {
     this.vm$ = this.formViewFacade.vm$;
@@ -177,7 +177,7 @@ export class FormViewComponent<T extends KotkaDocumentType> implements OnChanges
 
     this.lajiForm?.block();
 
-    this.vm$.pipe(take(1), switchMap((vm: SuccessViewModel) => {
+    this.vm$.pipe(take(1), switchMap((vm: SuccessViewModel<T>) => {
       data = FormViewUtils.removeMetaAndExcludedFields(data, vm.form?.excludeFromCopy);
 
       return navigate$.pipe(
