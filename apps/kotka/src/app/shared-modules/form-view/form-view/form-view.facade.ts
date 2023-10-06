@@ -19,6 +19,7 @@ import { allowAccessByOrganization, allowAccessByTime } from '@kotka/utils';
 import { LajiForm, Person } from '@kotka/shared/models';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { DocumentObject, KotkaDocumentType, StoreVersion } from '@kotka/api-interfaces';
+import { FormViewUtils } from './form-view-utils';
 
 export enum FormErrorEnum {
   dataNotFound = 'dataNotFound',
@@ -175,8 +176,8 @@ export class FormViewFacade<T extends KotkaDocumentType> implements OnDestroy {
     if (!dataURI) {
       return throwError(() => new Error(FormErrorEnum.dataNotFound));
     }
-    const uriParts = dataURI.split('/');
-    const id = uriParts.pop() as string;
+
+    const id = FormViewUtils.getIdFromDataURI(dataURI);
     return this.dataService.getById(dataType, id).pipe(
       catchError(err => {
         err = err.status === 404 ? FormErrorEnum.dataNotFound : err;

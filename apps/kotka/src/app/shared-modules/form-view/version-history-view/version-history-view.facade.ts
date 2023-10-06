@@ -20,6 +20,7 @@ import { distinctUntilChanged, filter, map, take } from 'rxjs/operators';
 import { LajiForm } from '@kotka/shared/models';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { DocumentObject, KotkaDocumentType, StoreVersion } from '@kotka/api-interfaces';
+import { FormViewUtils } from '../form-view/form-view-utils';
 
 export enum VersionHistoryErrorEnum {
   dataNotFound = 'dataNotFound',
@@ -201,8 +202,8 @@ export class VersionHistoryViewFacade<T extends KotkaDocumentType> {
     if (!dataURI) {
       return of([]);
     }
-    const uriParts = dataURI.split('/');
-    const id = uriParts.pop() as string;
+
+    const id = FormViewUtils.getIdFromDataURI(dataURI);
     return this.dataService.getVersionList(dataType, id).pipe(
       catchError(err => {
         err = err.status === 404 ? VersionHistoryErrorEnum.dataNotFound : err;
@@ -216,7 +217,7 @@ export class VersionHistoryViewFacade<T extends KotkaDocumentType> {
       return throwError(() => new Error(VersionHistoryErrorEnum.dataNotFound));
     }
 
-    const id: string = dataURI.split('/').pop() as string;
+    const id = FormViewUtils.getIdFromDataURI(dataURI);
     return this.dataService.getVersionData(dataType, id, version).pipe(
       catchError(err => {
         err = err.status === 404 ? VersionHistoryErrorEnum.dataNotFound : err;
@@ -230,7 +231,7 @@ export class VersionHistoryViewFacade<T extends KotkaDocumentType> {
       return throwError(() => new Error(VersionHistoryErrorEnum.dataNotFound));
     }
 
-    const id: string = dataURI.split('/').pop() as string;
+    const id = FormViewUtils.getIdFromDataURI(dataURI);
     return this.dataService.getVersionDifference(dataType, id, versions[0], versions[1]);
   }
 }
