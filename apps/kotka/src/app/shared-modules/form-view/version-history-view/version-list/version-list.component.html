@@ -11,9 +11,16 @@
     </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let version of (data | reverse)">
+      <tr *ngFor="let version of (data | reverse); first as first">
         <td><input type="checkbox" id="version_{{ version.version }}" name="selectedVersions" [checked]="checkedVersions[version.version]" (click)="checkboxClick($event, version.version)"/></td>
-        <td><a [routerLink]="[]" [queryParams]="{ version: version.version }" queryParamsHandling="merge">v. {{ version.version }}</a></td>
+        <td>
+          <ng-container *ngIf="first else oldVersion">
+            <a [routerLink]="['..', 'edit']" [queryParams]="{ version: undefined }" queryParamsHandling="merge">Current</a>
+          </ng-container>
+          <ng-template #oldVersion>
+            <a [routerLink]="[]" [queryParams]="{ version: version.version }" queryParamsHandling="merge">Version {{ version.version }}</a>
+          </ng-template>
+        </td>
         <td>{{ version.created | date:'dd.MM.YYYY HH:mm' }}</td>
       </tr>
     </tbody>

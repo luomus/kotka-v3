@@ -30,7 +30,7 @@
         <div *ngIf="vm.routeParams.editMode && vm.formData" class="mb-1">
           <strong class="d-block">Last edited by</strong>
           <span>{{ (vm.formData.editor || '') | label }} on {{ vm.formData.dateEdited | date:'dd.MM.YYYY HH:mm' }} </span>
-          <a [routerLink]="['..', 'history']" [queryParams]="{ uri: vm.routeParams.dataURI }">show history</a>
+          <a [routerLink]="['..', 'history']" [queryParams]="{ uri: vm.routeParams.dataURI }">view history</a>
           <strong class="d-block">Originally created by</strong>
           <span>{{ (vm.formData.creator || '') | label }} on {{ vm.formData.dateCreated | date:'dd.MM.YYYY HH:mm' }}</span>
         </div>

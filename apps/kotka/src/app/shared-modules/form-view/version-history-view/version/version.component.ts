@@ -38,7 +38,7 @@ export class VersionComponent implements OnChanges {
       const idx = this.versionList.findIndex(val => val.version === versionNbr);
 
       this.previousVersion = idx > 0 ? this.versionList[idx - 1].version : undefined;
-      this.nextVersion = idx !== this.versionList.length - 1 ? this.versionList[idx + 1].version : undefined;
+      this.nextVersion = idx !== this.versionList.length - 2 ? this.versionList[idx + 1].version : undefined;
     }
   }
 }

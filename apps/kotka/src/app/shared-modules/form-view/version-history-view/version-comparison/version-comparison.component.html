@@ -12,7 +12,7 @@
     </div>
     <div class="card d-inline-block ms-2 me-2">
       <div class="card-body">
-        <h5 class="card-title"><a [routerLink]="[]" [queryParams]="{ version: versions[1] }" queryParamsHandling="merge">Version {{ versions[1] }}</a></h5>
+        <h5 class="card-title"><a [routerLink]="nextVersion ? [] : ['..', 'edit']" [queryParams]="{ version: nextVersion ? versions[1] : undefined }" queryParamsHandling="merge">{{ nextVersion ? 'Version ' + versions[1] : 'Current' }}</a></h5>
         <h6 class="card-subtitle mb-2 text-muted">{{ versionData[1].created | date:'dd.MM.YYYY HH:mm' }}</h6>
       </div>
     </div>

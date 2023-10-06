@@ -16,7 +16,7 @@ import {
   switchMap,
   throwError
 } from 'rxjs';
-import { filter, map, take } from 'rxjs/operators';
+import { distinctUntilChanged, filter, map, take } from 'rxjs/operators';
 import { KotkaDocumentObject, LajiForm } from '@kotka/shared/models';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { FormErrorEnum, FormInputs } from '../form-view/form-view.facade';
@@ -111,15 +111,28 @@ export class VersionHistoryViewFacade {
     const routeParams$ = this.getRouteParams$();
     routeParams$.pipe(take(1)).subscribe(); // TODO refactor so that this is not needed
 
+    const versionList$ = combineLatest([routeParams$, this.inputs$]).pipe(
+      distinctUntilChanged(([params1, inputs1], [params2, inputs2]) => (
+        params1.dataURI === params2.dataURI && inputs1.dataType === inputs2.dataType
+      )),
+      switchMap(([params, inputs]) => concat(
+        of(undefined), this.getVersionList$(inputs.dataType, params.dataURI))
+      )
+    );
+
     const viewData$ = combineLatest([routeParams$, this.inputs$]).pipe(
       switchMap(([params, inputs]) => this.getViewData$(params, inputs))
     );
 
     return combineLatest([
-      routeParams$, viewData$
+      routeParams$, versionList$, viewData$
     ]).pipe(
-      map(([routeParams, viewData]) => {
-        return { routeParams, ...viewData };
+      map(([routeParams, versionList, viewData]) => {
+        const currentVersion = versionList ? versionList[versionList.length - 1].version + '' : undefined;
+        if (routeParams.view === VersionHistoryViewEnum.version && routeParams.version === currentVersion) {
+          throw new Error(VersionHistoryErrorEnum.genericError);
+        }
+        return { routeParams, versionList, ...viewData };
       }),
       catchError(err => {
         const errorType = err.message === VersionHistoryErrorEnum.dataNotFound ? VersionHistoryErrorEnum.dataNotFound : VersionHistoryErrorEnum.genericError;
@@ -154,25 +167,23 @@ export class VersionHistoryViewFacade {
     );
   }
 
-  private getViewData$(params: RouteParams, inputs: VersionHistoryInputs): Observable<Omit<SuccessViewModel, 'routeParams'>> {
+  private getViewData$(params: RouteParams, inputs: VersionHistoryInputs): Observable<Omit<SuccessViewModel, 'routeParams'|'versionList'>> {
     if (!params.dataURI) {
       return throwError(() => new Error(FormErrorEnum.dataNotFound));
     }
 
-    const versionList$ = concat(of(undefined), this.getVersionList$(inputs.dataType, params.dataURI));
-
     if (params.view === VersionHistoryViewEnum.versionList) {
-      return versionList$.pipe(map(versionList => ({ versionList })));
+      return of({});
     } else if (params.view === VersionHistoryViewEnum.version) {
       const form$ = concat(of(undefined), this.getForm$(inputs));
       const data$ = concat(of(undefined), this.getVersionData$(inputs.dataType, params.dataURI, params.version));
 
-      return combineLatest([form$, data$, versionList$]).pipe(map(([form, data, versionList]) => ({ form, data, versionList })));
+      return combineLatest([form$, data$]).pipe(map(([form, data]) => ({ form, data })));
     } else {
       const form$ = concat(of(undefined), this.getFormInJsonFormat$(inputs));
       const versionDifference$ = concat(of(undefined), this.getVersionDifference$(inputs.dataType, params.dataURI, params.versions));
 
-      return combineLatest([form$, versionDifference$, versionList$]).pipe(map(([form, diffData, versionList]) => ({ form, diffData, versionList })));
+      return combineLatest([form$, versionDifference$]).pipe(map(([form, diffData]) => ({ form, diffData })));
     }
   }
 
