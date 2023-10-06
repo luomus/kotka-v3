@@ -48,11 +48,11 @@ export class DataService {
     return this.apiClient.getDocumentVersionList(type, id);
   }
 
-  getVersionData<T extends KotkaDocumentType>(type: T, id: string, version: string): Observable<DocumentObject<T>> {
+  getVersionData<T extends KotkaDocumentType>(type: T, id: string, version: number): Observable<DocumentObject<T>> {
     return this.apiClient.getDocumentVersionData(type, id, version);
   }
 
-  getVersionDifference<T extends KotkaDocumentType>(type: T, id: string, version1: string, version2: string): Observable<VersionDifference<T>> {
+  getVersionDifference<T extends KotkaDocumentType>(type: T, id: string, version1: number, version2: number): Observable<VersionDifference<T>> {
     return this.apiClient.getDocumentVersionDifference(type, id, version1, version2).pipe(
       map(data => this.convertVersionHistoryFormat<T>(data))
     );

@@ -35,8 +35,8 @@ export enum VersionHistoryViewEnum {
 
 export interface RouteParams {
   dataURI?: string;
-  version?: string;
-  versions?: string[];
+  version?: number;
+  versions?: number[];
   view?: VersionHistoryViewEnum;
 }
 
@@ -147,15 +147,20 @@ export class VersionHistoryViewFacade {
       filter((event) => event instanceof NavigationEnd),
       map(() => {
         const dataURI = this.activeRoute.snapshot.queryParams['uri'];
-        let version = this.activeRoute.snapshot.queryParams['version'];
-        let versions = undefined;
+        const versionParam = this.activeRoute.snapshot.queryParams['version'];
 
-        if (Array.isArray(version)) {
-          versions = version;
-          version = undefined;
+        let version, versions;
+        if (versionParam) {
+          if (Array.isArray(versionParam)) {
+            version = undefined;
+            versions = versionParam.map(value => parseInt(value, 10)).filter(value => !!value);
+          } else {
+            version = parseInt(versionParam, 10) || undefined;
+            versions = undefined;
+          }
         }
 
-        const view = version ? VersionHistoryViewEnum.version : (
+        const view = version !== undefined ? VersionHistoryViewEnum.version : (
           versions ? VersionHistoryViewEnum.versionComparison : VersionHistoryViewEnum.versionList
         );
 
@@ -207,8 +212,8 @@ export class VersionHistoryViewFacade {
     );
   }
 
-  private getVersionData$<T extends KotkaDocumentType>(dataType: T, dataURI?: string, version?: string): Observable<DocumentObject<T>> {
-    if (!dataURI || !version) {
+  private getVersionData$<T extends KotkaDocumentType>(dataType: T, dataURI?: string, version?: number): Observable<DocumentObject<T>> {
+    if (!dataURI || version === undefined) {
       return throwError(() => new Error(FormErrorEnum.dataNotFound));
     }
 
@@ -221,7 +226,7 @@ export class VersionHistoryViewFacade {
     );
   }
 
-  private getVersionDifference$<T extends KotkaDocumentType>(dataType: T, dataURI?: string, versions?: string[]): Observable<VersionDifference<T>> {
+  private getVersionDifference$<T extends KotkaDocumentType>(dataType: T, dataURI?: string, versions?: number[]): Observable<VersionDifference<T>> {
     if (!dataURI || !versions || versions.length !== 2) {
       return throwError(() => new Error(FormErrorEnum.dataNotFound));
     }

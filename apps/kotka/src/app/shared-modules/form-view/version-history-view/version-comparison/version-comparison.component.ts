@@ -15,7 +15,7 @@ import { StoreVersion } from '@kotka/api-interfaces';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VersionComparisonComponent implements OnChanges {
-  @Input() versions?: string[];
+  @Input() versions?: number[];
   @Input() versionList?: StoreVersion[];
 
   @Input() form?: LajiForm.JsonForm;
@@ -26,11 +26,9 @@ export class VersionComparisonComponent implements OnChanges {
   nextVersion?: number;
 
   ngOnChanges() {
-    if (this.versions && this.versionList?.length) {
-      const version1 = parseInt(this.versions[0], 10);
-      const version2 = parseInt(this.versions[1], 10);
-      const idx1 = this.versionList.findIndex(val => val.version === version1);
-      const idx2 = this.versionList.findIndex(val => val.version === version2);
+    if (this.versions && this.versionList) {
+      const idx1 = this.versionList.findIndex(val => val.version === this.versions?.[0]);
+      const idx2 = this.versionList.findIndex(val => val.version === this.versions?.[1]);
 
       this.previousVersion = idx1 > 0 ? this.versionList[idx1 - 1].version : undefined;
       this.nextVersion = idx2 !== this.versionList.length - 1 ? this.versionList[idx2 + 1].version : undefined;

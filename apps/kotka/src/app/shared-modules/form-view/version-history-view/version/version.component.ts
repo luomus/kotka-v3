@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
-  Component, EventEmitter,
+  Component,
+  EventEmitter,
   Input,
   OnChanges, Output, ViewChild
 } from '@angular/core';
@@ -19,7 +20,7 @@ import { LajiFormComponent } from '@kotka/ui/laji-form';
 export class VersionComponent implements OnChanges {
   @Input() visibleDataTypeName?: string;
 
-  @Input() version?: string;
+  @Input() version?: number;
   @Input() versionList?: StoreVersion[];
 
   @Input() form?: LajiForm.SchemaForm;
@@ -38,9 +39,8 @@ export class VersionComponent implements OnChanges {
   ) {}
 
   ngOnChanges() {
-    if (this.version && this.versionList?.length) {
-      const versionNbr = parseInt(this.version, 10);
-      const idx = this.versionList.findIndex(val => val.version === versionNbr);
+    if (this.version !== undefined && this.versionList?.length) {
+      const idx = this.versionList.findIndex(val => val.version === this.version);
 
       this.previousVersion = idx > 0 ? this.versionList[idx - 1].version : undefined;
       this.nextVersion = idx !== this.versionList.length - 2 ? this.versionList[idx + 1].version : undefined;

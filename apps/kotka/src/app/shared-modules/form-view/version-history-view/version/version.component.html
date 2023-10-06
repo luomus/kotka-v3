@@ -1,4 +1,4 @@
-<kui-spinner [spinning]="!versionList" [hideContentWhileLoading]="true">
+<kui-spinner [spinning]="version === undefined || !versionList" [hideContentWhileLoading]="true">
   <ngb-alert [type]="'warning'" [dismissible]="false">
     <strong>You are viewing an old version of this {{ visibleDataTypeName }}.</strong>
     <div class="mt-1">

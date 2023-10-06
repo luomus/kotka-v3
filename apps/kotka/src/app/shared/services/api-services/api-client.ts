@@ -62,11 +62,11 @@ export class ApiClient {
     return this.httpClient.get<StoreVersion[]>(path + type + '/' + id + '/_ver');
   }
 
-  getDocumentVersionData<T extends KotkaDocumentType>(type: T, id: string, version: string): Observable<DocumentObject<T>> {
+  getDocumentVersionData<T extends KotkaDocumentType>(type: T, id: string, version: number): Observable<DocumentObject<T>> {
     return this.httpClient.get<DocumentObject<T>>(path + type + '/' + id + '/_ver/' + version);
   }
 
-  getDocumentVersionDifference(type: KotkaDocumentType, id: string, version1: string, version2: string): Observable<KotkaVersionDifference> {
+  getDocumentVersionDifference(type: KotkaDocumentType, id: string, version1: number, version2: number): Observable<KotkaVersionDifference> {
     return this.httpClient.get<KotkaVersionDifference>(path + type + '/' + id + '/_ver/' + version1 + '/diff/' + version2);
   }
 
