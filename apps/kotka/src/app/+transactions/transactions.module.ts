@@ -14,6 +14,7 @@ import { OrganizationAddressEmbedComponent } from './transaction-form-embed/orga
 import { PermitsInfoEmbedComponent } from './transaction-form-embed/permits-info-embed';
 import { SpecimenRangeSelectEmbedComponent } from './transaction-form-embed/specimen-range-select-embed';
 import { TransactionVersionHistoryComponent } from './transaction-version-history/transaction-version-history.component';
+import { TransactionFormEmbedService } from './transaction-form-embed/transaction-form-embed.service';
 
 @NgModule({
   imports: [
@@ -35,5 +36,8 @@ import { TransactionVersionHistoryComponent } from './transaction-version-histor
     SpecimenRangeSelectEmbedComponent,
     TransactionVersionHistoryComponent,
   ],
+  providers: [
+    TransactionFormEmbedService
+  ]
 })
 export class TransactionsModule {}

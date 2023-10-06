@@ -1,7 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  ComponentRef, OnDestroy,
+  OnDestroy,
   ViewChild
 } from '@angular/core';
 import {
@@ -16,18 +16,13 @@ import { FormViewComponent } from '../../shared-modules/form-view/form-view/form
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TransactionEventFormComponent } from './transaction-event-form.component';
 import { DialogService } from '../../shared/services/dialog.service';
-import { OrganizationAddressEmbedComponent } from '../transaction-form-embed/organization-address-embed';
-import { PermitsInfoEmbedComponent } from '../transaction-form-embed/permits-info-embed';
-import { SpecimenRangeSelectEmbedComponent } from '../transaction-form-embed/specimen-range-select-embed';
 import {
   LajiFormComponent,
-  LajiFormComponentEmbedderService,
-  LajiFormEmbedService,
-  LajiFormEventListenerEmbedderService
 } from '@kotka/ui/laji-form';
 import { ComponentCanDeactivate } from '../../shared/services/guards/component-can-deactivate.guard';
 import { KotkaDocumentType } from '@kotka/api-interfaces';
 import { ApiClient } from '../../shared/services/api-services/api-client';
+import { TransactionFormEmbedService } from '../transaction-form-embed/transaction-form-embed.service';
 
 type SpecimenIdKey = keyof Pick<SpecimenTransaction, 'awayIDs'|'returnedIDs'|'missingIDs'|'damagedIDs'>;
 
@@ -45,10 +40,6 @@ export class TransactionFormComponent implements OnDestroy, ComponentCanDeactiva
 
   private formData?: Partial<SpecimenTransaction>;
 
-  private organizationAddressRef?: ComponentRef<OrganizationAddressEmbedComponent>;
-  private permitsInfoRef?: ComponentRef<PermitsInfoEmbedComponent>;
-  private specimenRangeSelectRef?: ComponentRef<SpecimenRangeSelectEmbedComponent>;
-
   private specimenRangeButtonClickSubscription?: Subscription;
 
   private eventTypeSpecimenIdFieldMap: Record<Exclude<SpecimenTransactionEvent['eventType'], undefined>, SpecimenIdKey|undefined> = {
@@ -62,8 +53,7 @@ export class TransactionFormComponent implements OnDestroy, ComponentCanDeactiva
     private formService: FormService,
     private modalService: NgbModal,
     private dialogService: DialogService,
-    private lajiFormComponentEmbedderService: LajiFormComponentEmbedderService,
-    private lajiFormEventListenerEmbedderService: LajiFormEventListenerEmbedderService
+    private transactionFormEmbedService: TransactionFormEmbedService
   ) {}
 
   ngOnDestroy() {
@@ -82,26 +72,20 @@ export class TransactionFormComponent implements OnDestroy, ComponentCanDeactiva
     return formData;
   }
 
-  onFormReady(formData: Partial<SpecimenTransaction>) {
-    this.formData = formData;
+  onFormInit(data: { lajiForm: LajiFormComponent; formData: Partial<SpecimenTransaction> }) {
+    this.formData = data.formData;
 
-    const lajiFormEmbedService = new LajiFormEmbedService(
-      this.lajiFormComponentEmbedderService,
-      this.lajiFormEventListenerEmbedderService,
-      this.formView.lajiForm as LajiFormComponent
+    this.transactionFormEmbedService.initEmbeddedComponents(
+      data.lajiForm, data.formData, this.onAddTransactionEventButtonClick.bind(this)
     );
-
-    this.initEmbeddedComponents(lajiFormEmbedService, formData);
-
-    lajiFormEmbedService.addOnClickEventListener(
-      'root_transactionEvents-add',
-      this.onAddTransactionEventButtonClick.bind(this)
-    );
+    this.specimenRangeButtonClickSubscription = this.transactionFormEmbedService.specimenRangeClick$?.subscribe(range => (
+      this.specimenRangeClick(range)
+    ));
   }
 
   onFormDataChange(formData: Partial<SpecimenTransaction>) {
     this.formData = formData;
-    this.updateEmbeddedComponents(formData);
+    this.transactionFormEmbedService.updateEmbeddedComponents(formData);
   }
 
   private augmentForm(form: LajiForm.SchemaForm): Observable<LajiForm.SchemaForm> {
@@ -109,40 +93,6 @@ export class TransactionFormComponent implements OnDestroy, ComponentCanDeactiva
       form.schema.properties.geneticResourceAcquisitionCountry.oneOf = countries;
       return of(form);
     }));
-  }
-
-  private initEmbeddedComponents(lajiFormEmbedService: LajiFormEmbedService, formData: Partial<SpecimenTransaction>) {
-    this.organizationAddressRef = lajiFormEmbedService.embedComponent(OrganizationAddressEmbedComponent, {
-      anchorClassName: 'correspondent-organization',
-      positionToAnchor: 'nextSibling'
-    });
-    this.organizationAddressRef.instance.organization = formData.correspondentOrganization;
-
-    this.permitsInfoRef = lajiFormEmbedService.embedComponent(PermitsInfoEmbedComponent, {
-      anchorClassName: 'nagoya-fields',
-      positionToAnchor: 'parentNextSibling'
-    });
-    this.permitsInfoRef.instance.country = formData.geneticResourceAcquisitionCountry;
-
-    this.specimenRangeSelectRef = lajiFormEmbedService.embedComponent(SpecimenRangeSelectEmbedComponent, {
-      anchorClassName: 'specimen-id-fields',
-      positionToAnchor: 'firstChild'
-    });
-    this.specimenRangeButtonClickSubscription = this.specimenRangeSelectRef.instance.specimenRangeClick.subscribe(range => {
-      this.specimenRangeClick(range);
-    });
-  }
-
-  private updateEmbeddedComponents(formData: Partial<SpecimenTransaction>) {
-    const correspondentOrganization = this.getValidOrganizationId(formData.correspondentOrganization);
-    if (this.organizationAddressRef) {
-      this.organizationAddressRef.instance.organization = correspondentOrganization;
-    }
-
-    const geneticResourceAcquisitionCountry = formData.geneticResourceAcquisitionCountry;
-    if (this.permitsInfoRef) {
-      this.permitsInfoRef.instance.country = geneticResourceAcquisitionCountry;
-    }
   }
 
   private onAddTransactionEventButtonClick(event: MouseEvent) {
@@ -196,7 +146,7 @@ export class TransactionFormComponent implements OnDestroy, ComponentCanDeactiva
           const formData = {...this.formData || {}, awayIDs};
           this.formView.setFormData(formData);
 
-          this.specimenRangeSelectRef?.instance.clearSpecimenRangeInput();
+          this.transactionFormEmbedService.clearSpecimenRangeSelect();
         } else {
           this.dialogService.alert(result.status);
         }
@@ -207,9 +157,5 @@ export class TransactionFormComponent implements OnDestroy, ComponentCanDeactiva
         this.formView.lajiForm?.unBlock();
       }
     });
-  }
-
-  private getValidOrganizationId(organizationId?: string): string|undefined {
-    return organizationId && /^MOS\.\d+/.test(organizationId) ? organizationId : undefined;
   }
 }

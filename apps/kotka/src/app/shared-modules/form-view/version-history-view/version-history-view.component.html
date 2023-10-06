@@ -26,6 +26,7 @@
         [versionList]="vm.versionList"
         [form]="vm.form"
         [data]="vm.data"
+        (formInit)="formInit.emit($event)"
       ></kotka-version>
       <kotka-version-comparison
         *ngIf="isVersionComparisonViewModel(vm)"

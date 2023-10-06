@@ -42,7 +42,7 @@
           [showCopyButton]="vm.state.showCopyButton"
           [apiClient]="formApiClient"
           [notifier]="notifier"
-          (formReady)="formReady.emit($event)"
+          (formReady)="onFormReady($event)"
           (formChange)="onChange($event)"
           (formSubmit)="onSubmit($event)"
           (delete)="onDelete($event)"

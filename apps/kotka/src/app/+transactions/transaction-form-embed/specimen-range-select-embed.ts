@@ -46,6 +46,17 @@ export class SpecimenRangeSelectEmbedComponent implements LajiFormEmbedComponent
     }
   }
 
+  setDisabled() {
+    const specimenRangeInput = this.document.getElementById("specimenRangeInput") as HTMLInputElement|null;
+    if (specimenRangeInput) {
+      specimenRangeInput.disabled = true;
+    }
+    const specimenRangeButton =  this.document.getElementById("specimenRangeBtn")  as HTMLInputElement|null;
+    if (specimenRangeButton) {
+      specimenRangeButton.disabled = true;
+    }
+  }
+
   private specimenRangeBtnClick() {
     const specimenRangeInput = this.document.getElementById("specimenRangeInput") as HTMLInputElement|null;
     this.specimenRangeClick.next(specimenRangeInput?.value || '');

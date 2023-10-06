@@ -64,7 +64,7 @@ export class FormViewComponent<T extends KotkaDocumentType> implements OnChanges
   isSuccessViewModel = isSuccessViewModel;
 
   @Output() formDataChange = new EventEmitter<Partial<DocumentObject<T>>>();
-  @Output() formReady = new EventEmitter<Partial<DocumentObject<T>>>();
+  @Output() formInit = new EventEmitter<{ lajiForm: LajiFormComponent; formData: Partial<DocumentObject<T>> }>();
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
   @ContentChild('headerTpl', {static: true}) formHeader?: TemplateRef<Element>;
@@ -111,6 +111,12 @@ export class FormViewComponent<T extends KotkaDocumentType> implements OnChanges
       return of(true);
     }
     return this.dialogService.confirm('Are you sure you want to leave and discard unsaved changes?');
+  }
+
+  onFormReady(data: DocumentObject<T>) {
+    if (this.lajiForm) {
+      this.formInit.emit({lajiForm: this.lajiForm, formData: data});
+    }
   }
 
   onSubmit(data: DocumentObject<T>) {

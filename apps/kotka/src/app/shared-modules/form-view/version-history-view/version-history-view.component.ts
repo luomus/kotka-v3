@@ -1,8 +1,8 @@
 import {
   ChangeDetectionStrategy,
-  Component,
+  Component, EventEmitter,
   Input,
-  OnChanges,
+  OnChanges, Output,
   SimpleChanges,
 } from '@angular/core';
 import {
@@ -19,6 +19,8 @@ import {
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { KotkaDocumentType } from '@kotka/api-interfaces';
+import { KotkaDocumentObject } from '@kotka/shared/models';
+import { LajiFormComponent } from '@kotka/ui/laji-form';
 
 @Component({
   selector: 'kotka-version-history-view',
@@ -43,6 +45,8 @@ export class VersionHistoryViewComponent implements OnChanges {
   isVersionComparisonViewModel = isVersionComparisonViewModel;
 
   versionHistoryErrorEnum = VersionHistoryErrorEnum;
+
+  @Output() formInit = new EventEmitter<{ lajiForm: LajiFormComponent; formData: KotkaDocumentObject }>();
 
   constructor(
     private versionHistoryFacade: VersionHistoryViewFacade,
