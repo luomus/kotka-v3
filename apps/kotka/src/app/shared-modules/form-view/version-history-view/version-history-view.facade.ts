@@ -19,7 +19,7 @@ import {
 import { distinctUntilChanged, filter, map, take } from 'rxjs/operators';
 import { LajiForm } from '@kotka/shared/models';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { DocumentObject, KotkaDocumentType, StoreVersion } from '@kotka/api-interfaces';
+import { KotkaObject, KotkaObjectType, StoreVersion } from '@kotka/api-interfaces';
 import { FormViewUtils } from '../form-view/form-view-utils';
 
 export enum VersionHistoryErrorEnum {
@@ -40,7 +40,7 @@ export interface RouteParams {
   view?: VersionHistoryViewEnum;
 }
 
-export interface VersionHistoryInputs<T extends KotkaDocumentType> {
+export interface VersionHistoryInputs<T extends KotkaObjectType> {
   formId: string;
   dataType: T;
 }
@@ -52,43 +52,43 @@ export interface BaseViewModel {
 export interface VersionListViewModel extends BaseViewModel {
   versionList?: StoreVersion[];
 }
-export interface VersionViewModel<T extends KotkaDocumentType> extends BaseViewModel {
+export interface VersionViewModel<T extends KotkaObjectType> extends BaseViewModel {
   form?: LajiForm.SchemaForm;
-  data?: DocumentObject<T>;
+  data?: KotkaObject<T>;
   versionList?: StoreVersion[];
 }
-export interface VersionComparisonViewModel<T extends KotkaDocumentType> extends BaseViewModel {
+export interface VersionComparisonViewModel<T extends KotkaObjectType> extends BaseViewModel {
   form?: LajiForm.JsonForm;
   diffData?: VersionDifference<T>;
   versionList?: StoreVersion[];
 }
 
-export type SuccessViewModel<T extends KotkaDocumentType> = VersionListViewModel | VersionViewModel<T> | VersionComparisonViewModel<T>;
+export type SuccessViewModel<T extends KotkaObjectType> = VersionListViewModel | VersionViewModel<T> | VersionComparisonViewModel<T>;
 
 export interface ErrorViewModel extends BaseViewModel {
   errorType: VersionHistoryErrorEnum;
 }
 
-export type ViewModel<T extends KotkaDocumentType> = SuccessViewModel<T> | ErrorViewModel;
+export type ViewModel<T extends KotkaObjectType> = SuccessViewModel<T> | ErrorViewModel;
 
-export function isSuccessViewModel<T extends KotkaDocumentType>(viewModel: ViewModel<T>): viewModel is SuccessViewModel<T> {
+export function isSuccessViewModel<T extends KotkaObjectType>(viewModel: ViewModel<T>): viewModel is SuccessViewModel<T> {
   return !isErrorViewModel(viewModel);
 }
-export function isErrorViewModel<T extends KotkaDocumentType>(viewModel: ViewModel<T>): viewModel is ErrorViewModel {
+export function isErrorViewModel<T extends KotkaObjectType>(viewModel: ViewModel<T>): viewModel is ErrorViewModel {
   return 'errorType' in viewModel;
 }
-export function isVersionListViewModel<T extends KotkaDocumentType>(viewModel: SuccessViewModel<T>): viewModel is VersionListViewModel {
+export function isVersionListViewModel<T extends KotkaObjectType>(viewModel: SuccessViewModel<T>): viewModel is VersionListViewModel {
   return viewModel?.routeParams.view === VersionHistoryViewEnum.versionList;
 }
-export function isVersionViewModel<T extends KotkaDocumentType>(viewModel: SuccessViewModel<T>): viewModel is VersionViewModel<T> {
+export function isVersionViewModel<T extends KotkaObjectType>(viewModel: SuccessViewModel<T>): viewModel is VersionViewModel<T> {
   return viewModel?.routeParams.view === VersionHistoryViewEnum.version;
 }
-export function isVersionComparisonViewModel<T extends KotkaDocumentType>(viewModel: SuccessViewModel<T>): viewModel is VersionComparisonViewModel<T> {
+export function isVersionComparisonViewModel<T extends KotkaObjectType>(viewModel: SuccessViewModel<T>): viewModel is VersionComparisonViewModel<T> {
   return viewModel?.routeParams.view === VersionHistoryViewEnum.versionComparison;
 }
 
 @Injectable()
-export class VersionHistoryViewFacade<T extends KotkaDocumentType> {
+export class VersionHistoryViewFacade<T extends KotkaObjectType> {
   vm$: Observable<ViewModel<T>>;
 
   private inputs$ = new ReplaySubject<VersionHistoryInputs<T>>(1);
@@ -198,7 +198,7 @@ export class VersionHistoryViewFacade<T extends KotkaDocumentType> {
     return this.formService.getFormInJsonFormat(inputs.formId);
   }
 
-  private getVersionList$(dataType: KotkaDocumentType, dataURI?: string): Observable<StoreVersion[]> {
+  private getVersionList$(dataType: KotkaObjectType, dataURI?: string): Observable<StoreVersion[]> {
     if (!dataURI) {
       return of([]);
     }
@@ -212,7 +212,7 @@ export class VersionHistoryViewFacade<T extends KotkaDocumentType> {
     );
   }
 
-  private getVersionData$(dataType: T, dataURI?: string, version?: number): Observable<DocumentObject<T>> {
+  private getVersionData$(dataType: T, dataURI?: string, version?: number): Observable<KotkaObject<T>> {
     if (!dataURI || version === undefined) {
       return throwError(() => new Error(VersionHistoryErrorEnum.dataNotFound));
     }

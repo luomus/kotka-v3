@@ -2,7 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
 } from '@angular/core';
-import { KotkaDocumentType } from '@kotka/api-interfaces';
+import { KotkaObjectType } from '@kotka/api-interfaces';
 import { KotkaDocumentObject, SpecimenTransaction } from '@kotka/shared/models';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { TransactionFormEmbedService } from '../transaction-form-embed/transaction-form-embed.service';
@@ -20,7 +20,7 @@ import { TransactionFormEmbedService } from '../transaction-form-embed/transacti
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransactionVersionHistoryComponent {
-  dataType = KotkaDocumentType.transaction;
+  dataType = KotkaObjectType.transaction;
 
   constructor(
     private transactionFormEmbedService: TransactionFormEmbedService

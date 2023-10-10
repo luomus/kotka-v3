@@ -11,11 +11,11 @@ import {
 import { Observable } from 'rxjs';
 import { apiBase, lajiApiBase } from './constants';
 import {
-  KotkaDocumentType,
+  KotkaObjectType,
   StoreVersion,
   KotkaVersionDifference,
   RangeResponse,
-  DocumentObject, LoginResponse
+  KotkaObject, LoginResponse
 } from '@kotka/api-interfaces';
 
 const path = apiBase + '/';
@@ -31,23 +31,23 @@ export class ApiClient {
     private httpClient: HttpClient
   ) {}
 
-  getDocumentById<T extends KotkaDocumentType>(type: T, id: string): Observable<DocumentObject<T>> {
-    return this.httpClient.get<DocumentObject<T>>(path + type + '/' + id);
+  getDocumentById<T extends KotkaObjectType>(type: T, id: string): Observable<KotkaObject<T>> {
+    return this.httpClient.get<KotkaObject<T>>(path + type + '/' + id);
   }
 
-  createDocument<T extends KotkaDocumentType>(type: T, data: DocumentObject<T>): Observable<DocumentObject<T>> {
-    return this.httpClient.post<DocumentObject<T>>(path + type, data);
+  createDocument<T extends KotkaObjectType>(type: T, data: KotkaObject<T>): Observable<KotkaObject<T>> {
+    return this.httpClient.post<KotkaObject<T>>(path + type, data);
   }
 
-  updateDocument<T extends KotkaDocumentType>(type: T, id: string, data: DocumentObject<T>): Observable<DocumentObject<T>> {
-    return this.httpClient.put<DocumentObject<T>>(path + type + '/' + id, data);
+  updateDocument<T extends KotkaObjectType>(type: T, id: string, data: KotkaObject<T>): Observable<KotkaObject<T>> {
+    return this.httpClient.put<KotkaObject<T>>(path + type + '/' + id, data);
   }
 
-  deleteDocument(type: KotkaDocumentType, id: string): Observable<null> {
+  deleteDocument(type: KotkaObjectType, id: string): Observable<null> {
     return this.httpClient.delete<null>(path + type + '/' + id);
   }
 
-  getDocumentList<T extends KotkaDocumentType>(type: T, page=1, pageSize=100, sort?: string, searchQuery?: string): Observable<ListResponse<DocumentObject<T>>> {
+  getDocumentList<T extends KotkaObjectType>(type: T, page=1, pageSize=100, sort?: string, searchQuery?: string): Observable<ListResponse<KotkaObject<T>>> {
     let params = new HttpParams().set('page', page).set('page_size', pageSize);
     if (sort) {
       params = params.set('sort', sort);
@@ -55,18 +55,18 @@ export class ApiClient {
     if (searchQuery) {
       params = params.set('q', searchQuery);
     }
-    return this.httpClient.get<ListResponse<DocumentObject<T>>>(path + type, {params});
+    return this.httpClient.get<ListResponse<KotkaObject<T>>>(path + type, {params});
   }
 
-  getDocumentVersionList(type: KotkaDocumentType, id: string): Observable<StoreVersion[]> {
+  getDocumentVersionList(type: KotkaObjectType, id: string): Observable<StoreVersion[]> {
     return this.httpClient.get<StoreVersion[]>(path + type + '/' + id + '/_ver');
   }
 
-  getDocumentVersionData<T extends KotkaDocumentType>(type: T, id: string, version: number): Observable<DocumentObject<T>> {
-    return this.httpClient.get<DocumentObject<T>>(path + type + '/' + id + '/_ver/' + version);
+  getDocumentVersionData<T extends KotkaObjectType>(type: T, id: string, version: number): Observable<KotkaObject<T>> {
+    return this.httpClient.get<KotkaObject<T>>(path + type + '/' + id + '/_ver/' + version);
   }
 
-  getDocumentVersionDifference(type: KotkaDocumentType, id: string, version1: number, version2: number): Observable<KotkaVersionDifference> {
+  getDocumentVersionDifference(type: KotkaObjectType, id: string, version1: number, version2: number): Observable<KotkaVersionDifference> {
     return this.httpClient.get<KotkaVersionDifference>(path + type + '/' + id + '/_ver/' + version1 + '/diff/' + version2);
   }
 

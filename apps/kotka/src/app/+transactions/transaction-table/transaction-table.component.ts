@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/
 import { DatatableColumn, DatatableSource, GetRowsParams } from '../../../../../../libs/kotka/ui/datatable/src';
 import { URICellRenderer } from '../../../../../../libs/kotka/ui/datatable/src/lib/renderers/uri-cell-renderer';
 import { DatatableDataService } from '../../shared/services/datatable-data.service';
-import { KotkaDocumentType } from '@kotka/api-interfaces';
+import { KotkaObjectType } from '@kotka/api-interfaces';
 
 @Component({
   selector: 'kotka-transaction-table',
@@ -30,7 +30,7 @@ export class TransactionTableComponent {
       this.loading = true;
       this.cdr.markForCheck();
 
-      this.dataService.getData(KotkaDocumentType.transaction, params.startRow, params.endRow, params.sortModel, params.filterModel).subscribe(result => {
+      this.dataService.getData(KotkaObjectType.transaction, params.startRow, params.endRow, params.sortModel, params.filterModel).subscribe(result => {
         this.totalCount = result.totalItems;
         this.loading = false;
         this.cdr.markForCheck();

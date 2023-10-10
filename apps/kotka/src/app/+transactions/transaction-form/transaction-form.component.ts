@@ -20,7 +20,7 @@ import {
   LajiFormComponent,
 } from '@kotka/ui/laji-form';
 import { ComponentCanDeactivate } from '../../shared/services/guards/component-can-deactivate.guard';
-import { KotkaDocumentType } from '@kotka/api-interfaces';
+import { KotkaObjectType } from '@kotka/api-interfaces';
 import { ApiClient } from '../../shared/services/api-services/api-client';
 import { TransactionFormEmbedService } from '../transaction-form-embed/transaction-form-embed.service';
 
@@ -33,10 +33,10 @@ type SpecimenIdKey = keyof Pick<SpecimenTransaction, 'awayIDs'|'returnedIDs'|'mi
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransactionFormComponent implements OnDestroy, ComponentCanDeactivate {
-  dataType = KotkaDocumentType.transaction;
+  dataType = KotkaObjectType.transaction;
   augmentFormFunc = this.augmentForm.bind(this);
 
-  @ViewChild(FormViewComponent, { static: true }) formView!: FormViewComponent<KotkaDocumentType.transaction>;
+  @ViewChild(FormViewComponent, { static: true }) formView!: FormViewComponent<KotkaObjectType.transaction>;
 
   private formData?: Partial<SpecimenTransaction>;
 

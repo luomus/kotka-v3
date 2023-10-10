@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { KotkaDocumentObject, ListResponse } from '@kotka/shared/models';
 import { DataService} from './data.service';
 import { Injectable } from '@angular/core';
-import { KotkaDocumentType } from '@kotka/api-interfaces';
+import { KotkaObjectType } from '@kotka/api-interfaces';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +14,7 @@ export class DatatableDataService {
     private dataService: DataService
   ) {}
 
-  getData(dataType: KotkaDocumentType, startRow: number, endRow: number, sortModel: SortModel[], filterModel: any): Observable<ListResponse<KotkaDocumentObject>> {
+  getData(dataType: KotkaObjectType, startRow: number, endRow: number, sortModel: SortModel[], filterModel: any): Observable<ListResponse<KotkaDocumentObject>> {
     const pageSize = endRow - startRow;
     const page = (startRow / pageSize) + 1;
     const sort = this.sortModelToSortString(sortModel);

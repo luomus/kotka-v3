@@ -3,7 +3,7 @@ import { Dataset, Person, isDataset } from '@kotka/shared/models';
 import { FormViewComponent } from '../../shared-modules/form-view/form-view/form-view.component';
 import { ComponentCanDeactivate } from '../../shared/services/guards/component-can-deactivate.guard';
 import { Observable } from 'rxjs';
-import { KotkaDocumentType } from '@kotka/api-interfaces';
+import { KotkaObjectType } from '@kotka/api-interfaces';
 
 @Component({
   selector: 'kotka-dataset-form',
@@ -12,9 +12,9 @@ import { KotkaDocumentType } from '@kotka/api-interfaces';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DatasetFormComponent implements ComponentCanDeactivate {
-  dataType = KotkaDocumentType.dataset;
+  dataType = KotkaObjectType.dataset;
 
-  @ViewChild(FormViewComponent, { static: true }) formView!: FormViewComponent<KotkaDocumentType.dataset>;
+  @ViewChild(FormViewComponent, { static: true }) formView!: FormViewComponent<KotkaObjectType.dataset>;
 
   canDeactivate(): Observable<boolean> {
     return this.formView.canDeactivate();

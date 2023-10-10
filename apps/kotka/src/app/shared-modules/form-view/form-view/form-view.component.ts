@@ -21,7 +21,7 @@ import { ToastService } from '../../../shared/services/toast.service';
 import { UserService } from '../../../shared/services/user.service';
 import { FormApiClient } from '../../../shared/services/api-services/form-api-client';
 import { DialogService } from '../../../shared/services/dialog.service';
-import { DocumentObject, ErrorMessages, KotkaDocumentType } from '@kotka/api-interfaces';
+import { KotkaObject, ErrorMessages, KotkaObjectType } from '@kotka/api-interfaces';
 import {
   FormErrorEnum,
   ErrorViewModel,
@@ -42,12 +42,12 @@ import { DataService } from '../../../shared/services/data.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [FormViewFacade]
 })
-export class FormViewComponent<T extends KotkaDocumentType> implements OnChanges, ComponentCanDeactivate {
+export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, ComponentCanDeactivate {
   @Input() formId?: string;
   @Input() dataType?: T;
   @Input() dataTypeName?: string;
   @Input() augmentFormFunc?: (form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>;
-  @Input() getInitialFormDataFunc?: (user: Person) => Partial<DocumentObject<T>>;
+  @Input() getInitialFormDataFunc?: (user: Person) => Partial<KotkaObject<T>>;
   @Input() domain = 'http://tun.fi/';
 
   vm$: Observable<SuccessViewModel<T> | ErrorViewModel>;
@@ -63,8 +63,8 @@ export class FormViewComponent<T extends KotkaDocumentType> implements OnChanges
   isErrorViewModel = isErrorViewModel;
   isSuccessViewModel = isSuccessViewModel;
 
-  @Output() formDataChange = new EventEmitter<Partial<DocumentObject<T>>>();
-  @Output() formInit = new EventEmitter<{ lajiForm: LajiFormComponent; formData: Partial<DocumentObject<T>> }>();
+  @Output() formDataChange = new EventEmitter<Partial<KotkaObject<T>>>();
+  @Output() formInit = new EventEmitter<{ lajiForm: LajiFormComponent; formData: Partial<KotkaObject<T>> }>();
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
   @ContentChild('headerTpl', {static: true}) formHeader?: TemplateRef<Element>;
@@ -113,18 +113,18 @@ export class FormViewComponent<T extends KotkaDocumentType> implements OnChanges
     return this.dialogService.confirm('Are you sure you want to leave and discard unsaved changes?');
   }
 
-  onFormReady(data: DocumentObject<T>) {
+  onFormReady(data: KotkaObject<T>) {
     if (this.lajiForm) {
       this.formInit.emit({lajiForm: this.lajiForm, formData: data});
     }
   }
 
-  onSubmit(data: DocumentObject<T>) {
+  onSubmit(data: KotkaObject<T>) {
     if (!this.dataType) {
       return;
     }
 
-    let saveData$: Observable<DocumentObject<T>>;
+    let saveData$: Observable<KotkaObject<T>>;
     if (data.id) {
       saveData$ = this.dataService.update(this.dataType, data.id, data);
     } else {
@@ -152,7 +152,7 @@ export class FormViewComponent<T extends KotkaDocumentType> implements OnChanges
     });
   }
 
-  onDelete(data: DocumentObject<T>) {
+  onDelete(data: KotkaObject<T>) {
     this.dialogService.confirm(`Are you sure you want to delete this ${this.visibleDataTypeName}?`).subscribe(confirm => {
       if (confirm) {
         this.delete(data);
@@ -160,12 +160,12 @@ export class FormViewComponent<T extends KotkaDocumentType> implements OnChanges
     });
   }
 
-  onChange(data: Partial<DocumentObject<T>>) {
+  onChange(data: Partial<KotkaObject<T>>) {
     this.formHasChanges = true;
     this.formDataChange.emit(data);
   }
 
-  onCopy(data: Partial<DocumentObject<T>>) {
+  onCopy(data: Partial<KotkaObject<T>>) {
     if (this.formHasChanges) {
       this.dialogService.alert('The form has unsaved changes.');
       return;
@@ -189,11 +189,11 @@ export class FormViewComponent<T extends KotkaDocumentType> implements OnChanges
     })).subscribe();
   }
 
-  setFormData(data: Partial<DocumentObject<T>>) {
+  setFormData(data: Partial<KotkaObject<T>>) {
     this.formViewFacade.setFormData(data);
   }
 
-  private delete(data: DocumentObject<T>) {
+  private delete(data: KotkaObject<T>) {
     if (!this.dataType || !data.id) {
       return;
     }

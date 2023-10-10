@@ -8,7 +8,7 @@ import {
 import { LajiForm } from '@kotka/shared/models';
 import { FormApiClient } from '../../../../shared/services/api-services/form-api-client';
 import { ToastService } from '../../../../shared/services/toast.service';
-import { DocumentObject, KotkaDocumentType, StoreVersion } from '@kotka/api-interfaces';
+import { KotkaObject, KotkaObjectType, StoreVersion } from '@kotka/api-interfaces';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 
 @Component({
@@ -17,19 +17,19 @@ import { LajiFormComponent } from '@kotka/ui/laji-form';
   styleUrls: ['./version.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class VersionComponent<T extends KotkaDocumentType> implements OnChanges {
+export class VersionComponent<T extends KotkaObjectType> implements OnChanges {
   @Input() visibleDataTypeName?: string;
 
   @Input() version?: number;
   @Input() versionList?: StoreVersion[];
 
   @Input() form?: LajiForm.SchemaForm;
-  @Input() data?: DocumentObject<T>;
+  @Input() data?: KotkaObject<T>;
 
   previousVersion?: number;
   nextVersion?: number;
 
-  @Output() formInit = new EventEmitter<{ lajiForm: LajiFormComponent; formData: DocumentObject<T> }>();
+  @Output() formInit = new EventEmitter<{ lajiForm: LajiFormComponent; formData: KotkaObject<T> }>();
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
 
@@ -47,7 +47,7 @@ export class VersionComponent<T extends KotkaDocumentType> implements OnChanges 
     }
   }
 
-  onFormReady(formData: DocumentObject<T>) {
+  onFormReady(formData: KotkaObject<T>) {
     if (this.lajiForm) {
       this.formInit.emit({ lajiForm: this.lajiForm, formData });
     }

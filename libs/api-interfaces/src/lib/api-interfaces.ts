@@ -1,14 +1,14 @@
 import { Dataset, KotkaDocumentObject, Person, SpecimenTransaction } from '@kotka/shared/models';
 import { HealthCheckResult } from '@nestjs/terminus';
 
-export enum KotkaDocumentType {
+export enum KotkaObjectType {
   dataset = 'dataset',
   transaction = 'transaction'
 }
 
-export type DocumentObject<T extends KotkaDocumentType> = T extends KotkaDocumentType.dataset
+export type KotkaObject<T extends KotkaObjectType> = T extends KotkaObjectType.dataset
   ? Dataset
-  : SpecimenTransaction
+  : SpecimenTransaction;
 
 export interface StoreGetQuery {
   query?: string,
