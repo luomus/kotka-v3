@@ -28,6 +28,6 @@ export class TransactionVersionHistoryComponent {
 
   onFormInit(data: { lajiForm: LajiFormComponent; formData: KotkaDocumentObject }) {
     this.transactionFormEmbedService.initEmbeddedComponents(data.lajiForm, data.formData as SpecimenTransaction);
-    this.transactionFormEmbedService.disableEmbeddedComponents();
+    this.transactionFormEmbedService.setEmbeddedComponentsDisabled(true);
   }
 }

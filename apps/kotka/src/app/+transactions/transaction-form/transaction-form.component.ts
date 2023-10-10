@@ -48,6 +48,8 @@ export class TransactionFormComponent implements OnDestroy, ComponentCanDeactiva
     'HRX.eventTypeAddition': 'awayIDs'
   };
 
+  private disabled = false;
+
   constructor(
     private apiClient: ApiClient,
     private formService: FormService,
@@ -81,11 +83,20 @@ export class TransactionFormComponent implements OnDestroy, ComponentCanDeactiva
     this.specimenRangeButtonClickSubscription = this.transactionFormEmbedService.specimenRangeClick$?.subscribe(range => (
       this.specimenRangeClick(range)
     ));
+
+    if (this.disabled) {
+      this.setDisabled(this.disabled);
+    }
   }
 
   onFormDataChange(formData: Partial<SpecimenTransaction>) {
     this.formData = formData;
     this.transactionFormEmbedService.updateEmbeddedComponents(formData);
+  }
+
+  setDisabled(disabled: boolean) {
+    this.disabled = disabled;
+    this.transactionFormEmbedService.setEmbeddedComponentsDisabled(disabled);
   }
 
   private augmentForm(form: LajiForm.SchemaForm): Observable<LajiForm.SchemaForm> {

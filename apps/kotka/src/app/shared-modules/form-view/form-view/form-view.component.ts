@@ -10,12 +10,13 @@ import {
   EventEmitter,
   Output,
   OnChanges,
-  HostListener
+  HostListener,
+  OnDestroy
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormService } from '../../../shared/services/form.service';
 import { LajiForm, Person } from '@kotka/shared/models';
-import { EMPTY, from, Observable, of, switchMap } from 'rxjs';
+import { EMPTY, from, Observable, of, Subscription, switchMap } from 'rxjs';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ToastService } from '../../../shared/services/toast.service';
 import { UserService } from '../../../shared/services/user.service';
@@ -30,7 +31,7 @@ import {
   isErrorViewModel,
   isSuccessViewModel
 } from './form-view.facade';
-import { take, tap } from 'rxjs/operators';
+import { distinctUntilChanged, filter, map, take, tap } from 'rxjs/operators';
 import { ComponentCanDeactivate } from '../../../shared/services/guards/component-can-deactivate.guard';
 import { FormViewUtils } from './form-view-utils';
 import { DataService } from '../../../shared/services/data.service';
@@ -42,7 +43,7 @@ import { DataService } from '../../../shared/services/data.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [FormViewFacade]
 })
-export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, ComponentCanDeactivate {
+export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, OnDestroy, ComponentCanDeactivate {
   @Input() formId?: string;
   @Input() dataType?: T;
   @Input() dataTypeName?: string;
@@ -65,9 +66,12 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
 
   @Output() formDataChange = new EventEmitter<Partial<KotkaObject<T>>>();
   @Output() formInit = new EventEmitter<{ lajiForm: LajiFormComponent; formData: Partial<KotkaObject<T>> }>();
+  @Output() disabled = new EventEmitter<boolean>();
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
   @ContentChild('headerTpl', {static: true}) formHeader?: TemplateRef<Element>;
+
+  private disabledSub?: Subscription;
 
   constructor(
     public formApiClient: FormApiClient,
@@ -82,6 +86,14 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
     private cdr: ChangeDetectorRef
   ) {
     this.vm$ = this.formViewFacade.vm$;
+
+    this.disabledSub = this.vm$.pipe(
+      map(vm => isSuccessViewModel(vm) ? vm.state?.disabled : undefined),
+      filter(disabled => disabled !== undefined),
+      distinctUntilChanged()
+    ).subscribe(disabled => {
+      this.disabled.emit(disabled);
+    });
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -97,6 +109,10 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
     }
 
     this.visibleDataTypeName = this.dataTypeName || this.dataType;
+  }
+
+  ngOnDestroy() {
+    this.disabledSub?.unsubscribe();
   }
 
   @HostListener('window:beforeunload', ['$event'])

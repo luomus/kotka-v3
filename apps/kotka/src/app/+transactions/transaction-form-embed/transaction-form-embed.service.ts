@@ -68,9 +68,9 @@ export class TransactionFormEmbedService {
     }
   }
 
-  disableEmbeddedComponents() {
+  setEmbeddedComponentsDisabled(disabled: boolean) {
     if (this.specimenRangeSelectRef) {
-      this.specimenRangeSelectRef.instance.setDisabled();
+      this.specimenRangeSelectRef.instance.setDisabled(disabled);
     }
   }
 
