@@ -15,7 +15,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormService } from '../../../shared/services/form.service';
 import { LajiForm, Person } from '@kotka/shared/models';
-import { from, Observable, of, switchMap } from 'rxjs';
+import { EMPTY, from, Observable, of, switchMap } from 'rxjs';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ToastService } from '../../../shared/services/toast.service';
 import { UserService } from '../../../shared/services/user.service';
@@ -110,7 +110,14 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
     if (!this.formHasChanges) {
       return of(true);
     }
-    return this.dialogService.confirm('Are you sure you want to leave and discard unsaved changes?');
+
+    return this.dialogService.confirm('Are you sure you want to leave and discard unsaved changes?').pipe(
+      tap(confirm => {
+        if (confirm) {
+          this.formHasChanges = false;
+        }
+      })
+    );
   }
 
   onFormReady(data: KotkaObject<T>) {
@@ -120,21 +127,12 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
   }
 
   onSubmit(data: KotkaObject<T>) {
-    if (!this.dataType) {
-      return;
-    }
-
-    let saveData$: Observable<KotkaObject<T>>;
-    if (data.id) {
-      saveData$ = this.dataService.update(this.dataType, data.id, data);
-    } else {
-      saveData$ = this.dataService.create(this.dataType, data);
-    }
-
     this.lajiForm?.block();
-    saveData$.subscribe({
+
+    this.save$(data).subscribe({
       'next': formData => {
         this.formHasChanges = false;
+
         from(this.router.navigate(['..', 'edit'], {
           relativeTo: this.activeRoute,
           queryParams: { uri: this.domain + formData.id }
@@ -165,28 +163,19 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
     this.formDataChange.emit(data);
   }
 
-  onCopy(data: Partial<KotkaObject<T>>) {
-    if (this.formHasChanges) {
-      this.dialogService.alert('The form has unsaved changes.');
-      return;
-    }
-
-    const navigate$ = from(this.router.navigate(['..', 'add'], {
-      relativeTo: this.activeRoute
-    }));
-
+  onCopy(data: KotkaObject<T>) {
     this.lajiForm?.block();
 
-    this.vm$.pipe(take(1), switchMap((vm: SuccessViewModel<T>) => {
-      data = FormViewUtils.removeMetaAndExcludedFields(data, vm.form?.excludeFromCopy);
-
-      return navigate$.pipe(
-        tap(() => {
-          this.setFormData(data);
-          this.lajiForm?.unBlock();
-        })
-      );
-    })).subscribe();
+    this.save$(data).subscribe({
+      'next': data => {
+        this.copyAsNew(data);
+      },
+      'error': () => {
+        this.lajiForm?.unBlock();
+        this.notifier.showError('Save failed!');
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   setFormData(data: Partial<KotkaObject<T>>) {
@@ -218,6 +207,38 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
         this.cdr.markForCheck();
       }
     });
+  }
+
+  private save$(data: KotkaObject<T>): Observable<KotkaObject<T>> {
+    if (!this.dataType) {
+      return EMPTY;
+    }
+
+    let save$: Observable<KotkaObject<T>>;
+    if (data.id) {
+      save$ = this.dataService.update(this.dataType, data.id, data);
+    } else {
+      save$ = this.dataService.create(this.dataType, data);
+    }
+
+    return save$;
+  }
+
+  private copyAsNew(data: KotkaObject<T>) {
+    const navigate$ = from(this.router.navigate(['..', 'add'], {
+      relativeTo: this.activeRoute
+    }));
+
+    this.vm$.pipe(take(1), switchMap((vm: SuccessViewModel<T>) => {
+      const newData = FormViewUtils.removeMetaAndExcludedFields<T>(data, vm.form?.excludeFromCopy);
+
+      return navigate$.pipe(
+        tap(() => {
+          this.setFormData(newData);
+          this.lajiForm?.unBlock();
+        })
+      );
+    })).subscribe();
   }
 
   private navigateAway() {

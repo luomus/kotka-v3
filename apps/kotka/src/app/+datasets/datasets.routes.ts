@@ -20,7 +20,8 @@ export const datasetsRoutes: Routes = [
       add: { title: 'Add tag' },
       edit: { title: 'Edit tag', addUriToTitle: true }
     },
-    canDeactivate: [ ComponentCanDeactivateGuard ]
+    canDeactivate: [ ComponentCanDeactivateGuard ],
+    runGuardsAndResolvers: 'always'
   },
   {
     path: 'history',
