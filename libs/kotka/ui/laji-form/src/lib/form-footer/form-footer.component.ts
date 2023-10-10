@@ -4,14 +4,12 @@ import {
   Input,
   Output,
   EventEmitter,
-  ViewEncapsulation
 } from '@angular/core';
 
 @Component({
   selector: 'kui-form-footer',
   templateUrl: './form-footer.component.html',
-  styleUrls: ['./form-footer.component.css'],
-  encapsulation: ViewEncapsulation.Emulated,
+  styleUrls: ['./form-footer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormFooterComponent {

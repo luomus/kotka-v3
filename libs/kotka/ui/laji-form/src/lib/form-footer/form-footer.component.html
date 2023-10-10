@@ -6,8 +6,8 @@
     <button *ngIf="hasOnlyWarnings" type="button" class="btn btn-light col-lg-2 col-sm-3 col-xs-12" (click)="highlightErrors.emit()">
       Check the warnings
     </button>
-    <button *ngIf="showCopyButton" class="btn btn-light col-lg-2 col-sm-3 col-xs-12" type="submit" (click)="copyForm.emit()" [disabled]="disabled" data-cy="form-copy">
-      Save & copy as new
+    <button *ngIf="showCopyButton" class="btn btn-light col-lg-2 col-sm-3 col-xs-12" type="submit" (click)="copyForm.emit()" data-cy="form-copy">
+      {{ disabled ? 'Copy as new record' : 'Save & copy as new' }}
     </button>
     <button *ngIf="showDeleteButton" class="btn btn-danger col-lg-1 col-sm-2 col-xs-12" type="submit" (click)="delete.emit()" [disabled]="disabled" data-cy="form-delete">
       Delete

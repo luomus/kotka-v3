@@ -31,7 +31,7 @@ import {
   isErrorViewModel,
   isSuccessViewModel
 } from './form-view.facade';
-import { distinctUntilChanged, filter, map, take, tap } from 'rxjs/operators';
+import { take, tap } from 'rxjs/operators';
 import { ComponentCanDeactivate } from '../../../shared/services/guards/component-can-deactivate.guard';
 import { FormViewUtils } from './form-view-utils';
 import { DataService } from '../../../shared/services/data.service';
@@ -71,7 +71,8 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
   @ContentChild('headerTpl', {static: true}) formHeader?: TemplateRef<Element>;
 
-  private disabledSub?: Subscription;
+  private vm?: SuccessViewModel<T>;
+  private vmSub?: Subscription;
 
   constructor(
     public formApiClient: FormApiClient,
@@ -87,12 +88,13 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
   ) {
     this.vm$ = this.formViewFacade.vm$;
 
-    this.disabledSub = this.vm$.pipe(
-      map(vm => isSuccessViewModel(vm) ? vm.state?.disabled : undefined),
-      filter(disabled => disabled !== undefined),
-      distinctUntilChanged()
-    ).subscribe(disabled => {
-      this.disabled.emit(disabled);
+    this.vmSub = this.vm$.subscribe(vm => {
+      if (this.isSuccessViewModel(vm)) {
+        if (vm.state?.disabled !== undefined && vm.state.disabled !== this.vm?.state?.disabled) {
+          this.disabled.emit(vm.state.disabled);
+        }
+        this.vm = vm;
+      }
     });
   }
 
@@ -112,7 +114,7 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
   }
 
   ngOnDestroy() {
-    this.disabledSub?.unsubscribe();
+    this.vmSub?.unsubscribe();
   }
 
   @HostListener('window:beforeunload', ['$event'])
@@ -179,16 +181,20 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
   onCopy(data: KotkaObject<T>) {
     this.lajiForm?.block();
 
-    this.save$(data).subscribe({
-      'next': data => {
-        this.copyAsNew(data);
-      },
-      'error': () => {
-        this.lajiForm?.unBlock();
-        this.notifier.showError('Save failed!');
-        this.cdr.markForCheck();
-      }
-    });
+    if (!this.vm?.state?.disabled) {
+      this.save$(data).subscribe({
+        'next': data => {
+          this.copyAsNew(data);
+        },
+        'error': () => {
+          this.lajiForm?.unBlock();
+          this.notifier.showError('Save failed!');
+          this.cdr.markForCheck();
+        }
+      });
+    } else {
+      this.copyAsNew(data, ['owner']);
+    }
   }
 
   setFormData(data: Partial<KotkaObject<T>>) {
@@ -237,17 +243,16 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
     return save$;
   }
 
-  private copyAsNew(data: KotkaObject<T>) {
-    this.vm$.pipe(take(1), switchMap((vm: SuccessViewModel<T>) => {
-      const newData = FormViewUtils.removeMetaAndExcludedFields<T>(data, vm.form?.excludeFromCopy);
+  private copyAsNew(data: KotkaObject<T>, excludedFields: string[] = []) {
+    excludedFields = excludedFields.concat(this.vm?.form?.excludeFromCopy || []);
+    const newData = FormViewUtils.removeMetaAndExcludedFields<T>(data, excludedFields);
 
-      return this.navigateToAdd().pipe(
-        tap(() => {
-          this.setFormData(newData);
-          this.lajiForm?.unBlock();
-        })
-      );
-    })).subscribe();
+    return this.navigateToAdd().pipe(
+      tap(() => {
+        this.setFormData(newData);
+        this.lajiForm?.unBlock();
+      })
+    ).subscribe();
   }
 
   private navigateAway() {
