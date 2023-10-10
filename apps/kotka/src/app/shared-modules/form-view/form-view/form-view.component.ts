@@ -133,10 +133,7 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
       'next': formData => {
         this.formHasChanges = false;
 
-        from(this.router.navigate(['..', 'edit'], {
-          relativeTo: this.activeRoute,
-          queryParams: { uri: this.domain + formData.id }
-        })).subscribe(() => {
+        this.navigateToEdit(formData.id || '').subscribe(() => {
           this.lajiForm?.unBlock();
           this.notifier.showSuccess('Save success!');
           this.cdr.markForCheck();
@@ -225,14 +222,10 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
   }
 
   private copyAsNew(data: KotkaObject<T>) {
-    const navigate$ = from(this.router.navigate(['..', 'add'], {
-      relativeTo: this.activeRoute
-    }));
-
     this.vm$.pipe(take(1), switchMap((vm: SuccessViewModel<T>) => {
       const newData = FormViewUtils.removeMetaAndExcludedFields<T>(data, vm.form?.excludeFromCopy);
 
-      return navigate$.pipe(
+      return this.navigateToAdd().pipe(
         tap(() => {
           this.setFormData(newData);
           this.lajiForm?.unBlock();
@@ -243,5 +236,16 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
 
   private navigateAway() {
     this.router.navigate(['..'], { relativeTo: this.activeRoute });
+  }
+
+  private navigateToAdd(): Observable<boolean> {
+    return from(this.router.navigate(['..', 'add'], { relativeTo: this.activeRoute }));
+  }
+
+  private navigateToEdit(id: string): Observable<boolean> {
+    return from(this.router.navigate(['..', 'edit'], {
+      relativeTo: this.activeRoute,
+      queryParams: { uri: this.domain + id }
+    }));
   }
 }
