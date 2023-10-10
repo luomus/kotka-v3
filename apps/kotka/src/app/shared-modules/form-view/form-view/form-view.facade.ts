@@ -14,7 +14,7 @@ import {
   switchMap,
   throwError
 } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { filter, map, take } from 'rxjs/operators';
 import { allowAccessByOrganization, allowAccessByTime } from '@kotka/utils';
 import { LajiForm, Person } from '@kotka/shared/models';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
@@ -97,6 +97,12 @@ export class FormViewFacade<T extends KotkaObjectType> implements OnDestroy {
     this.formData$.next(formData);
   }
 
+  setInitialFormData(formData: Partial<KotkaObject<T>>) {
+    this.getEmptyFormData$().pipe(take(1)).subscribe(emptyFormData => {
+      this.formData$.next({ ...emptyFormData, ...formData });
+    });
+  }
+
   private getVm$(): Observable<ViewModel<T>> {
     const routeParams$ = this.getRouteParams$();
     const user$ = this.getUser$();
@@ -105,9 +111,9 @@ export class FormViewFacade<T extends KotkaObjectType> implements OnDestroy {
       shareReplay(1)
     );
 
-    this.initialFormDataSub = combineLatest([routeParams$, this.inputs$, user$]).pipe(
-      switchMap(([params, inputs, user]) => concat(
-        of(undefined), this.getInitialFormData$(params, inputs, user)
+    this.initialFormDataSub = combineLatest([routeParams$, this.inputs$]).pipe(
+      switchMap(([params, inputs]) => concat(
+        of(undefined), this.getInitialFormData$(params, inputs)
       ))
     ).subscribe({
       'next': formData => this.formData$.next(formData),
@@ -164,12 +170,22 @@ export class FormViewFacade<T extends KotkaObjectType> implements OnDestroy {
     );
   }
 
-  private getInitialFormData$(routeParams: RouteParams, inputs: FormInputs<T>, user: Person): Observable<Partial<KotkaObject<T>>> {
+  private getInitialFormData$(routeParams: RouteParams, inputs: FormInputs<T>): Observable<Partial<KotkaObject<T>>> {
     if (routeParams.editMode) {
       return this.getFormData$(inputs.dataType, routeParams.dataURI);
     } else {
-      return of(inputs.getInitialFormDataFunc?.(user as Person) || {});
+      return this.getEmptyFormData$();
     }
+  }
+
+  private getEmptyFormData$(): Observable<Partial<KotkaObject<T>>> {
+    return this.getUser$().pipe(map(user => {
+      const formData: Partial<KotkaObject<T>> = {};
+      if (user?.organisation && user.organisation.length === 1) {
+        formData.owner = user.organisation[0];
+      }
+      return formData;
+    }));
   }
 
   private getFormData$(dataType: T, dataURI?: string): Observable<Partial<KotkaObject<T>>> {

@@ -16,7 +16,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormService } from '../../../shared/services/form.service';
 import { LajiForm, Person } from '@kotka/shared/models';
-import { EMPTY, from, Observable, of, Subscription, switchMap } from 'rxjs';
+import { EMPTY, from, Observable, of, Subscription } from 'rxjs';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ToastService } from '../../../shared/services/toast.service';
 import { UserService } from '../../../shared/services/user.service';
@@ -31,7 +31,7 @@ import {
   isErrorViewModel,
   isSuccessViewModel
 } from './form-view.facade';
-import { take, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { ComponentCanDeactivate } from '../../../shared/services/guards/component-can-deactivate.guard';
 import { FormViewUtils } from './form-view-utils';
 import { DataService } from '../../../shared/services/data.service';
@@ -48,7 +48,6 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
   @Input() dataType?: T;
   @Input() dataTypeName?: string;
   @Input() augmentFormFunc?: (form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>;
-  @Input() getInitialFormDataFunc?: (user: Person) => Partial<KotkaObject<T>>;
   @Input() domain = 'http://tun.fi/';
 
   vm$: Observable<SuccessViewModel<T> | ErrorViewModel>;
@@ -99,13 +98,12 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['formId'] || changes['dataType'] || changes['augmentFormFunc'] || changes['getInitialFormDataFunc']) {
+    if (changes['formId'] || changes['dataType'] || changes['augmentFormFunc']) {
       if (this.formId && this.dataType) {
         this.formViewFacade.setInputs({
           formId: this.formId,
           dataType: this.dataType,
-          augmentFormFunc: this.augmentFormFunc,
-          getInitialFormDataFunc: this.getInitialFormDataFunc
+          augmentFormFunc: this.augmentFormFunc
         });
       }
     }
@@ -249,7 +247,7 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
 
     return this.navigateToAdd().pipe(
       tap(() => {
-        this.setFormData(newData);
+        this.formViewFacade.setInitialFormData(newData);
         this.lajiForm?.unBlock();
       })
     ).subscribe();

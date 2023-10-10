@@ -6,7 +6,6 @@ import {
 } from '@angular/core';
 import {
   LajiForm,
-  Person,
   SpecimenTransaction,
   SpecimenTransactionEvent
 } from '@kotka/shared/models';
@@ -64,14 +63,6 @@ export class TransactionFormComponent implements OnDestroy, ComponentCanDeactiva
 
   canDeactivate(): Observable<boolean> {
     return this.formView.canDeactivate();
-  }
-
-  getInitialFormData(user: Person): Partial<SpecimenTransaction> {
-    const formData: Partial<SpecimenTransaction> = {};
-    if (user?.organisation && user.organisation.length === 1) {
-      formData.owner = user.organisation[0];
-    }
-    return formData;
   }
 
   onFormInit(data: { lajiForm: LajiFormComponent; formData: Partial<SpecimenTransaction> }) {
