@@ -12,7 +12,7 @@ import { AbschService } from '../../shared/services/api-services/absch.service';
   selector: 'kotka-permits-info-embed',
   template: `
     <ng-template #template let-country="country" let-countryLinks="countryLinks">
-      <div class="col-lg-6 col-md-5 col-sm-4 d-none d-sm-block ps-4 pe-4" style="padding-top: 20px">
+      <div class="col-lg-6 col-md-5 col-sm-4 d-none d-sm-block ps-4 pe-4" style="padding-top: 20px" data-cy="permits-info">
         In this section it is possible to fill in the information about permits, agreements and other such documentation
         related to the specimens in the transaction (for example Nagoya protocol).  More information about the Nagoya protocol:
         <a href="https://absch.cbd.int/" target="_blank">absch.cbd.int</a> and

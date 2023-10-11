@@ -102,7 +102,8 @@ export class TransactionFormComponent implements OnDestroy, ComponentCanDeactiva
 
     const modalRef = this.modalService.open(TransactionEventFormComponent, {
       backdrop: 'static',
-      size: 'lg'
+      size: 'lg',
+      modalDialogClass: 'transaction-event-modal'
     });
     modalRef.componentInstance.transactionType = this.formData?.type;
 
