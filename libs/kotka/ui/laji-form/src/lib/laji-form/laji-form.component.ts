@@ -80,9 +80,6 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
         });
       });
     }
-    if (changes['formData']) {
-      this.formChange.emit(this.formData);
-    }
   }
 
   ngOnDestroy() {

@@ -15,7 +15,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormService } from '../../../shared/services/form.service';
-import { LajiForm, Person } from '@kotka/shared/models';
+import { LajiForm } from '@kotka/shared/models';
 import { EMPTY, from, Observable, of, Subscription } from 'rxjs';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ToastService } from '../../../shared/services/toast.service';
@@ -89,6 +89,9 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
 
     this.vmSub = this.vm$.subscribe(vm => {
       if (this.isSuccessViewModel(vm)) {
+        if (vm.routeParams.dataURI !== this.vm?.routeParams.dataURI) {
+          this.formHasChanges = false;
+        }
         if (vm.state?.disabled !== undefined && vm.state.disabled !== this.vm?.state?.disabled) {
           this.disabled.emit(vm.state.disabled);
         }
@@ -127,13 +130,7 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
       return of(true);
     }
 
-    return this.dialogService.confirm('Are you sure you want to leave and discard unsaved changes?').pipe(
-      tap(confirm => {
-        if (confirm) {
-          this.formHasChanges = false;
-        }
-      })
-    );
+    return this.dialogService.confirm('Are you sure you want to leave and discard unsaved changes?');
   }
 
   onFormReady(data: KotkaObject<T>) {
@@ -196,7 +193,14 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
   }
 
   setFormData(data: Partial<KotkaObject<T>>) {
+    this.formHasChanges = true;
     this.formViewFacade.setFormData(data);
+    this.formDataChange.emit(data);
+  }
+
+  private setInitialFormData(data: Partial<KotkaObject<T>>) {
+    this.formViewFacade.setInitialFormData(data);
+    this.formDataChange.emit(data);
   }
 
   private delete(data: KotkaObject<T>) {
@@ -247,7 +251,7 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
 
     return this.navigateToAdd().pipe(
       tap(() => {
-        this.formViewFacade.setInitialFormData(newData);
+        this.setInitialFormData(newData);
         this.lajiForm?.unBlock();
       })
     ).subscribe();
