@@ -18,7 +18,7 @@ import { filter, map, take } from 'rxjs/operators';
 import { allowAccessByOrganization, allowAccessByTime } from '@kotka/utils';
 import { LajiForm, Person } from '@kotka/shared/models';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { KotkaObject, KotkaObjectType, StoreVersion } from '@kotka/api-interfaces';
+import { KotkaObject, KotkaObjectType } from '@kotka/api-interfaces';
 import { FormViewUtils } from './form-view-utils';
 
 export enum FormErrorEnum {
@@ -35,7 +35,6 @@ export interface FormInputs<T extends KotkaObjectType> {
   formId: string;
   dataType: T;
   augmentFormFunc?: (form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>;
-  getInitialFormDataFunc?: (user: Person) => Partial<KotkaObject<T>>;
 }
 
 export interface FormState {
@@ -49,7 +48,6 @@ export interface SuccessViewModel<T extends KotkaObjectType> {
   form?: LajiForm.SchemaForm;
   formData?: Partial<KotkaObject<T>>;
   state?: FormState;
-  versionHistory?: StoreVersion[];
 }
 
 export interface ErrorViewModel {
