@@ -1,4 +1,5 @@
 {
+  "name": "laji-form",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/kotka/ui/laji-form/src",
   "projectType": "library",
@@ -7,12 +8,15 @@
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/kotka/ui/laji-form/**/*.ts", "libs/kotka/ui/laji-form/**/*.html"]
+        "lintFilePatterns": [
+          "libs/kotka/ui/laji-form/**/*.ts",
+          "libs/kotka/ui/laji-form/**/*.html"
+        ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/kotka/ui/laji-form"],
+      "outputs": ["{workspaceRoot}/coverage/libs/kotka/ui/laji-form"],
       "options": {
         "jestConfig": "libs/kotka/ui/laji-form/jest.config.ts",
         "passWithNoTests": true

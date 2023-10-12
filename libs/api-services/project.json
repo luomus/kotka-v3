@@ -1,11 +1,12 @@
 {
+  "name": "api-services",
   "projectType": "library",
   "sourceRoot": "libs/api-services/src",
   "prefix": "kotka",
   "targets": {
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/api-services"],
+      "outputs": ["{workspaceRoot}/coverage/libs/api-services"],
       "options": {
         "jestConfig": "libs/api-services/jest.config.ts",
         "passWithNoTests": true

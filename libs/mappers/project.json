@@ -1,4 +1,5 @@
 {
+  "name": "mappers",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/mappers/src",
   "projectType": "library",
@@ -12,7 +13,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/mappers"],
+      "outputs": ["{workspaceRoot}/coverage/libs/mappers"],
       "options": {
         "jestConfig": "libs/mappers/jest.config.ts",
         "passWithNoTests": true
