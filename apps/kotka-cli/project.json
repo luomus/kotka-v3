@@ -4,13 +4,15 @@
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nrwl/node:webpack",
+      "executor": "@nrwl/webpack:webpack",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/kotka-cli",
         "main": "apps/kotka-cli/src/main.ts",
         "tsConfig": "apps/kotka-cli/tsconfig.app.json",
-        "assets": ["apps/kotka-cli/src/assets"]
+        "assets": ["apps/kotka-cli/src/assets"],
+        "target": "node",
+        "compiler": "tsc"
       },
       "configurations": {
         "production": {

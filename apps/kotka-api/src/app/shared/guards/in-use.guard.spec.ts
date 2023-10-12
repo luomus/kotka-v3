@@ -24,7 +24,7 @@ describe('InUseGuard', () => {
     inUseGuard = moduleRef.get<InUseGuard>(InUseGuard);
     reflector = moduleRef.get<Reflector>(Reflector);
 
-    jest.useFakeTimers().setSystemTime(new Date('2022-11-22T12:00:00.000Z'));
+    jest.useFakeTimers();
   });
 
   it('Using any other request methods that DELETE grants access, no calls to reflector', async () => {

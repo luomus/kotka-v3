@@ -23,7 +23,7 @@ describe('InUseGuard', () => {
     organizationGuard = moduleRef.get<OrganizationGuard>(OrganizationGuard);
     reflector = moduleRef.get<Reflector>(Reflector);
 
-    jest.useFakeTimers().setSystemTime(new Date('2022-11-22T12:00:00.000Z'));
+    jest.useFakeTimers();
   });
 
   it('GET-requests are granted access', async () => {

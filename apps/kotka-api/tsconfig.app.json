@@ -8,5 +8,8 @@
     "target": "es2015"
   },
   "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts"],
-  "include": ["**/*.ts", "../../libs/mappers/src/lib/triplestore-mapper.service.ts"]
+  "include": [
+    "**/*.ts",
+    "../../libs/mappers/src/lib/triplestore-mapper.service.ts"
+  ]
 }

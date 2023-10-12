@@ -23,7 +23,7 @@ describe('InUseGuard', () => {
     timedDocumentAccessGuard = moduleRef.get<TimedDocumentAccessGuard>(TimedDocumentAccessGuard);
     reflector = moduleRef.get<Reflector>(Reflector);
 
-    jest.useFakeTimers().setSystemTime(new Date('2022-11-22T12:00:00.000Z'));
+    jest.useFakeTimers();
   });
 
   it('Admins are granted access', async () => {
