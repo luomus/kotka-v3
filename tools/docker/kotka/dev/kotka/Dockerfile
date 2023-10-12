@@ -6,7 +6,7 @@ RUN chown -Rh node:node /app
 
 COPY --chown=node:node ./decorate-angular-cli.js ./package*.json ./
 
-RUN npm ci --legacy-peer-deps && npm cache clean --force
+RUN npm ci && npm cache clean --force
 
 COPY --chown=node:node . .
 
