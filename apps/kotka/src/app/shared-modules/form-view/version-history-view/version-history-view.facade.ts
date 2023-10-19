@@ -12,10 +12,11 @@ import {
   of,
   ReplaySubject,
   shareReplay,
+  startWith,
   switchMap,
   throwError
 } from 'rxjs';
-import { distinctUntilChanged, filter, map, take } from 'rxjs/operators';
+import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 import {
   KotkaDocumentObject,
   KotkaDocumentObjectType,
@@ -113,7 +114,6 @@ export class VersionHistoryViewFacade {
 
   private getVm$(): Observable<ViewModel> {
     const routeParams$ = this.getRouteParams$();
-    routeParams$.pipe(take(1)).subscribe(); // TODO refactor so that this is not needed
 
     const versionList$ = combineLatest([routeParams$, this.inputs$]).pipe(
       distinctUntilChanged(([params1, inputs1], [params2, inputs2]) => (
@@ -149,6 +149,7 @@ export class VersionHistoryViewFacade {
   private getRouteParams$(): Observable<RouteParams> {
     return this.router.events.pipe(
       filter((event) => event instanceof NavigationEnd),
+      startWith(this.router),
       map(() => {
         const dataURI = this.activeRoute.snapshot.queryParams['uri'];
         const versionParam = this.activeRoute.snapshot.queryParams['version'];

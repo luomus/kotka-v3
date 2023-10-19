@@ -10,6 +10,7 @@ import {
   of,
   ReplaySubject,
   shareReplay,
+  startWith,
   Subscription,
   switchMap,
   throwError
@@ -143,6 +144,7 @@ export class FormViewFacade implements OnDestroy {
   private getRouteParams$(): Observable<RouteParams> {
     return this.router.events.pipe(
       filter((event) => event instanceof NavigationEnd),
+      startWith(this.router),
       map(() => {
         const editMode = this.activeRoute.snapshot.url[0].path === 'edit';
         const dataURI = this.activeRoute.snapshot.queryParams['uri'];
