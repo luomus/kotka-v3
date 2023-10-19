@@ -14,7 +14,7 @@ import { AgGridModule } from '@ag-grid-community/angular';
 import { CsvExportModule } from '@ag-grid-community/csv-export';
 import { ModuleRegistry } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
-import { URICellRenderer } from './renderers/uri-cell-renderer';
+import { URICellRendererComponent } from './renderers/u-r-i-cell-renderer.component';
 
 ModuleRegistry.registerModules([CsvExportModule, InfiniteRowModelModule]);
 
@@ -43,6 +43,6 @@ ModuleRegistry.registerModules([CsvExportModule, InfiniteRowModelModule]);
     TypeaheadModule,
     DatatableComponent,
   ],
-  declarations: [DatatableComponent, URICellRenderer],
+  declarations: [DatatableComponent, URICellRendererComponent],
 })
 export class KotkaUiDatatableModule {}

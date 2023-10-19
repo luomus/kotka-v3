@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
-import { DatatableColumn, DatatableSource, GetRowsParams} from '../../../../../../libs/kotka/ui/datatable/src';
-import { URICellRenderer } from '../../../../../../libs/kotka/ui/datatable/src/lib/renderers/uri-cell-renderer';
+import { DatatableColumn, DatatableSource, GetRowsParams} from '@kotka/ui/datatable';
+import { URICellRendererComponent } from '@kotka/ui/datatable';
 import { DatatableDataService } from '../../shared/services/datatable-data.service';
 import { KotkaDocumentObjectType } from '@kotka/shared/models';
 
@@ -14,7 +14,7 @@ export class DatasetTableComponent {
   columns: DatatableColumn[] = [{
     headerName: 'URI',
     field: 'id',
-    cellRenderer: URICellRenderer,
+    cellRenderer: URICellRendererComponent,
     cellRendererParams: {
       domain: 'http://tun.fi/'
     },

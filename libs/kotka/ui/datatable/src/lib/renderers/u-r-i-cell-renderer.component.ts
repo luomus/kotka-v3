@@ -3,7 +3,7 @@ import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ICellRendererParams } from '@ag-grid-community/core';
 
 @Component({
-  selector: 'uri-cell-renderer',
+  selector: 'kui-uri-cell-renderer',
   template: `
     <div *ngIf="value" class="uri-cell-layout">
       <a type="button" class="btn btn-info edit-button" [routerLink]="['edit']" [queryParams]="{
@@ -39,7 +39,7 @@ import { ICellRendererParams } from '@ag-grid-community/core';
     }
   `]
 })
-export class URICellRenderer implements ICellRendererAngularComp {
+export class URICellRendererComponent implements ICellRendererAngularComp {
   value = '';
   domain = '';
 
