@@ -5,8 +5,8 @@
 >
   <ng-template #headerTpl let-formData="formData">
     <a
-      *ngIf="asDataset(formData) as formData"
-      [href]='("/specimens/search?q=dataset.raw:\"" + formData.datasetName.en + "\"") | oldKotkaUrl'
+      *ngIf="isDataset(formData)"
+      [href]='("/specimens/search?q=dataset.raw:\"" + asDataset(formData).datasetName.en + "\"") | oldKotkaUrl'
       target="_blank"
     >
       Specimens with this tag

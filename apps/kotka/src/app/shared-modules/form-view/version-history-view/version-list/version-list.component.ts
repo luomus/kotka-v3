@@ -6,7 +6,7 @@ import {
   OnChanges,
   Output,
 } from '@angular/core';
-import { StoreVersion } from '@kotka/api-interfaces';
+import { StoreVersion } from '@kotka/shared/models';
 
 @Component({
   selector: 'kotka-version-list',

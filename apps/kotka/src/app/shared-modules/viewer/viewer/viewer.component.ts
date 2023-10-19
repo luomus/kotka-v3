@@ -3,8 +3,7 @@ import {
   Component,
   Input,
 } from '@angular/core';
-import { KotkaDocumentObject, LajiForm } from '@kotka/shared/models';
-import { DifferenceObject } from '../../../shared/services/data.service';
+import { DifferenceObject, KotkaDocumentObject, LajiForm } from '@kotka/shared/models';
 
 interface Field {
   name: keyof KotkaDocumentObject;

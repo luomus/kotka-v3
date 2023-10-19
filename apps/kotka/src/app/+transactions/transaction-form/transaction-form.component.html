@@ -2,8 +2,8 @@
   [formId]="'MHL.930'"
   [dataType]="dataType"
   [augmentFormFunc]="augmentFormFunc"
-  (formInit)="onFormInit($event)"
-  (formDataChange)="onFormDataChange($event)"
+  (formInit)="onFormInit($event.lajiForm, asPartialSpecimenTransaction($event.formData))"
+  (formDataChange)="onFormDataChange(asPartialSpecimenTransaction($event))"
   (disabled)="setDisabled($event)"
 >
 </kotka-form-view>

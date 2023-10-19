@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/
 import { DatatableColumn, DatatableSource, GetRowsParams} from '../../../../../../libs/kotka/ui/datatable/src';
 import { URICellRenderer } from '../../../../../../libs/kotka/ui/datatable/src/lib/renderers/uri-cell-renderer';
 import { DatatableDataService } from '../../shared/services/datatable-data.service';
-import { KotkaObjectType } from '@kotka/api-interfaces';
+import { KotkaDocumentObjectType } from '@kotka/shared/models';
 
 @Component({
   selector: 'kotka-dataset-table',
@@ -42,7 +42,7 @@ export class DatasetTableComponent {
       this.loading = true;
       this.cdr.markForCheck();
 
-      this.dataService.getData(KotkaObjectType.dataset, params.startRow, params.endRow, params.sortModel, params.filterModel).subscribe(result => {
+      this.dataService.getData(KotkaDocumentObjectType.dataset, params.startRow, params.endRow, params.sortModel, params.filterModel).subscribe(result => {
         this.totalCount = result.totalItems;
         this.loading = false;
         this.cdr.markForCheck();

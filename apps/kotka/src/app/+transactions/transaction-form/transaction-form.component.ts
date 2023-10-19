@@ -5,6 +5,8 @@ import {
   ViewChild
 } from '@angular/core';
 import {
+  asPartialSpecimenTransaction,
+  KotkaDocumentObjectType,
   LajiForm,
   SpecimenTransaction,
   SpecimenTransactionEvent
@@ -19,7 +21,6 @@ import {
   LajiFormComponent,
 } from '@kotka/ui/laji-form';
 import { ComponentCanDeactivate } from '../../shared/services/guards/component-can-deactivate.guard';
-import { KotkaObjectType } from '@kotka/api-interfaces';
 import { ApiClient } from '../../shared/services/api-services/api-client';
 import { TransactionFormEmbedService } from '../transaction-form-embed/transaction-form-embed.service';
 
@@ -32,10 +33,12 @@ type SpecimenIdKey = keyof Pick<SpecimenTransaction, 'awayIDs'|'returnedIDs'|'mi
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransactionFormComponent implements OnDestroy, ComponentCanDeactivate {
-  dataType = KotkaObjectType.transaction;
+  dataType = KotkaDocumentObjectType.transaction;
   augmentFormFunc = this.augmentForm.bind(this);
 
-  @ViewChild(FormViewComponent, { static: true }) formView!: FormViewComponent<KotkaObjectType.transaction>;
+  asPartialSpecimenTransaction = asPartialSpecimenTransaction;
+
+  @ViewChild(FormViewComponent, { static: true }) formView!: FormViewComponent;
 
   private formData?: Partial<SpecimenTransaction>;
 
@@ -65,11 +68,11 @@ export class TransactionFormComponent implements OnDestroy, ComponentCanDeactiva
     return this.formView.canDeactivate();
   }
 
-  onFormInit(data: { lajiForm: LajiFormComponent; formData: Partial<SpecimenTransaction> }) {
-    this.formData = data.formData;
+  onFormInit(lajiForm: LajiFormComponent, formData: Partial<SpecimenTransaction>) {
+    this.formData = formData;
 
     this.transactionFormEmbedService.initEmbeddedComponents(
-      data.lajiForm, data.formData, this.onAddTransactionEventButtonClick.bind(this)
+      lajiForm, formData, this.onAddTransactionEventButtonClick.bind(this)
     );
     this.specimenRangeButtonClickSubscription = this.transactionFormEmbedService.specimenRangeClick$?.subscribe(range => (
       this.specimenRangeClick(range)

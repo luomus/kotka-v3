@@ -1,11 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { FormViewComponent } from './form-view.component';
-import { KotkaObjectType } from '@kotka/api-interfaces';
 
 describe('FormViewComponent', () => {
-  let component: FormViewComponent<KotkaObjectType>;
-  let fixture: ComponentFixture<FormViewComponent<KotkaObjectType>>;
+  let component: FormViewComponent;
+  let fixture: ComponentFixture<FormViewComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({

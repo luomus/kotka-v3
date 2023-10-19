@@ -1,8 +1,10 @@
 import {
   ChangeDetectionStrategy,
-  Component, EventEmitter,
+  Component,
+  EventEmitter,
   Input,
-  OnChanges, Output,
+  OnChanges,
+  Output,
   SimpleChanges,
 } from '@angular/core';
 import {
@@ -18,8 +20,8 @@ import {
 } from './version-history-view.facade';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
-import { KotkaObject, KotkaObjectType } from '@kotka/api-interfaces';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
+import { KotkaDocumentObject, KotkaDocumentObjectType } from '@kotka/shared/models';
 
 @Component({
   selector: 'kotka-version-history-view',
@@ -28,12 +30,12 @@ import { LajiFormComponent } from '@kotka/ui/laji-form';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [VersionHistoryViewFacade]
 })
-export class VersionHistoryViewComponent<T extends KotkaObjectType> implements OnChanges {
+export class VersionHistoryViewComponent implements OnChanges {
   @Input() formId?: string;
-  @Input() dataType?: T;
+  @Input() dataType?: KotkaDocumentObjectType;
   @Input() dataTypeName?: string;
 
-  vm$: Observable<SuccessViewModel<T> | ErrorViewModel>;
+  vm$: Observable<SuccessViewModel | ErrorViewModel>;
 
   visibleDataTypeName?: string;
 
@@ -45,10 +47,10 @@ export class VersionHistoryViewComponent<T extends KotkaObjectType> implements O
 
   versionHistoryErrorEnum = VersionHistoryErrorEnum;
 
-  @Output() formInit = new EventEmitter<{ lajiForm: LajiFormComponent; formData: KotkaObject<T> }>();
+  @Output() formInit = new EventEmitter<{ lajiForm: LajiFormComponent; formData: KotkaDocumentObject }>();
 
   constructor(
-    private versionHistoryFacade: VersionHistoryViewFacade<T>,
+    private versionHistoryFacade: VersionHistoryViewFacade,
     private router: Router
   ) {
     this.vm$ = this.versionHistoryFacade.vm$;

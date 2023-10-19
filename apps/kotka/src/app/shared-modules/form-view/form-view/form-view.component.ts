@@ -15,14 +15,14 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormService } from '../../../shared/services/form.service';
-import { LajiForm } from '@kotka/shared/models';
+import { KotkaDocumentObject, KotkaDocumentObjectType, LajiForm } from '@kotka/shared/models';
 import { EMPTY, from, Observable, of, Subscription } from 'rxjs';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ToastService } from '../../../shared/services/toast.service';
 import { UserService } from '../../../shared/services/user.service';
 import { FormApiClient } from '../../../shared/services/api-services/form-api-client';
 import { DialogService } from '../../../shared/services/dialog.service';
-import { KotkaObject, ErrorMessages, KotkaObjectType } from '@kotka/api-interfaces';
+import { ErrorMessages } from '@kotka/api-interfaces';
 import {
   FormErrorEnum,
   ErrorViewModel,
@@ -43,14 +43,14 @@ import { DataService } from '../../../shared/services/data.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [FormViewFacade]
 })
-export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, OnDestroy, ComponentCanDeactivate {
+export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeactivate {
   @Input() formId?: string;
-  @Input() dataType?: T;
+  @Input() dataType?: KotkaDocumentObjectType;
   @Input() dataTypeName?: string;
   @Input() augmentFormFunc?: (form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>;
   @Input() domain = 'http://tun.fi/';
 
-  vm$: Observable<SuccessViewModel<T> | ErrorViewModel>;
+  vm$: Observable<SuccessViewModel | ErrorViewModel>;
 
   visibleDataTypeName?: string;
 
@@ -63,14 +63,14 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
   isErrorViewModel = isErrorViewModel;
   isSuccessViewModel = isSuccessViewModel;
 
-  @Output() formDataChange = new EventEmitter<Partial<KotkaObject<T>>>();
-  @Output() formInit = new EventEmitter<{ lajiForm: LajiFormComponent; formData: Partial<KotkaObject<T>> }>();
+  @Output() formDataChange = new EventEmitter<Partial<KotkaDocumentObject>>();
+  @Output() formInit = new EventEmitter<{ lajiForm: LajiFormComponent; formData: Partial<KotkaDocumentObject> }>();
   @Output() disabled = new EventEmitter<boolean>();
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
   @ContentChild('headerTpl', {static: true}) formHeader?: TemplateRef<Element>;
 
-  private vm?: SuccessViewModel<T>;
+  private vm?: SuccessViewModel;
   private vmSub?: Subscription;
 
   constructor(
@@ -82,7 +82,7 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
     private userService: UserService,
     private dialogService: DialogService,
     private router: Router,
-    private formViewFacade: FormViewFacade<T>,
+    private formViewFacade: FormViewFacade,
     private cdr: ChangeDetectorRef
   ) {
     this.vm$ = this.formViewFacade.vm$;
@@ -133,13 +133,13 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
     return this.dialogService.confirm('Are you sure you want to leave and discard unsaved changes?');
   }
 
-  onFormReady(data: KotkaObject<T>) {
+  onFormReady(data: KotkaDocumentObject) {
     if (this.lajiForm) {
       this.formInit.emit({lajiForm: this.lajiForm, formData: data});
     }
   }
 
-  onSubmit(data: KotkaObject<T>) {
+  onSubmit(data: KotkaDocumentObject) {
     this.lajiForm?.block();
 
     this.save$(data).subscribe({
@@ -160,7 +160,7 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
     });
   }
 
-  onDelete(data: KotkaObject<T>) {
+  onDelete(data: KotkaDocumentObject) {
     this.dialogService.confirm(`Are you sure you want to delete this ${this.visibleDataTypeName}?`).subscribe(confirm => {
       if (confirm) {
         this.delete(data);
@@ -168,12 +168,12 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
     });
   }
 
-  onChange(data: Partial<KotkaObject<T>>) {
+  onChange(data: Partial<KotkaDocumentObject>) {
     this.formHasChanges = true;
     this.formDataChange.emit(data);
   }
 
-  onCopy(data: KotkaObject<T>) {
+  onCopy(data: KotkaDocumentObject) {
     this.lajiForm?.block();
 
     if (!this.vm?.state?.disabled) {
@@ -192,18 +192,18 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
     }
   }
 
-  setFormData(data: Partial<KotkaObject<T>>) {
+  setFormData(data: Partial<KotkaDocumentObject>) {
     this.formHasChanges = true;
     this.formViewFacade.setFormData(data);
     this.formDataChange.emit(data);
   }
 
-  private setInitialFormData(data: Partial<KotkaObject<T>>) {
+  private setInitialFormData(data: Partial<KotkaDocumentObject>) {
     this.formViewFacade.setInitialFormData(data);
     this.formDataChange.emit(data);
   }
 
-  private delete(data: KotkaObject<T>) {
+  private delete(data: KotkaDocumentObject) {
     if (!this.dataType || !data.id) {
       return;
     }
@@ -230,12 +230,12 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
     });
   }
 
-  private save$(data: KotkaObject<T>): Observable<KotkaObject<T>> {
+  private save$(data: KotkaDocumentObject): Observable<KotkaDocumentObject> {
     if (!this.dataType) {
       return EMPTY;
     }
 
-    let save$: Observable<KotkaObject<T>>;
+    let save$: Observable<KotkaDocumentObject>;
     if (data.id) {
       save$ = this.dataService.update(this.dataType, data.id, data);
     } else {
@@ -245,9 +245,9 @@ export class FormViewComponent<T extends KotkaObjectType> implements OnChanges, 
     return save$;
   }
 
-  private copyAsNew(data: KotkaObject<T>, excludedFields: string[] = []) {
+  private copyAsNew(data: KotkaDocumentObject, excludedFields: string[] = []) {
     excludedFields = excludedFields.concat(this.vm?.form?.excludeFromCopy || []);
-    const newData = FormViewUtils.removeMetaAndExcludedFields<T>(data, excludedFields);
+    const newData = FormViewUtils.removeMetaAndExcludedFields(data, excludedFields);
 
     return this.navigateToAdd().pipe(
       tap(() => {

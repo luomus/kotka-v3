@@ -1,13 +1,13 @@
 import { JSONPath } from 'jsonpath-plus';
 import { cloneDeep } from 'lodash';
-import { KotkaObject, KotkaObjectType } from '@kotka/api-interfaces';
+import { KotkaDocumentObject } from '@kotka/shared/models';
 
 export class FormViewUtils {
   static getIdFromDataURI(dataURI: string): string {
     return dataURI.split('/').pop() as string;
   }
 
-  static removeMetaAndExcludedFields<T extends KotkaObjectType>(data: Partial<KotkaObject<T>>, excludedFields: string[] = []): Partial<KotkaObject<T>> {
+  static removeMetaAndExcludedFields(data: Partial<KotkaDocumentObject>, excludedFields: string[] = []): Partial<KotkaDocumentObject> {
     data = cloneDeep(data);
 
     let removedFields = ['$.id', '$.dateCreated', '$.dateEdited', '$.creator', '$.editor'];

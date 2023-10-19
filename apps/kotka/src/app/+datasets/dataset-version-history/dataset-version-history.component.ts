@@ -2,7 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
 } from '@angular/core';
-import { KotkaObjectType } from '@kotka/api-interfaces';
+import { KotkaDocumentObjectType } from '@kotka/shared/models';
 
 @Component({
   selector: 'kotka-transaction-version-history',
@@ -17,5 +17,5 @@ import { KotkaObjectType } from '@kotka/api-interfaces';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DatasetVersionHistoryComponent {
-  dataType = KotkaObjectType.dataset;
+  dataType = KotkaDocumentObjectType.dataset;
 }
