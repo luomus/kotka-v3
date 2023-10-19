@@ -9,7 +9,7 @@
         "plugin:@angular-eslint/template/process-inline-templates"
       ],
       "parserOptions": {
-        "project": ["libs/kotka/ui/spinner/tsconfig.*?.json"]
+        "project": ["libs/kotka/ui/viewer/tsconfig.*?.json"]
       },
       "rules": {
         "@angular-eslint/directive-selector": [

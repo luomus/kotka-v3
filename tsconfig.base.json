@@ -20,7 +20,11 @@
       "@kotka/api-services": ["libs/api-services/src/index.ts"],
       "@kotka/mappers": ["libs/mappers/src/index.ts"],
       "@kotka/shared/models": ["libs/shared/models/src/index.ts"],
+      "@kotka/ui/datatable": ["libs/kotka/ui/datatable/src/index.ts"],
       "@kotka/ui/laji-form": ["libs/kotka/ui/laji-form/src/index.ts"],
+      "@kotka/ui/main-content": ["libs/kotka/ui/main-content/src/index.ts"],
+      "@kotka/ui/spinner": ["libs/kotka/ui/spinner/src/index.ts"],
+      "@kotka/ui/viewer": ["libs/kotka/ui/viewer/src/index.ts"],
       "@kotka/utils": ["libs/utils/src/index.ts"]
     }
   },

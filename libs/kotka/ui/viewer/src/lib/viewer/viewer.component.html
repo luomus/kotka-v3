@@ -62,6 +62,10 @@
     {{ field.options?.value_options?.[value || ''] }}
   </ng-container>
   <ng-template #defaultFieldValue>
-    {{ value | label }}
+    <ng-container *ngTemplateOutlet="labelTpl ? labelTpl : noLabel; context: { value }"></ng-container>
   </ng-template>
+</ng-template>
+
+<ng-template #noLabel let-value="value">
+  {{ value }}
 </ng-template>

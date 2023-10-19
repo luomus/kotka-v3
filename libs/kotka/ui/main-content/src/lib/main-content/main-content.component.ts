@@ -28,10 +28,10 @@ export class MainContentComponent {
 
   _headerTpl?: TemplateRef<Element>;
 
-  @ContentChild('headerTpl', {static: false}) set headerTpl(headerTpl: TemplateRef<Element>|undefined) {
+  @ContentChild('headerTpl', { static: false }) set headerTpl(headerTpl: TemplateRef<Element>|undefined) {
     this._headerTpl = headerTpl;
     this.cdr.markForCheck();
-  };
+  }
 
   constructor(
     private cdr: ChangeDetectorRef

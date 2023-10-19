@@ -1,7 +1,8 @@
 import {
   ChangeDetectionStrategy,
-  Component,
+  Component, ContentChild,
   Input,
+  TemplateRef,
 } from '@angular/core';
 import { DifferenceObject, KotkaDocumentObject, LajiForm } from '@kotka/shared/models';
 
@@ -14,7 +15,7 @@ interface Field {
 }
 
 @Component({
-  selector: 'kotka-viewer',
+  selector: 'kui-viewer',
   templateUrl: './viewer.component.html',
   styleUrls: ['./viewer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,11 +27,13 @@ export class ViewerComponent {
     } else {
       this.fields = undefined;
     }
-  };
+  }
   @Input() data?: KotkaDocumentObject;
   @Input() differenceData: DifferenceObject = {};
 
   fields?: Field[];
+
+  @ContentChild('labelTpl') labelTpl?: TemplateRef<any>;
 
   private metaFields: Field[] = [{
     name: 'editor',

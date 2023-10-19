@@ -27,10 +27,14 @@
 <hr>
 
 <kui-spinner [spinning]="!form || !data">
-  <kotka-viewer
+  <kui-viewer
     *ngIf="form && data"
     [form]="form"
     [data]="data.original"
     [differenceData]="data.diff"
-  ></kotka-viewer>
+  >
+    <ng-template #labelTpl let-value="value">
+      {{ value | label }}
+    </ng-template>
+  </kui-viewer>
 </kui-spinner>
