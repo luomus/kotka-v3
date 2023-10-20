@@ -39,7 +39,7 @@ export class LajiStoreService {
     return this.httpService.post(`${this.urlBase}${type}/_search`, body, this.baseConfig);
   }
 
-  getVersionHistory(type: string, id: string, includeDiff: boolean = false) {
+  getVersionHistory(type: string, id: string, includeDiff = false) {
     return this.httpService.get(`${this.urlBase}${type}/${id}/_ver`, Object.assign({ params: { include_diff: includeDiff }}, this.baseConfig));
   }
 
