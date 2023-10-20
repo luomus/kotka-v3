@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, Observable, of, switchMap } from 'rxjs';
 import { map, tap, distinctUntilChanged, share } from 'rxjs/operators';
-import { WINDOW } from '@ng-toolkit/universal';
 import { Person } from '@kotka/shared/models';
 import { apiBase } from './api-services/constants';
 import { ApiClient } from './api-services/api-client';
@@ -30,7 +29,7 @@ export class UserService {
   isLoggedIn$: Observable<boolean>;
 
   constructor(
-    @Inject(WINDOW) private window: Window,
+    @Inject('Window') private window: Window,
     private apiClient: ApiClient
   ) {
     const profile$ = this.getSessionProfile().pipe(share());

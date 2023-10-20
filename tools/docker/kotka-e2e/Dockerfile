@@ -1,4 +1,6 @@
-FROM cypress/base:14.19.0
+FROM cypress/base:16.18.0
+
+RUN apt-get update && apt-get -y install bzip2 g++ make
 
 WORKDIR /app
 RUN chown -Rh node:node /app
@@ -6,7 +8,8 @@ RUN chown -Rh node:node /app
 
 COPY --chown=node:node ./decorate-angular-cli.js ./package*.json ./
 
-RUN npm ci --legacy-peer-deps && npm cache clean --force
+RUN mkdir node_modules && mkdir node_modules/.cache && chown -R node:node node_modules && chown -R node:node node_modules/.cache
+RUN npm ci && npm cache clean --force
 
 COPY --chown=node:node . .
 

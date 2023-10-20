@@ -1,8 +1,7 @@
-import { ErrorHandler, Inject, Injectable, Injector, Optional } from '@angular/core';
+import { ErrorHandler, Injectable, Injector } from '@angular/core';
 import { ToastService } from '../toast.service';
 import { Logger } from '../logger/logger.service';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
-import { RESPONSE } from '@nguniversal/express-engine/tokens';
 
 let errorSent = false;
 
@@ -12,8 +11,7 @@ export class ErrorHandlerService extends ErrorHandler {
   private logger?: Logger;
 
   constructor(
-    private injector: Injector,
-    @Optional() @Inject(RESPONSE) private response: any,
+    private injector: Injector
   ) {
     super();
   }
@@ -21,12 +19,6 @@ export class ErrorHandlerService extends ErrorHandler {
   override handleError(error: any) {
     if (!error || (typeof error === 'object' && typeof error.message === 'string' && error.message.length === 0)) {
       return super.handleError(error);
-    }
-
-    // Send error response code so that pages that have errors would not be indexed
-    if (this.response) {
-      this.response.statusCode = 500;
-      this.response.statusMessage = 'Internal Server Error';
     }
 
     if (this.isScheduled()) {

@@ -1,14 +1,12 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { AppComponent } from './components/app/app.component';
 import { NavComponent } from './components/nav/nav.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
-import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { KotkaUiSpinnerModule } from '@kotka/ui/spinner';
 import { ToasterComponent } from './components/toaster/toaster.component';
-import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbToastModule, NgbCollapseModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { LabelPipe } from './pipes/label.pipe';
 import { OldKotkaUrlPipe } from './pipes/old-kotka-url.pipe';
 import { KotkaUiMainContentModule } from '@kotka/ui/main-content';
@@ -20,9 +18,9 @@ import { ReversePipe } from './pipes/reverse.pipe';
   imports: [
     CommonModule,
     RouterModule,
-    CollapseModule,
-    BsDropdownModule,
     NgbToastModule,
+    NgbCollapseModule,
+    NgbDropdownModule,
     KotkaUiMainContentModule,
   ],
   declarations: [

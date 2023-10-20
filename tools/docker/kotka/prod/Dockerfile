@@ -1,5 +1,5 @@
 ARG TARGET
-FROM node:14 as builder
+FROM node:16 as builder
 ARG CONFIGURATION=production
 ENV NODE_ENV build
 

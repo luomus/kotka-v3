@@ -5,10 +5,7 @@ import { SharedModule } from './shared/shared.module';
 import { QuicklinkModule } from 'ngx-quicklink';
 import { AppRoutingModule } from './app-routing.module';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { ModalModule } from 'ngx-bootstrap/modal';
-import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { AppComponent } from './shared/components/app/app.component';
-import { NgtUniversalModule } from '@ng-toolkit/universal';
 import { Logger } from './shared/services/logger/logger.service';
 import { ILogger } from './shared/services/logger/logger.interface';
 import { HttpLogger } from './shared/services/logger/http-logger.service';
@@ -30,11 +27,8 @@ export function createLoggerLoader(httpClient: HttpClient): ILogger {
     BrowserAnimationsModule,
     HttpClientModule,
     QuicklinkModule,
-    NgtUniversalModule,
     AppRoutingModule,
-    SharedModule.forRoot(),
-    ModalModule.forRoot(),
-    BsDropdownModule.forRoot()
+    SharedModule.forRoot()
   ],
   providers: [
     { provide: ErrorHandler, useClass: ErrorHandlerService },
@@ -43,7 +37,8 @@ export function createLoggerLoader(httpClient: HttpClient): ILogger {
       provide: Logger,
       deps: [HttpClient],
       useFactory: createLoggerLoader
-    }
+    },
+    { provide: 'Window', useValue: window }
   ],
   bootstrap: [AppComponent]
 })
