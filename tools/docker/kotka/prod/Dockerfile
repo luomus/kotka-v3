@@ -14,7 +14,7 @@ RUN npm ci \
  && npm cache clean --force
 
 # Copy only the files that are needed for building the projects
-COPY --chown=node:node ./tsconfig.base.json ./nx.json ./angular.json ./
+COPY --chown=node:node ./tsconfig.base.json ./nx.json ./
 COPY --chown=node:node ./apps ./apps
 COPY --chown=node:node ./libs ./libs
 

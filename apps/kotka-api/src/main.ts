@@ -6,7 +6,7 @@ import { Request } from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { AppModule } from './app/app.module';
 import Redis from 'ioredis';
-import connectRedis from 'connect-redis';
+import RedisStore from 'connect-redis';
 import { AuthenticationService } from './app/authentication/authentication.service';
 import { Person } from '@kotka/shared/models';
 import { REDIS } from './app/shared-modules/redis/redis.constants';
@@ -49,8 +49,6 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
   const host = process.env.HOST || 'localhost';
   const port = process.env.PORT || 3333;
-
-  const RedisStore = connectRedis(session);
 
   app.use(
     session({

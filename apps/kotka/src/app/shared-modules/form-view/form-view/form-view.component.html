@@ -15,7 +15,7 @@
     <ng-container *ngIf="isSuccessViewModel(vm)">
       <ng-container *ngIf="vm.form && vm.formData && vm.state else spinner">
         <ng-template #headerTpl *ngIf="formHeader">
-          <ng-container *ngTemplateOutlet="formHeader; context:{ formData: vm.formData }"></ng-container>
+          <ng-container *ngTemplateOutlet="formHeader; context: { formData: vm.formData }"></ng-container>
         </ng-template>
 
         <ngb-alert *ngIf="showDeleteTargetInUseAlert" [type]="'danger'" (closed)="showDeleteTargetInUseAlert = true">

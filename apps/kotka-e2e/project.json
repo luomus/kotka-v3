@@ -10,7 +10,7 @@
   },
   "targets": {
     "e2e": {
-      "executor": "@nrwl/cypress:cypress",
+      "executor": "@nx/cypress:cypress",
       "options": {
         "baseUrl": "http://localhost:4200",
         "cypressConfig": "apps/kotka-e2e/cypress.config.js"
@@ -23,7 +23,7 @@
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["apps/kotka-e2e/**/*.{js,ts}"]

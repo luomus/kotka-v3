@@ -52,7 +52,7 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
 
   vm$: Observable<SuccessViewModel | ErrorViewModel>;
 
-  visibleDataTypeName?: string;
+  visibleDataTypeName = '';
 
   showDeleteTargetInUseAlert = false;
   disabledAlertDismissed = false;
@@ -68,7 +68,7 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
   @Output() disabled = new EventEmitter<boolean>();
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
-  @ContentChild('headerTpl', {static: true}) formHeader?: TemplateRef<Element>;
+  @ContentChild('headerTpl', {static: true}) formHeader?: TemplateRef<any>;
 
   private vm?: SuccessViewModel;
   private vmSub?: Subscription;
@@ -111,7 +111,7 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
       }
     }
 
-    this.visibleDataTypeName = this.dataTypeName || this.dataType;
+    this.visibleDataTypeName = this.dataTypeName || this.dataType || '';
   }
 
   ngOnDestroy() {

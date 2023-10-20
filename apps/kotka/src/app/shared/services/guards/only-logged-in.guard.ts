@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 
 import { UserService } from '../user.service';
 import { take, tap } from 'rxjs/operators';
 
 @Injectable({providedIn: 'root'})
-export class OnlyLoggedInGuard implements CanActivate {
+export class OnlyLoggedInGuard  {
 
   constructor(
     private userService: UserService

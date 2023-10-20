@@ -3,6 +3,7 @@
 
 @import "styles/variables";
 @import "node_modules/bootstrap/scss/variables";
+@import "node_modules/bootstrap/scss/variables-dark";
 @import "node_modules/bootstrap/scss/mixins";
 @import "node_modules/bootstrap/scss/maps";
 @import "node_modules/bootstrap/scss/root";
@@ -35,8 +36,8 @@
 @import "node_modules/@fortawesome/fontawesome-free/scss/fontawesome";
 @import "node_modules/@fortawesome/fontawesome-free/scss/solid";
 
-@import "node_modules/@ag-grid-community/core/dist/styles/ag-grid";
-@import "node_modules/@ag-grid-community/core/dist/styles/ag-theme-alpine";
+@import "node_modules/@ag-grid-community/styles/ag-grid";
+@import "node_modules/@ag-grid-community/styles/ag-theme-alpine";
 
 @import "node_modules/laji-form/dist/styles";
 @import "styles/laji-form";

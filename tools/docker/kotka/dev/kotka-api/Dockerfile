@@ -10,8 +10,6 @@ COPY --chown=node:node ./decorate-angular-cli.js ./package*.json ./
 
 RUN npm ci && npm cache clean --force
 
-RUN mkdir node_modules/.cache && chown -R node:node node_modules/.cache
-
 COPY --chown=node:node . .
 
 EXPOSE 3333
