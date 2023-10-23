@@ -2,7 +2,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { NgModule } from '@angular/core';
 import { QuicklinkStrategy } from 'ngx-quicklink';
 import { NotFoundComponent } from './shared/components/not-found/not-found.component';
-import { OnlyLoggedInGuard } from './shared/services/guards/only-logged-in.guard';
+import { OnlyLoggedInGuard} from './shared/services/guards/only-logged-in.guard';
 import { BaseComponent } from './shared/components/base/base.component';
 
 const baseRoutes: Routes = [
