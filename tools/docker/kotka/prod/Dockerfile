@@ -2,6 +2,7 @@ ARG TARGET
 FROM node:16 as builder
 ARG CONFIGURATION=production
 ENV NODE_ENV build
+ENV CYPRESS_INSTALL_BINARY 0
 
 WORKDIR /app
 RUN chown -Rh node:node /app
