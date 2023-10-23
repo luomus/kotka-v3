@@ -39,7 +39,7 @@ RUN chmod a+r /usr/share/nginx/html/favicon.ico
 EXPOSE 8080
 
 
-FROM node:14 as kotka-api
+FROM node:16 as kotka-api
 ENV NODE_ENV production
 ENV HOST "0.0.0.0"
 
