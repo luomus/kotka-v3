@@ -17,7 +17,8 @@ import {
 } from 'rxjs';
 import { filter, map, take } from 'rxjs/operators';
 import { allowAccessByOrganization, allowAccessByTime } from '@kotka/utils';
-import { KotkaDocumentObject, KotkaDocumentObjectType, LajiForm, Person } from '@kotka/shared/models';
+import { KotkaDocumentObject, KotkaDocumentObjectType } from '@kotka/shared/models';
+import { LajiForm, Person } from '@kotka/shared/models';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { FormViewUtils } from './form-view-utils';
 

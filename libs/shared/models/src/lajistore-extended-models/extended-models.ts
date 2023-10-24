@@ -1,4 +1,12 @@
-import { KotkaDocumentObject } from '@kotka/shared/models';
+import { Dataset, Document, Organization, Sample, SpecimenTransaction } from 'laji-schema';
+export * from 'laji-schema';
+
+export type KotkaDocumentObject =
+| Dataset
+| Document
+| Organization
+| Sample
+| SpecimenTransaction
 
 export enum KotkaDocumentObjectType {
   dataset = 'dataset',

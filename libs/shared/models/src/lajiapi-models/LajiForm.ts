@@ -1,8 +1,7 @@
 /**
  * Form interface
  */
-import { Document } from '../models/Document';
-import { Annotation } from '../models/Annotation';
+import { Annotation, Document } from '@kotka/shared/models';
 
 export namespace LajiForm {
   export enum PrintType {

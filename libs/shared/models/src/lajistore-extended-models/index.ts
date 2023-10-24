@@ -1,6 +1,6 @@
 export * from './extended-models';
 
-import { Dataset, SpecimenTransaction } from '../models';
+import { Dataset, SpecimenTransaction } from 'laji-schema';
 
 export function asDataset(data: unknown): Dataset {
   return data as Dataset;
