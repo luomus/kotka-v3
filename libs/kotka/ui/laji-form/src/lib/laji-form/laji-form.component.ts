@@ -28,6 +28,7 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
   static BOTTOM_OFFSET = 50;
   @Input() form: LajiFormModel.SchemaForm | null = null;
   @Input() formData: any = {};
+  @Input() hasChanges = false;
   @Input() disabled = false;
   @Input() apiClient?: any;
   @Input() notifier?: Notifier;
@@ -41,6 +42,7 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
   private lajiFormWrapperProto?: any;
   private lajiFormTheme?: LajiFormTheme;
   private isBlocked = false;
+  private copyAfterSubmit = false;
 
   @Output() formReady: EventEmitter<any> = new EventEmitter<any>();
   @Output() formDestroy: EventEmitter<void> = new EventEmitter<void>();
@@ -49,6 +51,7 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Output() formSubmit: EventEmitter<any> = new EventEmitter<any>();
   @Output() delete: EventEmitter<any> = new EventEmitter<any>();
   @Output() formCopy: EventEmitter<any> = new EventEmitter<any>();
+  @Output() formSubmitAndCopy: EventEmitter<any> = new EventEmitter<any>();
 
   @ViewChild('lajiForm', { static: true }) lajiFormRoot!: ElementRef;
 
@@ -105,6 +108,14 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
   }
 
   saveFormClicked() {
+    this.copyAfterSubmit = false;
+    this.ngZone.runOutsideAngular(() => {
+      this.lajiFormWrapper?.submit();
+    });
+  }
+
+  saveAndCopyFormClicked() {
+    this.copyAfterSubmit = true;
     this.ngZone.runOutsideAngular(() => {
       this.lajiFormWrapper?.submit();
     });
@@ -197,7 +208,13 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
   private onSubmit(data: any) {
     this.ngZone.run(() => {
       this.hasOnlyWarnings = false;
-      this.formSubmit.emit(data.formData);
+
+      if (this.copyAfterSubmit) {
+        this.formSubmitAndCopy.emit(data.formData);
+      } else {
+        this.formSubmit.emit(data.formData);
+      }
+
       this.cdr.markForCheck();
     });
   }

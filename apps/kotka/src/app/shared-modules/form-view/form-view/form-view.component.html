@@ -37,6 +37,7 @@
         <kui-laji-form
           [form]="vm.form"
           [formData]="vm.formData"
+          [hasChanges]="formHasChanges"
           [disabled]="vm.state.disabled"
           [showDeleteButton]="vm.state.showDeleteButton"
           [showCopyButton]="vm.state.showCopyButton"
@@ -47,6 +48,7 @@
           (formSubmit)="onSubmit($event)"
           (delete)="onDelete($event)"
           (formCopy)="onCopy($event)"
+          (formSubmitAndCopy)="onSubmitAndCopy($event)"
         >
         </kui-laji-form>
       </ng-container>
