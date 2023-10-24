@@ -1,4 +1,5 @@
-import { KotkaDocumentObject, Person } from "@kotka/shared/models";
+import { KotkaDocumentObject } from "@kotka/shared/models";
+import { Person } from 'laji-schema';
 import moment from 'moment';
 
 export function allowAccessByOrganization(document: Partial<KotkaDocumentObject>, user: Person): boolean {
