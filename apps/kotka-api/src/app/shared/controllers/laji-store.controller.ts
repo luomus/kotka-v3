@@ -26,7 +26,6 @@ import { cloneDeep } from 'lodash';
 import { UserInterceptor } from '../interceptors/user.interceptor';
 import { DateInterceptor } from '../interceptors/date.interceptor';
 import { ValidatorInterceptor } from '../interceptors/validator.interceptor';
-import jsonpatch from 'fast-json-patch';
 import { createPatch } from 'rfc6902';
 
 export abstract class LajiStoreController {
