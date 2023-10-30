@@ -27,6 +27,7 @@ import { UserInterceptor } from '../interceptors/user.interceptor';
 import { DateInterceptor } from '../interceptors/date.interceptor';
 import { ValidatorInterceptor } from '../interceptors/validator.interceptor';
 import jsonpatch from 'fast-json-patch';
+import { createPatch } from 'rfc6902';
 
 export abstract class LajiStoreController {
   constructor (
@@ -171,7 +172,7 @@ export abstract class LajiStoreController {
       throw new InternalServerErrorException(`Could not find version ${ver2} for ${this.type} ${id}`);
     }
 
-    const diff = jsonpatch.compare(firstDoc, lastDoc);
+    const diff = createPatch(firstDoc, lastDoc);
 
     return {
       original: firstDoc,
