@@ -14,12 +14,10 @@ import {
   OnDestroy
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormService } from '../../../shared/services/form.service';
 import { KotkaDocumentObject, KotkaDocumentObjectType, LajiForm } from '@kotka/shared/models';
 import { EMPTY, from, Observable, of, Subscription } from 'rxjs';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ToastService } from '../../../shared/services/toast.service';
-import { UserService } from '../../../shared/services/user.service';
 import { FormApiClient } from '../../../shared/services/api-services/form-api-client';
 import { DialogService } from '../../../shared/services/dialog.service';
 import { ErrorMessages } from '@kotka/api-interfaces';
@@ -77,9 +75,7 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
     public formApiClient: FormApiClient,
     public notifier: ToastService,
     private activeRoute: ActivatedRoute,
-    private formService: FormService,
     private dataService: DataService,
-    private userService: UserService,
     private dialogService: DialogService,
     private router: Router,
     private formViewFacade: FormViewFacade,
@@ -174,22 +170,24 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
   }
 
   onCopy(data: KotkaDocumentObject) {
+    const excludedFields = this.vm?.state?.disabled ? ['owner'] : [];
+    this.copyAsNew(data, excludedFields);
+  }
+
+  onSubmitAndCopy(data: KotkaDocumentObject) {
     this.lajiForm?.block();
 
-    if (!this.vm?.state?.disabled) {
-      this.save$(data).subscribe({
-        'next': data => {
-          this.copyAsNew(data);
-        },
-        'error': () => {
-          this.lajiForm?.unBlock();
-          this.notifier.showError('Save failed!');
-          this.cdr.markForCheck();
-        }
-      });
-    } else {
-      this.copyAsNew(data, ['owner']);
-    }
+    this.save$(data).subscribe({
+      'next': data => {
+        this.formHasChanges = false;
+        this.copyAsNew(data);
+      },
+      'error': () => {
+        this.lajiForm?.unBlock();
+        this.notifier.showError('Save failed!');
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   setFormData(data: Partial<KotkaDocumentObject>) {
@@ -246,6 +244,8 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
   }
 
   private copyAsNew(data: KotkaDocumentObject, excludedFields: string[] = []) {
+    this.lajiForm?.block();
+
     excludedFields = excludedFields.concat(this.vm?.form?.excludeFromCopy || []);
     const newData = FormViewUtils.removeMetaAndExcludedFields(data, excludedFields);
 

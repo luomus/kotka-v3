@@ -8,7 +8,7 @@
       <div class="row mt-3 mb-1" *ngIf="field.type === 'collection' && field.fields else nonCollectionField">
         <div class="col-12">
           <h2>{{ field.label }}</h2>
-          <div class="card card-body bg-light mb-2" [ngClass]="{'fielset-removed': differenceData[field.name]?.[i]?.op === 'remove', 'fieldset-added': differenceData[field.name]?.[i]?.op === 'add'}" *ngFor="let i of getIndexRangeForArrayValue(data[field.name], differenceData[field.name])">
+          <div class="card card-body bg-light mb-2" [ngClass]="{'fieldset-removed': differenceData[field.name]?.[i]?.op === 'remove', 'fieldset-added': differenceData[field.name]?.[i]?.op === 'add'}" *ngFor="let i of getIndexRangeForArrayValue(data[field.name], differenceData[field.name])">
             <ng-container *ngTemplateOutlet="fieldset; context: { fields: field.fields, data: data[field.name]?.[i] || differenceData[field.name]?.[i]?.value, differenceData: differenceData[field.name]?.[i] || {} }"></ng-container>
           </div>
         </div>
