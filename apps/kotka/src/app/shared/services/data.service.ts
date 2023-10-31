@@ -104,7 +104,7 @@ export class DataService {
       path[path.length - 1] = lastPathPart;
 
       return path;
-    }
+    };
 
 
     data.patch.forEach(patch => {
