@@ -5,11 +5,12 @@ import {
   KotkaVersionDifferenceObject,
   ListResponse,
   StoreVersion,
-  KotkaVersionDifference
+  KotkaVersionDifference,
+  StorePatch
 } from '@kotka/shared/models';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { set } from 'lodash';
+import { get, set } from 'lodash';
 import { ApiClient } from './api-services/api-client';
 
 
@@ -52,15 +53,62 @@ export class DataService {
 
   getVersionDifference(type: KotkaDocumentObjectType, id: string, version1: number, version2: number): Observable<KotkaVersionDifferenceObject> {
     return this.apiClient.getDocumentVersionDifference(type, id, version1, version2).pipe(
-      map(data => this.convertVersionHistoryFormat(data))
+      map(data => this.convertVersionDifferenceFormat(data))
     );
   }
 
-  private convertVersionHistoryFormat(data: KotkaVersionDifference): KotkaVersionDifferenceObject {
+  private convertVersionDifferenceFormat(data: KotkaVersionDifference): KotkaVersionDifferenceObject {
     const diff = {};
+    const isRemovedFromArray: Record<string, boolean[]> = {};
+
+    const getIdxBeforeArrayRemovals = (idx: number, arrayPath: string[], patch: StorePatch): number => {
+      const arrayPathString = arrayPath.join('/');
+
+      if (!isRemovedFromArray[arrayPathString]) {
+        isRemovedFromArray[arrayPathString] = [];
+      }
+
+      const isRemoved = isRemovedFromArray[arrayPathString];
+
+      for (let i = 0; i < isRemoved.length && i <= idx; i++) {
+        if (isRemoved[i]) {
+          idx++;
+        }
+      }
+
+      if (patch.op === "remove") {
+        isRemoved[idx] = true;
+      }
+
+      return idx;
+    };
+
+    const parsePatchPath = (patch: StorePatch): string[] => {
+      const path = patch.path.split('/').filter(value => !!value);
+
+      const parentPath = path.slice(0, -1);
+      const parentValue = get(data.original, parentPath);
+
+      let lastPathPart = path[path.length - 1];
+
+      if (lastPathPart === '-') {
+        const originalArray = parentValue || [];
+        const diffArray = get(diff, parentPath) || [];
+        lastPathPart = Math.max(originalArray.length, diffArray.length).toString();
+      } else if (Array.isArray(parentValue)) {
+        let arrayIdx = parseInt(lastPathPart, 10);
+        arrayIdx = getIdxBeforeArrayRemovals(arrayIdx, parentPath, patch);
+        lastPathPart = arrayIdx.toString();
+      }
+
+      path[path.length - 1] = lastPathPart;
+
+      return path;
+    };
+
 
     data.patch.forEach(patch => {
-      const path = patch.path.split('/').filter(value => !!value);
+      const path = parsePatchPath(patch);
       set(diff, path, { op: patch.op, value: patch.value });
     });
 
