@@ -6,12 +6,9 @@ import { Body, Controller, Get, Param, Post, Put, Query, Req, Res, UploadedFiles
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
 import { MediaService, NewMediaFile } from './media.service';
-import { lastValueFrom, map } from 'rxjs';
-import { Request } from 'express';
 //@ts-ignore
 import { Multer } from 'multer';
 import { MediaTypeValidatorInterceptor } from './media-type-size-validator.interceptor';
-import { Person } from '@kotka/shared/models';
 import {} from './media.service';
 
 @Controller('media')
