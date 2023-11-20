@@ -1,6 +1,6 @@
 export * from './extended-models';
 
-import { Dataset, SpecimenTransaction } from 'laji-schema';
+import { Dataset, SpecimenTransaction } from '@luomus/laji-schema';
 
 export function asDataset(data: unknown): Dataset {
   return data as Dataset;
