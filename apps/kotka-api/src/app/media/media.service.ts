@@ -24,34 +24,35 @@ export type NewMediaFile = {
 }
 
 export type Meta = {
-
-  license: string,
+  license: Image['intellectualRights'],
   rightsOwner: string,
   secret?: boolean,
-  capturers?: [string],
+  capturers?: string[],
   captureDateTime?: string,
   uploadedBy?: string,
   originalFilename?: string,
   documentId?: string,
-  tags?: [string],
+  tags?: string[],
   identifications?: Identifications,
-  primaryForTaxon?: [string],
+  primaryForTaxon?: string[],
   caption?: string,
   taxonDescriptionCaption?: {
     en: string,
     fi?: string,
     sv?: string,
   }
-  sex?: [string],
-  lifeStage?: [string],
-  plantLifeStage?: [string],
-  type?: [string],
+  sex?: string[],
+  lifeStage?: string[],
+  plantLifeStage?: string[],
+  type?: string[],
   sortOrder?: number,
+  uploadedDateTime?: string,
+  sourceSystem?: string,
 }
 
 export type Identifications = {
-  taxonIds: [string],
-  verbatim: [string],
+  taxonIds: string[],
+  verbatim: string[],
 }
 export type Media = {
   id: string,
@@ -90,8 +91,8 @@ export class MediaService {
 
   postMedia(type: string, files: Express.Multer.File[]) {
     const formData = new FormData();
-    console.log(files);
-    files.forEach((file, idx) => {
+
+    files.forEach((file) => {
       formData.append(file.originalname, file.buffer, file.originalname);
     });
 
@@ -112,7 +113,7 @@ export class MediaService {
     );
   }
 
-  async getMedia(id: string, type: string) {
+  getMedia(id: string, type: string) {
     return this.httpService.get<Media>(`${this.urlBase}api/${type}/${id}`, this.baseConfig).pipe(
       map(res => res.data),
       catchError(e => {
@@ -122,7 +123,7 @@ export class MediaService {
     );
   }
 
-  async postMetadata(type: string, meta: NewMediaFile[]) {
+  postMetadata(type: string, meta: NewMediaFile[]) {
     return this.httpService.post<Media[]>(`${this.urlBase}api/${type}`, meta, this.baseConfig).pipe(
       map(res => res.data),
       catchError(e => {
@@ -132,7 +133,7 @@ export class MediaService {
     );
   }
 
-  async putMetadata(id: string, type: string, meta: Meta) {
+  putMetadata(id: string, type: string, meta: Meta) {
     return this.httpService.put(`${this.urlBase}api/${type}/${id}`, meta, this.baseConfig).pipe(
       catchError(e => {
         console.error(e);
@@ -141,13 +142,48 @@ export class MediaService {
     );
   }
 
-  defaultMetadata(fileName: string, profile: Person): Meta {
+  mediaToMeta(profile: Person, media: Image, current?: Meta): Meta {
     return {
-      license: 'MZ.intellectualRightsCC-BY-SA-4.0',
-      rightsOwner: profile.fullName,
-      secret: false,
-      uploadedBy: profile.id,
-      originalFilename: fileName,
+      ...(current || {}),
+      capturers: media.capturerVerbatim,
+      rightsOwner: media.intellectualOwner,
+      license: media.intellectualRights,
+      caption: media.caption,
+      captureDateTime: media.captureDateTime,
+      tags: media.keyword,
+      uploadedBy: current?.uploadedBy || profile.id,
+      sortOrder: media.sortOrder || current?.sortOrder,
+      secret: (media.publicityRestrictions && media.publicityRestrictions !== 'MZ.publicityRestrictionsPublic') || false
+    };
+  }
+
+  metaToType(type: string, media: Media) {
+    switch (type) {
+      case 'pdf':
+        return this.metaToPDF(media);
+    };
+  }
+
+  metaToPDF(media: Media) {
+    const { meta, urls } = media;
+
+    return {
+      caption: meta.caption,
+      documentURI: [ meta.documentId ],
+      fullURL: urls.full,
+      intellectualOwner: meta.rightsOwner,
+      intellectualRights: meta.license,
+      keyword: meta.tags,
+      largeURL: urls.large,
+      originalFilename: meta.originalFilename,
+      originalURL: urls.original,
+      pdfUrl: urls.pdf,
+      publicityRestrictions: meta.secret ? 'MZ.publicityRestrictionsPrivate' : 'MZ.publicityRestrictionsPublic',
+      sourceSystem: meta.sourceSystem,
+      squareThumbnailURL: urls.square,
+      thumbnailURL: urls.thumbnail,
+      uploadDateTime: meta.uploadedDateTime,
+      uploadedBy: meta.uploadedBy,
     };
   }
 }
