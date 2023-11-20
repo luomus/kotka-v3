@@ -7,6 +7,7 @@ import { apiBase, lajiApiBase } from './constants';
 
 const AUTOCOMPLETE_ORGANIZATION_RESOURCE = '/autocomplete/organization';
 const VALIDATE_RESOURCE = '/documents/validate';
+const PDF_RESOURCE = '/pdf';
 
 @Injectable({
   providedIn: 'root'
@@ -36,6 +37,10 @@ export class FormApiClient {
         break;
       case VALIDATE_RESOURCE:
         path = apiBase + '/validate';
+        break;
+      case PDF_RESOURCE:
+        path = apiBase + '/media/pdf';
+        break;
     }
 
     return this.httpClient.request(
