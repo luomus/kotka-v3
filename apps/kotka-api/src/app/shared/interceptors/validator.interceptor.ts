@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import Ajv from 'ajv';
-import * as lajiValidate from 'laji-validate';
+import * as lajiValidate from '@luomus/laji-validate';
 import { ValidationService } from '../services/validation.service';
 
 @Injectable()
@@ -25,7 +25,7 @@ export class ValidatorInterceptor implements NestInterceptor {
     private readonly formService: FormService,
     private readonly validationService: ValidationService
   ) {
-    this.ajv = new Ajv({ 
+    this.ajv = new Ajv({
       allErrors: true,
     });
 
@@ -47,7 +47,7 @@ export class ValidatorInterceptor implements NestInterceptor {
     const errors = {};
 
     if (form.schema && !this.ajv.validate(form.schema, req.body)) {
-  
+
       this.ajv.errors.map(error => {
         if (!errors[error.instancePath]) {
           errors[error.instancePath] = [];

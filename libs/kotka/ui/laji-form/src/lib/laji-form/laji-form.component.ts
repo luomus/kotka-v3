@@ -10,9 +10,9 @@ import {
   Output,
   OnChanges, SimpleChanges, ChangeDetectorRef, Inject,
 } from '@angular/core';
-import LajiForm from 'laji-form/lib/index';
-import { Theme as LajiFormTheme } from 'laji-form/lib/themes/theme';
-import { scrollIntoViewIfNeeded } from 'laji-form/lib/utils';
+import LajiForm from '@luomus/laji-form/lib/index';
+import { Theme as LajiFormTheme } from '@luomus/laji-form/lib/themes/theme';
+import { scrollIntoViewIfNeeded } from '@luomus/laji-form/lib/utils';
 import { LajiForm as LajiFormModel } from '@kotka/shared/models';
 import { combineLatest } from 'rxjs';
 import { Notifier } from '../models';
@@ -133,8 +133,8 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
 
   private mount() {
     combineLatest([
-      import('laji-form'),
-      import('laji-form/lib/themes/bs5')
+      import('@luomus/laji-form'),
+      import('@luomus/laji-form/lib/themes/bs5')
     ]).subscribe(([formPackage, themePackage]) => {
       this.lajiFormWrapperProto = formPackage.default;
       this.lajiFormTheme = themePackage.default;

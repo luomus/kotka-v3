@@ -1,5 +1,5 @@
-import { Dataset, Document, Organization, Sample, SpecimenTransaction } from 'laji-schema';
-export * from 'laji-schema';
+import { Dataset, Document, Organization, Sample, SpecimenTransaction } from '@luomus/laji-schema';
+export * from '@luomus/laji-schema';
 
 export type KotkaDocumentObject =
 | Dataset
