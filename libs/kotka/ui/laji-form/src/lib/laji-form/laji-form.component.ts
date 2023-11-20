@@ -17,6 +17,7 @@ import { LajiForm as LajiFormModel } from '@kotka/shared/models';
 import { combineLatest } from 'rxjs';
 import { Notifier } from '../models';
 import { DOCUMENT } from '@angular/common';
+import { MediaMetadata } from '@luomus/laji-form/lib/components/LajiForm';
 
 @Component({
   selector: 'kui-laji-form',
@@ -32,6 +33,7 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Input() disabled = false;
   @Input() apiClient?: any;
   @Input() notifier?: Notifier;
+  @Input() mediaMetadata?: MediaMetadata;
   @Input() showFooter = true;
   @Input() showDeleteButton = false;
   @Input() showCopyButton = false;
@@ -168,6 +170,7 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
             onChange: this.onChange.bind(this),
             onValidationError: this.onValidationError.bind(this),
             apiClient: this.apiClient,
+            mediaMetadata: this.mediaMetadata,
             lang: 'en',
             renderSubmit: false,
             topOffset: LajiFormComponent.TOP_OFFSET,

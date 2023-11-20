@@ -21,6 +21,7 @@ import { KotkaDocumentObject, KotkaDocumentObjectType } from '@kotka/shared/mode
 import { LajiForm, Person } from '@kotka/shared/models';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { FormViewUtils } from './form-view-utils';
+import { MediaMetadata } from '@luomus/laji-form/lib/components/LajiForm';
 
 export enum FormErrorEnum {
   dataNotFound = 'dataNotFound',
@@ -49,6 +50,7 @@ export interface SuccessViewModel {
   form?: LajiForm.SchemaForm;
   formData?: Partial<KotkaDocumentObject>;
   state?: FormState;
+  mediaMetadata?: MediaMetadata;
 }
 
 export interface ErrorViewModel {
@@ -128,10 +130,10 @@ export class FormViewFacade implements OnDestroy {
 
     return routeParams$.pipe(
       switchMap(routeParams => combineLatest([
-        form$, this.formData$, state$
+        form$, this.formData$, state$, this.getMediaMetadata$()
       ]).pipe(
-        map(([form, formData, state]) => {
-          return { routeParams, form, formData, state };
+        map(([form, formData, state, mediaMetadata]) => {
+          return { routeParams, form, formData, state, mediaMetadata };
         }),
         catchError(err => {
           const errorType = err.message === FormErrorEnum.dataNotFound ? FormErrorEnum.dataNotFound : FormErrorEnum.genericError;
@@ -210,5 +212,13 @@ export class FormViewFacade implements OnDestroy {
     const showCopyButton = isEditMode && !!form.options?.allowTemplate;
 
     return { disabled, showDeleteButton, showCopyButton };
+  }
+
+  private getMediaMetadata$(): Observable<MediaMetadata> {
+    return this.getUser$().pipe(map(user => ({
+      intellectualRights: 'MZ.intellectualRightsCC-BY-SA-4.0',
+      intellectualOwner: user.fullName,
+      capturerVerbatim: user.fullName
+    })));
   }
 }
