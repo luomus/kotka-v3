@@ -23,17 +23,19 @@ export class MediaController {
 
   @Post(':type')
   @UseInterceptors(AnyFilesInterceptor(), MediaTypeValidatorInterceptor)
-  async postMedia(@Req() req: Request, @UploadedFiles() files: Express.Multer.File[], @Param('type') type) {
-    const profile: Person = req.user?.['profile'];
+  async postMedia(@UploadedFiles() files: Express.Multer.File[], @Param('type') type) {
 
-    const tempIDs = await lastValueFrom(this.mediaService.postMedia(type, files));
+    return this.mediaService.postMedia(type, files);
+  }
 
-    const newMedia: NewMediaFile[] = tempIDs.map(tempID => {
-      return {
-        tempFileId: tempID.id,
-        meta: this.mediaService.defaultMetadata(tempID.fileName ,profile)
-      };
-    });
+  @Post(':type/:tempId')
+  async postMetadata(@Param('type') type, @Param('tempId') tempId, @Body() body) {
+    const newMedia: NewMediaFile[] = [
+      {
+        tempFileId: tempId,
+        meta: body
+      }
+    ];
 
     return this.mediaService.postMetadata(type, newMedia);
   }

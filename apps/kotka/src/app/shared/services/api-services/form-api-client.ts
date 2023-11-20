@@ -41,6 +41,11 @@ export class FormApiClient {
       case PDF_RESOURCE:
         path = apiBase + '/media/pdf';
         break;
+      default:
+        if (resource.startsWith('/pdf/')) {
+          path = apiBase + `/media${resource}`;
+        }
+        break;
     }
 
     return this.httpClient.request(
