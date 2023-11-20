@@ -7,6 +7,6 @@
     "useDefineForClassFields": false
   },
   "files": ["src/main.ts", "src/polyfills.ts"],
-  "include": ["src/**/*.d.ts", "../../node_modules/laji-form/**/*.d.ts"],
+  "include": ["src/**/*.d.ts", "../../node_modules/@luomus/laji-form/**/*.d.ts"],
   "exclude": ["**/*.test.ts", "**/*.spec.ts", "jest.config.ts"]
 }
