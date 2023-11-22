@@ -7,14 +7,14 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import FormData from 'form-data';
 import { merge } from 'lodash';
 import { catchError, map } from 'rxjs';
-import { Person } from '@kotka/shared/models';
+import { Person, Image } from '@kotka/shared/models';
 //@ts-ignore
 import { Multer } from 'multer';
 
 export type FileUploadResponse = {
   name: string,
   fileName: string,
-  id: string, 
+  id: string,
   expires: number,
 }
 
