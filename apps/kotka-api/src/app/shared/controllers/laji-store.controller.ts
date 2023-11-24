@@ -33,6 +33,7 @@ export abstract class LajiStoreController {
     protected readonly triplestoreService: TriplestoreService,
     protected readonly triplestoreMapperService: TriplestoreMapperService,
     protected readonly type: string,
+    protected readonly useTriplestore: boolean = true,
   ) {
   }
 
@@ -54,9 +55,16 @@ export abstract class LajiStoreController {
     try {
       const res = await lastValueFrom(this.lajiStoreService.post(this.type, body));
 
-      const rdfXml = await this.triplestoreMapperService.jsonToTriplestore(cloneDeep(res.data), this.type);
+      if (this.useTriplestore) {
+        try {
+        const rdfXml = await this.triplestoreMapperService.jsonToTriplestore(cloneDeep(res.data), this.type);
 
-      await lastValueFrom(this.triplestoreService.put(res.data.id, rdfXml));
+        await lastValueFrom(this.triplestoreService.put(res.data.id, rdfXml));
+        } catch (err) {
+          await lastValueFrom(this.lajiStoreService.delete(this.type, res.data.id));
+          throw err;
+        }
+      }
 
       return res.data;
     } catch (err) {
@@ -86,9 +94,11 @@ export abstract class LajiStoreController {
     try {
       const res = await lastValueFrom(this.lajiStoreService.put(this.type, id, body));
 
-      const rdfXml = await this.triplestoreMapperService.jsonToTriplestore(cloneDeep(res.data), this.type);
+      if (this.useTriplestore) {
+        const rdfXml = await this.triplestoreMapperService.jsonToTriplestore(cloneDeep(res.data), this.type);
 
-      await lastValueFrom(this.triplestoreService.put(res.data.id, rdfXml));
+        await lastValueFrom(this.triplestoreService.put(res.data.id, rdfXml));
+      }
 
       return res.data;
     } catch (err) {
