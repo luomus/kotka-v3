@@ -5,8 +5,8 @@ import {
 } from '@angular/core';
 import { concat, Observable, of, ReplaySubject, switchMap } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
-import { LajiFormEmbedComponent } from '@kotka/ui/laji-form';
 import { AbschService } from '../../shared/services/api-services/absch.service';
+import { LajiFormEmbedComponent } from '../../shared/services/laji-form/laji-form-embed-component.interface';
 
 @Component({
   selector: 'kotka-permits-info-embed',

@@ -4,9 +4,9 @@ import {
   TemplateRef,
   ViewChild
 } from '@angular/core';
-import { LajiFormEmbedComponent } from '@kotka/ui/laji-form';
 import { DOCUMENT } from '@angular/common';
 import { Subject } from 'rxjs';
+import { LajiFormEmbedComponent } from '../../shared/services/laji-form/laji-form-embed-component.interface';
 
 @Component({
   selector: 'kotka-specimen-range-embed',

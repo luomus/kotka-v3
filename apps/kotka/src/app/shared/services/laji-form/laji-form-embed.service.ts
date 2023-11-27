@@ -1,6 +1,6 @@
-import { ComponentRef, Type } from '@angular/core';
+import { ComponentRef, Type, Injector } from '@angular/core';
 import { LajiFormEmbedComponent } from './laji-form-embed-component.interface';
-import { LajiFormComponent } from '../laji-form/laji-form.component';
+import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { Subscription, take } from 'rxjs';
 import {
   EmbeddedComponentData,
@@ -10,16 +10,21 @@ import {
 import { EventListenerData, LajiFormEventListenerEmbedderService } from './laji-form-event-listener-embedder.service';
 
 export class LajiFormEmbedService {
+  private componentEmbedder: LajiFormComponentEmbedderService;
+  private eventListenerEmbedder: LajiFormEventListenerEmbedderService;
+
   private componentData: EmbeddedComponentData[] = [];
   private eventListenerData: EventListenerData[] = [];
 
   private formChangeSubscription?: Subscription;
 
   constructor(
-    private componentEmbedder: LajiFormComponentEmbedderService,
-    private eventListenerEmbedder: LajiFormEventListenerEmbedderService,
+    private injector: Injector,
     private lajiForm: LajiFormComponent
   ) {
+    this.componentEmbedder = this.injector.get(LajiFormComponentEmbedderService);
+    this.eventListenerEmbedder = this.injector.get(LajiFormEventListenerEmbedderService);
+
     this.init();
   }
 

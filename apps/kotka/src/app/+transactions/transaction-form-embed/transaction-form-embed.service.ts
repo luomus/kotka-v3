@@ -1,15 +1,11 @@
-import { ComponentRef, Injectable } from '@angular/core';
-import {
-  LajiFormComponent,
-  LajiFormComponentEmbedderService,
-  LajiFormEmbedService,
-  LajiFormEventListenerEmbedderService
-} from '@kotka/ui/laji-form';
+import { ComponentRef, Injectable, Injector } from '@angular/core';
+import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { SpecimenTransaction } from '@kotka/shared/models';
 import { OrganizationAddressEmbedComponent } from './organization-address-embed';
 import { PermitsInfoEmbedComponent } from './permits-info-embed';
 import { SpecimenRangeSelectEmbedComponent } from './specimen-range-select-embed';
 import { Observable } from 'rxjs';
+import { LajiFormEmbedService } from '../../shared/services/laji-form/laji-form-embed.service';
 
 @Injectable()
 export class TransactionFormEmbedService {
@@ -20,17 +16,12 @@ export class TransactionFormEmbedService {
   private specimenRangeSelectRef?: ComponentRef<SpecimenRangeSelectEmbedComponent>;
 
   constructor(
-    private lajiFormComponentEmbedderService: LajiFormComponentEmbedderService,
-    private lajiFormEventListenerEmbedderService: LajiFormEventListenerEmbedderService
+    private injector: Injector
   ) {}
 
 
   initEmbeddedComponents(lajiFormComponent: LajiFormComponent, formData: Partial<SpecimenTransaction>, transactionEventAddListener?: (event: MouseEvent) => void) {
-    const lajiFormEmbedService = new LajiFormEmbedService(
-      this.lajiFormComponentEmbedderService,
-      this.lajiFormEventListenerEmbedderService,
-      lajiFormComponent
-    );
+    const lajiFormEmbedService = new LajiFormEmbedService(this.injector, lajiFormComponent);
 
     this.organizationAddressRef = lajiFormEmbedService.embedComponent(OrganizationAddressEmbedComponent, {
       anchorClassName: 'correspondent-organization',

@@ -5,9 +5,9 @@ import {
 } from '@angular/core';
 import { Observable, of, ReplaySubject, switchMap } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
-import { LajiFormEmbedComponent } from '@kotka/ui/laji-form';
 import { ApiClient } from '../../shared/services/api-services/api-client';
 import { LajiOrganization } from '@kotka/shared/models';
+import { LajiFormEmbedComponent } from '../../shared/services/laji-form/laji-form-embed-component.interface';
 
 @Component({
   selector: 'kotka-organization-address-embed',

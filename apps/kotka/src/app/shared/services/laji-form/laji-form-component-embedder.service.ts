@@ -29,7 +29,9 @@ export interface EmbeddedComponentData {
   contextSubscription?: Subscription;
 }
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class LajiFormComponentEmbedderService {
   private renderer: Renderer2;
 

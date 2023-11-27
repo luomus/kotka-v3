@@ -11,7 +11,9 @@ export interface EventListenerData {
   elem?: HTMLElement|null;
 }
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class LajiFormEventListenerEmbedderService {
   constructor(
     @Inject(DOCUMENT) private document: Document
