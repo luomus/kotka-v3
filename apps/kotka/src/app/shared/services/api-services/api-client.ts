@@ -108,4 +108,8 @@ export class ApiClient {
   logout(): Observable<any> {
     return this.httpClient.get(authPath + 'logout');
   }
+
+  htmlToPdf(html: string): Observable<Blob> {
+    return this.httpClient.post(`${lajiApiPath}html-to-pdf`, html, { responseType: 'blob' });
+  }
 }

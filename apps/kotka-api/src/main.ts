@@ -73,7 +73,7 @@ async function bootstrap() {
 
   const lajiApiBase = '/api/laji';
   const allowedGetPaths = ['/autocomplete', '/forms', '/organization', '/person', '/areas'];
-  const allowedPostPaths = ['/logger'];
+  const allowedPostPaths = ['/logger', '/html-to-pdf'];
 
   const externalProxyFilter = (pathname: string, req: UserRequest) => {
     const path = pathname.replace(lajiApiBase, '');
