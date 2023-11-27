@@ -1,16 +1,16 @@
 import {
+  ApplicationRef,
   ComponentRef,
   createComponent,
   EnvironmentInjector,
   Inject,
   Injectable,
   Injector,
-  Renderer2, RendererFactory2,
-  TemplateRef, Type
+  Renderer2,
+  RendererFactory2,
+  Type
 } from '@angular/core';
-import { LajiFormEmbedComponent } from './laji-form-embed-component.interface';
 import { DOCUMENT } from '@angular/common';
-import { of, Subscription } from 'rxjs';
 
 export type RelativePosition = 'firstChild'|'nextSibling'|'parentNextSibling';
 
@@ -22,11 +22,7 @@ export interface EmbedOptions {
 export interface EmbeddedComponentData {
   componentRef: ComponentRef<any>;
   options: EmbedOptions;
-  template: TemplateRef<any>;
-  templateContext?: any;
-  anchorElem?: HTMLElement|null;
-  elem?: HTMLElement|null;
-  contextSubscription?: Subscription;
+  elem: HTMLElement;
 }
 
 @Injectable({
@@ -38,69 +34,39 @@ export class LajiFormComponentEmbedderService {
   constructor(
     @Inject(DOCUMENT) private document: Document,
     rendererFactory: RendererFactory2,
+    private appRef: ApplicationRef,
     private injector: Injector,
     private environmentInjector: EnvironmentInjector
   ) {
     this.renderer = rendererFactory.createRenderer(null, null);
   }
 
-  embedComponent<T extends LajiFormEmbedComponent>(componentType: Type<T>, options: EmbedOptions): EmbeddedComponentData {
+  embedComponent<T>(componentType: Type<T>, options: EmbedOptions): EmbeddedComponentData {
     const componentRef = this.createComponentFromType(componentType);
-    const template = componentRef.instance.template;
-    const context$ = componentRef.instance.templateContext$ || of({});
+    this.appRef.attachView(componentRef.hostView);
+    const elem = componentRef.location.nativeElement.firstChild;
 
-    const dataItem: EmbeddedComponentData = { componentRef, options, template };
-
-    dataItem.contextSubscription = context$.subscribe((context) => {
-      dataItem.templateContext = context;
-      this.updateEmbeddedTemplate(dataItem);
-    });
-
-    return dataItem;
+    const data: EmbeddedComponentData = { componentRef, options, elem };
+    this.embedData(data);
+    return data;
   }
 
   updateAfterDomChange(data: EmbeddedComponentData) {
     if (data.elem && this.document.body.contains(data.elem)) {
       return;
     }
-    this.updateEmbeddedTemplate(data);
+    this.embedData(data);
   }
 
-  private updateEmbeddedTemplate(data: EmbeddedComponentData) {
-    if (data.elem) {
-      this.removeElement(data.elem);
-      data.elem = undefined;
-    }
-
-    if (!data.templateContext) {
-      return;
-    }
-
+  private embedData(data: EmbeddedComponentData) {
     const anchorElem: HTMLElement|null|undefined = this.document.getElementsByClassName(data.options.anchorClassName)?.[0] as HTMLElement|null|undefined;
-    data.anchorElem = anchorElem;
     if (!anchorElem) {
       return;
     }
-
-    const elem = this.createElementFromTemplate(data.template, data.templateContext);
-    this.appendElement(anchorElem, elem, data.options.positionToAnchor);
-    data.elem = elem;
-    data.componentRef.instance.onTemplateEmbed?.();
+    this.insertElement(anchorElem, data.elem, data.options.positionToAnchor);
   }
 
-  private createElementFromTemplate<T>(tpl: TemplateRef<T>, context: T): HTMLElement {
-    const view = tpl.createEmbeddedView(context);
-    view.detectChanges();
-    const newElem = view.rootNodes[0].cloneNode(true);
-    view.destroy();
-    return newElem;
-  }
-
-  private removeElement(elem: HTMLElement) {
-    this.renderer.removeChild(elem.parentElement, elem);
-  }
-
-  private appendElement(anchorElem: HTMLElement, newElem: HTMLElement, positionToAnchor: RelativePosition) {
+  private insertElement(anchorElem: HTMLElement, newElem: HTMLElement, positionToAnchor: RelativePosition) {
     if (positionToAnchor === 'firstChild') {
       this.renderer.insertBefore(anchorElem, newElem, anchorElem.firstChild);
     } else if (positionToAnchor === 'nextSibling' || positionToAnchor === 'parentNextSibling') {
@@ -123,7 +89,7 @@ export class LajiFormComponentEmbedderService {
     });
     return createComponent(componentType, {
       environmentInjector,
-      elementInjector,
+      elementInjector
     });
   }
 }

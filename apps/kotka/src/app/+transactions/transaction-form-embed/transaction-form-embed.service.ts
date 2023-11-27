@@ -61,12 +61,14 @@ export class TransactionFormEmbedService {
 
   setEmbeddedComponentsDisabled(disabled: boolean) {
     if (this.specimenRangeSelectRef) {
-      this.specimenRangeSelectRef.instance.setDisabled(disabled);
+      this.specimenRangeSelectRef.instance.disabled = disabled;
     }
   }
 
   clearSpecimenRangeSelect() {
-    this.specimenRangeSelectRef?.instance.clearSpecimenRangeInput();
+    if (this.specimenRangeSelectRef) {
+      this.specimenRangeSelectRef.instance.value = '';
+    }
   }
 
   private getValidOrganizationId(organizationId?: string): string|undefined {

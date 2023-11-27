@@ -1,5 +1,4 @@
 import { ComponentRef, Type, Injector } from '@angular/core';
-import { LajiFormEmbedComponent } from './laji-form-embed-component.interface';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { Subscription, take } from 'rxjs';
 import {
@@ -41,12 +40,12 @@ export class LajiFormEmbedService {
     this.lajiForm.formDestroy.pipe(take(1)).subscribe(() => {
       this.formChangeSubscription?.unsubscribe();
       this.componentData.forEach(d => {
-        d.contextSubscription?.unsubscribe();
+        d.componentRef.destroy();
       });
     });
   }
 
-  embedComponent<T extends LajiFormEmbedComponent>(componentType: Type<T>, options: EmbedOptions): ComponentRef<T> {
+  embedComponent<T>(componentType: Type<T>, options: EmbedOptions): ComponentRef<T> {
     const d = this.componentEmbedder.embedComponent(componentType, options);
     this.componentData.push(d);
     return d.componentRef;

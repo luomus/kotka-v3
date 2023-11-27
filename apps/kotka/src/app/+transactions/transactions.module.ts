@@ -15,6 +15,7 @@ import { PermitsInfoEmbedComponent } from './transaction-form-embed/permits-info
 import { SpecimenRangeSelectEmbedComponent } from './transaction-form-embed/specimen-range-select-embed';
 import { TransactionVersionHistoryComponent } from './transaction-version-history/transaction-version-history.component';
 import { TransactionFormEmbedService } from './transaction-form-embed/transaction-form-embed.service';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   imports: [
@@ -26,6 +27,7 @@ import { TransactionFormEmbedService } from './transaction-form-embed/transactio
     KotkaUiDatatableModule,
     FormViewModule,
     KotkaUiLajiFormModule,
+    FormsModule
   ],
   declarations: [
     TransactionFormComponent,
