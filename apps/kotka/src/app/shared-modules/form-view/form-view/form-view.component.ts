@@ -33,6 +33,7 @@ import { tap } from 'rxjs/operators';
 import { ComponentCanDeactivate } from '../../../shared/services/guards/component-can-deactivate.guard';
 import { FormViewUtils } from './form-view-utils';
 import { DataService } from '../../../shared/services/data.service';
+import { IdService } from '../../../shared/services/id.service';
 
 @Component({
   selector: 'kotka-form-view',
@@ -46,7 +47,6 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
   @Input() dataType?: KotkaDocumentObjectType;
   @Input() dataTypeName?: string;
   @Input() augmentFormFunc?: (form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>;
-  @Input() domain = 'http://tun.fi/';
 
   vm$: Observable<SuccessViewModel | ErrorViewModel>;
 
@@ -268,7 +268,7 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
   private navigateToEdit(id: string): Observable<boolean> {
     return from(this.router.navigate(['..', 'edit'], {
       relativeTo: this.activeRoute,
-      queryParams: { uri: this.domain + id }
+      queryParams: { uri: IdService.getUri(id) }
     }));
   }
 }

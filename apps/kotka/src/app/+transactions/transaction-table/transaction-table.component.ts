@@ -3,6 +3,7 @@ import { DatatableColumn, DatatableSource, GetRowsParams } from '@kotka/ui/datat
 import { URICellRendererComponent } from '@kotka/ui/datatable';
 import { DatatableDataService } from '../../shared/services/datatable-data.service';
 import { KotkaDocumentObjectType } from '@kotka/shared/models';
+import { DEFAULT_DOMAIN } from '../../shared/services/id.service';
 
 @Component({
   selector: 'kotka-transaction-table',
@@ -16,7 +17,7 @@ export class TransactionTableComponent {
     field: 'id',
     cellRenderer: URICellRendererComponent,
     cellRendererParams: {
-      domain: 'http://tun.fi/'
+      domain: DEFAULT_DOMAIN
     },
     hideDefaultTooltip: true
   }];

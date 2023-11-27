@@ -13,6 +13,7 @@ import { KotkaUiMainContentModule } from '@kotka/ui/main-content';
 import { ConfirmModalComponent } from './components/confirm-modal/confirm-modal';
 import { BaseComponent } from './components/base/base.component';
 import { ReversePipe } from './pipes/reverse.pipe';
+import { ToFullUriPipe } from './pipes/to-full-uri.pipe';
 
 @NgModule({
   imports: [
@@ -32,9 +33,10 @@ import { ReversePipe } from './pipes/reverse.pipe';
     OldKotkaUrlPipe,
     ReversePipe,
     ConfirmModalComponent,
-    BaseComponent
+    BaseComponent,
+    ToFullUriPipe
   ],
-  exports: [KotkaUiSpinnerModule, LabelPipe, OldKotkaUrlPipe, ReversePipe],
+  exports: [KotkaUiSpinnerModule, LabelPipe, OldKotkaUrlPipe, ReversePipe, ToFullUriPipe],
 })
 export class SharedModule {
   static forRoot(): ModuleWithProviders<SharedModule> {
