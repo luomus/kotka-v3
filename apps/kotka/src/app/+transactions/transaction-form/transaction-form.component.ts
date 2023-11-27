@@ -9,7 +9,9 @@ import {
   KotkaDocumentObjectType,
   LajiForm,
   SpecimenTransaction,
-  SpecimenTransactionEvent
+  SpecimenTransactionEvent,
+  isSpecimenTransaction,
+  asSpecimenTransaction
 } from '@kotka/shared/models';
 import { from, Observable, of, Subscription, switchMap } from 'rxjs';
 import { FormService } from '../../shared/services/form.service';
@@ -36,11 +38,13 @@ export class TransactionFormComponent implements OnDestroy, ComponentCanDeactiva
   dataType = KotkaDocumentObjectType.transaction;
   augmentFormFunc = this.augmentForm.bind(this);
 
+  formData?: Partial<SpecimenTransaction>;
+
+  isSpecimenTransaction = isSpecimenTransaction;
+  asSpecimenTransaction = asSpecimenTransaction;
   asPartialSpecimenTransaction = asPartialSpecimenTransaction;
 
   @ViewChild(FormViewComponent, { static: true }) formView!: FormViewComponent;
-
-  private formData?: Partial<SpecimenTransaction>;
 
   private specimenRangeButtonClickSubscription?: Subscription;
 

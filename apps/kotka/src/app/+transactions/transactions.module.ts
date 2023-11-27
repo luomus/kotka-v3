@@ -15,6 +15,8 @@ import { PermitsInfoEmbedComponent } from './transaction-form-embed/permits-info
 import { SpecimenRangeSelectEmbedComponent } from './transaction-form-embed/specimen-range-select-embed';
 import { TransactionVersionHistoryComponent } from './transaction-version-history/transaction-version-history.component';
 import { TransactionFormEmbedService } from './transaction-form-embed/transaction-form-embed.service';
+import { TransactionDispatchSheetComponent } from './transaction-pdf-sheets/transaction-dispatch-sheet/transaction-dispatch-sheet';
+import { TransactionPdfSheetsComponent } from './transaction-pdf-sheets/transaction-pdf-sheets.component';
 import { FormsModule } from '@angular/forms';
 
 @NgModule({
@@ -37,6 +39,8 @@ import { FormsModule } from '@angular/forms';
     PermitsInfoEmbedComponent,
     SpecimenRangeSelectEmbedComponent,
     TransactionVersionHistoryComponent,
+    TransactionPdfSheetsComponent,
+    TransactionDispatchSheetComponent
   ],
   providers: [
     TransactionFormEmbedService

@@ -1,16 +1,14 @@
 import {
   ApplicationRef,
   ComponentRef,
-  createComponent,
-  EnvironmentInjector,
   Inject,
   Injectable,
-  Injector,
   Renderer2,
   RendererFactory2,
   Type
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
+import { ComponentService } from '../component.service';
 
 export type RelativePosition = 'firstChild'|'nextSibling'|'parentNextSibling';
 
@@ -35,14 +33,13 @@ export class LajiFormComponentEmbedderService {
     @Inject(DOCUMENT) private document: Document,
     rendererFactory: RendererFactory2,
     private appRef: ApplicationRef,
-    private injector: Injector,
-    private environmentInjector: EnvironmentInjector
+    private componentService: ComponentService
   ) {
     this.renderer = rendererFactory.createRenderer(null, null);
   }
 
   embedComponent<T>(componentType: Type<T>, options: EmbedOptions): EmbeddedComponentData {
-    const componentRef = this.createComponentFromType(componentType);
+    const componentRef = this.componentService.createComponentFromType(componentType);
     this.appRef.attachView(componentRef.hostView);
     const elem = componentRef.location.nativeElement.firstChild;
 
@@ -79,17 +76,5 @@ export class LajiFormComponentEmbedderService {
 
       this.renderer.insertBefore(parentElem, newElem, anchorElem.nextSibling);
     }
-  }
-
-  private createComponentFromType<T>(componentType: Type<T>): ComponentRef<T> {
-    const environmentInjector = this.environmentInjector;
-    const elementInjector = Injector.create({
-      providers: [],
-      parent: this.injector,
-    });
-    return createComponent(componentType, {
-      environmentInjector,
-      elementInjector
-    });
   }
 }

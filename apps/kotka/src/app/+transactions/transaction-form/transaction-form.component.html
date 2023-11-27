@@ -1,3 +1,7 @@
+<kotka-transaction-pdf-sheets
+  *ngIf="isSpecimenTransaction(formData)"
+  [data]="asSpecimenTransaction(formData)">
+</kotka-transaction-pdf-sheets>
 <kotka-form-view
   [formId]="'MHL.930'"
   [dataType]="dataType"
