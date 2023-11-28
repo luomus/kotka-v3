@@ -1,24 +1,65 @@
 <div *ngIf="data && organization" class="page">
-  <table>
-    <tr>
-      <td>
-        {{ organization.organizationLevel2 }}
-        <br>
-        {{ organization.organizationLevel3 }}<ng-container *ngIf="organization.abbreviation"> ({{ organization.abbreviation }})</ng-container>
-        <br>
-        {{ organization.organizationLevel4 }}
-      </td>
-      <!-- logo -->
-      <td style="text-align:right">
-        <img [src]="'https://koivu.luomus.fi/projects/qrcode/?code=' + (data.id | toFullUri)" width="50" height="50">
-        <br>
-        {{ data.id | toFullUri }}
-      </td>
-    </tr>
-  </table>
-  <h2>{{ data.type }}</h2>
+  <div style="display: flex">
+    <div style="flex: 1">
+      {{ organization.organizationLevel2 }}
+      <br>
+      {{ organization.organizationLevel3 }}<ng-container *ngIf="organization.abbreviation"> ({{ organization.abbreviation }})</ng-container>
+      <br>
+      {{ organization.organizationLevel4 }}
+    </div>
+    <div style="flex: 0; text-align: center">
+      LOGO
+    </div>
+    <div style="flex: 1; text-align: right">
+      <img [src]="'https://koivu.luomus.fi/projects/qrcode/?code=' + (data.id | toFullUri)" width="50" height="50">
+      <br>
+      {{ data.id | toFullUri }}
+    </div>
+  </div>
+  <h2>{{ data.type | transactionTypeLabel | uppercase }}</h2>
   <p>We are sending you the material indicated here. Upon receiving the specimens/data, please sign and return one copy of this form to the above address<ng-container *ngIf="data.localHandlerEmail"> or email to {{ data.localHandlerEmail }}</ng-container>. This form, along with the attachments, constitutes the full loan agreement.</p>
   <p>Please reference the identifier {{ data.id | toFullUri }} in all correspondence related to this material.</p>
   <p>Please cite specimens/data using their unique identifiers and inform us about publications based on this material. If you image (photograph, scan) the specimens, send the digital files to us by email. See attachments for more information.</p>
-  <p>All {{ data.type }}s are governed by our terms and conditions as outlined in the attached documents. </p>
+  <p>All {{ data.type | transactionTypeLabel }}s are governed by our terms and conditions as outlined in the attached documents. </p>
+  <h4>Attached documents:</h4>
+  <div style="display: grid; grid-template-columns: 50% 50%">
+    <div>
+      [&nbsp;&nbsp;]&nbsp;&nbsp; {{ data.type | transactionTypeLabel | titlecase }} terms<br>
+      [&nbsp;&nbsp;]&nbsp;&nbsp; Additional loan terms<br>
+      [&nbsp;&nbsp;]&nbsp;&nbsp; Specimen data (printout or file by email)<br>
+      [&nbsp;&nbsp;]&nbsp;&nbsp; Permits
+    </div>
+    <div>
+      [&nbsp;&nbsp;]&nbsp;&nbsp; Instructions on returning the material<br>
+      [&nbsp;&nbsp;]&nbsp;&nbsp; Other:
+    </div>
+  </div>
+  <hr>
+  <div style="display: grid; grid-template-columns: 50% 50%">
+    <div>
+      <h4>Recipient</h4>
+      <div>
+        Corresponding person:<br>
+        {{ data.correspondentPerson }}
+      </div>
+      <div>
+        Receiving researcher:<br>
+        {{ data.correspondentResearcher }}
+      </div>
+    </div>
+    <div>
+      <h4>{{ data.type | transactionTypeLabel | titlecase }} ID: {{ data.id | toFullUri }}</h4>
+      <h4>Due date: {{ data.dueDate }}</h4>
+      <div>
+        Handler:<br>
+        {{ data.localHandler }}<br>
+        {{ data.localHandlerEmail }}
+      </div>
+      <div>
+        Person responsible:<br>
+        {{ data.localPerson }}<br>
+        {{ data.localPersonEmail }}
+      </div>
+    </div>
+  </div>
 </div>
