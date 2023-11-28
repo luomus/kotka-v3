@@ -6,15 +6,15 @@ import { Pipe, PipeTransform } from '@angular/core';
   pure: true
 })
 export class TransactionTypeLabelPipe implements PipeTransform {
-  transform(value: string = ''): string {
+  transform(value = ''): string {
     if (value === 'HRX.typeGiftOutgoing') {
       return 'specimen gift';
     } else if (value === 'HRX.typeExchangeOutgoing') {
-      return 'specimen exchange'
+      return 'specimen exchange';
     } else if (value === 'HRX.typeVirtualLoanOutgoing') {
       return 'virtual loan';
     } else {
-      return 'specimen loan'
+      return 'specimen loan';
     }
   }
 }
