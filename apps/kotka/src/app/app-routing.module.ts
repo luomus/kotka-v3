@@ -4,6 +4,7 @@ import { QuicklinkStrategy } from 'ngx-quicklink';
 import { NotFoundComponent } from './shared/components/not-found/not-found.component';
 import { OnlyLoggedInGuard} from './shared/services/guards/only-logged-in.guard';
 import { BaseComponent } from './shared/components/base/base.component';
+import { environment } from '../environments/environment';
 
 const baseRoutes: Routes = [
   { path: 'user', loadChildren: () => import('./+user/user.module').then(m => m.UserModule), data: {preload: false} },
@@ -19,6 +20,10 @@ export const routes: Routes = [
   { path: 'status', loadChildren: () => import('./+status/status.module').then(m => m.StatusModule), data: {preload: false} },
   { path: '', component: BaseComponent, children: baseRoutes }
 ];
+
+if (!environment.production) {
+  routes.unshift({ path: 'pdf-demo', canActivate: [OnlyLoggedInGuard], loadChildren: () => import('./+pdf-demo/pdf-demo.module').then(m => m.PdfDemoModule), data: {preload: false} });
+}
 
 @NgModule({
   imports: [RouterModule.forRoot(routes, {

@@ -15,9 +15,12 @@ import { PermitsInfoEmbedComponent } from './transaction-form-embed/permits-info
 import { SpecimenRangeSelectEmbedComponent } from './transaction-form-embed/specimen-range-select-embed';
 import { TransactionVersionHistoryComponent } from './transaction-version-history/transaction-version-history.component';
 import { TransactionFormEmbedService } from './transaction-form-embed/transaction-form-embed.service';
-import { TransactionDispatchSheetComponent } from './transaction-pdf-sheets/transaction-dispatch-sheet/transaction-dispatch-sheet';
 import { TransactionPdfSheetsComponent } from './transaction-pdf-sheets/transaction-pdf-sheets.component';
 import { FormsModule } from '@angular/forms';
+import { TransactionPdfSheetBaseComponent } from './transaction-pdf-sheets/transaction-pdf-sheet-base.component';
+import {
+  TransactionDispatchSheetComponent
+} from './transaction-pdf-sheets/transaction-dispatch-sheet/transaction-dispatch-sheet';
 
 @NgModule({
   imports: [
@@ -29,7 +32,8 @@ import { FormsModule } from '@angular/forms';
     KotkaUiDatatableModule,
     FormViewModule,
     KotkaUiLajiFormModule,
-    FormsModule
+    FormsModule,
+    TransactionDispatchSheetComponent
   ],
   declarations: [
     TransactionFormComponent,
@@ -40,7 +44,7 @@ import { FormsModule } from '@angular/forms';
     SpecimenRangeSelectEmbedComponent,
     TransactionVersionHistoryComponent,
     TransactionPdfSheetsComponent,
-    TransactionDispatchSheetComponent
+    TransactionPdfSheetBaseComponent
   ],
   providers: [
     TransactionFormEmbedService

@@ -16,7 +16,7 @@ export class ComponentService {
     private environmentInjector: EnvironmentInjector
   ) {}
 
-  createComponentFromType<T>(componentType: Type<T>): ComponentRef<T> {
+  createComponentFromType<T>(componentType: Type<T>, hostElement?: HTMLElement): ComponentRef<T> {
     const environmentInjector = this.environmentInjector;
     const elementInjector = Injector.create({
       providers: [],
@@ -24,7 +24,8 @@ export class ComponentService {
     });
     return createComponent(componentType, {
       environmentInjector,
-      elementInjector
+      elementInjector,
+      hostElement
     });
   }
 }

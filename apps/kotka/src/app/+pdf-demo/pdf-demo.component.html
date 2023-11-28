@@ -1,0 +1,4 @@
+<kotka-transaction-dispatch-sheet
+  [data]="asSpecimenTransaction(data$ | async)"
+  [organization]="(ownerOrganization$ | async) || undefined"
+></kotka-transaction-dispatch-sheet>

@@ -1,0 +1,9 @@
+@page {
+  size: A4;
+  margin: 0;
+}
+.page {
+  margin: 10mm;
+  width: 190mm;
+  height: 277mm;
+}
