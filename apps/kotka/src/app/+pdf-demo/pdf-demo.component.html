@@ -1,4 +1,4 @@
 <kotka-transaction-dispatch-sheet
-  [data]="asSpecimenTransaction(data$ | async)"
-  [organization]="(ownerOrganization$ | async) || undefined"
+  *ngIf="context$ | async as context"
+  [context]="context"
 ></kotka-transaction-dispatch-sheet>

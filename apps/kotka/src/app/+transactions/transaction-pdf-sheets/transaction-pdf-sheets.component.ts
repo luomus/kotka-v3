@@ -4,21 +4,23 @@ import {
   ComponentRef,
   Inject,
   Input,
-  OnChanges,
-  Type,
-  ViewEncapsulation
+  Type
 } from '@angular/core';
 import { TransactionDispatchSheetComponent } from './transaction-dispatch-sheet/transaction-dispatch-sheet';
-import { ApiClient } from '../../shared/services/api-services/api-client';
 import * as FileSaver from 'file-saver';
 import { SpecimenTransaction } from '@luomus/laji-schema';
-import { Observable, of, ReplaySubject, switchMap } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ComponentService } from '../../shared/services/component.service';
-import { LajiOrganization } from '@kotka/shared/models';
 import { TransactionPdfSheetBaseComponent } from './transaction-pdf-sheet-base.component';
 import { DOCUMENT } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { TransactionPdfSheetsContextService } from './transaction-pdf-sheets-context-service';
+import { ApiClient } from '../../shared/services/api-services/api-client';
+
+export interface ComponentWithContext {
+  context?: any;
+}
 
 @Component({
   selector: 'kotka-transaction-pdf-sheets',
@@ -27,53 +29,42 @@ import { HttpClient } from '@angular/common/http';
   `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None
+  providers: [TransactionPdfSheetsContextService]
 })
-export class TransactionPdfSheetsComponent implements OnChanges {
+export class TransactionPdfSheetsComponent {
   @Input() data?: SpecimenTransaction;
-
-  private ownerSubject = new ReplaySubject<string|undefined>(1);
-  private owner$ = this.ownerSubject.asObservable().pipe(take(1));
-  ownerOrganization$: Observable<LajiOrganization|undefined>;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private componentService: ComponentService,
+    private transactionPdfSheetsContext: TransactionPdfSheetsContextService,
     private apiClient: ApiClient,
     private httpClient: HttpClient
-  ) {
-    this.ownerOrganization$ = this.owner$.pipe(
-      switchMap(owner => owner ? this.apiClient.getOrganization(owner) : of(undefined))
-    );
-  }
-
-  ngOnChanges() {
-    this.ownerSubject.next(this.data?.owner);
-  }
+  ) {}
 
   downloadDispatchSheet() {
     if (!this.data) {
       return;
     }
 
-    this.ownerOrganization$.pipe(take(1)).subscribe(organization => {
+    this.transactionPdfSheetsContext.getDispatchSheetContext(this.data).subscribe(context => {
       this.downloadSheet(
         TransactionDispatchSheetComponent,
-        { data: this.data, organization },
+        context,
         `dispatchsheet_${this.data?.id}.pdf`
       );
     });
   }
 
-  private downloadSheet<T>(componentClass: Type<T>, state: any, fileName: string) {
-    this.getHtml(componentClass, state).subscribe(html => {
+  private downloadSheet<T extends ComponentWithContext>(componentClass: Type<T>, context: any, fileName: string) {
+    this.getHtml(componentClass, context).subscribe(html => {
       this.apiClient.htmlToPdf(html).subscribe(res => {
         FileSaver.saveAs(res, fileName);
       });
     });
   }
 
-  private getHtml<T>(componentClass: Type<T>, state: any): Observable<string> {
+  private getHtml<T extends ComponentWithContext>(componentClass: Type<T>, context: any): Observable<string> {
     return this.getStyleElement().pipe(map(styleElem => {
       const baseComponentRef = this.componentService.createComponentFromType(TransactionPdfSheetBaseComponent);
 
@@ -81,7 +72,7 @@ export class TransactionPdfSheetsComponent implements OnChanges {
       const body = baseComponentRef.instance.body.nativeElement;
 
       head.appendChild(styleElem);
-      const componentRef = this.addContentComponentToBody(componentClass, state, body);
+      const componentRef = this.addContentComponentToBody(componentClass, context, body);
 
       const html = baseComponentRef.location.nativeElement.innerHTML;
 
@@ -92,12 +83,10 @@ export class TransactionPdfSheetsComponent implements OnChanges {
     }));
   }
 
-  private addContentComponentToBody<T>(componentClass: Type<T>, state: any, bodyElem: HTMLBodyElement): ComponentRef<T> {
+  private addContentComponentToBody<T extends ComponentWithContext>(componentClass: Type<T>, context: any, bodyElem: HTMLBodyElement): ComponentRef<T> {
     const componentRef = this.componentService.createComponentFromType(componentClass, bodyElem);
 
-    Object.keys((state || {})).forEach(option => {
-      (componentRef.instance as any)[option] = state[option];
-    });
+    componentRef.instance.context = context;
     componentRef.changeDetectorRef.detectChanges();
 
     return componentRef;

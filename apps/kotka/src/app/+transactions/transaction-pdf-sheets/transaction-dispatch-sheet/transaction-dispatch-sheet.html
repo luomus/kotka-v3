@@ -1,11 +1,13 @@
-<div *ngIf="data && organization" class="page">
+<ng-container *ngIf="context">
   <div style="display: flex">
     <div style="flex: 1">
-      {{ organization.organizationLevel2 }}
-      <br>
-      {{ organization.organizationLevel3 }}<ng-container *ngIf="organization.abbreviation"> ({{ organization.abbreviation }})</ng-container>
-      <br>
-      {{ organization.organizationLevel4 }}
+      <ng-container *ngIf="context.ownerOrganization as ownerOrganization">
+        {{ ownerOrganization.organizationLevel2 }}
+        <br>
+        {{ ownerOrganization.organizationLevel3 }}<ng-container *ngIf="ownerOrganization.abbreviation"> ({{ ownerOrganization.abbreviation }})</ng-container>
+        <br>
+        {{ ownerOrganization.organizationLevel4 }}
+      </ng-container>
     </div>
     <div style="flex: 0; text-align: center">
       LOGO
@@ -35,31 +37,68 @@
     </div>
   </div>
   <hr>
-  <div style="display: grid; grid-template-columns: 50% 50%">
+  <div class="avoid-page-break" style="display: grid; grid-template-columns: 50% 50%">
     <div>
       <h4>Recipient</h4>
-      <div>
+      <p *ngIf="context.correspondingOrganization as correspondingOrganization">
+        {{ correspondingOrganization.organizationLevel2 }}
+        <br>
+        {{ correspondingOrganization.organizationLevel3 }}<ng-container *ngIf="correspondingOrganization.abbreviation"> ({{ correspondingOrganization.abbreviation }})</ng-container>
+        <br>
+        {{ correspondingOrganization.organizationLevel4 }}
+      </p>
+      <p>
         Corresponding person:<br>
         {{ data.correspondentPerson }}
-      </div>
-      <div>
+      </p>
+      <p>
         Receiving researcher:<br>
         {{ data.correspondentResearcher }}
-      </div>
+      </p>
     </div>
     <div>
       <h4>{{ data.type | transactionTypeLabel | titlecase }} ID: {{ data.id | toFullUri }}</h4>
-      <h4>Due date: {{ data.dueDate }}</h4>
-      <div>
+      <h4>Due date: {{ data.dueDate | date:'dd MMMM Y' }}</h4>
+      <p>
         Handler:<br>
         {{ data.localHandler }}<br>
         {{ data.localHandlerEmail }}
-      </div>
-      <div>
+      </p>
+      <p>
         Person responsible:<br>
         {{ data.localPerson }}<br>
         {{ data.localPersonEmail }}
-      </div>
+      </p>
+      <p>
+        Loan request received: {{ data.requestReceived | date:'dd MMMM Y' }}<br>
+        Send to you on: {{ data.outgoingSent | date:'dd MMMM Y' }}<br>
+        Sent by: {{ fieldData['transportMethod']['options']['value_options'][data.transportMethod || ''] }}
+      </p>
     </div>
   </div>
-</div>
+  <hr>
+  <div class="avoid-page-break">
+    <h4>Remarks</h4>
+    <p>{{ data.publicRemarks }}</p>
+  </div>
+  <hr>
+  <div class="avoid-page-break">
+    <p>Material received in good condition. We commit to the {{ data.type | transactionTypeLabel }} terms.</p>
+    <div style="display: grid; grid-template-columns: 35% 35% 15% 15%">
+      <span>Recipient name</span>
+      <span>Signature</span>
+      <span>Place</span>
+      <span>Date</span>
+    </div>
+  </div>
+  <hr>
+  <div class="avoid-page-break">
+    <h4>Material</h4>
+    <h4>Total number of specimens: {{ totalAwayCount }}</h4>
+    <p>{{ data.material }}</p>
+    <div style="display: grid; grid-template-columns: repeat(3, 33%)">
+      <span *ngFor="let awayID of data.awayIDs">{{ awayID }}</span>
+    </div>
+    <p>In addition, loan includes {{ data.awayCount }} specimen(s) not specified in this list.</p>
+  </div>
+</ng-container>

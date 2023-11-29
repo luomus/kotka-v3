@@ -1,9 +1,10 @@
 import { Component, Input } from '@angular/core';
 import { SpecimenTransaction } from '@luomus/laji-schema';
-import { LajiOrganization } from '@kotka/shared/models';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from '../../../shared/shared.module';
 import { TransactionTypeLabelPipe } from '../transaction-type-label.pipe';
+import { DispatchSheetContext } from '../transaction-pdf-sheets-context-service';
+import { ComponentWithContext } from '../transaction-pdf-sheets.component';
 
 @Component({
   standalone: true,
@@ -11,7 +12,18 @@ import { TransactionTypeLabelPipe } from '../transaction-type-label.pipe';
   selector: 'kotka-transaction-dispatch-sheet',
   templateUrl: './transaction-dispatch-sheet.html'
 })
-export class TransactionDispatchSheetComponent {
-  @Input() data?: SpecimenTransaction;
-  @Input() organization?: LajiOrganization;
+export class TransactionDispatchSheetComponent implements ComponentWithContext {
+  @Input() context?: DispatchSheetContext;
+
+  get data(): SpecimenTransaction {
+    return this.context!.data;
+  }
+
+  get fieldData(): Record<string, any> {
+    return this.context!.fieldData;
+  }
+
+  get totalAwayCount(): number {
+    return (this.data.awayIDs || []).length + (this.data.awayCount || 0);
+  }
 }

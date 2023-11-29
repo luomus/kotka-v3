@@ -25,6 +25,7 @@ import {
 import { ComponentCanDeactivate } from '../../shared/services/guards/component-can-deactivate.guard';
 import { ApiClient } from '../../shared/services/api-services/api-client';
 import { TransactionFormEmbedService } from '../transaction-form-embed/transaction-form-embed.service';
+import { globals } from '../../../../../kotka-api/src/environments/globals';
 
 type SpecimenIdKey = keyof Pick<SpecimenTransaction, 'awayIDs'|'returnedIDs'|'missingIDs'|'damagedIDs'>;
 
@@ -35,6 +36,7 @@ type SpecimenIdKey = keyof Pick<SpecimenTransaction, 'awayIDs'|'returnedIDs'|'mi
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransactionFormComponent implements OnDestroy, ComponentCanDeactivate {
+  formId = globals.transactionFormId;
   dataType = KotkaDocumentObjectType.transaction;
   augmentFormFunc = this.augmentForm.bind(this);
 

@@ -3,12 +3,13 @@ import {
   Component,
 } from '@angular/core';
 import { KotkaDocumentObjectType } from '@kotka/shared/models';
+import { globals } from '../../../../../kotka-api/src/environments/globals';
 
 @Component({
   selector: 'kotka-transaction-version-history',
   template: `
     <kotka-version-history-view
-      [formId]="'MHL.731'"
+      [formId]="formId"
       [dataType]="dataType"
       [dataTypeName]="'tag'"
     ></kotka-version-history-view>
@@ -17,5 +18,6 @@ import { KotkaDocumentObjectType } from '@kotka/shared/models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DatasetVersionHistoryComponent {
+  formId = globals.datasetFormId;
   dataType = KotkaDocumentObjectType.dataset;
 }

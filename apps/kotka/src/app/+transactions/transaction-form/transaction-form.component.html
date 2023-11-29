@@ -3,7 +3,7 @@
   [data]="asSpecimenTransaction(formData)">
 </kotka-transaction-pdf-sheets>
 <kotka-form-view
-  [formId]="'MHL.930'"
+  [formId]="formId"
   [dataType]="dataType"
   [augmentFormFunc]="augmentFormFunc"
   (formInit)="onFormInit($event.lajiForm, asPartialSpecimenTransaction($event.formData))"

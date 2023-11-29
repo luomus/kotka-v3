@@ -64,4 +64,24 @@ export class FormService {
 
     return this.countryOptions$;
   }
+
+  getFieldData(formId: string): Observable<Record<string, any>> {
+    return this.getFormInJsonFormat(formId).pipe(map(form => {
+      const result: Record<string, any> = {};
+
+      const addFieldsToResult = (fields: any[], path = '') => {
+        fields.forEach(field => {
+          const fieldPath = path + field.name;
+          result[fieldPath] = field;
+          if (field.fields) {
+            addFieldsToResult(field.fields, fieldPath + '.');
+          }
+        });
+      }
+
+      addFieldsToResult(form.fields);
+      console.log(result);
+      return result;
+    }));
+  }
 }
