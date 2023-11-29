@@ -80,7 +80,7 @@ export class FormService {
       }
 
       addFieldsToResult(form.fields);
-      console.log(result);
+
       return result;
     }));
   }

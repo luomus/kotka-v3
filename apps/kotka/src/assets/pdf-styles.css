@@ -7,6 +7,52 @@
   page-break-inside: avoid;
 }
 
+body {
+  font-size: 10pt;
+  overflow-wrap: anywhere;
+}
+
 h2 {
-  margin-top: 10mm;
+  margin-top: 15mm;
+  margin-bottom: 5mm;
+}
+
+h4 {
+  margin-top: 0;
+  margin-bottom: 3mm;
+}
+
+p {
+  margin-bottom: 5mm;
+}
+
+hr {
+  margin: 5mm 0;
+}
+
+.multi-line span {
+  display: block;
+}
+
+.content-block + .content-block {
+  margin-top: 5mm;
+}
+
+.signature-space {
+  height: 10mm;
+}
+
+.transaction-header {
+  display: flex;
+}
+.transaction-header-left {
+  flex: 1;
+}
+.transaction-header-center {
+  flex: 0;
+  text-align: center;
+}
+.transaction-header-right {
+  flex: 1;
+  text-align: right;
 }
