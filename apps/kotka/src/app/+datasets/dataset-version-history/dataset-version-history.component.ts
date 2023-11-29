@@ -3,7 +3,7 @@ import {
   Component,
 } from '@angular/core';
 import { KotkaDocumentObjectType } from '@kotka/shared/models';
-import { globals } from '../../../../../kotka-api/src/environments/globals';
+import { globals } from '../../../environments/globals';
 
 @Component({
   selector: 'kotka-transaction-version-history',

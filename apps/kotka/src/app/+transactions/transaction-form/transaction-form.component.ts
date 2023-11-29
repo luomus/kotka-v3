@@ -25,7 +25,7 @@ import {
 import { ComponentCanDeactivate } from '../../shared/services/guards/component-can-deactivate.guard';
 import { ApiClient } from '../../shared/services/api-services/api-client';
 import { TransactionFormEmbedService } from '../transaction-form-embed/transaction-form-embed.service';
-import { globals } from '../../../../../kotka-api/src/environments/globals';
+import { globals } from '../../../environments/globals';
 
 type SpecimenIdKey = keyof Pick<SpecimenTransaction, 'awayIDs'|'returnedIDs'|'missingIDs'|'damagedIDs'>;
 

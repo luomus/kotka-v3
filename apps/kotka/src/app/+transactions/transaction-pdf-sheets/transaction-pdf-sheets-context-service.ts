@@ -4,7 +4,7 @@ import { SpecimenTransaction } from '@luomus/laji-schema';
 import { LajiForm, LajiOrganization } from '@kotka/shared/models';
 import { forkJoin, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { globals } from '../../../../../kotka-api/src/environments/globals';
+import { globals } from '../../../environments/globals';
 import { FormService } from '../../shared/services/form.service';
 
 export interface DispatchSheetContext {

@@ -77,7 +77,7 @@ export class FormService {
             addFieldsToResult(field.fields, fieldPath + '.');
           }
         });
-      }
+      };
 
       addFieldsToResult(form.fields);
 

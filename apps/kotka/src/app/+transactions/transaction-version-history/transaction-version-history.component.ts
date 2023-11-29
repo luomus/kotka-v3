@@ -5,7 +5,7 @@ import {
 import { asSpecimenTransaction, KotkaDocumentObjectType, SpecimenTransaction } from '@kotka/shared/models';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { TransactionFormEmbedService } from '../transaction-form-embed/transaction-form-embed.service';
-import { globals } from '../../../../../kotka-api/src/environments/globals';
+import { globals } from '../../../environments/globals';
 
 @Component({
   selector: 'kotka-transaction-version-history',
