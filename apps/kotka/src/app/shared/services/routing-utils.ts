@@ -1,7 +1,6 @@
 import { NavigationEnd, Router, UrlMatchResult, UrlSegment } from '@angular/router';
-import { Observable, shareReplay, startWith } from 'rxjs';
+import { Observable, startWith } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
-import { RouteParams } from '../../shared-modules/form-view/form-view/form-view.facade';
 
 export class RoutingUtils {
   static formMatcher(segments: UrlSegment[]): UrlMatchResult|null {
