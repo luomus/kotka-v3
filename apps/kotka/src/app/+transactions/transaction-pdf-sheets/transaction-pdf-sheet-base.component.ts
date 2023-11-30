@@ -7,9 +7,8 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
     <head #head>
       <meta charset="utf-8">
       <title>Pdf</title>
-      <script type="application/javascript">await document.fonts.ready;</script>
     </head>
-    <body #body style="margin: 0; padding: 0;"></body>
+    <body #body></body>
     </html>
   `
 })

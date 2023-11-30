@@ -67,6 +67,7 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
   @ContentChild('headerTpl', {static: true}) formHeader?: TemplateRef<any>;
+  @ContentChild('extraSection', {static: true}) extraSection?: TemplateRef<any>;
 
   private vm?: SuccessViewModel;
   private vmSub?: Subscription;

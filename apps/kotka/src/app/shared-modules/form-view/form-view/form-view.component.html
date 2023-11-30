@@ -27,12 +27,17 @@
           You can only view this {{ visibleDataTypeName }}. To be able to edit this {{ visibleDataTypeName }}, you must belong to {{ vm.formData.owner | label }}
         </ngb-alert>
 
-        <div *ngIf="vm.routeParams.editMode && vm.formData" class="mb-1">
-          <strong class="d-block">Last edited by</strong>
-          <span>{{ (vm.formData.editor || '') | label }} on {{ vm.formData.dateEdited | date:'dd.MM.YYYY HH:mm' }} </span>
-          <a [routerLink]="['..', 'history']" [queryParams]="{ uri: vm.routeParams.dataURI }">view history</a>
-          <strong class="d-block">Originally created by</strong>
-          <span>{{ (vm.formData.creator || '') | label }} on {{ vm.formData.dateCreated | date:'dd.MM.YYYY HH:mm' }}</span>
+        <div class="row mb-1">
+          <div *ngIf="extraSection" class="col-lg-6 col-md-5 col-sm-4 col-12 order-sm-last position-relative">
+            <ng-container *ngTemplateOutlet="extraSection"></ng-container>
+          </div>
+          <div *ngIf="vm.routeParams.editMode && vm.formData" class="col-lg-6 col-md-7 col-sm-8 col-12 order-sm-first">
+            <strong class="d-block">Last edited by</strong>
+            <span>{{ (vm.formData.editor || '') | label }} on {{ vm.formData.dateEdited | date:'dd.MM.YYYY HH:mm' }} </span>
+            <a [routerLink]="['..', 'history']" [queryParams]="{ uri: vm.routeParams.dataURI }">view history</a>
+            <strong class="d-block">Originally created by</strong>
+            <span>{{ (vm.formData.creator || '') | label }} on {{ vm.formData.dateCreated | date:'dd.MM.YYYY HH:mm' }}</span>
+          </div>
         </div>
         <kui-laji-form
           [form]="vm.form"

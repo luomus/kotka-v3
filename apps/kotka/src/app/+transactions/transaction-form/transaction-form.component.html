@@ -1,7 +1,3 @@
-<kotka-transaction-pdf-sheets
-  *ngIf="isSpecimenTransaction(formData)"
-  [data]="asSpecimenTransaction(formData)">
-</kotka-transaction-pdf-sheets>
 <kotka-form-view
   [formId]="formId"
   [dataType]="dataType"
@@ -10,4 +6,10 @@
   (formDataChange)="onFormDataChange(asPartialSpecimenTransaction($event))"
   (disabled)="setDisabled($event)"
 >
+  <ng-template #extraSection>
+    <kotka-transaction-pdf-sheets
+      *ngIf="isSpecimenTransaction(formData)"
+      [data]="asSpecimenTransaction(formData)">
+    </kotka-transaction-pdf-sheets>
+  </ng-template>
 </kotka-form-view>

@@ -1,0 +1,11 @@
+@import "../../../styles/variables";
+@import "node_modules/bootstrap/scss/mixins";
+
+@include media-breakpoint-up(sm) {
+  kotka-transaction-pdf-sheets {
+    position: absolute;
+    display: block;
+    right: 0;
+    z-index: 1;
+  }
+}
