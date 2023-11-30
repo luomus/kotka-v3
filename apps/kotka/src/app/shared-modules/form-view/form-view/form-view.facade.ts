@@ -10,18 +10,18 @@ import {
   of,
   ReplaySubject,
   shareReplay,
-  startWith,
   Subscription,
   switchMap,
   throwError
 } from 'rxjs';
-import { filter, map, take } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { allowAccessByOrganization, allowAccessByTime } from '@kotka/utils';
 import { KotkaDocumentObject, KotkaDocumentObjectType } from '@kotka/shared/models';
 import { LajiForm, Person } from '@kotka/shared/models';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormViewUtils } from './form-view-utils';
 import { MediaMetadata } from '@luomus/laji-form/lib/components/LajiForm';
+import { RoutingUtils } from '../../../shared/services/routing-utils';
 
 export enum FormErrorEnum {
   dataNotFound = 'dataNotFound',
@@ -71,8 +71,11 @@ export function isErrorViewModel(viewModel: ViewModel): viewModel is ErrorViewMo
 export class FormViewFacade implements OnDestroy {
   vm$: Observable<ViewModel>;
 
+  form$!: Observable<LajiForm.SchemaForm|undefined>;
+  formData$ = new ReplaySubject<Partial<KotkaDocumentObject>|undefined>(1);
+  state$!: Observable<FormState|undefined>;
+
   private inputs$ = new ReplaySubject<FormInputs>(1);
-  private formData$ = new ReplaySubject<Partial<KotkaDocumentObject>|undefined>(1);
 
   private initialFormDataSub?: Subscription;
 
@@ -107,7 +110,8 @@ export class FormViewFacade implements OnDestroy {
   private getVm$(): Observable<ViewModel> {
     const routeParams$ = this.getRouteParams$();
     const user$ = this.getUser$();
-    const form$: Observable<LajiForm.SchemaForm|undefined> = this.inputs$.pipe(
+
+    this.form$ = this.inputs$.pipe(
       switchMap((inputs) => concat(of(undefined), this.getForm$(inputs))),
       shareReplay(1)
     );
@@ -121,16 +125,18 @@ export class FormViewFacade implements OnDestroy {
       'error': err => this.formData$.error(err)
     });
 
-    const state$: Observable<FormState|undefined> = combineLatest([
-      routeParams$, form$, this.formData$, user$
-    ]).pipe(map(([routeParams, form, formData, user]) => (
+    this.state$ = combineLatest([
+      routeParams$, this.form$, this.formData$, user$
+    ]).pipe(
+      map(([routeParams, form, formData, user]) => (
         form && formData ? this.getFormState(routeParams, form, formData, user) : undefined
-      )
-    ));
+      )),
+      shareReplay(1)
+    );
 
     return routeParams$.pipe(
       switchMap(routeParams => combineLatest([
-        form$, this.formData$, state$, this.getMediaMetadata$()
+        this.form$, this.formData$, this.state$, this.getMediaMetadata$()
       ]).pipe(
         map(([form, formData, state, mediaMetadata]) => {
           return { routeParams, form, formData, state, mediaMetadata };
@@ -145,9 +151,7 @@ export class FormViewFacade implements OnDestroy {
   }
 
   private getRouteParams$(): Observable<RouteParams> {
-    return this.router.events.pipe(
-      filter((event) => event instanceof NavigationEnd),
-      startWith(this.router),
+    return RoutingUtils.navigationEnd$(this.router).pipe(
       map(() => {
         const editMode = this.activeRoute.snapshot.url[0].path === 'edit';
         const dataURI = this.activeRoute.snapshot.queryParams['uri'];

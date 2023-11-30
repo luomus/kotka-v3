@@ -3,9 +3,9 @@
   [dataType]="dataType"
   [augmentFormFunc]="augmentFormFunc"
   [extraSectionTpl]="extraSection"
-  (formInit)="onFormInit($event.lajiForm, asPartialSpecimenTransaction($event.formData))"
+  (formInit)="onFormInit($event)"
   (formDataChange)="onFormDataChange(asPartialSpecimenTransaction($event))"
-  (disabled)="setDisabled($event)"
+  (disabledChange)="setDisabled($event)"
 >
 </kotka-form-view>
 

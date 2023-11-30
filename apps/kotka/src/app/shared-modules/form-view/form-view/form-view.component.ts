@@ -4,7 +4,6 @@ import {
   Component,
   Input,
   ViewChild,
-  ContentChild,
   TemplateRef,
   SimpleChanges,
   EventEmitter,
@@ -29,11 +28,12 @@ import {
   isErrorViewModel,
   isSuccessViewModel
 } from './form-view.facade';
-import { tap } from 'rxjs/operators';
+import { distinctUntilChanged, filter, map, tap } from 'rxjs/operators';
 import { ComponentCanDeactivate } from '../../../shared/services/guards/component-can-deactivate.guard';
 import { FormViewUtils } from './form-view-utils';
 import { DataService } from '../../../shared/services/data.service';
 import { IdService } from '../../../shared/services/id.service';
+import { RoutingUtils } from '../../../shared/services/routing-utils';
 
 @Component({
   selector: 'kotka-form-view',
@@ -65,13 +65,14 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
   isSuccessViewModel = isSuccessViewModel;
 
   @Output() formDataChange = new EventEmitter<Partial<KotkaDocumentObject>>();
-  @Output() formInit = new EventEmitter<{ lajiForm: LajiFormComponent; formData: Partial<KotkaDocumentObject> }>();
-  @Output() disabled = new EventEmitter<boolean>();
+  @Output() formInit = new EventEmitter<LajiFormComponent>();
+  @Output() disabledChange = new EventEmitter<boolean>();
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
 
   private vm?: SuccessViewModel;
-  private vmSub?: Subscription;
+
+  private subscription: Subscription = new Subscription();
 
   constructor(
     public formApiClient: FormApiClient,
@@ -85,17 +86,39 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
   ) {
     this.vm$ = this.formViewFacade.vm$;
 
-    this.vmSub = this.vm$.subscribe(vm => {
-      if (this.isSuccessViewModel(vm)) {
-        if (vm.routeParams.dataURI !== this.vm?.routeParams.dataURI) {
-          this.formHasChanges = false;
-        }
-        if (vm.state?.disabled !== undefined && vm.state.disabled !== this.vm?.state?.disabled) {
-          this.disabled.emit(vm.state.disabled);
-        }
+    this.subscription.add(
+      this.vm$.subscribe(vm => {
         this.vm = vm;
-      }
-    });
+        this.cdr.markForCheck();
+      })
+    )
+
+    this.subscription.add(
+      RoutingUtils.navigationEnd$(this.router).subscribe(() => {
+        this.formHasChanges = false;
+        this.cdr.markForCheck();
+      })
+    );
+
+    this.subscription.add(
+      this.formViewFacade.state$.pipe(
+        map(state => state?.disabled),
+        filter(disabled => disabled !== undefined),
+        distinctUntilChanged()
+      ).subscribe(disabled => {
+        this.disabledChange.emit(disabled);
+        this.cdr.markForCheck();
+      })
+    );
+
+    this.subscription.add(
+      this.formViewFacade.formData$.subscribe(formData => {
+        if (formData) {
+          this.formDataChange.emit(formData);
+          this.cdr.markForCheck();
+        }
+      })
+    );
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -113,7 +136,7 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
   }
 
   ngOnDestroy() {
-    this.vmSub?.unsubscribe();
+    this.subscription.unsubscribe();
   }
 
   @HostListener('window:beforeunload', ['$event'])
@@ -131,9 +154,9 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
     return this.dialogService.confirm('Are you sure you want to leave and discard unsaved changes?');
   }
 
-  onFormReady(data: KotkaDocumentObject) {
+  onFormReady() {
     if (this.lajiForm) {
-      this.formInit.emit({lajiForm: this.lajiForm, formData: data});
+      this.formInit.emit(this.lajiForm);
     }
   }
 

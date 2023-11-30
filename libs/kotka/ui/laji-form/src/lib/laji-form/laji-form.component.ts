@@ -46,7 +46,7 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
   private isBlocked = false;
   private copyAfterSubmit = false;
 
-  @Output() formReady: EventEmitter<any> = new EventEmitter<any>();
+  @Output() formReady: EventEmitter<any> = new EventEmitter<void>();
   @Output() formDestroy: EventEmitter<void> = new EventEmitter<void>();
 
   @Output() formChange: EventEmitter<any> = new EventEmitter<any>();
@@ -143,7 +143,7 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
       this.createNewLajiForm(() => {
         setTimeout(() => {
           this.ngZone.run(() => {
-            this.formReady.emit(this.formData);
+            this.formReady.emit();
           });
         }, 0);
       });

@@ -26,6 +26,7 @@ import {
 } from '@kotka/shared/models';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { FormViewUtils } from '../form-view/form-view-utils';
+import { RoutingUtils } from '../../../shared/services/routing-utils';
 
 export enum VersionHistoryErrorEnum {
   dataNotFound = 'dataNotFound',
@@ -147,9 +148,7 @@ export class VersionHistoryViewFacade {
   }
 
   private getRouteParams$(): Observable<RouteParams> {
-    return this.router.events.pipe(
-      filter((event) => event instanceof NavigationEnd),
-      startWith(this.router),
+    return RoutingUtils.navigationEnd$(this.router).pipe(
       map(() => {
         const dataURI = this.activeRoute.snapshot.queryParams['uri'];
         const versionParam = this.activeRoute.snapshot.queryParams['version'];

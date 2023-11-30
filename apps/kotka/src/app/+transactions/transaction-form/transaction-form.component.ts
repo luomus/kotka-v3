@@ -74,11 +74,9 @@ export class TransactionFormComponent implements OnDestroy, ComponentCanDeactiva
     return this.formView.canDeactivate();
   }
 
-  onFormInit(lajiForm: LajiFormComponent, formData: Partial<SpecimenTransaction>) {
-    this.formData = formData;
-
+  onFormInit(lajiForm: LajiFormComponent) {
     this.transactionFormEmbedService.initEmbeddedComponents(
-      lajiForm, formData, this.onAddTransactionEventButtonClick.bind(this)
+      lajiForm, this.formData || {}, this.onAddTransactionEventButtonClick.bind(this)
     );
     this.specimenRangeButtonClickSubscription = this.transactionFormEmbedService.specimenRangeClick$?.subscribe(range => (
       this.specimenRangeClick(range)
