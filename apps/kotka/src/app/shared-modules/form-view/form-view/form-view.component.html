@@ -1,6 +1,7 @@
 <ng-container *ngIf="vm$ | async as vm else spinner">
   <kui-main-content
     [header]="vm.routeParams.editMode ? 'Edit ' + visibleDataTypeName + ' ' + (vm.routeParams.dataURI || ''): 'Add ' + visibleDataTypeName"
+    [headerTpl]="headerTpl"
     [containerClass]="'container'"
   >
     <ngb-alert *ngIf="isErrorViewModel(vm)" [type]="'danger'" [dismissible]="false">
@@ -14,10 +15,6 @@
 
     <ng-container *ngIf="isSuccessViewModel(vm)">
       <ng-container *ngIf="vm.form && vm.formData && vm.state else spinner">
-        <ng-template #headerTpl *ngIf="formHeader">
-          <ng-container *ngTemplateOutlet="formHeader; context: { formData: vm.formData }"></ng-container>
-        </ng-template>
-
         <ngb-alert *ngIf="showDeleteTargetInUseAlert" [type]="'danger'" (closed)="showDeleteTargetInUseAlert = true">
           <strong>Delete failed:</strong>
           This {{ visibleDataTypeName}} can't be deleted because there are resources that are attached to it.
@@ -28,8 +25,8 @@
         </ngb-alert>
 
         <div class="row mb-1">
-          <div *ngIf="extraSection" class="col-lg-6 col-md-5 col-sm-4 col-12 order-sm-last position-relative">
-            <ng-container *ngTemplateOutlet="extraSection"></ng-container>
+          <div *ngIf="extraSectionTpl" class="col-lg-6 col-md-5 col-sm-4 col-12 order-sm-last position-relative">
+            <ng-container *ngTemplateOutlet="extraSectionTpl"></ng-container>
           </div>
           <div *ngIf="vm.routeParams.editMode && vm.formData" class="col-lg-6 col-md-7 col-sm-8 col-12 order-sm-first">
             <strong class="d-block">Last edited by</strong>

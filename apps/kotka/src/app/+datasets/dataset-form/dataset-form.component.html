@@ -2,14 +2,18 @@
   [formId]="formId"
   [dataType]="dataType"
   [dataTypeName]="'tag'"
+  [headerTpl]="headerTpl"
+  (formInit)="updateDatasetQuery($event.formData)"
+  (formDataChange)="updateDatasetQuery($event)"
 >
-  <ng-template #headerTpl let-formData="formData">
-    <a
-      *ngIf="isDataset(formData)"
-      [href]='("/specimens/search?q=dataset.raw:\"" + asDataset(formData).datasetName.en + "\"") | oldKotkaUrl'
-      target="_blank"
-    >
-      Specimens with this tag
-    </a>
-  </ng-template>
 </kotka-form-view>
+
+<ng-template #headerTpl>
+  <a
+    *ngIf="datasetQuery"
+    [href]='("/specimens/search?q=dataset.raw:\"" + datasetQuery + "\"") | oldKotkaUrl'
+    target="_blank"
+  >
+    Specimens with this tag
+  </a>
+</ng-template>

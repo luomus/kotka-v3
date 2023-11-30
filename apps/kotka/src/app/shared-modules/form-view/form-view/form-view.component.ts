@@ -48,6 +48,9 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
   @Input() dataTypeName?: string;
   @Input() augmentFormFunc?: (form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>;
 
+  @Input() headerTpl?: TemplateRef<any>;
+  @Input() extraSectionTpl?: TemplateRef<any>;
+
   vm$: Observable<SuccessViewModel | ErrorViewModel>;
 
   visibleDataTypeName = '';
@@ -66,8 +69,6 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
   @Output() disabled = new EventEmitter<boolean>();
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
-  @ContentChild('headerTpl', {static: true}) formHeader?: TemplateRef<any>;
-  @ContentChild('extraSection', {static: true}) extraSection?: TemplateRef<any>;
 
   private vm?: SuccessViewModel;
   private vmSub?: Subscription;

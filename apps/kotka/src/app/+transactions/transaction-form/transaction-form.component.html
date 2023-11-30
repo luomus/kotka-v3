@@ -2,14 +2,16 @@
   [formId]="formId"
   [dataType]="dataType"
   [augmentFormFunc]="augmentFormFunc"
+  [extraSectionTpl]="extraSection"
   (formInit)="onFormInit($event.lajiForm, asPartialSpecimenTransaction($event.formData))"
   (formDataChange)="onFormDataChange(asPartialSpecimenTransaction($event))"
   (disabled)="setDisabled($event)"
 >
-  <ng-template #extraSection>
-    <kotka-transaction-pdf-sheets
-      *ngIf="isSpecimenTransaction(formData)"
-      [data]="asSpecimenTransaction(formData)">
-    </kotka-transaction-pdf-sheets>
-  </ng-template>
 </kotka-form-view>
+
+<ng-template #extraSection>
+  <kotka-transaction-pdf-sheets
+    *ngIf="isSpecimenTransaction(formData)"
+    [data]="asSpecimenTransaction(formData)">
+  </kotka-transaction-pdf-sheets>
+</ng-template>
