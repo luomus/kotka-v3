@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { SharedModule } from '../../../shared/shared.module';
 import { TransactionTypeLabelPipe } from '../transaction-type-label.pipe';
 import { DispatchSheetContext } from '../transaction-pdf-sheets-context-service';
-import { ComponentWithContext } from '../transaction-pdf-sheets.component';
+import { ComponentWithContext } from '../../../shared/services/pdf.service';
 
 @Component({
   standalone: true,

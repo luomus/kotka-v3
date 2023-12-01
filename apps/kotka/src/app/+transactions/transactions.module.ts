@@ -17,7 +17,6 @@ import { TransactionVersionHistoryComponent } from './transaction-version-histor
 import { TransactionFormEmbedService } from './transaction-form-embed/transaction-form-embed.service';
 import { TransactionPdfSheetsComponent } from './transaction-pdf-sheets/transaction-pdf-sheets.component';
 import { FormsModule } from '@angular/forms';
-import { TransactionPdfSheetBaseComponent } from './transaction-pdf-sheets/transaction-pdf-sheet-base.component';
 import {
   TransactionDispatchSheetComponent
 } from './transaction-pdf-sheets/transaction-dispatch-sheet/transaction-dispatch-sheet';
@@ -43,8 +42,7 @@ import {
     PermitsInfoEmbedComponent,
     SpecimenRangeSelectEmbedComponent,
     TransactionVersionHistoryComponent,
-    TransactionPdfSheetsComponent,
-    TransactionPdfSheetBaseComponent
+    TransactionPdfSheetsComponent
   ],
   providers: [
     TransactionFormEmbedService

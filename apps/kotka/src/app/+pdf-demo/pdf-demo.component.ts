@@ -7,8 +7,7 @@ import {
   asSpecimenTransaction,
   KotkaDocumentObjectType,
 } from '@kotka/shared/models';
-import { ApiClient } from '../shared/services/api-services/api-client';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import {
   DispatchSheetContext,
   TransactionPdfSheetsContextService
@@ -19,8 +18,7 @@ import {
   templateUrl: './pdf-demo.component.html',
   styleUrls: ['./pdf-demo.component.scss', '../../assets/pdf-styles.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None,
-  providers: [TransactionPdfSheetsContextService]
+  encapsulation: ViewEncapsulation.None
 })
 export class PdfDemoComponent {
   context$: Observable<DispatchSheetContext>;

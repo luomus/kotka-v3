@@ -1,7 +1,8 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 
 @Component({
-  selector: 'kotka-transaction-pdf-sheet-base',
+  standalone: true,
+  selector: 'kotka-pdf-base',
   template: `
     <html>
     <head #head>
@@ -12,7 +13,7 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
     </html>
   `
 })
-export class TransactionPdfSheetBaseComponent {
+export class PdfBaseComponent {
   @ViewChild('head', { static: true }) head!: ElementRef<HTMLHeadElement>;
   @ViewChild('body', { static: true }) body!: ElementRef<HTMLBodyElement>;
 }
