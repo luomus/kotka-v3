@@ -30,10 +30,9 @@ export class ViewerComponent {
   }
   @Input() data?: KotkaDocumentObject;
   @Input() differenceData: DifferenceObject = {};
+  @Input() labelTpl?: TemplateRef<any>;
 
   fields?: Field[];
-
-  @ContentChild('labelTpl') labelTpl?: TemplateRef<any>;
 
   private metaFields: Field[] = [{
     name: 'editor',

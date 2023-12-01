@@ -2,11 +2,11 @@
   <kui-main-content
     class="mb-5"
     [containerClass]="'container'"
-    [header]="(visibleDataTypeName | titlecase) + (vm.routeParams.dataURI ? (' ' + vm.routeParams.dataURI) : '')"
+    [header]="(dataTypeName | titlecase) + (dataURI ? (' ' + dataURI) : '')"
   >
     <ngb-alert *ngIf="isErrorViewModel(vm)" [type]="'danger'" [dismissible]="false">
       <ng-container *ngIf="vm.errorType === versionHistoryErrorEnum.dataNotFound else genericError">
-        {{ visibleDataTypeName | titlecase }} <ng-container *ngIf="vm.routeParams.dataURI">with URI {{ vm.routeParams.dataURI }} </ng-container>was not found.
+        {{ dataTypeName | titlecase }} <ng-container *ngIf="dataURI">with URI {{ dataURI }} </ng-container>was not found.
       </ng-container>
       <ng-template #genericError>
         An unexpected error occurred
@@ -15,25 +15,25 @@
 
     <ng-container *ngIf="isSuccessViewModel(vm)">
       <kotka-version-list
-        *ngIf="isVersionListViewModel(vm)"
+        *ngIf="view === versionHistoryViewEnum.versionList"
         [data]="vm.versionList"
         (compareVersionsClick)="onCompareVersionsClick($event)"
       ></kotka-version-list>
       <kotka-version
-        *ngIf="isVersionViewModel(vm)"
-        [visibleDataTypeName]="visibleDataTypeName"
-        [version]="vm.routeParams.version"
+        *ngIf="view === versionHistoryViewEnum.version"
+        [visibleDataTypeName]="dataTypeName"
+        [version]="version"
         [versionList]="vm.versionList"
         [form]="vm.form"
         [data]="vm.data"
         (formInit)="formInit.emit($event)"
       ></kotka-version>
       <kotka-version-comparison
-        *ngIf="isVersionComparisonViewModel(vm)"
-        [versions]="vm.routeParams.versions"
+        *ngIf="view === versionHistoryViewEnum.versionComparison"
+        [versions]="versions"
         [versionList]="vm.versionList"
-        [form]="vm.form"
-        [data]="vm.diffData"
+        [form]="vm.jsonForm"
+        [data]="vm.differenceData"
       ></kotka-version-comparison>
     </ng-container>
   </kui-main-content>

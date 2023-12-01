@@ -2,7 +2,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { ModuleWithProviders } from '@angular/core';
 import { TransactionFormComponent } from './transaction-form/transaction-form.component';
 import { TransactionTableComponent } from './transaction-table/transaction-table.component';
-import { RoutingUtils } from '../shared/services/routing-utils';
+import { Utils } from '../shared/services/utils';
 import { ComponentCanDeactivateGuard } from '../shared/services/guards/component-can-deactivate.guard';
 import { TransactionVersionHistoryComponent } from './transaction-version-history/transaction-version-history.component';
 
@@ -14,7 +14,7 @@ export const datasetsRoutes: Routes = [
     data: { title: 'Transactions' }
   },
   {
-    matcher: RoutingUtils.formMatcher,
+    matcher: Utils.formMatcher,
     component: TransactionFormComponent,
     data: {
       add: { title: 'Add transaction' },

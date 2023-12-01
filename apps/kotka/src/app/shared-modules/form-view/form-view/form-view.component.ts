@@ -29,7 +29,7 @@ import { filter } from 'rxjs/operators';
 import { FormViewUtils } from './form-view-utils';
 import { DataService } from '../../../shared/services/data.service';
 import { IdService } from '../../../shared/services/id.service';
-import { RoutingUtils } from '../../../shared/services/routing-utils';
+import { Utils } from '../../../shared/services/utils';
 import { FormApiClient } from '../../../shared/services/api-services/form-api-client';
 
 @Component({
@@ -40,8 +40,6 @@ import { FormApiClient } from '../../../shared/services/api-services/form-api-cl
   providers: [FormViewFacade]
 })
 export class FormViewComponent implements OnChanges, OnDestroy {
-  @Input() editMode = false;
-  @Input() dataURI?: string;
   @Input() formId?: string;
   @Input() dataType?: KotkaDocumentObjectType;
   @Input() dataTypeName = '';
@@ -49,6 +47,9 @@ export class FormViewComponent implements OnChanges, OnDestroy {
 
   @Input() headerTpl?: TemplateRef<any>;
   @Input() extraSectionTpl?: TemplateRef<any>;
+
+  editMode = false;
+  dataURI?: string;
 
   vm$: Observable<FormState | ErrorViewModel>;
 
@@ -76,9 +77,7 @@ export class FormViewComponent implements OnChanges, OnDestroy {
     private formViewFacade: FormViewFacade,
     private cdr: ChangeDetectorRef
   ) {
-    const params = this.getRouteParams();
-    this.editMode = params.editMode;
-    this.dataURI = params.dataURI;
+    this.setRouteParamsIfChanged();
 
     this.vm$ = this.formViewFacade.vm$;
 
@@ -243,11 +242,8 @@ export class FormViewComponent implements OnChanges, OnDestroy {
 
   private initSubscriptions() {
     this.subscription.add(
-      RoutingUtils.navigationEnd$(this.router).subscribe(() => {
-        const params = this.getRouteParams();
-        if (this.editMode !== params.editMode || this.dataURI !== params.dataURI) {
-          this.editMode = params.editMode;
-          this.dataURI = params.dataURI;
+      Utils.navigationEnd$(this.router).subscribe(() => {
+        if (this.setRouteParamsIfChanged()) {
           this.updateInputs();
         }
       })
@@ -275,10 +271,17 @@ export class FormViewComponent implements OnChanges, OnDestroy {
     );
   }
 
-  private getRouteParams(): { editMode: boolean, dataURI?: string} {
+  private setRouteParamsIfChanged(): boolean {
     const editMode = this.activeRoute.snapshot.url[0].path === 'edit';
     const dataURI = this.activeRoute.snapshot.queryParams['uri'];
-    return { editMode, dataURI };
+
+    if (this.editMode !== editMode || this.dataURI !== dataURI) {
+      this.editMode = editMode;
+      this.dataURI = dataURI;
+      return true;
+    }
+
+    return false;
   }
 
   private updateInputs() {
