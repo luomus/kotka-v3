@@ -11,6 +11,7 @@ import { RouterModule } from '@angular/router';
 import { VersionListComponent } from './version-history-view/version-list/version-list.component';
 import { VersionComponent } from './version-history-view/version/version.component';
 import { KotkaUiViewerModule } from '@kotka/ui/viewer';
+import { MetaFieldsComponent } from './meta-fields/meta-fields.component';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { KotkaUiViewerModule } from '@kotka/ui/viewer';
     VersionComparisonComponent,
     VersionListComponent,
     VersionComponent,
+    MetaFieldsComponent,
   ],
   imports: [
     CommonModule,

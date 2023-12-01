@@ -19,15 +19,21 @@
 </kui-spinner>
 
 <kui-spinner [spinning]="!form || !data">
-  <kui-laji-form
-    *ngIf="form && data"
-    [form]="form"
-    [formData]="data"
-    [disabled]="true"
-    [showFooter]="false"
-    [apiClient]="formApiClient"
-    [notifier]="notifier"
-    (formReady)="onFormReady($event)"
-  >
-  </kui-laji-form>
+  <ng-container *ngIf="form && data">
+    <kotka-meta-fields
+      [formData]="data"
+      [editMode]="true"
+    ></kotka-meta-fields>
+    <kui-laji-form
+      *ngIf="form && data"
+      [form]="form"
+      [formData]="data"
+      [disabled]="true"
+      [showFooter]="false"
+      [apiClient]="formApiClient"
+      [notifier]="notifier"
+      (formReady)="onFormReady($event)"
+    >
+    </kui-laji-form>
+  </ng-container>
 </kui-spinner>
