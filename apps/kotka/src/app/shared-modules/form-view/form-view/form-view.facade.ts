@@ -4,8 +4,8 @@ import { FormService } from '../../../shared/services/form.service';
 import { UserService } from '../../../shared/services/user.service';
 import {
   catchError,
-  combineLatest,
   concat,
+  forkJoin,
   Observable,
   of,
   ReplaySubject,
@@ -14,53 +14,45 @@ import {
   switchMap,
   throwError
 } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { distinctUntilChanged, map, take } from 'rxjs/operators';
 import { allowAccessByOrganization, allowAccessByTime } from '@kotka/utils';
 import { KotkaDocumentObject, KotkaDocumentObjectType } from '@kotka/shared/models';
 import { LajiForm, Person } from '@kotka/shared/models';
-import { ActivatedRoute, Router } from '@angular/router';
 import { FormViewUtils } from './form-view-utils';
 import { MediaMetadata } from '@luomus/laji-form/lib/components/LajiForm';
-import { RoutingUtils } from '../../../shared/services/routing-utils';
 
 export enum FormErrorEnum {
   dataNotFound = 'dataNotFound',
   genericError = 'genericError'
 }
 
-export interface RouteParams {
-  editMode: boolean;
-  dataURI?: string;
-}
-
 export interface FormInputs {
   formId: string;
   dataType: KotkaDocumentObjectType;
+  editMode: boolean;
+  dataURI?: string;
   augmentFormFunc?: (form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>;
 }
 
 export interface FormState {
-  disabled: boolean;
-  showDeleteButton: boolean;
-  showCopyButton: boolean;
-}
-
-export interface SuccessViewModel {
-  routeParams: RouteParams;
   form?: LajiForm.SchemaForm;
   formData?: Partial<KotkaDocumentObject>;
-  state?: FormState;
+  disabled?: boolean;
+  showDeleteButton?: boolean;
+  showCopyButton?: boolean;
   mediaMetadata?: MediaMetadata;
+  formHasChanges?: boolean;
+  disabledAlertDismissed?: boolean;
+  showDeleteTargetInUseAlert?: boolean;
 }
 
 export interface ErrorViewModel {
-  routeParams: RouteParams;
   errorType: FormErrorEnum;
 }
 
-export type ViewModel = SuccessViewModel | ErrorViewModel;
+export type ViewModel = FormState | ErrorViewModel;
 
-export function isSuccessViewModel(viewModel: ViewModel): viewModel is SuccessViewModel {
+export function isSuccessViewModel(viewModel: ViewModel): viewModel is FormState {
   return !isErrorViewModel(viewModel);
 }
 export function isErrorViewModel(viewModel: ViewModel): viewModel is ErrorViewModel {
@@ -69,28 +61,31 @@ export function isErrorViewModel(viewModel: ViewModel): viewModel is ErrorViewMo
 
 @Injectable()
 export class FormViewFacade implements OnDestroy {
-  vm$: Observable<ViewModel>;
+  private store  = new ReplaySubject<FormState>(1);
+  state$ = this.store.asObservable();
 
-  form$!: Observable<LajiForm.SchemaForm|undefined>;
-  formData$ = new ReplaySubject<Partial<KotkaDocumentObject>|undefined>(1);
-  state$!: Observable<FormState|undefined>;
+  formData$ = this.state$.pipe(map(state => state.formData), distinctUntilChanged());
+  disabled$ = this.state$.pipe(map(state => state.disabled), distinctUntilChanged());
+
+  vm$: Observable<ViewModel>;
 
   private inputs$ = new ReplaySubject<FormInputs>(1);
 
-  private initialFormDataSub?: Subscription;
+  private initialStateSub: Subscription;
+
+  private _state: FormState = {};
 
   constructor(
-    private router: Router,
-    private activeRoute: ActivatedRoute,
     private userService: UserService,
     private formService: FormService,
     private dataService: DataService
   ) {
     this.vm$ = this.getVm$();
+    this.initialStateSub = this.getInitialStateSub();
   }
 
   ngOnDestroy() {
-    this.initialFormDataSub?.unsubscribe();
+    this.initialStateSub.unsubscribe();
   }
 
   setInputs(inputs: FormInputs) {
@@ -98,87 +93,61 @@ export class FormViewFacade implements OnDestroy {
   }
 
   setFormData(formData: Partial<KotkaDocumentObject>) {
-    this.formData$.next(formData);
+    this.setState({ ...this._state, formData, formHasChanges: true });
   }
 
-  setInitialFormData(formData: Partial<KotkaDocumentObject>) {
+  setCopiedFormData(formData: Partial<KotkaDocumentObject>) {
     this.getEmptyFormData$().pipe(take(1)).subscribe(emptyFormData => {
-      this.formData$.next({ ...emptyFormData, ...formData });
+      formData = { ...emptyFormData, ...formData };
+      this.setState({ ...this._state, formData, formHasChanges: false });
     });
+  }
+
+  setFormHasChanges(formHasChanges: boolean) {
+    this.setState({ ...this._state, formHasChanges });
+  }
+
+  setDisabledAlertDismissed(disabledAlertDismissed: boolean) {
+    this.setState({ ...this._state, disabledAlertDismissed });
+  }
+
+  setShowDeleteTargetInUseAlert(showDeleteTargetInUseAlert: boolean) {
+    this.setState({ ...this._state, showDeleteTargetInUseAlert });
   }
 
   private getVm$(): Observable<ViewModel> {
-    const routeParams$ = this.getRouteParams$();
-    const user$ = this.getUser$();
-
-    this.form$ = this.inputs$.pipe(
-      switchMap((inputs) => concat(of(undefined), this.getForm$(inputs))),
-      shareReplay(1)
-    );
-
-    this.initialFormDataSub = combineLatest([routeParams$, this.inputs$]).pipe(
-      switchMap(([params, inputs]) => concat(
-        of(undefined), this.getInitialFormData$(params, inputs)
-      ))
-    ).subscribe({
-      'next': formData => this.formData$.next(formData),
-      'error': err => this.formData$.error(err)
-    });
-
-    this.state$ = combineLatest([
-      routeParams$, this.form$, this.formData$, user$
-    ]).pipe(
-      map(([routeParams, form, formData, user]) => (
-        form && formData ? this.getFormState(routeParams, form, formData, user) : undefined
-      )),
-      shareReplay(1)
-    );
-
-    return routeParams$.pipe(
-      switchMap(routeParams => combineLatest([
-        this.form$, this.formData$, this.state$, this.getMediaMetadata$()
-      ]).pipe(
-        map(([form, formData, state, mediaMetadata]) => {
-          return { routeParams, form, formData, state, mediaMetadata };
-        }),
+    return this.inputs$.pipe(
+      switchMap(() => this.state$.pipe(
         catchError(err => {
           const errorType = err.message === FormErrorEnum.dataNotFound ? FormErrorEnum.dataNotFound : FormErrorEnum.genericError;
-          return of({ routeParams, errorType });
+          return of({ errorType });
         }))
       ),
       shareReplay(1)
     );
   }
 
-  private getRouteParams$(): Observable<RouteParams> {
-    return RoutingUtils.navigationEnd$(this.router).pipe(
-      map(() => {
-        const editMode = this.activeRoute.snapshot.url[0].path === 'edit';
-        const dataURI = this.activeRoute.snapshot.queryParams['uri'];
-        return { editMode, dataURI };
+  private getUser$(): Observable<Person> {
+    return this.userService.user$.pipe(
+      map(user => {
+        if (!user) {
+          throw new Error('Missing user information!');
+        }
+        return user;
       }),
-      shareReplay(1)
+      take(1)
     );
   }
 
-  private getUser$(): Observable<Person> {
-    return this.userService.user$.pipe(map(user => {
-      if (!user) {
-        throw new Error('Missing user information!');
-      }
-      return user;
-    }));
-  }
-
-  private getForm$(inputs: FormInputs): Observable<LajiForm.SchemaForm> {
+  private getAugmentedForm$(inputs: FormInputs): Observable<LajiForm.SchemaForm> {
     return this.formService.getFormWithUserContext(inputs.formId).pipe(
       switchMap(form => inputs.augmentFormFunc ? inputs.augmentFormFunc(form) : of(form))
     );
   }
 
-  private getInitialFormData$(routeParams: RouteParams, inputs: FormInputs): Observable<Partial<KotkaDocumentObject>> {
-    if (routeParams.editMode) {
-      return this.getFormData$(inputs.dataType, routeParams.dataURI);
+  private getInitialFormData$(inputs: FormInputs): Observable<Partial<KotkaDocumentObject>> {
+    if (inputs.editMode) {
+      return this.getFormData$(inputs.dataType, inputs.dataURI);
     } else {
       return this.getEmptyFormData$();
     }
@@ -208,21 +177,58 @@ export class FormViewFacade implements OnDestroy {
     );
   }
 
-  private getFormState(routeParams: RouteParams, form: LajiForm.SchemaForm, formData: Partial<KotkaDocumentObject>, user: Person): FormState {
+  private getInitialStateSub(): Subscription {
+    return this.inputs$.pipe(
+      switchMap(inputs => concat(
+        of({}), // set the state first as empty object before the values load
+        forkJoin([
+          this.getAugmentedForm$(inputs),
+          this.getInitialFormData$(inputs),
+          this.getUser$()
+        ]).pipe(
+          map(([form, formData, user]) => (
+            this.getInitialFormState(inputs, form, formData, user)
+          ))
+        )
+      ))
+    ).subscribe({
+      'next': (state: FormState) => {
+        this.setState(state);
+      },
+      'error': err => this.store.error(err)
+    });
+  }
+
+  private getInitialFormState(inputs: FormInputs, form: LajiForm.SchemaForm, formData: Partial<KotkaDocumentObject>, user: Person): FormState {
     const isAdmin = this.userService.isICTAdmin(user);
-    const isEditMode =  routeParams.editMode;
+    const isEditMode =  inputs.editMode;
     const disabled = isEditMode && !isAdmin && !allowAccessByOrganization(formData, user);
     const showDeleteButton = isEditMode && (isAdmin || (!disabled && allowAccessByTime(formData, {'d': 14})));
     const showCopyButton = isEditMode && !!form.options?.allowTemplate;
 
-    return { disabled, showDeleteButton, showCopyButton };
+    return {
+      form,
+      formData,
+      disabled,
+      showDeleteButton,
+      showCopyButton,
+      mediaMetadata: this.getMediaMetadata(user),
+      formHasChanges: false,
+      disabledAlertDismissed: false,
+      showDeleteTargetInUseAlert: false
+    };
   }
 
-  private getMediaMetadata$(): Observable<MediaMetadata> {
-    return this.getUser$().pipe(map(user => ({
+  private getMediaMetadata(user: Person): MediaMetadata {
+    return {
       intellectualRights: 'MZ.intellectualRightsCC-BY-SA-4.0',
       intellectualOwner: user.fullName,
       capturerVerbatim: user.fullName
-    })));
+    };
+  }
+
+  private setState(state: FormState) {
+    this._state = state;
+    this.store.next(this._state);
   }
 }

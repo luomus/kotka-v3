@@ -13,11 +13,11 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormFooterComponent {
-  @Input() hasChanges = false;
-  @Input() disabled = false;
-  @Input() hasOnlyWarnings = false;
-  @Input() showDeleteButton = false;
-  @Input() showCopyButton = false;
+  @Input() hasChanges? = false;
+  @Input() disabled? = false;
+  @Input() hasOnlyWarnings? = false;
+  @Input() showDeleteButton? = false;
+  @Input() showCopyButton? = false;
 
   @Output() saveForm: EventEmitter<void> = new EventEmitter<void>();
   @Output() highlightErrors: EventEmitter<void> = new EventEmitter<void>();

@@ -29,14 +29,14 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
   static BOTTOM_OFFSET = 50;
   @Input() form: LajiFormModel.SchemaForm | null = null;
   @Input() formData: any = {};
-  @Input() hasChanges = false;
-  @Input() disabled = false;
+  @Input() hasChanges? = false;
+  @Input() disabled? = false;
   @Input() apiClient?: any;
   @Input() notifier?: Notifier;
   @Input() mediaMetadata?: MediaMetadata;
-  @Input() showFooter = true;
-  @Input() showDeleteButton = false;
-  @Input() showCopyButton = false;
+  @Input() showFooter? = true;
+  @Input() showDeleteButton? = false;
+  @Input() showCopyButton? = false;
 
   hasOnlyWarnings = false;
 
@@ -225,6 +225,7 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
   private onChange(data: any) {
     this.ngZone.run(() => {
       this.hasOnlyWarnings = false;
+      this.formData = data;
       this.formChange.emit(data);
       this.cdr.markForCheck();
     });

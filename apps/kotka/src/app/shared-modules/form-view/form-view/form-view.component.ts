@@ -5,35 +5,32 @@ import {
   Input,
   ViewChild,
   TemplateRef,
-  SimpleChanges,
   EventEmitter,
   Output,
   OnChanges,
-  HostListener,
   OnDestroy
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { KotkaDocumentObject, KotkaDocumentObjectType, LajiForm } from '@kotka/shared/models';
-import { EMPTY, from, Observable, of, Subscription } from 'rxjs';
+import { EMPTY, from, Observable, Subscription, switchMap } from 'rxjs';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ToastService } from '../../../shared/services/toast.service';
-import { FormApiClient } from '../../../shared/services/api-services/form-api-client';
 import { DialogService } from '../../../shared/services/dialog.service';
 import { ErrorMessages } from '@kotka/api-interfaces';
 import {
   FormErrorEnum,
   ErrorViewModel,
-  SuccessViewModel,
+  FormState,
   FormViewFacade,
   isErrorViewModel,
   isSuccessViewModel
 } from './form-view.facade';
-import { distinctUntilChanged, filter, map, tap } from 'rxjs/operators';
-import { ComponentCanDeactivate } from '../../../shared/services/guards/component-can-deactivate.guard';
+import { filter } from 'rxjs/operators';
 import { FormViewUtils } from './form-view-utils';
 import { DataService } from '../../../shared/services/data.service';
 import { IdService } from '../../../shared/services/id.service';
 import { RoutingUtils } from '../../../shared/services/routing-utils';
+import { FormApiClient } from '../../../shared/services/api-services/form-api-client';
 
 @Component({
   selector: 'kotka-form-view',
@@ -42,36 +39,31 @@ import { RoutingUtils } from '../../../shared/services/routing-utils';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [FormViewFacade]
 })
-export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeactivate {
+export class FormViewComponent implements OnChanges, OnDestroy {
+  @Input() editMode = false;
+  @Input() dataURI?: string;
   @Input() formId?: string;
   @Input() dataType?: KotkaDocumentObjectType;
-  @Input() dataTypeName?: string;
+  @Input() dataTypeName = '';
   @Input() augmentFormFunc?: (form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>;
 
   @Input() headerTpl?: TemplateRef<any>;
   @Input() extraSectionTpl?: TemplateRef<any>;
 
-  vm$: Observable<SuccessViewModel | ErrorViewModel>;
-
-  visibleDataTypeName = '';
-
-  showDeleteTargetInUseAlert = false;
-  disabledAlertDismissed = false;
-  formHasChanges = false;
+  vm$: Observable<FormState | ErrorViewModel>;
 
   formErrorEnum = FormErrorEnum;
 
   isErrorViewModel = isErrorViewModel;
   isSuccessViewModel = isSuccessViewModel;
 
-  @Output() formDataChange = new EventEmitter<Partial<KotkaDocumentObject>>();
+  @Output() formDataChange = new EventEmitter<Partial<KotkaDocumentObject|undefined>>();
   @Output() formInit = new EventEmitter<LajiFormComponent>();
-  @Output() disabledChange = new EventEmitter<boolean>();
+  @Output() disabledChange = new EventEmitter<boolean|undefined>();
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
 
-  private vm?: SuccessViewModel;
-
+  private state?: FormState;
   private subscription: Subscription = new Subscription();
 
   constructor(
@@ -84,74 +76,21 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
     private formViewFacade: FormViewFacade,
     private cdr: ChangeDetectorRef
   ) {
+    const params = this.getRouteParams();
+    this.editMode = params.editMode;
+    this.dataURI = params.dataURI;
+
     this.vm$ = this.formViewFacade.vm$;
 
-    this.subscription.add(
-      this.vm$.subscribe(vm => {
-        this.vm = vm;
-        this.cdr.markForCheck();
-      })
-    )
-
-    this.subscription.add(
-      RoutingUtils.navigationEnd$(this.router).subscribe(() => {
-        this.formHasChanges = false;
-        this.cdr.markForCheck();
-      })
-    );
-
-    this.subscription.add(
-      this.formViewFacade.state$.pipe(
-        map(state => state?.disabled),
-        filter(disabled => disabled !== undefined),
-        distinctUntilChanged()
-      ).subscribe(disabled => {
-        this.disabledChange.emit(disabled);
-        this.cdr.markForCheck();
-      })
-    );
-
-    this.subscription.add(
-      this.formViewFacade.formData$.subscribe(formData => {
-        if (formData) {
-          this.formDataChange.emit(formData);
-          this.cdr.markForCheck();
-        }
-      })
-    );
+    this.initSubscriptions();
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['formId'] || changes['dataType'] || changes['augmentFormFunc']) {
-      if (this.formId && this.dataType) {
-        this.formViewFacade.setInputs({
-          formId: this.formId,
-          dataType: this.dataType,
-          augmentFormFunc: this.augmentFormFunc
-        });
-      }
-    }
-
-    this.visibleDataTypeName = this.dataTypeName || this.dataType || '';
+  ngOnChanges() {
+    this.updateInputs();
   }
 
   ngOnDestroy() {
     this.subscription.unsubscribe();
-  }
-
-  @HostListener('window:beforeunload', ['$event'])
-  preventLeave($event: any) {
-    if (this.formHasChanges) {
-      $event.returnValue = false;
-    }
-  }
-
-  canDeactivate(): Observable<boolean> {
-    if (!this.formHasChanges) {
-      return of(true);
-    }
-
-    return this.dialogService.confirm('Are you sure you want to leave and discard unsaved changes?');
   }
 
   onFormReady() {
@@ -159,13 +98,12 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
       this.formInit.emit(this.lajiForm);
     }
   }
-
   onSubmit(data: KotkaDocumentObject) {
     this.lajiForm?.block();
 
     this.save$(data).subscribe({
       'next': formData => {
-        this.formHasChanges = false;
+        this.formViewFacade.setFormHasChanges(false);
 
         this.navigateToEdit(formData.id || '').subscribe(() => {
           this.lajiForm?.unBlock();
@@ -182,7 +120,7 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
   }
 
   onDelete(data: KotkaDocumentObject) {
-    this.dialogService.confirm(`Are you sure you want to delete this ${this.visibleDataTypeName}?`).subscribe(confirm => {
+    this.dialogService.confirm(`Are you sure you want to delete this ${this.dataTypeName}?`).subscribe(confirm => {
       if (confirm) {
         this.delete(data);
       }
@@ -190,12 +128,11 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
   }
 
   onChange(data: Partial<KotkaDocumentObject>) {
-    this.formHasChanges = true;
-    this.formDataChange.emit(data);
+    this.formViewFacade.setFormData(data);
   }
 
   onCopy(data: KotkaDocumentObject) {
-    const excludedFields = this.vm?.state?.disabled ? ['owner'] : [];
+    const excludedFields = this.state?.disabled ? ['owner'] : [];
     this.copyAsNew(data, excludedFields);
   }
 
@@ -204,7 +141,7 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
 
     this.save$(data).subscribe({
       'next': data => {
-        this.formHasChanges = false;
+        this.formViewFacade.setFormHasChanges(false);
         this.copyAsNew(data);
       },
       'error': () => {
@@ -216,14 +153,20 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
   }
 
   setFormData(data: Partial<KotkaDocumentObject>) {
-    this.formHasChanges = true;
     this.formViewFacade.setFormData(data);
     this.formDataChange.emit(data);
   }
 
-  private setInitialFormData(data: Partial<KotkaDocumentObject>) {
-    this.formViewFacade.setInitialFormData(data);
-    this.formDataChange.emit(data);
+  getFormHasChanges(): boolean {
+    return this.state?.formHasChanges || false;
+  }
+
+  dismissDisabledAlert() {
+    this.formViewFacade.setDisabledAlertDismissed(true);
+  }
+
+  hideDeleteTargetInUseAlert() {
+    this.formViewFacade.setShowDeleteTargetInUseAlert(false);
   }
 
   private delete(data: KotkaDocumentObject) {
@@ -234,7 +177,7 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
     this.lajiForm?.block();
     this.dataService.delete(this.dataType, data.id).subscribe({
       'next': () => {
-        this.formHasChanges = false;
+        this.formViewFacade.setFormHasChanges(false);
         this.lajiForm?.unBlock();
         this.notifier.showSuccess('Success!');
         this.navigateAway();
@@ -243,7 +186,7 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
         this.lajiForm?.unBlock();
 
         if (err?.error?.message === ErrorMessages.deletionTargetInUse) {
-          this.showDeleteTargetInUseAlert = true;
+          this.formViewFacade.setShowDeleteTargetInUseAlert(true);
         } else {
           this.notifier.showError('Delete failed!');
         }
@@ -271,15 +214,16 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
   private copyAsNew(data: KotkaDocumentObject, excludedFields: string[] = []) {
     this.lajiForm?.block();
 
-    excludedFields = excludedFields.concat(this.vm?.form?.excludeFromCopy || []);
+    excludedFields = excludedFields.concat(this.state?.form?.excludeFromCopy || []);
     const newData = FormViewUtils.removeMetaAndExcludedFields(data, excludedFields);
 
     return this.navigateToAdd().pipe(
-      tap(() => {
-        this.setInitialFormData(newData);
-        this.lajiForm?.unBlock();
-      })
-    ).subscribe();
+      switchMap(() => this.formViewFacade.formData$), // wait that the initial form data has loaded
+      filter(formData => formData !== undefined)
+    ).subscribe(() => {
+      this.formViewFacade.setCopiedFormData(newData);
+      this.lajiForm?.unBlock();
+    });
   }
 
   private navigateAway() {
@@ -295,5 +239,57 @@ export class FormViewComponent implements OnChanges, OnDestroy, ComponentCanDeac
       relativeTo: this.activeRoute,
       queryParams: { uri: IdService.getUri(id) }
     }));
+  }
+
+  private initSubscriptions() {
+    this.subscription.add(
+      RoutingUtils.navigationEnd$(this.router).subscribe(() => {
+        const params = this.getRouteParams();
+        if (this.editMode !== params.editMode || this.dataURI !== params.dataURI) {
+          this.editMode = params.editMode;
+          this.dataURI = params.dataURI;
+          this.updateInputs();
+        }
+      })
+    );
+
+    this.subscription.add(
+      this.formViewFacade.state$.subscribe(state => {
+        this.state = state;
+        this.cdr.markForCheck();
+      })
+    );
+
+    this.subscription.add(
+      this.formViewFacade.disabled$.subscribe(disabled => {
+        this.disabledChange.emit(disabled);
+        this.cdr.markForCheck();
+      })
+    );
+
+    this.subscription.add(
+      this.formViewFacade.formData$.subscribe(formData => {
+        this.formDataChange.emit(formData);
+        this.cdr.markForCheck();
+      })
+    );
+  }
+
+  private getRouteParams(): { editMode: boolean, dataURI?: string} {
+    const editMode = this.activeRoute.snapshot.url[0].path === 'edit';
+    const dataURI = this.activeRoute.snapshot.queryParams['uri'];
+    return { editMode, dataURI };
+  }
+
+  private updateInputs() {
+    if (this.formId && this.dataType) {
+      this.formViewFacade.setInputs({
+        formId: this.formId,
+        dataType: this.dataType,
+        editMode: this.editMode,
+        dataURI: this.dataURI,
+        augmentFormFunc: this.augmentFormFunc
+      });
+    }
   }
 }

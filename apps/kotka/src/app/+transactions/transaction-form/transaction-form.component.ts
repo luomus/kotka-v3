@@ -22,10 +22,10 @@ import { DialogService } from '../../shared/services/dialog.service';
 import {
   LajiFormComponent,
 } from '@kotka/ui/laji-form';
-import { ComponentCanDeactivate } from '../../shared/services/guards/component-can-deactivate.guard';
 import { ApiClient } from '../../shared/services/api-services/api-client';
 import { TransactionFormEmbedService } from '../transaction-form-embed/transaction-form-embed.service';
 import { globals } from '../../../environments/globals';
+import { FormViewContainerComponent } from '../../shared-modules/form-view/form-view/form-view-container';
 
 type SpecimenIdKey = keyof Pick<SpecimenTransaction, 'awayIDs'|'returnedIDs'|'missingIDs'|'damagedIDs'>;
 
@@ -35,7 +35,7 @@ type SpecimenIdKey = keyof Pick<SpecimenTransaction, 'awayIDs'|'returnedIDs'|'mi
   styleUrls: ['./transaction-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TransactionFormComponent implements OnDestroy, ComponentCanDeactivate {
+export class TransactionFormComponent extends FormViewContainerComponent implements OnDestroy {
   formId = globals.transactionFormId;
   dataType = KotkaDocumentObjectType.transaction;
   augmentFormFunc = this.augmentForm.bind(this);
@@ -62,16 +62,14 @@ export class TransactionFormComponent implements OnDestroy, ComponentCanDeactiva
     private apiClient: ApiClient,
     private formService: FormService,
     private modalService: NgbModal,
-    private dialogService: DialogService,
+    dialogService: DialogService,
     private transactionFormEmbedService: TransactionFormEmbedService
-  ) {}
+  ) {
+    super(dialogService);
+  }
 
   ngOnDestroy() {
     this.specimenRangeButtonClickSubscription?.unsubscribe();
-  }
-
-  canDeactivate(): Observable<boolean> {
-    return this.formView.canDeactivate();
   }
 
   onFormInit(lajiForm: LajiFormComponent) {
@@ -87,14 +85,16 @@ export class TransactionFormComponent implements OnDestroy, ComponentCanDeactiva
     }
   }
 
-  onFormDataChange(formData: Partial<SpecimenTransaction>) {
+  onFormDataChange(formData?: Partial<SpecimenTransaction>) {
     this.formData = formData;
     this.transactionFormEmbedService.updateEmbeddedComponents(formData);
   }
 
-  setDisabled(disabled: boolean) {
-    this.disabled = disabled;
-    this.transactionFormEmbedService.setEmbeddedComponentsDisabled(disabled);
+  setDisabled(disabled?: boolean) {
+    if (disabled !== undefined) {
+      this.disabled = disabled;
+      this.transactionFormEmbedService.setEmbeddedComponentsDisabled(disabled);
+    }
   }
 
   private augmentForm(form: LajiForm.SchemaForm): Observable<LajiForm.SchemaForm> {

@@ -1,12 +1,12 @@
-<ng-container *ngIf="vm$ | async as vm else spinner">
-  <kui-main-content
-    [header]="vm.routeParams.editMode ? 'Edit ' + visibleDataTypeName + ' ' + (vm.routeParams.dataURI || ''): 'Add ' + visibleDataTypeName"
-    [headerTpl]="headerTpl"
-    [containerClass]="'container'"
-  >
+<kui-main-content
+  [header]="editMode ? 'Edit ' + dataTypeName + ' ' + (dataURI || ''): 'Add ' + dataTypeName"
+  [headerTpl]="headerTpl"
+  [containerClass]="'container'"
+>
+  <ng-container *ngIf="vm$ | async as vm else spinner">
     <ngb-alert *ngIf="isErrorViewModel(vm)" [type]="'danger'" [dismissible]="false">
       <ng-container *ngIf="vm.errorType === formErrorEnum.dataNotFound else genericError">
-        {{ visibleDataTypeName | titlecase }} <ng-container *ngIf="vm.routeParams.dataURI">with URI {{ vm.routeParams.dataURI }} </ng-container>was not found.
+        {{ dataTypeName | titlecase }} <ng-container *ngIf="dataURI">with URI {{ dataURI }} </ng-container>was not found.
       </ng-container>
       <ng-template #genericError>
         An unexpected error occurred
@@ -14,24 +14,24 @@
     </ngb-alert>
 
     <ng-container *ngIf="isSuccessViewModel(vm)">
-      <ng-container *ngIf="vm.form && vm.formData && vm.state else spinner">
-        <ngb-alert *ngIf="showDeleteTargetInUseAlert" [type]="'danger'" (closed)="showDeleteTargetInUseAlert = true">
+      <ng-container *ngIf="vm.form && vm.formData else spinner">
+        <ngb-alert *ngIf="vm.showDeleteTargetInUseAlert" [type]="'danger'" (closed)="hideDeleteTargetInUseAlert()">
           <strong>Delete failed:</strong>
-          This {{ visibleDataTypeName}} can't be deleted because there are resources that are attached to it.
+          This {{ dataTypeName}} can't be deleted because there are resources that are attached to it.
         </ngb-alert>
-        <ngb-alert *ngIf="vm.state.disabled && !disabledAlertDismissed" [type]="'warning'" (closed)="disabledAlertDismissed = true">
+        <ngb-alert *ngIf="vm.disabled && !vm.disabledAlertDismissed" [type]="'warning'" (closed)="dismissDisabledAlert()">
           <strong>Note:</strong>
-          You can only view this {{ visibleDataTypeName }}. To be able to edit this {{ visibleDataTypeName }}, you must belong to {{ vm.formData.owner | label }}
+          You can only view this {{ dataTypeName }}. To be able to edit this {{ dataTypeName }}, you must belong to {{ vm.formData.owner | label }}
         </ngb-alert>
 
         <div class="row mb-1">
           <div *ngIf="extraSectionTpl" class="col-lg-6 col-md-5 col-sm-4 col-12 order-sm-last position-relative">
             <ng-container *ngTemplateOutlet="extraSectionTpl"></ng-container>
           </div>
-          <div *ngIf="vm.routeParams.editMode && vm.formData" class="col-lg-6 col-md-7 col-sm-8 col-12 order-sm-first">
+          <div *ngIf="editMode && vm.formData" class="col-lg-6 col-md-7 col-sm-8 col-12 order-sm-first">
             <strong class="d-block">Last edited by</strong>
             <span>{{ (vm.formData.editor || '') | label }} on {{ vm.formData.dateEdited | date:'dd.MM.YYYY HH:mm' }} </span>
-            <a [routerLink]="['..', 'history']" [queryParams]="{ uri: vm.routeParams.dataURI }">view history</a>
+            <a [routerLink]="['..', 'history']" [queryParams]="{ uri: dataURI }">view history</a>
             <strong class="d-block">Originally created by</strong>
             <span>{{ (vm.formData.creator || '') | label }} on {{ vm.formData.dateCreated | date:'dd.MM.YYYY HH:mm' }}</span>
           </div>
@@ -39,10 +39,10 @@
         <kui-laji-form
           [form]="vm.form"
           [formData]="vm.formData"
-          [hasChanges]="formHasChanges"
-          [disabled]="vm.state.disabled"
-          [showDeleteButton]="vm.state.showDeleteButton"
-          [showCopyButton]="vm.state.showCopyButton"
+          [hasChanges]="vm.formHasChanges"
+          [disabled]="vm.disabled"
+          [showDeleteButton]="vm.showDeleteButton"
+          [showCopyButton]="vm.showCopyButton"
           [apiClient]="formApiClient"
           [notifier]="notifier"
           [mediaMetadata]="vm.mediaMetadata"
@@ -56,8 +56,9 @@
         </kui-laji-form>
       </ng-container>
     </ng-container>
-  </kui-main-content>
-</ng-container>
+  </ng-container>
+</kui-main-content>
+
 
 <ng-template #spinner>
   <kui-spinner></kui-spinner>

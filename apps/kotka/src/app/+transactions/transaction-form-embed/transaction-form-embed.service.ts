@@ -20,20 +20,20 @@ export class TransactionFormEmbedService {
   ) {}
 
 
-  initEmbeddedComponents(lajiFormComponent: LajiFormComponent, formData: Partial<SpecimenTransaction>, transactionEventAddListener?: (event: MouseEvent) => void) {
+  initEmbeddedComponents(lajiFormComponent: LajiFormComponent, formData?: Partial<SpecimenTransaction>, transactionEventAddListener?: (event: MouseEvent) => void) {
     const lajiFormEmbedService = new LajiFormEmbedService(this.injector, lajiFormComponent);
 
     this.organizationAddressRef = lajiFormEmbedService.embedComponent(OrganizationAddressEmbedComponent, {
       anchorClassName: 'correspondent-organization',
       positionToAnchor: 'nextSibling'
     });
-    this.organizationAddressRef.instance.organization = formData.correspondentOrganization;
+    this.organizationAddressRef.instance.organization = formData?.correspondentOrganization;
 
     this.permitsInfoRef = lajiFormEmbedService.embedComponent(PermitsInfoEmbedComponent, {
       anchorClassName: 'nagoya-fields',
       positionToAnchor: 'parentNextSibling'
     });
-    this.permitsInfoRef.instance.country = formData.geneticResourceAcquisitionCountry;
+    this.permitsInfoRef.instance.country = formData?.geneticResourceAcquisitionCountry;
 
     this.specimenRangeSelectRef = lajiFormEmbedService.embedComponent(SpecimenRangeSelectEmbedComponent, {
       anchorClassName: 'specimen-id-fields',
@@ -47,13 +47,13 @@ export class TransactionFormEmbedService {
   }
 
 
-  updateEmbeddedComponents(formData: Partial<SpecimenTransaction>) {
-    const correspondentOrganization = this.getValidOrganizationId(formData.correspondentOrganization);
+  updateEmbeddedComponents(formData?: Partial<SpecimenTransaction>) {
+    const correspondentOrganization = this.getValidOrganizationId(formData?.correspondentOrganization);
     if (this.organizationAddressRef) {
       this.organizationAddressRef.instance.organization = correspondentOrganization;
     }
 
-    const geneticResourceAcquisitionCountry = formData.geneticResourceAcquisitionCountry;
+    const geneticResourceAcquisitionCountry = formData?.geneticResourceAcquisitionCountry;
     if (this.permitsInfoRef) {
       this.permitsInfoRef.instance.country = geneticResourceAcquisitionCountry;
     }

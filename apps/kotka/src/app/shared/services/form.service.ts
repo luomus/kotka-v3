@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { combineLatest, Observable, shareReplay } from 'rxjs';
 import { LajiForm } from '@kotka/shared/models';
-import { map } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { UserService } from './user.service';
 import { ApiClient } from './api-services/api-client';
 
@@ -42,7 +42,8 @@ export class FormService {
           userEmail: user?.emailAddress,
           ...form.uiSchemaContext
         }
-      }))
+      })),
+      take(1)
     );
   }
 
