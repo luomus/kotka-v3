@@ -6,6 +6,7 @@ data:
   SYSTEM_ID: KE.1383
   TRIPLESTORE_URL: https://fmnh-legacy-test-21.it.helsinki.fi/triplestore/
   OLD_KOTKA_URL: https://kotkatest.luomus.fi/
+  MEDIA_API_URL: https://media-api-test.luomus.fi/kuvapalvelu/
 kind: ConfigMap
 metadata:
   creationTimestamp: null
