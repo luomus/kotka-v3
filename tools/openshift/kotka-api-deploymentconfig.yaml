@@ -100,13 +100,13 @@ spec:
             - name: MEDIA_API_URL
               valueFrom:
                 configMapKeyRef:
-                name: kotka-config
-                key: MEDIA_API_URL
+                  name: kotka-config
+                  key: MEDIA_API_URL
             - name: MEDIA_API_AUTH
               valueFrom:
                 secretKeyRef:
-                name: kotka-secret
-                key: MEDIA_API_AUTH
+                  name: kotka-secret
+                  key: MEDIA_API_AUTH
           resources: {}
           imagePullPolicy: Always
       restartPolicy: Always
