@@ -49,8 +49,8 @@ describe('transactions', () => {
       });
 
       it('should be possible to add specimens by a range', () => {
-        cy.get('#specimenRangeInput').type('HT.120-300');
-        cy.get('#specimenRangeBtn').click();
+        cy.get('[data-cy=specimen-range-input]').type('HT.120-300');
+        cy.get('[data-cy=specimen-range-button]').click();
 
         cy.get('#root_awayIDs').siblings('.rw-multiselect-taglist').children()
           .should('have.length.greaterThan', 0)

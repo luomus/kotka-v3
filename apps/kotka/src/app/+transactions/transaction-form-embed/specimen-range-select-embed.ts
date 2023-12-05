@@ -10,8 +10,8 @@ import { Subject } from 'rxjs';
       <div class="row">
         <div class="col-md-6 col-lg-6">
           <div class="input-group">
-            <input type="text" class="form-control" placeholder="ex: HT.120-300" [(ngModel)]="value" [disabled]="disabled">
-            <button class="btn btn-primary text-white" (click)="specimenRangeClick.next(value)" [disabled]="disabled">Add</button>
+            <input type="text" class="form-control" placeholder="ex: HT.120-300" [(ngModel)]="value" [disabled]="disabled" data-cy="specimen-range-input">
+            <button class="btn btn-primary text-white" (click)="specimenRangeClick.next(value)" [disabled]="disabled" data-cy="specimen-range-button">Add</button>
           </div>
         </div>
       </div>
