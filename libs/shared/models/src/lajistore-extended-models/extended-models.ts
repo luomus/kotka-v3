@@ -24,7 +24,7 @@ export interface StoreVersion {
 export interface StorePatch {
   op: 'add'|'replace'|'remove';
   path: string;
-  value: string|number|boolean;
+  value: any;
 }
 
 export interface KotkaVersionDifference {
@@ -33,10 +33,16 @@ export interface KotkaVersionDifference {
 }
 
 export interface DifferenceObject {
-  [key: string]: DifferenceObject|Omit<StorePatch, 'path'>;
+  [key: string]: DifferenceObjectValue;
 }
+export type DifferenceObjectPatch = Omit<StorePatch, 'path'>;
+export type DifferenceObjectValue = DifferenceObject|DifferenceObject[]|DifferenceObjectPatch|DifferenceObjectPatch[];
 
 export interface KotkaVersionDifferenceObject {
   original: KotkaDocumentObject;
   diff: DifferenceObject;
+}
+
+export function isDifferenceObjectPatch(value: DifferenceObjectValue|undefined|null): value is DifferenceObjectPatch {
+  return value !== undefined && value !== null && 'op' in value;
 }

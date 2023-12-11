@@ -1,12 +1,7 @@
-import {
-  ChangeDetectionStrategy,
-  Component, ContentChild,
-  Input,
-  TemplateRef,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, TemplateRef, ViewEncapsulation, } from '@angular/core';
 import { DifferenceObject, KotkaDocumentObject, LajiForm } from '@kotka/shared/models';
 
-interface Field {
+export interface Field {
   name: keyof KotkaDocumentObject;
   label: string;
   type: 'text'|'checkbox'|'select'|'collection'|string;
@@ -18,6 +13,7 @@ interface Field {
   selector: 'kui-viewer',
   templateUrl: './viewer.component.html',
   styleUrls: ['./viewer.component.scss'],
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewerComponent {
@@ -51,13 +47,4 @@ export class ViewerComponent {
     label: 'Date created',
     type: 'text'
   }];
-
-  isMultiLangField(field: Field, data?: any, differenceData?: any): boolean {
-    return field.type === 'text' && typeof data !== 'string' && typeof differenceData !== 'string';
-  }
-
-  getIndexRangeForArrayValue(value: Array<any>, differenceData: Array<any>): number[] {
-    const arrayLength = Math.max(value?.length || 0, differenceData?.length || 0);
-    return Array(arrayLength).fill(undefined).map((x, i) => i);
-  }
 }

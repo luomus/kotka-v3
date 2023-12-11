@@ -1,16 +1,14 @@
-.fieldset-removed {
+.viewer-fieldset-removed {
   background-color: rgb(231, 118, 129, 0.2) !important;
 }
-.fieldset-added {
+.viewer-fieldset-added {
   background-color: rgb(37, 200, 124, 0.2) !important;
 }
 
-.field-value {
-  &.field-value-removed {
-    background-color: rgb(231, 118, 129, 0.2);
-    text-decoration: line-through;
-  }
-  &.field-value-added {
-    background-color: rgb(37, 200, 124, 0.2);
-  }
+.viewer-array-field-removed .viewer-field-value, .viewer-field-value.viewer-field-value-removed {
+  background-color: rgb(231, 118, 129, 0.2);
+  text-decoration: line-through;
+}
+.viewer-array-field-added .viewer-field-value, .viewer-field-value.viewer-field-value-added {
+  background-color: rgb(37, 200, 124, 0.2);
 }
