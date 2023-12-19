@@ -17,7 +17,7 @@ import {
 import { distinctUntilChanged, map, take } from 'rxjs/operators';
 import { allowAccessByOrganization, allowAccessByTime } from '@kotka/utils';
 import { KotkaDocumentObject, KotkaDocumentObjectType } from '@kotka/shared/models';
-import { LajiForm, Person } from '@kotka/shared/models';
+import { LajiForm, Person, Image } from '@kotka/shared/models';
 import { FormViewUtils } from './form-view-utils';
 import { MediaMetadata } from '@luomus/laji-form/lib/components/LajiForm';
 
@@ -40,7 +40,7 @@ export interface FormState {
   disabled?: boolean;
   showDeleteButton?: boolean;
   showCopyButton?: boolean;
-  mediaMetadata?: MediaMetadata;
+  mediaMetadata?: KotkaMediaMetadata;
   formHasChanges?: boolean;
   disabledAlertDismissed?: boolean;
   showDeleteTargetInUseAlert?: boolean;
@@ -57,6 +57,10 @@ export function isSuccessViewModel(viewModel: ViewModel): viewModel is FormState
 }
 export function isErrorViewModel(viewModel: ViewModel): viewModel is ErrorViewModel {
   return 'errorType' in viewModel;
+}
+
+interface KotkaMediaMetadata extends MediaMetadata {
+  publicityRestrictions?: Image['publicityRestrictions']
 }
 
 @Injectable()
@@ -219,11 +223,12 @@ export class FormViewFacade implements OnDestroy {
     };
   }
 
-  private getMediaMetadata(user: Person): MediaMetadata {
+  private getMediaMetadata(user: Person): KotkaMediaMetadata {
     return {
-      intellectualRights: 'MZ.intellectualRightsCC-BY-SA-4.0',
+      intellectualRights: 'MZ.intellectualRightsARR',
       intellectualOwner: user.fullName,
-      capturerVerbatim: user.fullName
+      capturerVerbatim: user.fullName,
+      publicityRestrictions: 'MZ.publicityRestrictionsPrivate'
     };
   }
 

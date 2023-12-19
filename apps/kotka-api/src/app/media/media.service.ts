@@ -165,7 +165,14 @@ export class MediaService {
   }
 
   metaToPDF(media: Media) {
-    const { meta, urls } = media;
+    const { meta, secretKey } = media;
+
+    const urls = {...media.urls};
+    Object.keys(urls).forEach(key => {
+      if (urls[key]) {
+        urls[key] = urls[key] + '?secret=' + secretKey;
+      }
+    });
 
     return {
       caption: meta.caption,
