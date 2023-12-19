@@ -52,11 +52,10 @@ export class TransactionEventFormComponent {
 
   form$: Observable<LajiForm.SchemaForm>;
 
+  private defaultEventTypeBlackList: SpecimenTransactionEvent['eventType'][] = ['HRX.eventTypeReturn'];
   private eventTypeBlacklistByType: Partial<Record<SpecimenTransaction['type'], SpecimenTransactionEvent['eventType'][]>> = {
-    'HRX.typeGiftIncoming': ['HRX.eventTypeReturn'],
-    'HRX.typeGiftOutgoing': ['HRX.eventTypeReturn'],
-    'HRX.typeExchangeIncoming': ['HRX.eventTypeReturn'],
-    'HRX.typeExchangeOutgoing': ['HRX.eventTypeReturn']
+    'HRX.typeLoanIncoming': [],
+    'HRX.typeLoanOutgoing': []
   };
 
   constructor(
@@ -66,7 +65,7 @@ export class TransactionEventFormComponent {
   ) {
     this.form$ = this.formService.getFormWithUserContext('MHL.1060').pipe(
       map(form => {
-        const eventTypeBlacklist = this.eventTypeBlacklistByType[this.transactionType] || [];
+        const eventTypeBlacklist = this.eventTypeBlacklistByType[this.transactionType] || this.defaultEventTypeBlackList;
         const eventTypeOptions = form.schema.properties.eventType.oneOf.filter((value: EnumOption) => (
           !eventTypeBlacklist.includes(value.const as SpecimenTransactionEvent['eventType'])
         ));
