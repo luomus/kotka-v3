@@ -7,7 +7,6 @@ import { apiBase, lajiApiBase } from './constants';
 
 const AUTOCOMPLETE_ORGANIZATION_RESOURCE = '/autocomplete/organization';
 const VALIDATE_RESOURCE = '/documents/validate';
-const PDF_RESOURCE = '/pdf';
 
 @Injectable({
   providedIn: 'root'
@@ -38,11 +37,11 @@ export class FormApiClient {
       case VALIDATE_RESOURCE:
         path = apiBase + '/validate';
         break;
-      case PDF_RESOURCE:
-        path = apiBase + '/media/pdf';
-        break;
       default:
-        if (resource.startsWith('/pdf/')) {
+        if (resource.startsWith('/pdf')) {
+          if (options.method === 'DELETE') {
+            return Promise.resolve({json: () => ''});
+          }
           path = apiBase + `/media${resource}`;
         }
         break;
