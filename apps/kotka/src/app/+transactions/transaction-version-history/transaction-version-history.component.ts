@@ -13,6 +13,7 @@ import { globals } from '../../../environments/globals';
     <kotka-version-history-view
       [formId]="formId"
       [dataType]="dataType"
+      [dataTypeName]="'transaction'"
       (formInit)="onFormInit($event.lajiForm, asSpecimenTransaction($event.formData))"
     ></kotka-version-history-view>
   `,
