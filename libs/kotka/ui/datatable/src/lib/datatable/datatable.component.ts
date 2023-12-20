@@ -16,15 +16,11 @@ import {
   RowModelType
 } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
+import { SortModel } from '@kotka/shared/models';
 
 export interface DatatableColumn extends ColDef {
   hideDefaultHeaderTooltip?: boolean;
   hideDefaultTooltip?: boolean;
-}
-
-export interface SortModel {
-  colId: string;
-  sort: 'asc' | 'desc';
 }
 
 export interface GetRowsParams extends IGetRowsParams {
