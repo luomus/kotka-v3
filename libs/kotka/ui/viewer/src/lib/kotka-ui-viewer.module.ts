@@ -7,12 +7,12 @@ import { ArrayIndexRangePipe } from './pipes/array-index-range.pipe';
 import { ViewerMultilangComponent } from './viewer/components/viewer-multilang.component';
 import { ViewerFieldComponent } from './viewer/components/viewer-field.component';
 import { ViewerFieldValueComponent } from './viewer/components/viewer-field-value.component';
-import { EnumPipe } from './pipes/enum-pipe';
 import { ViewerFieldValueArrayComponent } from './viewer/components/viewer-field-value-array.component';
 import { ViewerFieldsetFieldComponent } from './viewer/components/viewer-fieldset-field.component';
+import { PipesModule } from '@kotka/pipes';
 
 @NgModule({
-  imports: [CommonModule],
+  imports: [CommonModule, PipesModule],
   declarations: [
     ViewerComponent,
     ViewerFieldsetComponent,
@@ -22,8 +22,7 @@ import { ViewerFieldsetFieldComponent } from './viewer/components/viewer-fieldse
     ViewerFieldComponent,
     ViewerFieldValueComponent,
     ViewerFieldValueArrayComponent,
-    ArrayIndexRangePipe,
-    EnumPipe
+    ArrayIndexRangePipe
   ],
   exports: [ViewerComponent]
 })

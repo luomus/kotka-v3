@@ -12,6 +12,7 @@ import { VersionListComponent } from './version-history-view/version-list/versio
 import { VersionComponent } from './version-history-view/version/version.component';
 import { KotkaUiViewerModule } from '@kotka/ui/viewer';
 import { MetaFieldsComponent } from './meta-fields/meta-fields.component';
+import { PipesModule } from '@kotka/pipes';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { MetaFieldsComponent } from './meta-fields/meta-fields.component';
     KotkaUiViewerModule,
     NgbAlertModule,
     RouterModule,
+    PipesModule
   ],
   exports: [FormViewComponent, VersionHistoryViewComponent],
 })

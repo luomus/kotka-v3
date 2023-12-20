@@ -2,11 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   Input,
-  OnChanges,
-  TemplateRef,
+  OnChanges
 } from '@angular/core';
-import { Field } from '../viewer.component';
-import { DifferenceObjectPatch, isDifferenceObjectPatch } from '@kotka/shared/models';
+import { DifferenceObjectPatch, isDifferenceObjectPatch, LajiForm } from '@kotka/shared/models';
 
 @Component({
   selector: 'kui-viewer-field',
@@ -26,7 +24,6 @@ import { DifferenceObjectPatch, isDifferenceObjectPatch } from '@kotka/shared/mo
             [field]="field"
             [data]="differenceDataPatch?.op === 'add' ? differenceDataPatch?.value : data"
             [differenceData]="differenceDataPatchArray"
-            [labelTpl]="labelTpl"
           ></kui-viewer-field-value-array>
         </div>
         <kui-viewer-field-value
@@ -34,7 +31,6 @@ import { DifferenceObjectPatch, isDifferenceObjectPatch } from '@kotka/shared/mo
           [field]="field"
           [data]="data"
           [differenceData]="differenceDataPatch"
-          [labelTpl]="labelTpl"
         ></kui-viewer-field-value>
       </div>
     </div>
@@ -44,10 +40,9 @@ import { DifferenceObjectPatch, isDifferenceObjectPatch } from '@kotka/shared/mo
 })
 export class ViewerFieldComponent implements OnChanges {
   @Input() label?: string;
-  @Input() field?: Field;
+  @Input() field?: LajiForm.Field;
   @Input() data?: any;
   @Input() differenceData?: DifferenceObjectPatch|DifferenceObjectPatch[];
-  @Input() labelTpl?: TemplateRef<any>;
 
   isArray = false;
   hasData = false;

@@ -1,10 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Input, TemplateRef,
+  Input
 } from '@angular/core';
-import { Field } from '../viewer.component';
-import { DifferenceObjectPatch } from '@kotka/shared/models';
+import { DifferenceObjectPatch, LajiForm } from '@kotka/shared/models';
 
 @Component({
   selector: 'kui-viewer-field-value',
@@ -30,12 +29,8 @@ import { DifferenceObjectPatch } from '@kotka/shared/models';
           {{ $any(value) | enum: field }}
         </ng-container>
         <ng-template #defaultFieldValue>
-          <ng-container *ngTemplateOutlet="labelTpl ? labelTpl : noLabel; context: { value }"></ng-container>
+          {{ value | label }}
         </ng-template>
-      </ng-template>
-
-      <ng-template #noLabel let-value="value">
-        {{ value }}
       </ng-template>
     </ng-container>
   `,
@@ -43,8 +38,7 @@ import { DifferenceObjectPatch } from '@kotka/shared/models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewerFieldValueComponent {
-  @Input() field?: Field;
+  @Input() field?: LajiForm.Field;
   @Input() data?: any;
   @Input() differenceData?: DifferenceObjectPatch;
-  @Input() labelTpl?: TemplateRef<any>;
 }

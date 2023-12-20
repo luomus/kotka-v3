@@ -1,13 +1,5 @@
-import { ChangeDetectionStrategy, Component, Input, TemplateRef, ViewEncapsulation, } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, ViewEncapsulation, } from '@angular/core';
 import { DifferenceObject, KotkaDocumentObject, LajiForm } from '@kotka/shared/models';
-
-export interface Field {
-  name: keyof KotkaDocumentObject;
-  label: string;
-  type: 'text'|'checkbox'|'select'|'collection'|string;
-  options?: { value_options?: Record<string, string> },
-  fields?: Field[]
-}
 
 @Component({
   selector: 'kui-viewer',
@@ -26,11 +18,10 @@ export class ViewerComponent {
   }
   @Input() data?: KotkaDocumentObject;
   @Input() differenceData: DifferenceObject = {};
-  @Input() labelTpl?: TemplateRef<any>;
 
-  fields?: Field[];
+  fields?: LajiForm.Field[];
 
-  private metaFields: Field[] = [{
+  private metaFields: LajiForm.Field[] = [{
     name: 'editor',
     label: 'Editor',
     type: 'text'

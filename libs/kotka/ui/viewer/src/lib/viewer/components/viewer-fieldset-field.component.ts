@@ -1,13 +1,12 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Input,
-  TemplateRef,
+  Input
 } from '@angular/core';
-import { Field } from '../viewer.component';
 import {
   DifferenceObjectValue,
-  isDifferenceObjectPatch
+  isDifferenceObjectPatch,
+  LajiForm
 } from '@kotka/shared/models';
 
 @Component({
@@ -19,7 +18,6 @@ import {
         [field]="field"
         [data]="data"
         [differenceData]="$any(differenceData)"
-        [labelTpl]="labelTpl"
       ></kui-viewer-collection>
 
       <ng-template #nonCollectionField>
@@ -28,7 +26,6 @@ import {
           [field]="field"
           [data]="data"
           [differenceData]="$any(differenceData)"
-          [labelTpl]="labelTpl"
         ></kui-viewer-multilang>
       </ng-template>
 
@@ -37,7 +34,6 @@ import {
           [field]="field"
           [data]="data"
           [differenceData]="$any(differenceData)"
-          [labelTpl]="labelTpl"
         ></kui-viewer-field>
       </ng-template>
     </ng-container>
@@ -46,12 +42,11 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewerFieldsetFieldComponent {
-  @Input() field?: Field;
+  @Input() field?: LajiForm.Field;
   @Input() data?: any;
   @Input() differenceData?: DifferenceObjectValue;
-  @Input() labelTpl?: TemplateRef<any>;
 
-  isMultiLangField(field: Field): boolean {
+  isMultiLangField(field: LajiForm.Field): boolean {
     const differenceValue = isDifferenceObjectPatch(this.differenceData) ? this.differenceData.value : undefined;
 
     return field.type === 'text' && (this.isMultiLangValue(this.data) || this.isMultiLangValue(differenceValue));

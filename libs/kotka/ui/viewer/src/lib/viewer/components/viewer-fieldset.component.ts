@@ -1,11 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Input,
-  TemplateRef,
+  Input
 } from '@angular/core';
-import { Field } from '../viewer.component';
-import { DifferenceObject } from '@kotka/shared/models';
+import { DifferenceObject, LajiForm } from '@kotka/shared/models';
 
 @Component({
   selector: 'kui-viewer-fieldset',
@@ -15,7 +13,6 @@ import { DifferenceObject } from '@kotka/shared/models';
         [field]="field"
         [data]="data[field.name || '']"
         [differenceData]="differenceData?.[field.name || '']"
-        [labelTpl]="labelTpl"
       ></kui-viewer-fieldset-field>
     </ng-container>
   `,
@@ -23,8 +20,7 @@ import { DifferenceObject } from '@kotka/shared/models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewerFieldsetComponent {
-  @Input() fields: Field[] = [];
+  @Input() fields: LajiForm.Field[] = [];
   @Input() data: any = {};
   @Input() differenceData?: DifferenceObject;
-  @Input() labelTpl?: TemplateRef<any>;
 }

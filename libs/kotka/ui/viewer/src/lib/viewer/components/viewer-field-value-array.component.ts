@@ -1,10 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Input, TemplateRef,
+  Input
 } from '@angular/core';
-import { Field } from '../viewer.component';
-import { DifferenceObjectPatch } from '@kotka/shared/models';
+import { DifferenceObjectPatch, LajiForm } from '@kotka/shared/models';
 
 @Component({
   selector: 'kui-viewer-field-value-array',
@@ -15,7 +14,6 @@ import { DifferenceObjectPatch } from '@kotka/shared/models';
           [field]="field"
           [data]="data?.[i]"
           [differenceData]="differenceData?.[i]"
-          [labelTpl]="labelTpl"
         ></kui-viewer-field-value>
         <span *ngIf="!last">, </span>
       </ng-container>
@@ -25,8 +23,7 @@ import { DifferenceObjectPatch } from '@kotka/shared/models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewerFieldValueArrayComponent {
-  @Input() field?: Field;
+  @Input() field?: LajiForm.Field;
   @Input() data?: any[];
   @Input() differenceData?: DifferenceObjectPatch[];
-  @Input() labelTpl?: TemplateRef<any>;
 }

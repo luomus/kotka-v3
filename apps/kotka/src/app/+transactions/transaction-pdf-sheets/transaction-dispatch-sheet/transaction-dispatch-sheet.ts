@@ -5,10 +5,11 @@ import { SharedModule } from '../../../shared/shared.module';
 import { TransactionTypeLabelPipe } from '../transaction-type-label.pipe';
 import { DispatchSheetContext } from '../transaction-pdf-sheets-context-service';
 import { ComponentWithContext } from '@kotka/services';
+import { PipesModule } from '@kotka/pipes';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, SharedModule, TransactionTypeLabelPipe],
+  imports: [CommonModule, SharedModule, PipesModule, TransactionTypeLabelPipe],
   selector: 'kotka-transaction-dispatch-sheet',
   templateUrl: './transaction-dispatch-sheet.html'
 })

@@ -183,6 +183,14 @@ export namespace LajiForm {
   export interface JsonForm extends List {
     options: FormOptions;
     uiSchema: any;
-    fields: any[];
+    fields: Field[];
+  }
+
+  export interface Field {
+    name: string;
+    label: string;
+    type: 'text'|'checkbox'|'select'|'collection'|string;
+    options?: { value_options?: Record<string, string> },
+    fields?: Field[]
   }
 }

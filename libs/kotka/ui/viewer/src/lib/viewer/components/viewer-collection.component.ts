@@ -1,14 +1,13 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Input,
-  TemplateRef,
+  Input
 } from '@angular/core';
-import { Field } from '../viewer.component';
 import {
   DifferenceObject,
   DifferenceObjectPatch,
-  isDifferenceObjectPatch
+  isDifferenceObjectPatch,
+  LajiForm
 } from '@kotka/shared/models';
 
 @Component({
@@ -29,7 +28,6 @@ import {
             [fields]="field.fields || []"
             [data]="differenceDataPatchArray?.[i]?.op === 'add' ? differenceDataPatchArray?.[i]?.value : data?.[i]"
             [differenceData]="differenceDataObjectArray?.[i]"
-            [labelTpl]="labelTpl"
           ></kui-viewer-fieldset>
         </div>
       </div>
@@ -39,7 +37,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewerCollectionComponent {
-  @Input() field?: Field;
+  @Input() field?: LajiForm.Field;
   @Input() data?: any[];
   @Input() set differenceData(differenceData: DifferenceObject[]|DifferenceObjectPatch|DifferenceObjectPatch[]|undefined) {
     this.differenceDataObjectArray = undefined;
@@ -58,7 +56,6 @@ export class ViewerCollectionComponent {
       }
     }
   };
-  @Input() labelTpl?: TemplateRef<any>;
 
   differenceDataObjectArray?: DifferenceObject[];
   differenceDataPatchArray?: DifferenceObjectPatch[];

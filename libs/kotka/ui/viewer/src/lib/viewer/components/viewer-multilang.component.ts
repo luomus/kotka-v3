@@ -1,10 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Input, TemplateRef,
+  Input
 } from '@angular/core';
-import { Field } from '../viewer.component';
-import { DifferenceObject, DifferenceObjectPatch, isDifferenceObjectPatch } from '@kotka/shared/models';
+import { DifferenceObject, DifferenceObjectPatch, isDifferenceObjectPatch, LajiForm } from '@kotka/shared/models';
 
 @Component({
   selector: 'kui-viewer-multilang',
@@ -17,7 +16,6 @@ import { DifferenceObject, DifferenceObjectPatch, isDifferenceObjectPatch } from
             [field]="field"
             [data]="data?.[lang]"
             [differenceData]="differenceDataPatch ? { op: differenceDataPatch.op, value: differenceDataPatch.value[lang] } : $any(differenceDataObject?.[lang])"
-            [labelTpl]="labelTpl"
           ></kui-viewer-field>
         </ng-container>
       </ng-container>
@@ -27,7 +25,7 @@ import { DifferenceObject, DifferenceObjectPatch, isDifferenceObjectPatch } from
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewerMultilangComponent {
-  @Input() field?: Field;
+  @Input() field?: LajiForm.Field;
   @Input() data?: any;
   @Input() set differenceData(differenceData: DifferenceObject|DifferenceObjectPatch|undefined) {
     this.differenceDataObject = undefined;
@@ -39,7 +37,6 @@ export class ViewerMultilangComponent {
       this.differenceDataObject = differenceData;
     }
   };
-  @Input() labelTpl?: TemplateRef<any>;
 
   differenceDataObject?: DifferenceObject;
   differenceDataPatch?: DifferenceObjectPatch;
