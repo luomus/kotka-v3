@@ -6,7 +6,6 @@ import {
   OnChanges, Output, ViewChild
 } from '@angular/core';
 import { LajiForm, StoreVersion, KotkaDocumentObject } from '@kotka/shared/models';
-import { FormApiClient, ToastService } from '@kotka/services';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 
 @Component({
@@ -30,11 +29,6 @@ export class VersionComponent implements OnChanges {
   @Output() formInit = new EventEmitter<{ lajiForm: LajiFormComponent; formData: KotkaDocumentObject }>();
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
-
-  constructor(
-    public formApiClient: FormApiClient,
-    public notifier: ToastService,
-  ) {}
 
   ngOnChanges() {
     if (this.version !== undefined && this.versionList?.length) {

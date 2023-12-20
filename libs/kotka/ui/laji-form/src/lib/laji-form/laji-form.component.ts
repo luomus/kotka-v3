@@ -15,9 +15,9 @@ import { Theme as LajiFormTheme } from '@luomus/laji-form/lib/themes/theme';
 import { scrollIntoViewIfNeeded } from '@luomus/laji-form/lib/utils';
 import { LajiForm as LajiFormModel } from '@kotka/shared/models';
 import { combineLatest } from 'rxjs';
-import { Notifier } from '../models';
 import { DOCUMENT } from '@angular/common';
 import { MediaMetadata } from '@luomus/laji-form/lib/components/LajiForm';
+import { FormApiClient, ToastService } from '@kotka/services';
 
 @Component({
   selector: 'kui-laji-form',
@@ -31,8 +31,6 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Input() formData: any = {};
   @Input() hasChanges? = false;
   @Input() disabled? = false;
-  @Input() apiClient?: any;
-  @Input() notifier?: Notifier;
   @Input() mediaMetadata?: MediaMetadata;
   @Input() showFooter? = true;
   @Input() showDeleteButton? = false;
@@ -59,6 +57,8 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
+    private apiClient: FormApiClient,
+    private notifier: ToastService,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef
   ) {}

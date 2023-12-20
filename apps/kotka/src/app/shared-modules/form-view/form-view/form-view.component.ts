@@ -27,7 +27,6 @@ import { filter } from 'rxjs/operators';
 import { FormViewUtils } from './form-view-utils';
 import { DataService, IdService, ToastService, DialogService } from '@kotka/services';
 import { Utils } from '../../../shared/services/utils';
-import { FormApiClient } from '@kotka/services';
 
 @Component({
   selector: 'kotka-form-view',
@@ -65,8 +64,7 @@ export class FormViewComponent implements OnChanges, OnDestroy {
   private subscription: Subscription = new Subscription();
 
   constructor(
-    public formApiClient: FormApiClient,
-    public notifier: ToastService,
+    private notifier: ToastService,
     private activeRoute: ActivatedRoute,
     private dataService: DataService,
     private dialogService: DialogService,

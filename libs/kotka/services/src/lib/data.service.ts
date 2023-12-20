@@ -11,7 +11,7 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { get, set } from 'lodash';
-import { ApiClient } from '@kotka/services';
+import { ApiClient } from './api-client';
 
 
 @Injectable({

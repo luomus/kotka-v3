@@ -1,5 +1,5 @@
 import { ComponentRef, Type, Injector } from '@angular/core';
-import { LajiFormComponent } from '@kotka/ui/laji-form';
+import { LajiFormComponent } from '../laji-form/laji-form.component';
 import { Subscription, take } from 'rxjs';
 import {
   EmbeddedComponentData,

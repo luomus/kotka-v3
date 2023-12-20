@@ -5,7 +5,7 @@ import { OrganizationAddressEmbedComponent } from './organization-address-embed'
 import { PermitsInfoEmbedComponent } from './permits-info-embed';
 import { SpecimenRangeSelectEmbedComponent } from './specimen-range-select-embed';
 import { Observable } from 'rxjs';
-import { LajiFormEmbedService } from '@kotka/services';
+import { LajiFormEmbedService } from '@kotka/ui/laji-form';
 
 @Injectable()
 export class TransactionFormEmbedService {

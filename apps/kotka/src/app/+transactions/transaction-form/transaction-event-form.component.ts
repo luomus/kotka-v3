@@ -1,6 +1,6 @@
 import { Component, Input, ViewChild } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ToastService, EnumOption, FormService } from '@kotka/services';
+import { EnumOption, FormService } from '@kotka/services';
 import { Observable } from 'rxjs';
 import { LajiForm, SpecimenTransaction, SpecimenTransactionEvent } from '@kotka/shared/models';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
@@ -15,7 +15,6 @@ import { map } from 'rxjs/operators';
         <kui-laji-form
           [form]="form"
           [formData]="{}"
-          [notifier]="notifier"
           [showFooter]="false"
           (formSubmit)="onSubmit($event)"
         >
@@ -59,7 +58,6 @@ export class TransactionEventFormComponent {
 
   constructor(
     public modal: NgbActiveModal,
-    public notifier: ToastService,
     private formService: FormService
   ) {
     this.form$ = this.formService.getFormWithUserContext('MHL.1060').pipe(
