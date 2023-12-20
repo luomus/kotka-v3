@@ -6,8 +6,7 @@ import {
   OnChanges, Output, ViewChild
 } from '@angular/core';
 import { LajiForm, StoreVersion, KotkaDocumentObject } from '@kotka/shared/models';
-import { FormApiClient } from '../../../../shared/services/api-services/form-api-client';
-import { ToastService } from '../../../../shared/services/toast.service';
+import { FormApiClient, ToastService } from '@kotka/services';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 
 @Component({

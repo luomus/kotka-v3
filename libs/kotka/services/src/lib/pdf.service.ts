@@ -2,10 +2,10 @@ import { ComponentRef, Inject, Injectable, Type } from '@angular/core';
 import * as FileSaver from 'file-saver';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiClient } from './api-services/api-client';
+import { ApiClient } from './api-client';
 import { HttpClient } from '@angular/common/http';
 import { ComponentService } from './component.service';
-import { PdfBaseComponent } from '../components/pdf-base/pdf-base.component';
+import { PdfBaseComponent } from './components/pdf-base.component';
 import { DOCUMENT } from '@angular/common';
 
 export interface ComponentWithContext {

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, from, catchError } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmModalComponent } from '../components/confirm-modal/confirm-modal';
+import { ConfirmModalComponent } from './components/confirm-modal';
 
 interface DialogConfig {
   message: string;

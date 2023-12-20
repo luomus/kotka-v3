@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Observable, of, ReplaySubject, switchMap } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
-import { AbschService, LinkData } from '../../shared/services/api-services/absch.service';
+import { AbschService, LinkData } from '@kotka/services';
 
 @Component({
   selector: 'kotka-permits-info-embed',

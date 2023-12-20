@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { ToastService } from '../toast.service';
+import { ToastService } from './toast.service';
 import { apiBase, lajiApiBase } from './constants';
 
 const AUTOCOMPLETE_ORGANIZATION_RESOURCE = '/autocomplete/organization';

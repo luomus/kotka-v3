@@ -10,7 +10,6 @@ import { NgbToastModule, NgbCollapseModule, NgbDropdownModule } from '@ng-bootst
 import { LabelPipe } from './pipes/label.pipe';
 import { OldKotkaUrlPipe } from './pipes/old-kotka-url.pipe';
 import { KotkaUiMainContentModule } from '@kotka/ui/main-content';
-import { ConfirmModalComponent } from './components/confirm-modal/confirm-modal';
 import { BaseComponent } from './components/base/base.component';
 import { ReversePipe } from './pipes/reverse.pipe';
 import { ToFullUriPipe } from './pipes/to-full-uri.pipe';
@@ -32,7 +31,6 @@ import { ToFullUriPipe } from './pipes/to-full-uri.pipe';
     LabelPipe,
     OldKotkaUrlPipe,
     ReversePipe,
-    ConfirmModalComponent,
     BaseComponent,
     ToFullUriPipe
   ],

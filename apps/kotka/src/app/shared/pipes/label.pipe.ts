@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Pipe, PipeTransform } from '@angular/core';
 import { forkJoin, Observable } from 'rxjs';
-import { LabelKey, LabelService } from '../services/label.service';
+import { LabelKey, LabelService } from '@kotka/services';
 
 @Pipe({
   name: 'label',

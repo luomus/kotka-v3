@@ -1,8 +1,11 @@
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'kotka-confirm-modal',
+  standalone: true,
+  imports: [CommonModule],
+  selector: 'kui-confirm-modal',
   template: `
     <div class="modal-body">
       <p>{{ message }}</p>

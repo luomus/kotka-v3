@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ViewEncapsulation, } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { map, switchMap } from 'rxjs/operators';
-import { DataService } from '../shared/services/data.service';
+import { DataService } from '@kotka/services';
 import { FormViewUtils } from '../shared-modules/form-view/form-view/form-view-utils';
 import {
   asSpecimenTransaction,

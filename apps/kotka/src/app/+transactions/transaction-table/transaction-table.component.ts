@@ -1,9 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { DatatableColumn, DatatableSource, GetRowsParams } from '@kotka/ui/datatable';
 import { URICellRendererComponent } from '@kotka/ui/datatable';
-import { DatatableDataService } from '../../shared/services/datatable-data.service';
+import { DatatableDataService, DEFAULT_DOMAIN } from '@kotka/services';
 import { KotkaDocumentObjectType } from '@kotka/shared/models';
-import { DEFAULT_DOMAIN } from '../../shared/services/id.service';
 
 @Component({
   selector: 'kotka-transaction-table',
@@ -20,6 +19,15 @@ export class TransactionTableComponent {
       domain: DEFAULT_DOMAIN
     },
     hideDefaultTooltip: true
+  }, {
+    headerName: 'Team',
+    field: 'owner'
+  }, {
+    headerName: 'Transaction status',
+    field: 'status'
+  }, {
+    headerName: 'Transaction type',
+    field: 'type'
   }];
 
   loading = false;

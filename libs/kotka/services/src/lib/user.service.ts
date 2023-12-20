@@ -2,8 +2,8 @@ import { Inject, Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, Observable, of, switchMap } from 'rxjs';
 import { map, tap, distinctUntilChanged, share } from 'rxjs/operators';
 import { Person } from '@kotka/shared/models';
-import { apiBase } from './api-services/constants';
-import { ApiClient } from './api-services/api-client';
+import { apiBase } from './constants';
+import { ApiClient } from './api-client';
 
 export interface IUserServiceState {
   user: Person | null;

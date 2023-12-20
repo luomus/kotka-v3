@@ -14,8 +14,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { KotkaDocumentObject, KotkaDocumentObjectType, LajiForm } from '@kotka/shared/models';
 import { EMPTY, from, Observable, Subscription, switchMap } from 'rxjs';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
-import { ToastService } from '../../../shared/services/toast.service';
-import { DialogService } from '../../../shared/services/dialog.service';
 import { ErrorMessages } from '@kotka/api-interfaces';
 import {
   FormErrorEnum,
@@ -27,10 +25,9 @@ import {
 } from './form-view.facade';
 import { filter } from 'rxjs/operators';
 import { FormViewUtils } from './form-view-utils';
-import { DataService } from '../../../shared/services/data.service';
-import { IdService } from '../../../shared/services/id.service';
+import { DataService, IdService, ToastService, DialogService } from '@kotka/services';
 import { Utils } from '../../../shared/services/utils';
-import { FormApiClient } from '../../../shared/services/api-services/form-api-client';
+import { FormApiClient } from '@kotka/services';
 
 @Component({
   selector: 'kotka-form-view',

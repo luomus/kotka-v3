@@ -7,7 +7,7 @@ import {
 import { TransactionDispatchSheetComponent } from './transaction-dispatch-sheet/transaction-dispatch-sheet';
 import { SpecimenTransaction } from '@luomus/laji-schema';
 import { TransactionPdfSheetsContextService } from './transaction-pdf-sheets-context-service';
-import { PdfService } from '../../shared/services/pdf.service';
+import { PdfService } from '@kotka/services';
 
 @Component({
   selector: 'kotka-transaction-pdf-sheets',

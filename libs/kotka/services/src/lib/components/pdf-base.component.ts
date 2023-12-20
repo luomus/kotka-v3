@@ -2,7 +2,7 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 
 @Component({
   standalone: true,
-  selector: 'kotka-pdf-base',
+  selector: 'kui-pdf-base',
   template: `
     <html>
     <head #head>

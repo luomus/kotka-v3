@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, TemplateRef, HostBinding } from '@angular/core';
-import { ToastService } from '../../services/toast.service';
+import { ToastService } from '@kotka/services';
 
 @Component({
   selector: 'kotka-toaster',

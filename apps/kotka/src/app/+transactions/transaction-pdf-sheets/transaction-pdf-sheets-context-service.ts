@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { ApiClient } from '../../shared/services/api-services/api-client';
+import { ApiClient } from '@kotka/services';
 import { SpecimenTransaction } from '@luomus/laji-schema';
 import { LajiOrganization } from '@kotka/shared/models';
 import { forkJoin, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { globals } from '../../../environments/globals';
-import { FormService } from '../../shared/services/form.service';
+import { FormService } from '@kotka/services';
 
 export interface DispatchSheetContext {
   data: SpecimenTransaction,

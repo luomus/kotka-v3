@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 import { Observable, of, ReplaySubject, switchMap } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
-import { ApiClient } from '../../shared/services/api-services/api-client';
+import { ApiClient } from '@kotka/services';
 import { LajiOrganization } from '@kotka/shared/models';
 
 @Component({

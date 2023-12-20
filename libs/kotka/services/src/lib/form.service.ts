@@ -3,7 +3,7 @@ import { combineLatest, Observable, shareReplay } from 'rxjs';
 import { LajiForm } from '@kotka/shared/models';
 import { map, take } from 'rxjs/operators';
 import { UserService } from './user.service';
-import { ApiClient } from './api-services/api-client';
+import { ApiClient } from '@kotka/services';
 
 export type EnumOption = { const: string, title: string };
 

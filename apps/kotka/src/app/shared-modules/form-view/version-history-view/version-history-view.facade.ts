@@ -1,8 +1,5 @@
 import { Injectable } from '@angular/core';
-import {
-  DataService
-} from '../../../shared/services/data.service';
-import { FormService } from '../../../shared/services/form.service';
+import { DataService, FormService } from '@kotka/services';
 import {
   catchError,
   combineLatest,

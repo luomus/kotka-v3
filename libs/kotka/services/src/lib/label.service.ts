@@ -3,7 +3,7 @@ import { catchError, Observable, of, switchMap, isObservable } from 'rxjs';
 import { map, tap, share } from 'rxjs/operators';
 import { UserService } from './user.service';
 import { DatePipe } from '@angular/common';
-import { ApiClient } from './api-services/api-client';
+import { ApiClient } from './api-client';
 
 export type LabelKey = string|number|boolean;
 

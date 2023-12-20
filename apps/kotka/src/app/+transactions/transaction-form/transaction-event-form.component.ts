@@ -1,9 +1,8 @@
 import { Component, Input, ViewChild } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ToastService } from '../../shared/services/toast.service';
+import { ToastService, EnumOption, FormService } from '@kotka/services';
 import { Observable } from 'rxjs';
 import { LajiForm, SpecimenTransaction, SpecimenTransactionEvent } from '@kotka/shared/models';
-import { EnumOption, FormService } from '../../shared/services/form.service';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { map } from 'rxjs/operators';
 

@@ -5,7 +5,7 @@ import {
 } from '@angular/core';
 import { ComponentCanDeactivate } from '../../../shared/services/guards/component-can-deactivate.guard';
 import { Observable, of } from 'rxjs';
-import { DialogService } from '../../../shared/services/dialog.service';
+import { DialogService } from '@kotka/services';
 import { FormViewComponent } from './form-view.component';
 
 @Directive()

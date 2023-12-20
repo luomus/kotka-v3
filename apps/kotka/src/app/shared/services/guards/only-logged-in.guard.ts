@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, RouterStateSnapshot } from '@angular/router';
 
-import { UserService } from '../user.service';
+import { UserService } from '@kotka/services';
 import { take, tap } from 'rxjs/operators';
 
 export const OnlyLoggedInGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {

@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { IdService } from '../services/id.service';
+import { IdService } from '@kotka/services';
 
 @Pipe({
   name: 'toFullUri'

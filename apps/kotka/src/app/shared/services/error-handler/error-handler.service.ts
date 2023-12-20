@@ -1,6 +1,5 @@
 import { ErrorHandler, Injectable, Injector } from '@angular/core';
-import { ToastService } from '../toast.service';
-import { Logger } from '../logger/logger.service';
+import { ToastService, Logger } from '@kotka/services';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 
 let errorSent = false;

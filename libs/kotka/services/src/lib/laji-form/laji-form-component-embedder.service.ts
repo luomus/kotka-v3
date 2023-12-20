@@ -8,7 +8,7 @@ import {
   Type
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
-import { ComponentService } from '../component.service';
+import { ComponentService } from '@kotka/services';
 
 export type RelativePosition = 'firstChild'|'nextSibling'|'parentNextSibling';
 

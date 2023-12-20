@@ -1,7 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { DataService } from '../../../shared/services/data.service';
-import { FormService } from '../../../shared/services/form.service';
-import { UserService } from '../../../shared/services/user.service';
+import { DataService, FormService, UserService } from '@kotka/services';
 import {
   catchError,
   concat,

@@ -14,15 +14,14 @@ import {
   asSpecimenTransaction
 } from '@kotka/shared/models';
 import { from, Observable, of, Subscription, switchMap } from 'rxjs';
-import { FormService } from '../../shared/services/form.service';
+import { FormService, DialogService } from '@kotka/services';
 import { FormViewComponent } from '../../shared-modules/form-view/form-view/form-view.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TransactionEventFormComponent } from './transaction-event-form.component';
-import { DialogService } from '../../shared/services/dialog.service';
 import {
   LajiFormComponent,
 } from '@kotka/ui/laji-form';
-import { ApiClient } from '../../shared/services/api-services/api-client';
+import { ApiClient } from '@kotka/services';
 import { TransactionFormEmbedService } from '../transaction-form-embed/transaction-form-embed.service';
 import { globals } from '../../../environments/globals';
 import { FormViewContainerComponent } from '../../shared-modules/form-view/form-view/form-view-container';
