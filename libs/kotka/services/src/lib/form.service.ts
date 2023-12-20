@@ -66,11 +66,11 @@ export class FormService {
     return this.countryOptions$;
   }
 
-  getFieldData(formId: string): Observable<Record<string, any>> {
+  getFieldData(formId: string): Observable<Record<string, LajiForm.Field>> {
     return this.getFormInJsonFormat(formId).pipe(map(form => {
-      const result: Record<string, any> = {};
+      const result: Record<string, LajiForm.Field> = {};
 
-      const addFieldsToResult = (fields: any[], path = '') => {
+      const addFieldsToResult = (fields: LajiForm.Field[], path = '') => {
         fields.forEach(field => {
           const fieldPath = path + field.name;
           result[fieldPath] = field;

@@ -1,4 +1,4 @@
-import { SortModel } from '@kotka/ui/datatable';
+import type { SortModel } from '@kotka/ui/datatable';
 import { Observable } from 'rxjs';
 import { KotkaDocumentObject, ListResponse, KotkaDocumentObjectType } from '@kotka/shared/models';
 import { DataService} from './data.service';

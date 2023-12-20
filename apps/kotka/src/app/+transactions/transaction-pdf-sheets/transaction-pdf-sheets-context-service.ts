@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ApiClient } from '@kotka/services';
 import { SpecimenTransaction } from '@luomus/laji-schema';
-import { LajiOrganization } from '@kotka/shared/models';
+import { LajiForm, LajiOrganization } from '@kotka/shared/models';
 import { forkJoin, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { globals } from '../../../environments/globals';
@@ -11,7 +11,7 @@ export interface DispatchSheetContext {
   data: SpecimenTransaction,
   ownerOrganization?: LajiOrganization,
   correspondingOrganization?: LajiOrganization,
-  fieldData: Record<string, any>
+  fieldData: Record<string, LajiForm.Field>
 }
 
 @Injectable({
