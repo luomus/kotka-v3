@@ -5,12 +5,17 @@ describe('user', () => {
   });
 
   it('should show the correct page after login', () => {
-    cy.fixture('test-user').then((defaultUser: { email: string, password: string }) => {
-      cy.visit('/tags');
-      cy.login(defaultUser.email, defaultUser.password);
-      cy.url().should('equal', Cypress.config('baseUrl') + '/tags');
-      cy.get('[data-cy=main-header]').should('contain', 'Tags');
-    });
+    const userEmail = Cypress.env('TEST_EMAIL');
+    const userPassword = Cypress.env('TEST_PASSWORD');
+
+    if (!userEmail || !userPassword) {
+      throw Error('Missing test email or password');
+    }
+
+    cy.visit('/tags');
+    cy.login(userEmail, userPassword);
+    cy.url().should('equal', Cypress.config('baseUrl') + '/tags');
+    cy.get('[data-cy=main-header]').should('contain', 'Tags');
   });
 
   it('should redirect to old kotka logout page after logout', () => {

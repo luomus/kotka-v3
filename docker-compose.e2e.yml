@@ -40,6 +40,9 @@ services:
     volumes:
       - .:/app
       - shared-volume:/app/node_modules
+    environment:
+      - CYPRESS_TEST_EMAIL=${CYPRESS_TEST_EMAIL}
+      - CYPRESS_TEST_PASSWORD=${CYPRESS_TEST_PASSWORD}
 volumes:
   shared-volume:
   redis:
