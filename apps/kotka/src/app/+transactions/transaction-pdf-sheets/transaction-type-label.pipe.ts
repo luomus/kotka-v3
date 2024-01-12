@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import { SpecimenTransaction } from '@luomus/laji-schema';
 
 @Pipe({
   standalone: true,
@@ -6,15 +7,12 @@ import { Pipe, PipeTransform } from '@angular/core';
   pure: true
 })
 export class TransactionTypeLabelPipe implements PipeTransform {
-  transform(value = ''): string {
-    if (value === 'HRX.typeGiftOutgoing') {
-      return 'specimen gift';
-    } else if (value === 'HRX.typeExchangeOutgoing') {
-      return 'specimen exchange';
-    } else if (value === 'HRX.typeVirtualLoanOutgoing') {
-      return 'virtual loan';
-    } else {
-      return 'specimen loan';
+  transform(type?: SpecimenTransaction['type']): string {
+    if (type === 'HRX.typeExchangeIncoming' || type === 'HRX.typeExchangeOutgoing') {
+      return 'exchange';
+    } else if (type === 'HRX.typeGiftIncoming' || type === 'HRX.typeGiftOutgoing') {
+      return 'gift';
     }
+    return 'loan';
   }
 }

@@ -2,12 +2,13 @@ import {
   ChangeDetectionStrategy,
   Component,
   Input,
-  OnChanges
+  OnChanges, Type
 } from '@angular/core';
 import { TransactionDispatchSheetComponent } from './transaction-dispatch-sheet/transaction-dispatch-sheet';
 import { SpecimenTransaction } from '@luomus/laji-schema';
 import { TransactionPdfSheetsContextService } from './transaction-pdf-sheets-context-service';
-import { PdfService } from '@kotka/services';
+import { ComponentWithContext, PdfService } from '@kotka/services';
+import { TransactionIncomingSheetComponent } from './transaction-incoming-sheet/transaction-incoming-sheet';
 
 @Component({
   selector: 'kotka-transaction-pdf-sheets',
@@ -15,7 +16,7 @@ import { PdfService } from '@kotka/services';
     <div class="d-xs-flex mb-2">
       <div class="btn-group-vertical col-12">
         <button class="btn btn-light" (click)="downloadDispatchSheet()">Dispatch sheet (PDF)</button>
-        <button class="btn btn-light" [disabled]="true">Incoming receipt (PDF)</button>
+        <button class="btn btn-light" (click)="downloadIncomingSheet()">Incoming receipt (PDF)</button>
         <button class="btn btn-light" [disabled]="true">Inquiry sheet (PDF)</button>
         <button class="btn btn-light mb-3" [disabled]="true">Return sheet (PDF)</button>
         <button class="btn btn-light" [disabled]="true">Insect labels (PDF)</button>
@@ -49,15 +50,23 @@ export class TransactionPdfSheetsComponent implements OnChanges {
   }
 
   downloadDispatchSheet() {
+    this.downloadSheet(TransactionDispatchSheetComponent, 'dispatchsheet');
+  }
+
+  downloadIncomingSheet() {
+    this.downloadSheet(TransactionIncomingSheetComponent, 'receipt');
+  }
+
+  private downloadSheet(componentClass: Type<ComponentWithContext>, name: string) {
     if (!this.data) {
       return;
     }
 
-    this.transactionPdfSheetsContext.getDispatchSheetContext(this.data).subscribe(context => {
+    this.transactionPdfSheetsContext.getSheetContext(this.data).subscribe(context => {
       this.pdfService.downloadSheet(
-        TransactionDispatchSheetComponent,
+        componentClass,
         context,
-        `dispatchsheet_${this.data?.id}.pdf`
+        `${name}_${this.data?.id}.pdf`
       );
     });
   }

@@ -15,28 +15,12 @@
       <span>{{ data.id | toFullUri }}</span>
     </div>
   </div>
-  <h2>{{ data.type | transactionDispatchLabel | uppercase }}</h2>
-  <p>We are sending you the material indicated here. Upon receiving the specimens/data, please sign and return one copy of this form to the above address<ng-container *ngIf="data.localHandlerEmail"> or email to {{ data.localHandlerEmail }}</ng-container>. This form, along with the attachments, constitutes the full loan agreement.</p>
-  <p>Please reference the identifier {{ data.id | toFullUri }} in all correspondence related to this material.</p>
-  <p>Please cite specimens/data using their unique identifiers and inform us about publications based on this material. If you image (photograph, scan) the specimens, send the digital files to us by email. See attachments for more information.</p>
-  <p>All {{ data.type | transactionDispatchLabel }}s are governed by our terms and conditions as outlined in the attached documents. </p>
-  <h4>Attached documents:</h4>
-  <div style="display: grid; grid-template-columns: 50% 50%">
-    <div>
-      [&nbsp;&nbsp;]&nbsp;&nbsp; {{ data.type | transactionDispatchLabel | titlecase }} terms<br>
-      [&nbsp;&nbsp;]&nbsp;&nbsp; Additional loan terms<br>
-      [&nbsp;&nbsp;]&nbsp;&nbsp; Specimen data (printout or file by email)<br>
-      [&nbsp;&nbsp;]&nbsp;&nbsp; Permits
-    </div>
-    <div>
-      [&nbsp;&nbsp;]&nbsp;&nbsp; Instructions on returning the material<br>
-      [&nbsp;&nbsp;]&nbsp;&nbsp; Other:
-    </div>
-  </div>
+  <h2>INCOMING {{ data.type | transactionTypeLabel | uppercase }}</h2>
+  <p>We have received the material indicated here from your institution. Please reference the identifier <strong>{{ data.id | toFullUri }}</strong> in all correspondence related to this material. Thank you.</p>
   <hr>
   <div class="avoid-page-break" style="display: grid; grid-template-columns: 50% 50%">
     <div>
-      <h4>Recipient</h4>
+      <h4>Sender</h4>
       <div *ngIf="context.correspondingOrganization as correspondingOrganization" class="multi-line content-block">
         <span>{{ correspondingOrganization.organizationLevel4 }}<ng-container *ngIf="correspondingOrganization.abbreviation"> ({{ correspondingOrganization.abbreviation }})</ng-container></span>
         <span>{{ correspondingOrganization.organizationLevel1 }}</span>
@@ -53,16 +37,27 @@
         <span>Corresponding person:</span>
         <span>{{ data.correspondentPerson }}</span>
       </div>
-      <div *ngIf="data.correspondentResearcher" class="multi-line content-block">
-        <span>Receiving researcher:</span>
-        <span>{{ data.correspondentResearcher }}</span>
+      <div *ngIf="data.externalID" class="multi-line content-block">
+        Sender's loan ID: {{ data.externalID }}
       </div>
     </div>
     <div>
-      <h4>
-        {{ data.type | transactionDispatchLabel | titlecase }} ID: {{ data.id | toFullUri }}
-        <ng-container *ngIf="data.dueDate"><br>Due date: {{ data.dueDate | date:'dd MMMM Y' }}</ng-container>
-      </h4>
+      <h4>Recipient</h4>
+      <div *ngIf="context.ownerOrganization as ownerOrganization" class="multi-line content-block">
+        <span>{{ ownerOrganization.organizationLevel4 }}</span>
+        <span>{{ ownerOrganization.organizationLevel3 }}</span>
+        <span>{{ ownerOrganization.organizationLevel2 }}</span>
+        <span>{{ ownerOrganization.organizationLevel1 }}</span>
+      </div>
+      <div *ngIf="data.localResearcher" class="multi-line content-block">
+        <span>Receiving researcher:</span>
+        <span>{{ data.localResearcher }}</span>
+      </div>
+      <div *ngIf="data.requestReceived || data.outgoingSent || data.transportMethod" class="multi-line content-block">
+        <span>Recipient loan ID: {{ data.id | toFullUri }}</span>
+        <span>Loan received: {{ data.incomingReceived | date:'dd MMMM Y' }}</span>
+        <span>Due date: {{ data.dueDate | date:'dd MMMM Y' }}</span>
+      </div>
       <div *ngIf="data.localHandler || data.localHandlerEmail" class="multi-line content-block">
         <span>Handler:</span>
         <span>{{ data.localHandler }}</span>
@@ -73,11 +68,6 @@
         <span>{{ data.localPerson }}</span>
         <span>{{ data.localPersonEmail }}</span>
       </div>
-      <div *ngIf="data.requestReceived || data.outgoingSent || data.transportMethod" class="multi-line content-block">
-        <span>Loan request received: {{ data.requestReceived | date:'dd MMMM Y' }}</span>
-        <span>Send to you on: {{ data.outgoingSent | date:'dd MMMM Y' }}</span>
-        <span>Sent by: {{ data.transportMethod | enum: fieldData['transportMethod'] }}</span>
-      </div>
     </div>
   </div>
   <div *ngIf="data.publicRemarks" class="avoid-page-break">
@@ -87,7 +77,7 @@
   </div>
   <hr>
   <div class="avoid-page-break">
-    <p>Material received in good condition. We commit to the {{ data.type | transactionDispatchLabel }} terms.</p>
+    <p>Material received in good condition. We commit to the {{ data.type | transactionTypeLabel }} terms.</p>
     <div class="signature-space"></div>
     <div style="display: grid; grid-template-columns: 35% 35% 15% 15%">
       <span>Recipient name</span>

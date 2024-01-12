@@ -1,4 +1,12 @@
-<kotka-transaction-dispatch-sheet
-  *ngIf="context$ | async as context"
-  [context]="context"
-></kotka-transaction-dispatch-sheet>
+<ng-container *ngIf="context$ | async as context">
+  <ng-container [ngSwitch]="type$ | async">
+    <kotka-transaction-dispatch-sheet
+      *ngSwitchCase="typeEnum.transactionDispatch"
+      [context]="context"
+    ></kotka-transaction-dispatch-sheet>
+    <kotka-transaction-incoming-sheet
+      *ngSwitchDefault
+      [context]="context"
+    ></kotka-transaction-incoming-sheet>
+  </ng-container>
+</ng-container>
