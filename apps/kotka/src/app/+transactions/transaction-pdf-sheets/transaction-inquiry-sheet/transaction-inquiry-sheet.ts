@@ -5,23 +5,22 @@ import { SharedModule } from '../../../shared/shared.module';
 import { TransactionSheetContext } from '../transaction-pdf-sheets-context-service';
 import { ComponentWithContext } from '@kotka/services';
 import { PipesModule } from '@kotka/pipes';
-import { TransactionDispatchLabelPipe } from '../transaction-dispatch-label.pipe';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, SharedModule, PipesModule, TransactionDispatchLabelPipe],
-  selector: 'kotka-transaction-dispatch-sheet',
-  templateUrl: './transaction-dispatch-sheet.html'
+  imports: [CommonModule, SharedModule, PipesModule],
+  selector: 'kotka-transaction-inquiry-sheet',
+  templateUrl: './transaction-inquiry-sheet.html'
 })
-export class TransactionDispatchSheetComponent implements ComponentWithContext {
+export class TransactionInquirySheetComponent implements ComponentWithContext {
   @Input({ required: true }) context!: TransactionSheetContext;
 
   get data(): SpecimenTransaction {
-    return this.context!.data;
+    return this.context.data;
   }
 
   get fieldData(): Record<string, any> {
-    return this.context!.fieldData;
+    return this.context.fieldData;
   }
 
   get totalAwayCount(): number {

@@ -9,6 +9,7 @@ import { SpecimenTransaction } from '@luomus/laji-schema';
 import { TransactionPdfSheetsContextService } from './transaction-pdf-sheets-context-service';
 import { ComponentWithContext, PdfService } from '@kotka/services';
 import { TransactionIncomingSheetComponent } from './transaction-incoming-sheet/transaction-incoming-sheet';
+import { TransactionInquirySheetComponent } from './transaction-inquiry-sheet/transaction-inquiry-sheet';
 
 @Component({
   selector: 'kotka-transaction-pdf-sheets',
@@ -17,7 +18,7 @@ import { TransactionIncomingSheetComponent } from './transaction-incoming-sheet/
       <div class="btn-group-vertical col-12">
         <button class="btn btn-light" (click)="downloadDispatchSheet()">Dispatch sheet (PDF)</button>
         <button class="btn btn-light" (click)="downloadIncomingSheet()">Incoming receipt (PDF)</button>
-        <button class="btn btn-light" [disabled]="true">Inquiry sheet (PDF)</button>
+        <button class="btn btn-light" (click)="downloadInquirySheet()">Inquiry sheet (PDF)</button>
         <button class="btn btn-light mb-3" [disabled]="true">Return sheet (PDF)</button>
         <button class="btn btn-light" [disabled]="true">Insect labels (PDF)</button>
         <div class="px-3 py-2 w-100 text-center">
@@ -55,6 +56,10 @@ export class TransactionPdfSheetsComponent implements OnChanges {
 
   downloadIncomingSheet() {
     this.downloadSheet(TransactionIncomingSheetComponent, 'receipt');
+  }
+
+  downloadInquirySheet() {
+    this.downloadSheet(TransactionInquirySheetComponent, 'inquirysheet');
   }
 
   private downloadSheet(componentClass: Type<ComponentWithContext>, name: string) {

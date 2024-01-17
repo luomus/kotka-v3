@@ -5,8 +5,12 @@
       [context]="context"
     ></kotka-transaction-dispatch-sheet>
     <kotka-transaction-incoming-sheet
-      *ngSwitchDefault
+      *ngSwitchCase="typeEnum.transactionIncoming"
       [context]="context"
     ></kotka-transaction-incoming-sheet>
+    <kotka-transaction-inquiry-sheet
+      *ngSwitchCase="typeEnum.transactionInquiry"
+      [context]="context"
+    ></kotka-transaction-inquiry-sheet>
   </ng-container>
 </ng-container>

@@ -14,10 +14,10 @@ import { PipesModule } from '@kotka/pipes';
   templateUrl: './transaction-incoming-sheet.html'
 })
 export class TransactionIncomingSheetComponent implements ComponentWithContext {
-  @Input() context?: TransactionSheetContext;
+  @Input({ required: true }) context!: TransactionSheetContext;
 
   get data(): SpecimenTransaction {
-    return this.context!.data;
+    return this.context.data;
   }
 
   get totalAwayCount(): number {

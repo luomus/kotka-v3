@@ -10,16 +10,20 @@ import {
 import {
     TransactionIncomingSheetComponent
 } from '../+transactions/transaction-pdf-sheets/transaction-incoming-sheet/transaction-incoming-sheet';
+import {
+  TransactionInquirySheetComponent
+} from '../+transactions/transaction-pdf-sheets/transaction-inquiry-sheet/transaction-inquiry-sheet';
 
 @NgModule({
-    imports: [
-        routing,
-        RouterModule,
-        CommonModule,
-        SharedModule,
-        TransactionDispatchSheetComponent,
-        TransactionIncomingSheetComponent
-    ],
+  imports: [
+    routing,
+    RouterModule,
+    CommonModule,
+    SharedModule,
+    TransactionDispatchSheetComponent,
+    TransactionIncomingSheetComponent,
+    TransactionInquirySheetComponent
+  ],
   declarations: [
     PdfDemoComponent
   ],

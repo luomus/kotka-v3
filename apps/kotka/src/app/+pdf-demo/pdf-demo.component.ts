@@ -14,7 +14,8 @@ import {
 
 enum TypeEnum {
   transactionDispatch = 'transactionDispatch',
-  transactionIncoming = 'transactionIncoming'
+  transactionIncoming = 'transactionIncoming',
+  transactionInquiry = 'transactionInquiry'
 }
 
 @Component({
