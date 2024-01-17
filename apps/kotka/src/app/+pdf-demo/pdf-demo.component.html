@@ -12,5 +12,9 @@
       *ngSwitchCase="typeEnum.transactionInquiry"
       [context]="context"
     ></kotka-transaction-inquiry-sheet>
+    <kotka-transaction-return-sheet
+      *ngSwitchCase="typeEnum.transactionReturn"
+      [context]="context"
+    ></kotka-transaction-return-sheet>
   </ng-container>
 </ng-container>

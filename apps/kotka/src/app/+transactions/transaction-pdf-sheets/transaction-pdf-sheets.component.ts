@@ -10,6 +10,7 @@ import { TransactionPdfSheetsContextService } from './transaction-pdf-sheets-con
 import { ComponentWithContext, PdfService } from '@kotka/services';
 import { TransactionIncomingSheetComponent } from './transaction-incoming-sheet/transaction-incoming-sheet';
 import { TransactionInquirySheetComponent } from './transaction-inquiry-sheet/transaction-inquiry-sheet';
+import { TransactionReturnSheetComponent } from './transaction-return-sheet/transaction-return-sheet';
 
 @Component({
   selector: 'kotka-transaction-pdf-sheets',
@@ -19,7 +20,7 @@ import { TransactionInquirySheetComponent } from './transaction-inquiry-sheet/tr
         <button class="btn btn-light" (click)="downloadDispatchSheet()">Dispatch sheet (PDF)</button>
         <button class="btn btn-light" (click)="downloadIncomingSheet()">Incoming receipt (PDF)</button>
         <button class="btn btn-light" (click)="downloadInquirySheet()">Inquiry sheet (PDF)</button>
-        <button class="btn btn-light mb-3" [disabled]="true">Return sheet (PDF)</button>
+        <button class="btn btn-light mb-3" (click)="downloadReturnSheet()">Return sheet (PDF)</button>
         <button class="btn btn-light" [disabled]="true">Insect labels (PDF)</button>
         <div class="px-3 py-2 w-100 text-center">
           <a
@@ -60,6 +61,10 @@ export class TransactionPdfSheetsComponent implements OnChanges {
 
   downloadInquirySheet() {
     this.downloadSheet(TransactionInquirySheetComponent, 'inquirysheet');
+  }
+
+  downloadReturnSheet() {
+    this.downloadSheet(TransactionReturnSheetComponent, 'returnsheet');
   }
 
   private downloadSheet(componentClass: Type<ComponentWithContext>, name: string) {
