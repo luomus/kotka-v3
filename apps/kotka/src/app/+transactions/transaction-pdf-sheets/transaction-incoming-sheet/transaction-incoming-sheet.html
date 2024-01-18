@@ -1,103 +1,23 @@
-<div class="transaction-header">
-  <div class="transaction-header-left multi-line">
-    <ng-container *ngIf="context.ownerOrganization as ownerOrganization">
-      <span>{{ ownerOrganization.organizationLevel2 }}</span>
-      <span>{{ ownerOrganization.organizationLevel3 }}<ng-container *ngIf="ownerOrganization.abbreviation"> ({{ ownerOrganization.abbreviation }})</ng-container></span>
-      <span>{{ ownerOrganization.organizationLevel4 }}</span>
-    </ng-container>
-  </div>
-  <div class="transaction-header-middle">
-    LOGO
-  </div>
-  <div class="transaction-header-right multi-line">
-    <img [src]="'https://koivu.luomus.fi/projects/qrcode/?code=' + (data.id | toFullUri)" width="50" height="50">
-    <span>{{ data.id | toFullUri }}</span>
-  </div>
-</div>
+<kotka-transaction-sheet-header
+  [data]="data"
+  [ownerOrganization]="context.ownerOrganization"
+></kotka-transaction-sheet-header>
 <h2>INCOMING {{ data.type | transactionTypeLabel | uppercase }}</h2>
 <p>We have received the material indicated here from your institution. Please reference the identifier <strong>{{ data.id | toFullUri }}</strong> in all correspondence related to this material. Thank you.</p>
 <hr>
-<div class="avoid-page-break" style="display: grid; grid-template-columns: 50% 50%">
-  <div>
-    <h4>Sender</h4>
-    <div *ngIf="context.correspondingOrganization as correspondingOrganization" class="multi-line content-block">
-      <span>{{ correspondingOrganization.organizationLevel4 }}<ng-container *ngIf="correspondingOrganization.abbreviation"> ({{ correspondingOrganization.abbreviation }})</ng-container></span>
-      <span>{{ correspondingOrganization.organizationLevel1 }}</span>
-      <span>{{ correspondingOrganization.organizationLevel2 }}</span>
-      <span>{{ correspondingOrganization.organizationLevel3 }}</span>
-      <!--span>PO box</span-->
-      <span>{{ correspondingOrganization.streetAddress }}</span>
-      <span>{{ correspondingOrganization.postalCode }}</span>
-      <span>{{ correspondingOrganization.locality }}</span>
-      <span>{{ correspondingOrganization.region }}</span>
-      <span>{{ correspondingOrganization.country }}</span>
-    </div>
-    <div *ngIf="data.correspondentPerson" class="multi-line content-block">
-      <span>Corresponding person:</span>
-      <span>{{ data.correspondentPerson }}</span>
-    </div>
-    <div *ngIf="data.externalID" class="multi-line content-block">
-      Sender's loan ID: {{ data.externalID }}
-    </div>
-  </div>
-  <div>
-    <h4>Recipient</h4>
-    <div *ngIf="context.ownerOrganization as ownerOrganization" class="multi-line content-block">
-      <span>{{ ownerOrganization.organizationLevel4 }}</span>
-      <span>{{ ownerOrganization.organizationLevel3 }}</span>
-      <span>{{ ownerOrganization.organizationLevel2 }}</span>
-      <span>{{ ownerOrganization.organizationLevel1 }}</span>
-    </div>
-    <div *ngIf="data.localResearcher" class="multi-line content-block">
-      <span>Receiving researcher:</span>
-      <span>{{ data.localResearcher }}</span>
-    </div>
-    <div *ngIf="data.requestReceived || data.outgoingSent || data.transportMethod" class="multi-line content-block">
-      <span>Recipient loan ID: {{ data.id | toFullUri }}</span>
-      <span>Loan received: {{ data.incomingReceived | date:'dd MMMM Y' }}</span>
-      <span>Due date: {{ data.dueDate | date:'dd MMMM Y' }}</span>
-    </div>
-    <div *ngIf="data.localHandler || data.localHandlerEmail" class="multi-line content-block">
-      <span>Handler:</span>
-      <span>{{ data.localHandler }}</span>
-      <span>{{ data.localHandlerEmail }}</span>
-    </div>
-    <div *ngIf="data.localPerson || data.localPersonEmail" class="multi-line content-block">
-      <span>Person responsible:</span>
-      <span>{{ data.localPerson }}</span>
-      <span>{{ data.localPersonEmail }}</span>
-    </div>
-  </div>
-</div>
-<div *ngIf="data.publicRemarks" class="avoid-page-break">
-  <hr>
-  <h4>Remarks</h4>
-  <p>{{ data.publicRemarks }}</p>
-</div>
+<kotka-transaction-sheet-incoming-details
+  [data]="data"
+  [ownerOrganization]="context.ownerOrganization"
+  [correspondingOrganization]="context.correspondingOrganization"
+></kotka-transaction-sheet-incoming-details>
+<kotka-transaction-sheet-remarks
+  [data]="data"
+></kotka-transaction-sheet-remarks>
 <hr>
-<div class="avoid-page-break">
-  <p>Material received in good condition. We commit to the {{ data.type | transactionTypeLabel }} terms.</p>
-  <div class="signature-space"></div>
-  <div style="display: grid; grid-template-columns: 35% 35% 15% 15%">
-    <span>Recipient name</span>
-    <span>Signature</span>
-    <span>Place</span>
-    <span>Date</span>
-  </div>
-</div>
+<kotka-transaction-sheet-signature
+  [data]="data"
+></kotka-transaction-sheet-signature>
 <hr>
-<div class="avoid-page-break">
-  <h4>Material</h4>
-  <div class="content-block">
-    <strong>Total number of specimens: {{ totalAwayCount }}</strong>
-  </div>
-  <div *ngIf="data.material" class="content-block">
-    {{ data.material }}
-  </div>
-  <div *ngIf="data.awayIDs?.length" class="content-block" style="display: grid; grid-template-columns: repeat(3, 33%)">
-    <span *ngFor="let awayID of data.awayIDs">{{ awayID }}</span>
-  </div>
-  <div *ngIf="data.awayCount" class="content-block">
-    In addition, loan includes {{ data.awayCount }} specimen(s) not specified in this list.
-  </div>
-</div>
+<kotka-transaction-sheet-material
+  [data]="data"
+></kotka-transaction-sheet-material>

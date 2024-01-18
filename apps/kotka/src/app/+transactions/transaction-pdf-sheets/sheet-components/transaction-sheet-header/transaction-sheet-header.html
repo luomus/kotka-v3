@@ -1,0 +1,16 @@
+<div class="transaction-header">
+  <div class="transaction-header-left multi-line">
+    <ng-container *ngIf="ownerOrganization">
+      <span>{{ ownerOrganization.organizationLevel2 }}</span>
+      <span>{{ ownerOrganization.organizationLevel3 }}<ng-container *ngIf="ownerOrganization.abbreviation"> ({{ ownerOrganization.abbreviation }})</ng-container></span>
+      <span>{{ ownerOrganization.organizationLevel4 }}</span>
+    </ng-container>
+  </div>
+  <div class="transaction-header-middle">
+    LOGO
+  </div>
+  <div class="transaction-header-right multi-line">
+    <img [src]="'https://koivu.luomus.fi/projects/qrcode/?code=' + (data.id | toFullUri)" width="50" height="50">
+    <span>{{ data.id | toFullUri }}</span>
+  </div>
+</div>
