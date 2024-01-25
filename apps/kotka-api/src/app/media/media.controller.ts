@@ -2,31 +2,26 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { Body, Controller, Get, Param, Post, Put, Req, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
-import { AnyFilesInterceptor } from '@nestjs/platform-express';
+import { Body, Controller, Get, Param, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
-import { MediaService, NewMediaFile } from './media.service';
-//@ts-ignore
-import { Multer } from 'multer';
-import { MediaTypeValidatorInterceptor } from './media-type-size-validator.interceptor';
-import {} from './media.service';
+import { MediaApiService, NewMediaFile } from '@kotka/api-services';
 import { map } from 'rxjs';
+import { Image } from '@luomus/laji-schema';
 
 @Controller('media')
 @UseGuards(AuthenticateCookieGuard)
 export class MediaController {
   constructor(
-    private readonly mediaService: MediaService
+    private readonly mediaService: MediaApiService
   ) {}
 
   @Post(':type')
-  @UseInterceptors(AnyFilesInterceptor(), MediaTypeValidatorInterceptor)
-  postMedia(@UploadedFiles() files: Express.Multer.File[], @Param('type') type) {
-    return this.mediaService.postMedia(type, files);
+  postMedia(@Req() req, @Res() res, @Param('type') type) {
+    return this.mediaService.postMediaStreaming(type, req, res);
   }
 
   @Post(':type/:tempId')
-  postMetadata(@Req() request, @Param('type') type, @Param('tempId') tempId, @Body() body) {
+  postMetadata(@Req() request, @Param('type') type: string, @Param('tempId') tempId: string, @Body() body: Image) {
     const profile = request.user.profile;
     const newMedia: NewMediaFile[] = [
       {

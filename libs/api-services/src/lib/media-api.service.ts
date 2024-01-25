@@ -3,13 +3,15 @@ https://docs.nestjs.com/providers#services
 */
 
 import { HttpService } from '@nestjs/axios';
+import https from 'https';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import FormData from 'form-data';
 import { merge } from 'lodash';
-import { catchError, map } from 'rxjs';
+import { catchError, lastValueFrom, map } from 'rxjs';
 import { Person, Image } from '@kotka/shared/models';
 //@ts-ignore
 import { Multer } from 'multer';
+import { Request, Response } from 'express';
 
 export type FileUploadResponse = {
   name: string,
@@ -76,7 +78,7 @@ export type Urls = {
 }
 
 @Injectable()
-export class MediaService {
+export class MediaApiService {
   constructor(
     private readonly httpService: HttpService,
   ) {}
@@ -89,7 +91,25 @@ export class MediaService {
   private urlBase = process.env['MEDIA_API_URL'];
   private baseConfig = { headers: { Authorization: 'Basic ' + process.env['MEDIA_API_AUTH'] }};
 
-  postMedia(type: string, files: Express.Multer.File[]) {
+  postMediaStreaming(type: 'pdf' | 'images', req: Request, res: Response) {
+    const proxy = https.request(`${this.urlBase}api/fileUpload`, merge({
+      method: 'post',
+      params: {
+        mediaClass: this.mediaClasses[type]
+      },
+      headers: {
+        'content-type': req.headers['content-type'],
+        'content-length': req.headers['content-length'],
+      }
+    }, this.baseConfig), (response) => {
+      response.pipe(res);
+    });
+
+    console.log(proxy.getHeaders());
+    req.pipe(proxy);
+  }
+
+  postMedia(type: 'pdf' | 'images', files: Express.Multer.File[]) {
     const formData = new FormData();
 
     files.forEach((file) => {
