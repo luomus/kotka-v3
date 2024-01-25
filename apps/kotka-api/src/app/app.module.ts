@@ -1,3 +1,4 @@
+import { OrganizationModule } from './organization/organization.module';
 import { ValidateModule } from './validate/validate.module';
 import { SharedModule } from './shared/shared.module';
 import { MappersModule } from '@kotka/mappers';
@@ -25,6 +26,7 @@ import { MediaModule } from './media/media.module';
     SpecimenModule,
     TransactionModule,
     MediaModule,
+    OrganizationModule
   ],
   controllers: [],
   providers: []
