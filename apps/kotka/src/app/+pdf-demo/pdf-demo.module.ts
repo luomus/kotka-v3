@@ -7,15 +7,27 @@ import { PdfDemoComponent } from './pdf-demo.component';
 import {
   TransactionDispatchSheetComponent
 } from '../+transactions/transaction-pdf-sheets/transaction-dispatch-sheet/transaction-dispatch-sheet';
+import {
+    TransactionIncomingSheetComponent
+} from '../+transactions/transaction-pdf-sheets/transaction-incoming-sheet/transaction-incoming-sheet';
+import {
+  TransactionInquirySheetComponent
+} from '../+transactions/transaction-pdf-sheets/transaction-inquiry-sheet/transaction-inquiry-sheet';
+import {
+    TransactionReturnSheetComponent
+} from '../+transactions/transaction-pdf-sheets/transaction-return-sheet/transaction-return-sheet';
 
 @NgModule({
-  imports: [
-    routing,
-    RouterModule,
-    CommonModule,
-    SharedModule,
-    TransactionDispatchSheetComponent
-  ],
+    imports: [
+        routing,
+        RouterModule,
+        CommonModule,
+        SharedModule,
+        TransactionDispatchSheetComponent,
+        TransactionIncomingSheetComponent,
+        TransactionInquirySheetComponent,
+        TransactionReturnSheetComponent
+    ],
   declarations: [
     PdfDemoComponent
   ],

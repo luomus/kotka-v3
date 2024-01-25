@@ -7,11 +7,17 @@ import {
   asSpecimenTransaction,
   KotkaDocumentObjectType,
 } from '@kotka/shared/models';
-import { Observable } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
 import {
-  DispatchSheetContext,
   TransactionPdfSheetsContextService
 } from '../+transactions/transaction-pdf-sheets/transaction-pdf-sheets-context-service';
+
+enum TypeEnum {
+  transactionDispatch = 'transactionDispatch',
+  transactionIncoming = 'transactionIncoming',
+  transactionInquiry = 'transactionInquiry',
+  transactionReturn = 'transactionReturn'
+}
 
 @Component({
   selector: 'kotka-pdf-demo-component',
@@ -21,21 +27,33 @@ import {
   encapsulation: ViewEncapsulation.None
 })
 export class PdfDemoComponent {
-  context$: Observable<DispatchSheetContext>;
+  type$: Observable<TypeEnum>;
+  context$: Observable<any>;
+
+  typeEnum = TypeEnum;
 
   constructor(
     private route: ActivatedRoute,
     private dataService: DataService,
     private transactionPdfSheetsContextService: TransactionPdfSheetsContextService
   ) {
-    const id$ = this.route.queryParams.pipe(
-      map((p) => FormViewUtils.getIdFromDataURI(p['uri']))
+    const params$ = this.route.queryParams.pipe(
+      map(({ uri, type }) => ({
+        id: FormViewUtils.getIdFromDataURI(uri),
+        type: <TypeEnum> (<any> TypeEnum)[type] || TypeEnum.transactionDispatch
+      }))
     );
-    const data$ = id$.pipe(switchMap(id => (
-      this.dataService.getById(KotkaDocumentObjectType.transaction, id)
-    )));
-    this.context$ = data$.pipe(switchMap(data => (
-      this.transactionPdfSheetsContextService.getDispatchSheetContext(asSpecimenTransaction(data))
-    )));
+
+    this.type$ = params$.pipe(map(params => params.type));
+
+    const data$ = params$.pipe(switchMap(params => {
+      return this.dataService.getById(KotkaDocumentObjectType.transaction, params.id);
+    }));
+
+    this.context$ = combineLatest([params$, data$]).pipe(
+      switchMap(([ params, data ]) => {
+        return this.transactionPdfSheetsContextService.getSheetContext(asSpecimenTransaction(data));
+      })
+    );
   }
 }

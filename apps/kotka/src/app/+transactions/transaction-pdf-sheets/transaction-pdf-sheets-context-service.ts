@@ -7,7 +7,7 @@ import { map } from 'rxjs/operators';
 import { globals } from '../../../environments/globals';
 import { FormService } from '@kotka/services';
 
-export interface DispatchSheetContext {
+export interface TransactionSheetContext {
   data: SpecimenTransaction,
   ownerOrganization?: LajiOrganization,
   correspondingOrganization?: LajiOrganization,
@@ -23,7 +23,7 @@ export class TransactionPdfSheetsContextService {
     private formService: FormService
   ) {}
 
-  getDispatchSheetContext(data: SpecimenTransaction): Observable<DispatchSheetContext> {
+  getSheetContext(data: SpecimenTransaction): Observable<TransactionSheetContext> {
     type ForkJoinReturnType = [LajiOrganization|undefined, LajiOrganization|undefined, Record<string, any>];
 
     return forkJoin([

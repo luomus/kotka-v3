@@ -1,0 +1,15 @@
+<div class="avoid-page-break">
+  <h4>Material</h4>
+  <div class="content-block">
+    <strong>Total number of specimens: {{ totalAwayCount }}</strong>
+  </div>
+  <div *ngIf="data.material" class="content-block">
+    {{ data.material }}
+  </div>
+  <div *ngIf="data.awayIDs?.length" class="content-block" style="display: grid; grid-template-columns: repeat(3, 33%)">
+    <span *ngFor="let awayID of data.awayIDs">{{ awayID }}</span>
+  </div>
+  <div *ngIf="data.awayCount" class="content-block">
+    In addition, loan includes {{ data.awayCount }} specimen(s) not specified in this list.
+  </div>
+</div>
