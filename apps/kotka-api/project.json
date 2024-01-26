@@ -8,6 +8,7 @@
       "executor": "@nrwl/webpack:webpack",
       "outputs": ["{options.outputPath}"],
       "options": {
+        "webpackConfig": "apps/kotka-api/webpack.config.js",
         "outputPath": "dist/apps/kotka-api",
         "main": "apps/kotka-api/src/main.ts",
         "tsConfig": "apps/kotka-api/tsconfig.app.json",
@@ -42,17 +43,13 @@
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["apps/kotka-api/**/*.ts"]
-      }
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/apps/kotka-api"],
       "options": {
-        "jestConfig": "apps/kotka-api/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "apps/kotka-api/jest.config.ts"
       }
     }
   },

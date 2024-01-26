@@ -6,20 +6,13 @@
   "targets": {
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": [
-          "libs/kotka/ui/laji-form/**/*.ts",
-          "libs/kotka/ui/laji-form/**/*.html"
-        ]
-      }
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/kotka/ui/laji-form"],
       "options": {
-        "jestConfig": "libs/kotka/ui/laji-form/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "libs/kotka/ui/laji-form/jest.config.ts"
       }
     }
   },
