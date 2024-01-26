@@ -16,6 +16,9 @@ import {
 import {
     TransactionReturnSheetComponent
 } from '../+transactions/transaction-pdf-sheets/transaction-return-sheet/transaction-return-sheet';
+import {
+    TransactionInsectLabelsComponent
+} from '../+transactions/transaction-pdf-sheets/transaction-insect-labels/transaction-insect-labels';
 
 @NgModule({
     imports: [
@@ -26,7 +29,8 @@ import {
         TransactionDispatchSheetComponent,
         TransactionIncomingSheetComponent,
         TransactionInquirySheetComponent,
-        TransactionReturnSheetComponent
+        TransactionReturnSheetComponent,
+        TransactionInsectLabelsComponent
     ],
   declarations: [
     PdfDemoComponent

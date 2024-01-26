@@ -16,7 +16,8 @@ enum TypeEnum {
   transactionDispatch = 'transactionDispatch',
   transactionIncoming = 'transactionIncoming',
   transactionInquiry = 'transactionInquiry',
-  transactionReturn = 'transactionReturn'
+  transactionReturn = 'transactionReturn',
+  transactionInsectLabels = 'transactionInsectLabels'
 }
 
 @Component({
@@ -52,7 +53,13 @@ export class PdfDemoComponent {
 
     this.context$ = combineLatest([params$, data$]).pipe(
       switchMap(([ params, data ]) => {
-        return this.transactionPdfSheetsContextService.getSheetContext(asSpecimenTransaction(data));
+        data = asSpecimenTransaction(data);
+
+        if (params.type === TypeEnum.transactionInsectLabels) {
+          return this.transactionPdfSheetsContextService.getShelfSlipContext(data);
+        }
+
+        return this.transactionPdfSheetsContextService.getSheetContext(data);
       })
     );
   }

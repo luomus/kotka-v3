@@ -11,6 +11,7 @@ import { ComponentWithContext, PdfService } from '@kotka/services';
 import { TransactionIncomingSheetComponent } from './transaction-incoming-sheet/transaction-incoming-sheet';
 import { TransactionInquirySheetComponent } from './transaction-inquiry-sheet/transaction-inquiry-sheet';
 import { TransactionReturnSheetComponent } from './transaction-return-sheet/transaction-return-sheet';
+import { TransactionInsectLabelsComponent } from './transaction-insect-labels/transaction-insect-labels';
 
 @Component({
   selector: 'kotka-transaction-pdf-sheets',
@@ -21,7 +22,7 @@ import { TransactionReturnSheetComponent } from './transaction-return-sheet/tran
         <button class="btn btn-light" (click)="downloadIncomingSheet()">Incoming receipt (PDF)</button>
         <button class="btn btn-light" (click)="downloadInquirySheet()">Inquiry sheet (PDF)</button>
         <button class="btn btn-light mb-3" (click)="downloadReturnSheet()">Return sheet (PDF)</button>
-        <button class="btn btn-light" [disabled]="true">Insect labels (PDF)</button>
+        <button class="btn btn-light" (click)="downloadInsectLabels()">Insect labels (PDF)</button>
         <div class="px-3 py-2 w-100 text-center">
           <a
             [href]='("/specimens/search?identifier=" + specimenIdQuery) | oldKotkaUrl'
@@ -67,12 +68,30 @@ export class TransactionPdfSheetsComponent implements OnChanges {
     this.downloadSheet(TransactionReturnSheetComponent, 'returnsheet');
   }
 
+  downloadInsectLabels() {
+    this.downloadShelfSlip(TransactionInsectLabelsComponent, 'insectlabels');
+  }
+
   private downloadSheet(componentClass: Type<ComponentWithContext>, name: string) {
     if (!this.data) {
       return;
     }
 
     this.transactionPdfSheetsContext.getSheetContext(this.data).subscribe(context => {
+      this.pdfService.downloadSheet(
+        componentClass,
+        context,
+        `${name}_${this.data?.id}.pdf`
+      );
+    });
+  }
+
+  private downloadShelfSlip(componentClass: Type<ComponentWithContext>, name: string) {
+    if (!this.data) {
+      return;
+    }
+
+    this.transactionPdfSheetsContext.getShelfSlipContext(this.data).subscribe(context => {
       this.pdfService.downloadSheet(
         componentClass,
         context,
