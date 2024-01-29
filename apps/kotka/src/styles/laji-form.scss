@@ -13,4 +13,8 @@
     border-top: 12px solid transparent;
     border-bottom: 12px solid transparent;
   }
+
+  .date-widget > .date-picker {
+    flex: 0 0 auto;
+  }
 }
