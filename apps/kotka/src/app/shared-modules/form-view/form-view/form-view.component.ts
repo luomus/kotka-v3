@@ -41,8 +41,8 @@ export class FormViewComponent implements OnChanges, OnDestroy {
   @Input() dataTypeName = '';
   @Input() augmentFormFunc?: (form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>;
 
-  @Input() headerTpl?: TemplateRef<any>;
-  @Input() extraSectionTpl?: TemplateRef<any>;
+  @Input() headerTpl?: TemplateRef<unknown>;
+  @Input() extraSectionTpl?: TemplateRef<unknown>;
 
   editMode = false;
   dataURI?: string;

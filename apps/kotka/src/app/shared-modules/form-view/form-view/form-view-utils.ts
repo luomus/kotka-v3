@@ -25,16 +25,17 @@ export class FormViewUtils {
     return data;
   }
 
-  private static removeMetaFieldsRecursively(data: any): any {
+  private static removeMetaFieldsRecursively(data: unknown): unknown {
     if (Array.isArray(data)) {
       return data.map(FormViewUtils.removeMetaFieldsRecursively);
     } else if (typeof data === 'object') {
-      Object.keys(data).map(key => {
+      const objectData = data as Record<string, unknown>;
+      Object.keys(objectData).map(key => {
         if (key.startsWith('@')) {
-          delete data[key];
+          delete objectData[key];
           return;
         }
-        FormViewUtils.removeMetaFieldsRecursively(data[key]);
+        FormViewUtils.removeMetaFieldsRecursively(objectData[key]);
       });
     }
 

@@ -9,7 +9,7 @@ import { PdfBaseComponent } from './components/pdf-base.component';
 import { DOCUMENT } from '@angular/common';
 
 export interface ComponentWithContext {
-  context?: any;
+  context?: unknown;
 }
 
 @Injectable({
@@ -23,7 +23,7 @@ export class PdfService {
     private componentService: ComponentService
   ) {}
 
-  downloadSheet<T extends ComponentWithContext>(componentClass: Type<T>, context: any, fileName: string) {
+  downloadSheet<T extends ComponentWithContext>(componentClass: Type<T>, context: unknown, fileName: string) {
     this.getHtml(componentClass, context).subscribe(html => {
       this.apiClient.htmlToPdf(html).subscribe(res => {
         FileSaver.saveAs(res, fileName);
@@ -31,7 +31,7 @@ export class PdfService {
     });
   }
 
-  private getHtml<T extends ComponentWithContext>(componentClass: Type<T>, context: any): Observable<string> {
+  private getHtml<T extends ComponentWithContext>(componentClass: Type<T>, context: unknown): Observable<string> {
     return this.getStyleElement().pipe(map(styleElem => {
       const baseComponentRef = this.componentService.createComponentFromType(PdfBaseComponent);
 
@@ -50,7 +50,7 @@ export class PdfService {
     }));
   }
 
-  private addContentComponentToBody<T extends ComponentWithContext>(componentClass: Type<T>, context: any, bodyElem: HTMLBodyElement): ComponentRef<T> {
+  private addContentComponentToBody<T extends ComponentWithContext>(componentClass: Type<T>, context: unknown, bodyElem: HTMLBodyElement): ComponentRef<T> {
     const componentRef = this.componentService.createComponentFromType(componentClass, bodyElem);
 
     componentRef.instance.context = context;

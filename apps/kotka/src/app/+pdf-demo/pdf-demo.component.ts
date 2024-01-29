@@ -41,7 +41,7 @@ export class PdfDemoComponent {
     const params$ = this.route.queryParams.pipe(
       map(({ uri, type }) => ({
         id: FormViewUtils.getIdFromDataURI(uri),
-        type: <TypeEnum> (<any> TypeEnum)[type] || TypeEnum.transactionDispatch
+        type: <TypeEnum> (<never> TypeEnum)[type] || TypeEnum.transactionDispatch
       }))
     );
 

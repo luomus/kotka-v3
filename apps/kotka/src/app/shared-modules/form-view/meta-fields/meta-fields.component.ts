@@ -12,5 +12,5 @@ export class MetaFieldsComponent {
   @Input() editMode?: boolean;
   @Input() dataURI?: string;
 
-  @Input() extraSectionTpl?: TemplateRef<any>;
+  @Input() extraSectionTpl?: TemplateRef<unknown>;
 }

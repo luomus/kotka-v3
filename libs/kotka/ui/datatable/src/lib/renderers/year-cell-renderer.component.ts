@@ -1,22 +1,11 @@
 import { Component } from '@angular/core';
-import { ICellRendererAngularComp } from '@ag-grid-community/angular';
-import { ICellRendererParams } from '@ag-grid-community/core';
+import { CellRendererComponent } from './cell-renderer';
 
 @Component({
   selector: 'kui-year-cell-renderer',
   template: `
-    <span title="{{ value | date:'YYYY' }}">{{ value | date:'YYYY' }}</span>
+    <span title="{{ params.value | date:'YYYY' }}">{{ params.value | date:'YYYY' }}</span>
   `,
   styles: []
 })
-export class YearCellRendererComponent implements ICellRendererAngularComp {
-  value = '';
-
-  agInit(params: any): void {
-    this.value = params.getValue();
-  }
-
-  refresh(params: ICellRendererParams<any>): boolean {
-    return false;
-  }
-}
+export class YearCellRendererComponent extends CellRendererComponent {}

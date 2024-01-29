@@ -4,8 +4,6 @@ https://docs.nestjs.com/interceptors#interceptors
 
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, UnsupportedMediaTypeException, PayloadTooLargeException } from '@nestjs/common';
 import { Observable } from 'rxjs';
-//@ts-ignore
-import { Multer } from 'multer';
 
 @Injectable()
 export class MediaTypeValidatorInterceptor implements NestInterceptor {

@@ -6,10 +6,7 @@ import { Body, Controller, Get, Param, Post, Put, Req, UploadedFiles, UseGuards,
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
 import { MediaService, NewMediaFile } from './media.service';
-//@ts-ignore
-import { Multer } from 'multer';
 import { MediaTypeValidatorInterceptor } from './media-type-size-validator.interceptor';
-import {} from './media.service';
 import { map } from 'rxjs';
 
 @Controller('media')

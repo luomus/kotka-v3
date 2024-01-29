@@ -8,7 +8,7 @@ import FormData from 'form-data';
 import { merge } from 'lodash';
 import { catchError, map } from 'rxjs';
 import { Person, Image } from '@kotka/shared/models';
-//@ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Multer } from 'multer';
 
 export type FileUploadResponse = {

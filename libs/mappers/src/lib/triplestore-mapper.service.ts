@@ -24,15 +24,15 @@ export class TriplestoreMapperService implements OnModuleInit {
   triplestoreToJson (data, type): Promise<StoreObject> {
     const baseUrl = 'http://tun.fi/';
     const store = graph();
-    
-    return new Promise((resolve, reject) => {
+
+    return new Promise((resolve) => {
       parse(data, store, baseUrl, 'application/rdf+xml');
       serialize(null, store, baseUrl, 'application/ld+json', async (err, data) => {
         const jsonld = JSON.parse(data);
-        
+
         try {
         const json = await compact(jsonld, this.fromContext[type]);
-        
+
         if (json['@graph']) {
           resolve(json['@graph']);
         }
@@ -61,7 +61,7 @@ export class TriplestoreMapperService implements OnModuleInit {
 
     const rdf = await toRDF(data, {format: 'application/n-quads'});
 
-    return new Promise( (resolve, reject) => {
+    return new Promise( (resolve) => {
       parse(rdf, store, baseUrl, 'application/n-quads', (err, data) => {
 
         serialize(null, data, undefined, 'application/rdf+xml', (err, data) => {
@@ -71,7 +71,7 @@ export class TriplestoreMapperService implements OnModuleInit {
       });
     });
   }
-  
+
   documentMaps = {};
   fromContext = {};
   returnContext = {};

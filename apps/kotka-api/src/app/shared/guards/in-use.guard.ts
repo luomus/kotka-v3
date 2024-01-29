@@ -5,7 +5,7 @@ https://docs.nestjs.com/guards#guards
 import { LajiStoreService, TriplestoreService } from '@kotka/api-services';
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { lastValueFrom, Observable } from 'rxjs';
+import { lastValueFrom } from 'rxjs';
 import { ErrorMessages } from '@kotka/api-interfaces';
 
 @Injectable()
@@ -25,7 +25,7 @@ export class InUseGuard implements CanActivate {
       return true;
     }
 
-    const type: string = this.reflector.get('controllerType', context.getClass());
+    this.reflector.get('controllerType', context.getClass());
     const inUseTypes: Array<string> = this.reflector.get('inUseTypes', context.getClass());
 
     if (inUseTypes.length === 0 || !inUseTypes) {

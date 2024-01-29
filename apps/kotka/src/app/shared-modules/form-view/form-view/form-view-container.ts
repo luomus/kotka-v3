@@ -17,7 +17,7 @@ export class FormViewContainerComponent implements ComponentCanDeactivate {
   ) {}
 
   @HostListener('window:beforeunload', ['$event'])
-  preventLeave($event: any) {
+  preventLeave($event: BeforeUnloadEvent) {
     if (this.formViewComponent?.getFormHasChanges()) {
       $event.returnValue = false;
     }

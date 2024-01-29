@@ -28,7 +28,7 @@ export class TransactionPdfSheetsContextService {
   ) {}
 
   getSheetContext(data: SpecimenTransaction): Observable<TransactionSheetContext> {
-    type ForkJoinReturnType = [LajiOrganization|undefined, LajiOrganization|undefined, Record<string, any>];
+    type ForkJoinReturnType = [LajiOrganization|undefined, LajiOrganization|undefined, Record<string, LajiForm.Field>];
 
     return forkJoin([
       this.getOrganization(data.owner),

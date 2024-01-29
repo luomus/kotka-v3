@@ -10,7 +10,7 @@ export interface ToastOptions {
   pauseDuration?: number;
 }
 export interface ToastInfo extends ToastOptions {
-  textOrTpl: string | TemplateRef<any>;
+  textOrTpl: string | TemplateRef<unknown>;
 }
 
 @Injectable({
@@ -20,7 +20,7 @@ export class ToastService {
   toasts$: Observable<ToastInfo[]>;
   private toastsSubject = new BehaviorSubject<ToastInfo[]>([]);
 
-  private pausedToasts: (string | TemplateRef<any>)[] = [];
+  private pausedToasts: (string | TemplateRef<unknown>)[] = [];
 
   constructor(
     private ngZone: NgZone
@@ -28,7 +28,7 @@ export class ToastService {
     this.toasts$ = this.toastsSubject.asObservable();
   }
 
-  show(textOrTpl: string | TemplateRef<any>, options: ToastOptions = {}) {
+  show(textOrTpl: string | TemplateRef<unknown>, options: ToastOptions = {}) {
     if (this.pausedToasts.includes(textOrTpl)) {
       return;
     }
@@ -76,7 +76,7 @@ export class ToastService {
     this.showError(message, options);
   }
 
-  private pauseToast(textOrTpl: string | TemplateRef<any>, pauseDuration = 10000) {
+  private pauseToast(textOrTpl: string | TemplateRef<unknown>, pauseDuration = 10000) {
     this.pausedToasts.push(textOrTpl);
     setTimeout(() => {
       this.pausedToasts = this.pausedToasts.filter(t => t !== textOrTpl);
