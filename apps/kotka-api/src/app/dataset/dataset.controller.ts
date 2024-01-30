@@ -13,6 +13,7 @@ import { TimedAccessSet } from '../shared/decorators/timed-access-set.decorator'
 import { TimedDocumentAccessGuard } from '../shared/guards/timed-document-access.guard';
 import { InUseGuard } from '../shared/guards/in-use.guard';
 import { InUseTypesSet } from '../shared/decorators/in-use-types-set.decorator';
+import { Dataset } from '@luomus/laji-schema';
 
 const type = 'GX.dataset';
 
@@ -26,7 +27,7 @@ const type = 'GX.dataset';
   TimedDocumentAccessGuard,
   InUseGuard  
 )
-export class DatasetController extends LajiStoreController {
+export class DatasetController extends LajiStoreController<Dataset> {
   constructor(
     protected readonly lajiStoreService: LajiStoreService,
     protected readonly triplestoreService: TriplestoreService,

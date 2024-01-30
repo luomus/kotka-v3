@@ -2,11 +2,30 @@ import { Person } from '@kotka/shared/models';
 import { HealthCheckResult } from '@nestjs/terminus';
 
 export interface StoreGetQuery {
-  query?: string,
+  q?: string,
   page?: number,
   page_size?: number,
   sort?: string,
   fields?: string
+}
+
+export interface StoreQueryResult<T> {
+  '@context': string,
+  '@type': string,
+  view: {
+    '@id': string,
+    '@type': string,
+    itemsPerPage: string,
+    first: string,
+    last: string,
+    previous: string,
+    next: string
+  },
+  totalItems: number,
+  pageSize: number,
+  currentPage: number,
+  lastPage: number,
+  member: T[]
 }
 
 export enum ErrorMessages {

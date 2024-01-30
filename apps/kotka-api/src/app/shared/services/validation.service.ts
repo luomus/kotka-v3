@@ -3,6 +3,7 @@ https://docs.nestjs.com/providers#services
 */
 
 import { LajiApiService, LajiStoreService, AbschService } from '@kotka/api-services';
+import { Dataset } from '@luomus/laji-schema';
 import { Injectable } from '@nestjs/common';
 import { get } from 'lodash';
 import { lastValueFrom, map } from 'rxjs';
@@ -42,7 +43,7 @@ export class ValidationService {
   async validateDatasetNameUnique(data, field) {
     const datasetNameField = 'datasetName' + field;
     const datasetName = get(data, datasetNameField);
-    const members: Record<string, unknown>[] = await lastValueFrom(this.lajiStoreService.search('GX.dataset', { query: { match: { [datasetNameField]: datasetName }}}).pipe(map(res => res.data?.member)));
+    const members: Dataset[] = await lastValueFrom(this.lajiStoreService.search<Dataset>('GX.dataset', { query: { match: { [datasetNameField]: datasetName }}}).pipe(map(res => res.data?.member)));
 
     if (members.length !== 0 && !(members.length === 1 && members[0].id === data.id)) {
       return this.getError(datasetNameField, "Dataset name must be unique.");

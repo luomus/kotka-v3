@@ -28,7 +28,7 @@ import { DateInterceptor } from '../interceptors/date.interceptor';
 import { ValidatorInterceptor } from '../interceptors/validator.interceptor';
 import { createPatch } from 'rfc6902';
 
-export abstract class LajiStoreController {
+export abstract class LajiStoreController<T extends StoreObject> {
   constructor (
     protected readonly lajiStoreService: LajiStoreService,
     protected readonly triplestoreService: TriplestoreService,
@@ -41,7 +41,7 @@ export abstract class LajiStoreController {
   @Get()
   async getAll(@Query() query: StoreGetQuery) {
     try {
-      const res = await lastValueFrom(this.lajiStoreService.getAll(this.type, query));
+      const res = await lastValueFrom(this.lajiStoreService.getAll<T>(this.type, query));
 
       return res.data;
     } catch (err) {
@@ -52,9 +52,9 @@ export abstract class LajiStoreController {
 
   @UseInterceptors(UserInterceptor, DateInterceptor, ValidatorInterceptor)
   @Post()
-  async post(@Req() req, @Body() body: StoreObject) {
+  async post(@Req() req, @Body() body: T) {
     try {
-      const res = await lastValueFrom(this.lajiStoreService.post(this.type, body));
+      const res = await lastValueFrom(this.lajiStoreService.post<T>(this.type, body));
 
       if (this.useTriplestore) {
         try {
@@ -77,7 +77,7 @@ export abstract class LajiStoreController {
   @Get(':id')
   async get(@Param('id') id: string) {
     try {
-      const res = await lastValueFrom(this.lajiStoreService.get(this.type, id));
+      const res = await lastValueFrom(this.lajiStoreService.get<T>(this.type, id));
 
       return res.data;
     } catch (err) {
@@ -91,9 +91,9 @@ export abstract class LajiStoreController {
 
   @UseInterceptors(UserInterceptor, DateInterceptor, ValidatorInterceptor)
   @Put(':id')
-  async put(@Req() req, @Param('id') id: string, @Body() body: StoreObject) {
+  async put(@Req() req, @Param('id') id: string, @Body() body: T) {
     try {
-      const res = await lastValueFrom(this.lajiStoreService.put(this.type, id, body));
+      const res = await lastValueFrom(this.lajiStoreService.put<T>(this.type, id, body));
 
       if (this.useTriplestore) {
         const rdfXml = await this.triplestoreMapperService.jsonToTriplestore(cloneDeep(res.data), this.type);

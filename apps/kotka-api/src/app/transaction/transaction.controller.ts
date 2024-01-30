@@ -12,6 +12,7 @@ import { InUseTypesSet } from '../shared/decorators/in-use-types-set.decorator';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
 import { TimedDocumentAccessGuard } from '../shared/guards/timed-document-access.guard';
 import { OrganizationGuard } from '../shared/guards/organization.guard';
+import { SpecimenTransaction } from '@luomus/laji-schema';
 
 const type = 'HRX.specimenTransaction';
 const useTriplestore = false;
@@ -25,7 +26,7 @@ const useTriplestore = false;
   OrganizationGuard,
   TimedDocumentAccessGuard,
 )
-export class TransactionController extends LajiStoreController {
+export class TransactionController extends LajiStoreController<SpecimenTransaction> {
   constructor(
     protected readonly lajiStoreService: LajiStoreService,
     protected readonly triplestoreService: TriplestoreService,
