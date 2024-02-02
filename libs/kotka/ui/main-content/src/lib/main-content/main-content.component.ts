@@ -25,5 +25,5 @@ import { Component, ChangeDetectionStrategy, Input, TemplateRef } from '@angular
 export class MainContentComponent {
   @Input() header?: string;
   @Input() containerClass = 'container-xl';
-  @Input() headerTpl?: TemplateRef<any>;
+  @Input() headerTpl?: TemplateRef<unknown>;
 }

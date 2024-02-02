@@ -9,18 +9,11 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/api-services"],
       "options": {
-        "jestConfig": "libs/api-services/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "libs/api-services/jest.config.ts"
       }
     },
     "lint": {
-      "executor": "@nx/eslint:lint",
-      "options": {
-        "lintFilePatterns": [
-          "libs/api-services/**/*.ts",
-          "libs/api-services/**/*.html"
-        ]
-      }
+      "executor": "@nx/eslint:lint"
     }
   },
   "tags": []

@@ -10,23 +10,23 @@ export class HttpLogger implements ILogger {
     private httpClient: HttpClient
   ) {}
 
-  public error(message: string, meta?: any): void {
+  public error(message: string, meta?: unknown): void {
     this._log('error', message, meta);
   }
 
-  public info(message: string, meta?: any): void {
+  public info(message: string, meta?: unknown): void {
     this._log('info', message, meta);
   }
 
-  public warn(message: string, meta?: any): void {
+  public warn(message: string, meta?: unknown): void {
     this._log('warn', message, meta);
   }
 
-  public log(message: string, meta?: any): void {
+  public log(): void {
     // log level items are not send forward
   }
 
-  private _log(type: 'error'|'warn'|'info', message: string, meta?: any): void {
+  private _log(type: 'error'|'warn'|'info', message: string, meta?: unknown): void {
     const path = this.loggerPath + type;
     this.httpClient.post(path, {message, meta}).subscribe();
   }

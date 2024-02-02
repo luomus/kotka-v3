@@ -9,17 +9,19 @@ import { DatasetFormComponent } from './dataset-form/dataset-form.component';
 import { FormViewModule } from '../shared-modules/form-view/form-view.module';
 import { SharedModule } from '../shared/shared.module';
 import { DatasetVersionHistoryComponent } from './dataset-version-history/dataset-version-history.component';
+import { PipesModule } from '@kotka/pipes';
 
 @NgModule({
-  imports: [
-    routing,
-    RouterModule,
-    CommonModule,
-    SharedModule,
-    KotkaUiMainContentModule,
-    KotkaUiDatatableModule,
-    FormViewModule
-  ],
+    imports: [
+        routing,
+        RouterModule,
+        CommonModule,
+        SharedModule,
+        KotkaUiMainContentModule,
+        KotkaUiDatatableModule,
+        FormViewModule,
+        PipesModule
+    ],
   declarations: [DatasetTableComponent, DatasetFormComponent, DatasetVersionHistoryComponent],
 })
 export class DatasetsModule {}

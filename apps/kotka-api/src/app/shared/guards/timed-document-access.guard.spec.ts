@@ -27,7 +27,7 @@ describe('InUseGuard', () => {
   });
 
   it('Admins are granted access', async () => {
-    const mockReflectorGet = jest.spyOn(reflector, 'get').mockImplementation((key, target) => {
+    jest.spyOn(reflector, 'get').mockImplementation((key) => {
       if (key === 'controllerType') {
         return 'GX.dataset';
       } else if (key === 'timedAccessMetadata') {
@@ -43,7 +43,7 @@ describe('InUseGuard', () => {
   });
 
   it('Calls to methods using getAll and post result into access granted without calls to lajistore', async () => {
-    const mockReflectorGet = jest.spyOn(reflector, 'get').mockImplementation((key, target) => {
+    jest.spyOn(reflector, 'get').mockImplementation((key) => {
       if (key === 'controllerType') {
         return 'GX.dataset';
       } else if (key === 'timedAccessMetadata') {
@@ -64,7 +64,7 @@ describe('InUseGuard', () => {
 
 
   it('Calls to methods without the timing set results in access being granted and no calls to lajistore', async () => {
-    const mockReflectorGet = jest.spyOn(reflector, 'get').mockImplementation((key, target) => {
+    jest.spyOn(reflector, 'get').mockImplementation((key) => {
       if (key === 'controllerType') {
         return 'GX.dataset';
       } else if (key === 'timedAccessMetadata') {
@@ -75,31 +75,31 @@ describe('InUseGuard', () => {
 
     mockContext.switchToHttp().getRequest.mockReturnValue({ method: 'GET', params: {id: 'GX.1'}, user: { profile: { organisation: ['MOS.1'] }}, body: {}});
     mockContext.getHandler.mockReturnValue(function get() { return undefined; });
-    const mockLajistoreGet = jest.spyOn(lajiStoreService, 'get').mockImplementation((type, id) => of({ data: { dateCreated: '2022-11-22T12:00:00.000Z', dateEdited: '2022-11-22T12:00:00.000Z' }, status: 200, statusText: '', headers: {}, config: {}}));
-    
+    const mockLajistoreGet = jest.spyOn(lajiStoreService, 'get').mockImplementation(() => of({ data: { dateCreated: '2022-11-22T12:00:00.000Z', dateEdited: '2022-11-22T12:00:00.000Z' }, status: 200, statusText: '', headers: {}, config: {}}));
+
     let canActivate = await timedDocumentAccessGuard.canActivate(mockContext);
     expect(canActivate).toBe(true);
     expect(mockLajistoreGet).toBeCalledTimes(0);
 
     mockContext.switchToHttp().getRequest.mockReturnValue({ method: 'PUT', params: {id: 'GX.1'}, user: { profile: { organisation: ['MOS.1'] }}, body: {}});
     mockContext.getHandler.mockReturnValue(function put() { return undefined; });
-    const mockLajistorePut = jest.spyOn(lajiStoreService, 'get').mockImplementation((type, id) => of({ data: { dateCreated: '2022-11-22T12:00:00.000Z', dateEdited: '2022-11-22T12:00:00.000Z' }, status: 200, statusText: '', headers: {}, config: {}}));
-    
+    const mockLajistorePut = jest.spyOn(lajiStoreService, 'get').mockImplementation(() => of({ data: { dateCreated: '2022-11-22T12:00:00.000Z', dateEdited: '2022-11-22T12:00:00.000Z' }, status: 200, statusText: '', headers: {}, config: {}}));
+
     canActivate = await timedDocumentAccessGuard.canActivate(mockContext);
     expect(canActivate).toBe(true);
     expect(mockLajistorePut).toBeCalledTimes(0);
 
     mockContext.switchToHttp().getRequest.mockReturnValue({ method: 'DELETE', params: {id: 'GX.1'}, user: { profile: { organisation: ['MOS.1'] }}, body: {}});
     mockContext.getHandler.mockReturnValue(function del() { return undefined; });
-    const mockLajistoreDel = jest.spyOn(lajiStoreService, 'get').mockImplementation((type, id) => of({ data: { dateCreated: '2022-11-22T12:00:00.000Z', dateEdited: '2022-11-22T12:00:00.000Z' }, status: 200, statusText: '', headers: {}, config: {}}));
-    
+    const mockLajistoreDel = jest.spyOn(lajiStoreService, 'get').mockImplementation(() => of({ data: { dateCreated: '2022-11-22T12:00:00.000Z', dateEdited: '2022-11-22T12:00:00.000Z' }, status: 200, statusText: '', headers: {}, config: {}}));
+
     canActivate = await timedDocumentAccessGuard.canActivate(mockContext);
     expect(canActivate).toBe(true);
     expect(mockLajistoreDel).toBeCalledTimes(0);
   });
 
   it('Calls to methods with the timing set results in calls to lajistore and when document creation time is close enough a granted access', async () => {
-    const mockReflectorGet = jest.spyOn(reflector, 'get').mockImplementation((key, target) => {
+    jest.spyOn(reflector, 'get').mockImplementation((key) => {
       if (key === 'controllerType') {
         return 'GX.dataset';
       } else if (key === 'timedAccessMetadata') {
@@ -110,31 +110,31 @@ describe('InUseGuard', () => {
 
     mockContext.switchToHttp().getRequest.mockReturnValue({ method: 'GET', params: {id: 'GX.1'}, user: { profile: { organisation: ['MOS.1'] }}, body: {}});
     mockContext.getHandler.mockReturnValue(function get() { return undefined; });
-    const mockLajistoreGet = jest.spyOn(lajiStoreService, 'get').mockImplementation((type, id) => of({ data: { dateCreated: '2022-11-22T12:00:00.000Z', dateEdited: '2022-11-22T12:00:00.000Z' }, status: 200, statusText: '', headers: {}, config: {}}));
-    
+    const mockLajistoreGet = jest.spyOn(lajiStoreService, 'get').mockImplementation(() => of({ data: { dateCreated: '2022-11-22T12:00:00.000Z', dateEdited: '2022-11-22T12:00:00.000Z' }, status: 200, statusText: '', headers: {}, config: {}}));
+
     let canActivate = await timedDocumentAccessGuard.canActivate(mockContext);
     expect(canActivate).toBe(true);
     expect(mockLajistoreGet).toBeCalledTimes(1);
 
     mockContext.switchToHttp().getRequest.mockReturnValue({ method: 'PUT', params: {id: 'GX.1'}, user: { profile: { organisation: ['MOS.1'] }}, body: {}});
     mockContext.getHandler.mockReturnValue(function put() { return undefined; });
-    const mockLajistorePut = jest.spyOn(lajiStoreService, 'get').mockImplementation((type, id) => of({ data: { dateCreated: '2022-11-22T12:00:00.000Z', dateEdited: '2022-11-22T12:00:00.000Z' }, status: 200, statusText: '', headers: {}, config: {}}));
-    
+    const mockLajistorePut = jest.spyOn(lajiStoreService, 'get').mockImplementation(() => of({ data: { dateCreated: '2022-11-22T12:00:00.000Z', dateEdited: '2022-11-22T12:00:00.000Z' }, status: 200, statusText: '', headers: {}, config: {}}));
+
     canActivate = await timedDocumentAccessGuard.canActivate(mockContext);
     expect(canActivate).toBe(true);
     expect(mockLajistorePut).toBeCalledTimes(2);
 
     mockContext.switchToHttp().getRequest.mockReturnValue({ method: 'DELETE', params: {id: 'GX.1'}, user: { profile: { organisation: ['MOS.1'] }}, body: {}});
     mockContext.getHandler.mockReturnValue(function del() { return undefined; });
-    const mockLajistoreDel = jest.spyOn(lajiStoreService, 'get').mockImplementation((type, id) => of({ data: { dateCreated: '2022-11-22T12:00:00.000Z', dateEdited: '2022-11-22T12:00:00.000Z' }, status: 200, statusText: '', headers: {}, config: {}}));
-    
+    const mockLajistoreDel = jest.spyOn(lajiStoreService, 'get').mockImplementation(() => of({ data: { dateCreated: '2022-11-22T12:00:00.000Z', dateEdited: '2022-11-22T12:00:00.000Z' }, status: 200, statusText: '', headers: {}, config: {}}));
+
     canActivate = await timedDocumentAccessGuard.canActivate(mockContext);
     expect(canActivate).toBe(true);
     expect(mockLajistoreDel).toBeCalledTimes(3);
   });
 
   it('Calls to methods with the timing set results in calls to lajistore and when document creation time is to far a denied access', async () => {
-    const mockReflectorGet = jest.spyOn(reflector, 'get').mockImplementation((key, target) => {
+    jest.spyOn(reflector, 'get').mockImplementation((key) => {
       if (key === 'controllerType') {
         return 'GX.dataset';
       } else if (key === 'timedAccessMetadata') {
@@ -145,22 +145,22 @@ describe('InUseGuard', () => {
 
     mockContext.switchToHttp().getRequest.mockReturnValue({ method: 'GET', params: {id: 'GX.1'}, user: { profile: { organisation: ['MOS.1'] }}, body: {}});
     mockContext.getHandler.mockReturnValue(function get() { return undefined; });
-    const mockLajistoreGet = jest.spyOn(lajiStoreService, 'get').mockImplementation((type, id) => of({ data: { dateCreated: '2022-11-10T12:00:00.000Z', dateEdited: '2022-11-22T12:00:00.000Z' }, status: 200, statusText: '', headers: {}, config: {}}));
-    
+    const mockLajistoreGet = jest.spyOn(lajiStoreService, 'get').mockImplementation(() => of({ data: { dateCreated: '2022-11-10T12:00:00.000Z', dateEdited: '2022-11-22T12:00:00.000Z' }, status: 200, statusText: '', headers: {}, config: {}}));
+
     await expect(timedDocumentAccessGuard.canActivate(mockContext)).rejects.toThrow(ForbiddenException);
     expect(mockLajistoreGet).toBeCalledTimes(1);
 
     mockContext.switchToHttp().getRequest.mockReturnValue({ method: 'PUT', params: {id: 'GX.1'}, user: { profile: { organisation: ['MOS.1'] }}, body: {}});
     mockContext.getHandler.mockReturnValue(function put() { return undefined; });
-    const mockLajistorePut = jest.spyOn(lajiStoreService, 'get').mockImplementation((type, id) => of({ data: { dateCreated: '2022-11-10T12:00:00.000Z', dateEdited: '2022-11-22T12:00:00.000Z' }, status: 200, statusText: '', headers: {}, config: {}}));
-    
+    const mockLajistorePut = jest.spyOn(lajiStoreService, 'get').mockImplementation(() => of({ data: { dateCreated: '2022-11-10T12:00:00.000Z', dateEdited: '2022-11-22T12:00:00.000Z' }, status: 200, statusText: '', headers: {}, config: {}}));
+
     await expect(timedDocumentAccessGuard.canActivate(mockContext)).rejects.toThrow(ForbiddenException);
     expect(mockLajistorePut).toBeCalledTimes(2);
 
     mockContext.switchToHttp().getRequest.mockReturnValue({ method: 'DELETE', params: {id: 'GX.1'}, user: { profile: { organisation: ['MOS.1'] }}, body: {}});
     mockContext.getHandler.mockReturnValue(function del() { return undefined; });
-    const mockLajistoreDel = jest.spyOn(lajiStoreService, 'get').mockImplementation((type, id) => of({ data: { dateCreated: '2022-11-10T12:00:00.000Z', dateEdited: '2022-11-22T12:00:00.000Z' }, status: 200, statusText: '', headers: {}, config: {}}));
-    
+    const mockLajistoreDel = jest.spyOn(lajiStoreService, 'get').mockImplementation(() => of({ data: { dateCreated: '2022-11-10T12:00:00.000Z', dateEdited: '2022-11-22T12:00:00.000Z' }, status: 200, statusText: '', headers: {}, config: {}}));
+
     await expect(timedDocumentAccessGuard.canActivate(mockContext)).rejects.toThrow(ForbiddenException);
     expect(mockLajistoreDel).toBeCalledTimes(3);
   });

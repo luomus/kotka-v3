@@ -105,8 +105,8 @@ export class ApiClient {
     return this.httpClient.get<LoginResponse>(authPath + 'postLogin');
   }
 
-  logout(): Observable<any> {
-    return this.httpClient.get(authPath + 'logout');
+  logout(): Observable<void> {
+    return this.httpClient.get<void>(authPath + 'logout');
   }
 
   htmlToPdf(html: string): Observable<Blob> {

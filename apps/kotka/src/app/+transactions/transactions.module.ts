@@ -20,6 +20,7 @@ import { FormsModule } from '@angular/forms';
 import {
   TransactionDispatchSheetComponent
 } from './transaction-pdf-sheets/transaction-dispatch-sheet/transaction-dispatch-sheet';
+import { PipesModule } from '@kotka/pipes';
 
 @NgModule({
   imports: [
@@ -32,7 +33,8 @@ import {
     FormViewModule,
     KotkaUiLajiFormModule,
     FormsModule,
-    TransactionDispatchSheetComponent
+    TransactionDispatchSheetComponent,
+    PipesModule
   ],
   declarations: [
     TransactionFormComponent,

@@ -1,18 +1,22 @@
 import { Component } from '@angular/core';
-import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ICellRendererParams } from '@ag-grid-community/core';
+import { CellRendererComponent } from './cell-renderer';
+
+interface RendererParams extends ICellRendererParams {
+  domain: string;
+}
 
 @Component({
   selector: 'kui-uri-cell-renderer',
   template: `
-    <div *ngIf="value" class="uri-cell-layout">
+    <div *ngIf="params.value" class="uri-cell-layout">
       <a type="button" class="btn btn-info edit-button" [routerLink]="['edit']" [queryParams]="{
-        uri: domain + value
+        uri: params.domain + params.value
       }">
         <i class="fa fa-pen-to-square"></i>
       </a>
-      <small class="domain-value">{{ domain }}</small>
-      <span class="id-value" title="{{ value }}">{{ value }}</span>
+      <small class="domain-value">{{ params.domain }}</small>
+      <span class="id-value" title="{{ params.value }}">{{ params.value }}</span>
     </div>
   `,
   styles: [`
@@ -39,16 +43,4 @@ import { ICellRendererParams } from '@ag-grid-community/core';
     }
   `]
 })
-export class URICellRendererComponent implements ICellRendererAngularComp {
-  value = '';
-  domain = '';
-
-  agInit(params: any): void {
-    this.value = params.getValue();
-    this.domain = params.domain;
-  }
-
-  refresh(params: ICellRendererParams<any>): boolean {
-    return false;
-  }
-}
+export class URICellRendererComponent extends CellRendererComponent<RendererParams> {}

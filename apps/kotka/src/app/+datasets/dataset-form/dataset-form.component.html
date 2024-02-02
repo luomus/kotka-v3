@@ -2,15 +2,15 @@
   [formId]="formId"
   [dataType]="dataType"
   [dataTypeName]="'tag'"
-  [headerTpl]="headerTpl"
-  (formDataChange)="onFormDataChange($event)"
+  [editModeHeaderTpl]="editModeHeaderTpl"
 >
 </kotka-form-view>
 
-<ng-template #headerTpl>
+<ng-template #editModeHeaderTpl let-dataURI="dataURI" let-formData="formData">
+  <h1>Edit tag {{ dataURI }}</h1>
   <a
-    *ngIf="datasetQuery"
-    [href]='("/specimens/search?q=dataset.raw:\"" + datasetQuery + "\"") | oldKotkaUrl'
+    *ngIf="isDataset(formData)"
+    [href]='("/specimens/search?q=dataset.raw:\"" + asDataset(formData).datasetName.en + "\"") | oldKotkaUrl'
     target="_blank"
   >
     Specimens with this tag

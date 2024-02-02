@@ -6,20 +6,13 @@
   "targets": {
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": [
-          "libs/kotka/pipes/**/*.ts",
-          "libs/kotka/pipes/**/*.html"
-        ]
-      }
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/kotka/pipes"],
       "options": {
-        "jestConfig": "libs/kotka/pipes/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "libs/kotka/pipes/jest.config.ts"
       }
     }
   },

@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { SpecimenTransaction } from '@luomus/laji-schema';
 import { CommonModule } from '@angular/common';
 import { PipesModule } from '@kotka/pipes';
-import { LajiOrganization } from '@kotka/shared/models';
+import { LajiForm, LajiOrganization } from '@kotka/shared/models';
 import { TransactionTypeLabelPipe } from '../../pipes/transaction-type-label.pipe';
 
 @Component({
@@ -14,5 +14,5 @@ import { TransactionTypeLabelPipe } from '../../pipes/transaction-type-label.pip
 export class TransactionSheetOutgoingDetailsComponent {
   @Input({ required: true }) data!: SpecimenTransaction;
   @Input({ required: true }) correspondingOrganization?: LajiOrganization;
-  @Input({ required: true }) fieldData!: Record<string, any>;
+  @Input({ required: true }) fieldData!: Record<string, LajiForm.Field>;
 }

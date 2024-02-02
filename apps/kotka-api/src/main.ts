@@ -97,7 +97,7 @@ async function bootstrap() {
 
       return newPath;
     },
-    onProxyRes: (proxyRes, req: UserRequest, res) => {
+    onProxyRes: (proxyRes, req: UserRequest) => {
       const data = [];
       proxyRes.on('data', (chunk) => {
         data.push(chunk);

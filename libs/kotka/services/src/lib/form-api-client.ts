@@ -20,8 +20,8 @@ export class FormApiClient {
   public fetch(
     resource: string,
     query: any,
-    options?: {method?: string; body?: any; headers?: {[header: string]: string | string[]}}
-  ): Promise<any> {
+    options?: {method?: string; body?: unknown; headers?: {[header: string]: string | string[]}}
+  ): Promise<unknown> {
     let path = lajiApiBase + resource;
 
     const queryParameters = {...query};

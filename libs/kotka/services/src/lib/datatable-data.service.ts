@@ -3,6 +3,8 @@ import { KotkaDocumentObject, ListResponse, KotkaDocumentObjectType, SortModel }
 import { DataService} from './data.service';
 import { Injectable } from '@angular/core';
 
+type FilterModel = Record<string, any>;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -12,7 +14,7 @@ export class DatatableDataService {
     private dataService: DataService
   ) {}
 
-  getData(dataType: KotkaDocumentObjectType, startRow: number, endRow: number, sortModel: SortModel[], filterModel: any): Observable<ListResponse<KotkaDocumentObject>> {
+  getData(dataType: KotkaDocumentObjectType, startRow: number, endRow: number, sortModel: SortModel[], filterModel: FilterModel): Observable<ListResponse<KotkaDocumentObject>> {
     const pageSize = endRow - startRow;
     const page = (startRow / pageSize) + 1;
     const sort = this.sortModelToSortString(sortModel);
@@ -24,13 +26,13 @@ export class DatatableDataService {
     return sortModel.map(sort => sort.colId + ' ' + sort.sort).join(',');
   }
 
-  private filterModelToSearchQuery(filterModel: any): string {
+  private filterModelToSearchQuery(filterModel: FilterModel): string {
     return Object.keys(filterModel).map(
       key => this.filterModelEntryToSearchQuery(key, filterModel[key])
     ).join(' AND ');
   }
 
-  private filterModelEntryToSearchQuery(key: string, filterModel: any): string {
+  private filterModelEntryToSearchQuery(key: string, filterModel: FilterModel): string {
     if (filterModel['filterType'] !== 'text') {
       return '';
     }

@@ -167,7 +167,7 @@ export class TriplestoreMapperService implements OnModuleInit {
 
     const rdf = await toRDF(data, {format: 'application/n-quads'});
 
-    return new Promise( (resolve, reject) => {
+    return new Promise( (resolve) => {
       parse(rdf, store, baseUrl, 'application/n-quads', (err, data) => {
 
         serialize(null, data, undefined, 'application/rdf+xml', (err, data) => {
@@ -177,7 +177,7 @@ export class TriplestoreMapperService implements OnModuleInit {
       });
     });
   }
-  
+
   documentMaps = {};
   fromContext = {};
   returnContext = {};

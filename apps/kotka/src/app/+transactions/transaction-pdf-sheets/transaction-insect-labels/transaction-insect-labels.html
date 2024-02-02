@@ -1,0 +1,10 @@
+<div style="font-size: 11pt; margin-bottom: 10mm">
+  Labels for loan <strong>{{ data.id | toFullUri }}</strong>, sent {{ data.outgoingSent | date:'dd MMMM Y' }}
+</div>
+<div style="font-size: 6pt; display: grid; grid-template-columns: repeat(7, 1fr)">
+  <div *ngFor="let specimen of allSpecimens" class="multi-line avoid-page-break" style="margin: 2mm 1mm;">
+    <span>{{ specimen }}</span>
+    <span>Loan <span style="display: inline-block">{{ data.id | toFullUri }}</span></span>
+    <span>{{ data.outgoingSent | date:'dd MMMM Y' }}</span>
+  </div>
+</div>

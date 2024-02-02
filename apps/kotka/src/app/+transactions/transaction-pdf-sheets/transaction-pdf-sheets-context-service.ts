@@ -14,6 +14,10 @@ export interface TransactionSheetContext {
   fieldData: Record<string, LajiForm.Field>
 }
 
+export interface TransactionShelfSlipContext {
+  data: SpecimenTransaction
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -24,7 +28,7 @@ export class TransactionPdfSheetsContextService {
   ) {}
 
   getSheetContext(data: SpecimenTransaction): Observable<TransactionSheetContext> {
-    type ForkJoinReturnType = [LajiOrganization|undefined, LajiOrganization|undefined, Record<string, any>];
+    type ForkJoinReturnType = [LajiOrganization|undefined, LajiOrganization|undefined, Record<string, LajiForm.Field>];
 
     return forkJoin([
       this.getOrganization(data.owner),
@@ -37,6 +41,10 @@ export class TransactionPdfSheetsContextService {
         correspondingOrganization,
         fieldData
     })));
+  }
+
+  getShelfSlipContext(data: SpecimenTransaction): Observable<TransactionShelfSlipContext> {
+    return of({ data });
   }
 
   private getOrganization(organizationId?: string): Observable<LajiOrganization|undefined> {

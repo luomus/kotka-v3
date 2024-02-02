@@ -82,7 +82,7 @@ export class AuthenticationService {
   }
 
   public invalidateSession(request) {
-    request.logout((err) => {
+    request.logout(() => {
       request.session.cookie.maxAge = 0;
     });
 

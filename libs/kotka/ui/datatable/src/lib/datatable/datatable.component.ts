@@ -70,7 +70,6 @@ export class DatatableComponent implements OnChanges {
     filter: true,
     floatingFilter: true
   };
-  public components: any;
   public rowBuffer = 0;
   public rowSelection: 'single'|'multiple'|undefined = 'multiple';
   public rowModelType: RowModelType = 'infinite';

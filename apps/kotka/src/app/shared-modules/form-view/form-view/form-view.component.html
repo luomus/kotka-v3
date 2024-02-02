@@ -1,8 +1,14 @@
 <kui-main-content
-  [header]="editMode ? 'Edit ' + dataTypeName + ' ' + (dataURI || ''): 'Add ' + dataTypeName"
-  [headerTpl]="headerTpl"
+  [header]="editMode ? (editModeHeaderTpl ? undefined : 'Edit ' + dataTypeName + ' ' + (dataURI || '')) : 'Add ' + dataTypeName"
+  [headerTpl]="editMode && editModeHeaderTpl ? editModeHeaderTplWithContext : undefined"
   [containerClass]="'container'"
 >
+  <ng-template #editModeHeaderTplWithContext>
+    <ng-container *ngIf="editModeHeaderTpl">
+      <ng-container *ngTemplateOutlet="editModeHeaderTpl; context: { dataURI, formData: $any((vm$ | async)).formData }"></ng-container>
+    </ng-container>
+  </ng-template>
+
   <ng-container *ngIf="vm$ | async as vm else spinner">
     <ngb-alert *ngIf="isErrorViewModel(vm)" [type]="'danger'" [dismissible]="false">
       <ng-container *ngIf="vm.errorType === formErrorEnum.dataNotFound else genericError">
@@ -50,7 +56,6 @@
     </ng-container>
   </ng-container>
 </kui-main-content>
-
 
 <ng-template #spinner>
   <kui-spinner></kui-spinner>

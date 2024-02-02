@@ -42,17 +42,13 @@
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["apps/kotka-cli/**/*.ts"]
-      }
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/apps/kotka-cli"],
       "options": {
-        "jestConfig": "apps/kotka-cli/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "apps/kotka-cli/jest.config.ts"
       }
     }
   },
