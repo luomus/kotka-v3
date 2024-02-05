@@ -11,5 +11,5 @@ import { PipesModule } from '@kotka/pipes';
 })
 export class TransactionSheetHeaderComponent {
   @Input({ required: true }) data!: SpecimenTransaction;
-  @Input({ required: true }) ownerOrganization?: Organization
+  @Input({ required: true }) ownerOrganization?: Organization;
 }
