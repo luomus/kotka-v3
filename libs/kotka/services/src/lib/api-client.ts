@@ -6,7 +6,6 @@ import {
   KotkaDocumentObjectType,
   KotkaVersionDifference,
   LajiForm,
-  LajiOrganization,
   ListResponse,
   PagedResult,
   Person,
@@ -18,6 +17,7 @@ import {
   RangeResponse,
   LoginResponse
 } from '@kotka/api-interfaces';
+import { Organization } from '@luomus/laji-schema';
 
 const path = apiBase + '/';
 const authPath = apiBase + '/auth/';
@@ -84,8 +84,8 @@ export class ApiClient {
     return this.httpClient.get<RangeResponse>(`${path}specimen/range/${range}`);
   }
 
-  getOrganization(id: string): Observable<LajiOrganization> {
-    return this.httpClient.get<LajiOrganization>(`${lajiApiPath}organization/by-id/${id}`);
+  getOrganization(id: string): Observable<Organization> {
+    return this.httpClient.get<Organization>(`${path}organization/${id}`);
   }
 
   getPerson(id: string): Observable<Person> {
