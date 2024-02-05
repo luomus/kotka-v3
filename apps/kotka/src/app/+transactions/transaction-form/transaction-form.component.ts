@@ -49,8 +49,7 @@ export class TransactionFormComponent extends FormViewContainerComponent impleme
 
   private specimenRangeButtonClickSubscription?: Subscription;
 
-  private eventTypeSpecimenIdFieldMap: Record<Exclude<SpecimenTransactionEvent['eventType'], undefined>, SpecimenIdKey|undefined> = {
-    '': undefined,
+  private eventTypeSpecimenIdFieldMap: Record<SpecimenTransactionEvent['eventType'], SpecimenIdKey|undefined> = {
     'HRX.eventTypeReturn': 'returnedIDs',
     'HRX.eventTypeAddition': 'awayIDs'
   };
@@ -124,7 +123,7 @@ export class TransactionFormComponent extends FormViewContainerComponent impleme
     const transactionEvents = [...(formData.transactionEvents || []), transactionEvent];
     formData = { ...formData, transactionEvents };
 
-    const specimenIdField = this.eventTypeSpecimenIdFieldMap[transactionEvent.eventType || ''];
+    const specimenIdField = this.eventTypeSpecimenIdFieldMap[transactionEvent.eventType];
     const eventIds = transactionEvent.eventDocumentIDs || [];
 
     if (specimenIdField) {
