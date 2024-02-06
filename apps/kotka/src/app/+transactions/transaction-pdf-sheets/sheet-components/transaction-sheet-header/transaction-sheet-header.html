@@ -1,24 +1,26 @@
 <div class="transaction-header" *ngIf="ownerOrganization">
   <div class="transaction-header-left">
-    <div class="content-block multi-line">
+    <div class="content-block multi-line font-bold">
       <span *ngIf="ownerOrganization.organizationLevel2">{{ ownerOrganization.organizationLevel2.en }}</span>
       <span *ngIf="ownerOrganization.organizationLevel3 || ownerOrganization.abbreviation">{{ ownerOrganization.organizationLevel3?.en }}<ng-container *ngIf="ownerOrganization.abbreviation"> ({{ ownerOrganization.abbreviation }})</ng-container></span>
       <span *ngIf="ownerOrganization.organizationLevel4">{{ ownerOrganization.organizationLevel4.en }}</span>
     </div>
-    <div class="content-block" *ngIf="ownerOrganization.EORINumber">
-      EORI: {{ ownerOrganization.EORINumber }}
-    </div>
-    <div class="content-block multi-line">
-      <span *ngIf="ownerOrganization.postOfficeBox">P.O. Box {{ ownerOrganization.postOfficeBox }}</span>
-      <span *ngIf="ownerOrganization.postalCode || ownerOrganization.locality">{{ ownerOrganization.postalCode }} {{ ownerOrganization.locality }}</span>
-      <span *ngIf="ownerOrganization.country">{{ ownerOrganization.country }}</span>
-    </div>
-    <div class="content-block" *ngIf="ownerOrganization.courierAddress">
-      Street address for couriers:
-    </div>
-    <div class="content-block" *ngIf="ownerOrganization.courierAddress" style="white-space: pre-wrap">{{ ownerOrganization.courierAddress }}</div>
-    <div class="content-block" *ngIf="ownerOrganization.phone">
-      Tel. {{ ownerOrganization.phone }}
+    <div class="content-block">
+      <div class="sub-content-block" *ngIf="ownerOrganization.EORINumber">
+        EORI: {{ ownerOrganization.EORINumber }}
+      </div>
+      <div class="sub-content-block multi-line">
+        <span *ngIf="ownerOrganization.postOfficeBox">P.O. Box {{ ownerOrganization.postOfficeBox }}</span>
+        <span *ngIf="ownerOrganization.postalCode || ownerOrganization.locality">{{ ownerOrganization.postalCode }} {{ ownerOrganization.locality }}</span>
+        <span *ngIf="ownerOrganization.country">{{ ownerOrganization.country }}</span>
+      </div>
+      <div class="sub-content-block" *ngIf="ownerOrganization.courierAddress">
+        Street address for couriers:
+      </div>
+      <div class="sub-content-block" *ngIf="ownerOrganization.courierAddress" style="white-space: pre-wrap">{{ ownerOrganization.courierAddress }}</div>
+      <div class="sub-content-block" *ngIf="ownerOrganization.phone">
+        Tel. {{ ownerOrganization.phone }}
+      </div>
     </div>
   </div>
   <div class="transaction-header-middle">

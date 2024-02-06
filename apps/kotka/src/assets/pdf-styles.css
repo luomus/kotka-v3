@@ -15,7 +15,7 @@ body {
 }
 
 h2 {
-  margin-top: 10mm;
+  margin-top: 15mm;
   margin-bottom: 5mm;
 }
 
@@ -38,6 +38,14 @@ hr {
 
 .content-block + .content-block {
   margin-top: 5mm;
+}
+
+.sub-content-block + .sub-content-block {
+  margin-top: 2mm;
+}
+
+.font-bold {
+  font-weight: bold;
 }
 
 .signature-space {
