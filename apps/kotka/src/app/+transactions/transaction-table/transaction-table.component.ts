@@ -59,13 +59,15 @@ export class TransactionTableComponent {
         cellRendererParams: {
           domain: DEFAULT_DOMAIN
         },
-        hideDefaultTooltip: true
+        hideDefaultTooltip: true,
+        defaultSelected: true
       },
       {
         headerName: 'Team',
         field: 'owner',
         cellRenderer: LabelCellRendererComponent,
-        hideDefaultTooltip: true
+        hideDefaultTooltip: true,
+        defaultSelected: true
       },
       {
         headerName: 'Transaction status',
@@ -74,7 +76,8 @@ export class TransactionTableComponent {
         cellRendererParams: {
           field: fieldData['status']
         },
-        hideDefaultTooltip: true
+        hideDefaultTooltip: true,
+        defaultSelected: true
       },
       {
         headerName: 'Transaction type',
@@ -93,7 +96,7 @@ export class TransactionTableComponent {
       },
       {
         headerName: 'Corresponding organization',
-        field: 'owner',
+        field: 'correspondentOrganization',
         cellRenderer: LabelCellRendererComponent,
         hideDefaultTooltip: true
       },

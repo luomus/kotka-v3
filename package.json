@@ -55,6 +55,7 @@
     "lodash": "^4.17.21",
     "nestjs-console": "^9.0.0",
     "ngx-quicklink": "^0.4.2",
+    "ngx-webstorage": "^13.0.1",
     "ora": "^5.4.1",
     "passport": "^0.6.0",
     "passport-custom": "^1.1.1",

@@ -11,8 +11,10 @@ import { EnumCellRendererComponent } from './renderers/enum-cell-renderer.compon
 import { PipesModule } from '@kotka/pipes';
 import { LabelCellRendererComponent } from './renderers/label-cell-renderer.component';
 import { YearCellRendererComponent } from './renderers/year-cell-renderer.component';
+import { ColumnSettingsModalComponent } from './column-settings-modal/column-settings-modal.component';
+import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 
-ModuleRegistry.registerModules([CsvExportModule, InfiniteRowModelModule]);
+ModuleRegistry.registerModules([CsvExportModule, InfiniteRowModelModule, ClientSideRowModelModule]);
 
 @NgModule({
   imports: [
@@ -29,7 +31,8 @@ ModuleRegistry.registerModules([CsvExportModule, InfiniteRowModelModule]);
     URICellRendererComponent,
     EnumCellRendererComponent,
     LabelCellRendererComponent,
-    YearCellRendererComponent
+    YearCellRendererComponent,
+    ColumnSettingsModalComponent
   ],
 })
 export class KotkaUiDatatableModule {}

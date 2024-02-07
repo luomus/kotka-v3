@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -17,10 +18,15 @@ import {
 } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
 import { SortModel } from '@kotka/shared/models';
+import { from } from 'rxjs';
+import { ColumnSettingsModalComponent } from '../column-settings-modal/column-settings-modal.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { LocalStorage } from 'ngx-webstorage';
 
 export interface DatatableColumn extends ColDef {
   hideDefaultHeaderTooltip?: boolean;
   hideDefaultTooltip?: boolean;
+  defaultSelected?: boolean;
 }
 
 export interface GetRowsParams extends IGetRowsParams {
@@ -30,6 +36,11 @@ export interface GetRowsParams extends IGetRowsParams {
 export interface DatatableSource {
   rowCount?: number;
   getRows: (params: GetRowsParams) => void;
+}
+
+export interface ColumnSettings {
+  selected?: string[];
+  order?: string[];
 }
 
 interface GridReadyEvent {
@@ -44,15 +55,19 @@ interface GridReadyEvent {
   styleUrls: ['./datatable.component.scss'],
 })
 export class DatatableComponent implements OnChanges {
-  @Input() set columns(columns: DatatableColumn[]) {
-    this.setColumns(columns);
-  }
+  @Input() columns: DatatableColumn[] = [];
 
   @Input()
   public datasource?: DatatableSource;
 
   @Input()
   public loading? = false;
+
+  @Input()
+  public enableColumnSelection? = false;
+
+  @Input()
+  public settingsKey?: string;
 
   @Output()
   rowClicked = new EventEmitter();
@@ -87,6 +102,15 @@ export class DatatableComponent implements OnChanges {
   public gridApi?: GridApi;
   public gridColumnApi?: ColumnApi;
 
+  private allColumns: DatatableColumn[] = [];
+
+  @LocalStorage('datatable-settings', {}) private settings!: Record<string, ColumnSettings>;
+
+  constructor(
+    private modalService: NgbModal,
+    private cdr: ChangeDetectorRef
+  ) {}
+
   onGridReady(params: GridReadyEvent) {
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
@@ -100,6 +124,9 @@ export class DatatableComponent implements OnChanges {
     }
     if (changes['datasource']) {
       this.updateDatasource();
+    }
+    if (changes['columns'] || changes['enableColumnSelection']) {
+      this.updateColumns();
     }
   }
 
@@ -131,15 +158,102 @@ export class DatatableComponent implements OnChanges {
     }
   }
 
-  private setColumns(columns: DatatableColumn[]) {
-    this.colDefs = columns.map(col => {
+  openColumnSettingsModal() {
+    const modalRef = this.modalService.open(ColumnSettingsModalComponent, {
+      backdrop: 'static',
+      size: 'md',
+      modalDialogClass: 'column-settings-modal'
+    });
+    modalRef.componentInstance.columns = this.allColumns;
+    modalRef.componentInstance.settings = this.getColumnSettings();
+
+    from(modalRef.result).subscribe({
+      'next': (settings) => {
+        this.setColumnSettings(settings);
+        this.updateColumns();
+        this.cdr.markForCheck();
+      },
+      'error': () => undefined
+    });
+  }
+
+  private updateColumns() {
+    this.allColumns = this.processColumns(this.columns);
+
+    let columns = this.allColumns;
+    if (this.enableColumnSelection) {
+      columns = this.filterAndSortColumns(columns);
+    }
+
+    this.colDefs = columns.map(col => ({
+      ...col,
+      hideDefaultHeaderTooltip: undefined,
+      hideDefaultTooltip: undefined,
+      defaultSelected: undefined
+    }));
+  }
+
+  private processColumns(columns: DatatableColumn[]): DatatableColumn[] {
+    return columns.map(col => {
+      const newCol: DatatableColumn = {
+        ...col,
+        colId: col.colId || col.field
+      };
+
       if (!col.hideDefaultHeaderTooltip) {
-        col.headerTooltip = col.headerName;
+        newCol.headerTooltip = col.headerName;
       }
       if (!col.hideDefaultTooltip) {
-        col.tooltipField = col.field;
+        newCol.tooltipField = col.field;
       }
-      return col;
+
+      if (this.enableColumnSelection && !newCol.colId) {
+        throw Error('Every column should either have colId or field when the enableColumnSelection option is on');
+      }
+
+      return newCol;
     });
+  }
+
+  private filterAndSortColumns(columns: DatatableColumn[]): DatatableColumn[] {
+    const settings = this.getColumnSettings();
+
+    if (!settings.selected) {
+      settings.selected = this.getDefaultSelectedColumns();
+    }
+    const selected = settings.selected;
+
+    columns = columns.filter(col => selected.includes(col.colId!));
+    columns.sort((columnA, columnB) => (
+      selected.indexOf(columnA.colId!) - selected.indexOf(columnB.colId!)
+    ));
+
+    return columns;
+  }
+
+  private getDefaultSelectedColumns(): string[] {
+    return this.allColumns.filter(col => col.defaultSelected).map(col => col.colId!);
+  }
+
+  private getColumnSettings() {
+    if (!this.settingsKey) {
+      throw Error('A settingsKey should be provided when the enableColumnSelection options is on');
+    }
+
+    if (!this.settings[this.settingsKey]) {
+      this.settings[this.settingsKey] = {};
+    }
+
+    return this.settings[this.settingsKey];
+  }
+
+  private setColumnSettings(columnSettings: ColumnSettings) {
+    if (!this.settingsKey) {
+      throw Error('A settingsKey should be provided when the enableColumnSelection options is on');
+    }
+
+    const settings = this.settings;
+    settings[this.settingsKey] = columnSettings;
+    this.settings = settings;
   }
 }

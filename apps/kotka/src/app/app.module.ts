@@ -10,6 +10,7 @@ import { Logger, ILogger, HttpLogger, ConsoleLogger } from '@kotka/services';
 import { environment } from '../environments/environment';
 import { ErrorHandlerService } from './shared/services/error-handler/error-handler.service';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
+import { NgxWebstorageModule } from 'ngx-webstorage';
 
 export function createLoggerLoader(httpClient: HttpClient): ILogger {
   if (environment.production) {
@@ -25,7 +26,8 @@ export function createLoggerLoader(httpClient: HttpClient): ILogger {
     HttpClientModule,
     QuicklinkModule,
     AppRoutingModule,
-    SharedModule.forRoot()
+    SharedModule.forRoot(),
+    NgxWebstorageModule.forRoot({prefix: 'kotka-', separator: ''}),
   ],
   providers: [
     { provide: ErrorHandler, useClass: ErrorHandlerService },
