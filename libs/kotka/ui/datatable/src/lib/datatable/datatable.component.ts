@@ -43,6 +43,8 @@ export interface ColumnSettings {
   order?: string[];
 }
 
+type CustomColumnKey = keyof Pick<DatatableColumn, 'hideDefaultTooltip'|'hideDefaultHeaderTooltip'|'defaultSelected'>;
+
 interface GridReadyEvent {
   type: string;
   api: GridApi;
@@ -71,9 +73,6 @@ export class DatatableComponent implements OnChanges {
 
   @Output()
   rowClicked = new EventEmitter();
-
-  @Output()
-  selectedColsChange = new EventEmitter<string[]>();
 
   public modules: Module[] = [InfiniteRowModelModule];
   public colDefs: ColDef[] = [];
@@ -149,12 +148,16 @@ export class DatatableComponent implements OnChanges {
   }
 
   columnUpdated() {
-    if (this.gridColumnApi) {
-      this.selectedColsChange.emit(
-        this.gridColumnApi
-          .getAllDisplayedColumns()
-          .map((c) => c.getUserProvidedColDef()?.field || '')
-      );
+    if (!this.gridColumnApi) {
+      return;
+    }
+
+    if (this.enableColumnSelection) {
+      const selected = this.gridColumnApi
+        .getAllDisplayedColumns()
+        .map((c) => c.getColDef().colId!);
+
+      this.updateSettingsAfterColumnUpdate(selected);
     }
   }
 
@@ -185,12 +188,7 @@ export class DatatableComponent implements OnChanges {
       columns = this.filterAndSortColumns(columns);
     }
 
-    this.colDefs = columns.map(col => ({
-      ...col,
-      hideDefaultHeaderTooltip: undefined,
-      hideDefaultTooltip: undefined,
-      defaultSelected: undefined
-    }));
+    this.colDefs = this.removeCustomColumnKeys(columns);
   }
 
   private processColumns(columns: DatatableColumn[]): DatatableColumn[] {
@@ -231,8 +229,41 @@ export class DatatableComponent implements OnChanges {
     return columns;
   }
 
+  private removeCustomColumnKeys(columns: DatatableColumn[]): ColDef[] {
+    return columns.map(col => {
+      col = {...col};
+
+      const customKeys: CustomColumnKey[] = ['hideDefaultHeaderTooltip', 'hideDefaultTooltip', 'defaultSelected'];
+      for (const key of customKeys) {
+        delete col[key];
+      }
+
+      return col;
+    });
+  }
+
   private getDefaultSelectedColumns(): string[] {
     return this.allColumns.filter(col => col.defaultSelected).map(col => col.colId!);
+  }
+
+  private updateSettingsAfterColumnUpdate(selected: string[]) {
+    const order = this.getColumnSettings().order;
+
+    if (order) {
+      const getSortIndex = (value: string): number => {
+        let index = selected.indexOf(value);
+        if (index === -1) {
+          index = selected.length;
+        }
+        return index;
+      };
+
+      order.sort((valueA, valueB) => (
+        getSortIndex(valueA) - getSortIndex(valueB)
+      ));
+    }
+
+    this.setColumnSettings({ selected, order });
   }
 
   private getColumnSettings() {
