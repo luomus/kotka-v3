@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ColumnSettings, DatatableColumn } from '../datatable/datatable.component';
 import { ColDef, GridApi, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
@@ -12,14 +12,16 @@ import { combineLatest, ReplaySubject, take } from 'rxjs';
 })
 export class ColumnSettingsModalComponent {
   columnsSubject: ReplaySubject<DatatableColumn[]> = new ReplaySubject(1);
-  set columns(columns: DatatableColumn[]) {
+  @Input() set columns(columns: DatatableColumn[]) {
     this.columnsSubject.next(columns);
   }
 
   settingsSubject: ReplaySubject<ColumnSettings> = new ReplaySubject(1);
-  set settings(settings: ColumnSettings) {
+  @Input() set settings(settings: ColumnSettings) {
     this.settingsSubject.next(settings);
   }
+
+  @Input() defaultSettings?: ColumnSettings;
 
   colDefs: ColDef[] = [];
   rowData: DatatableColumn[] = [];
@@ -29,6 +31,7 @@ export class ColumnSettingsModalComponent {
     animateRows: true
   };
 
+  private allColumns: DatatableColumn[] = [];
   private initialSettings?: ColumnSettings;
   private gridApi?: GridApi;
 
@@ -39,12 +42,13 @@ export class ColumnSettingsModalComponent {
     combineLatest([this.columnsSubject, this.settingsSubject]).pipe(
       take(1)
     ).subscribe(([columns, settings]: [DatatableColumn[], ColumnSettings]) => {
+      this.allColumns = columns;
       this.initialSettings = settings;
 
       this.colDefs = [
         { field: 'headerName', rowDrag: true, checkboxSelection: true, resizable: false, flex: 1 }
       ];
-      this.rowData = columns.sort(this.comparator.bind(this));
+      this.updateRowData();
 
       this.cdr.markForCheck();
     });
@@ -70,21 +74,29 @@ export class ColumnSettingsModalComponent {
 
   onGridReady(params: GridReadyEvent) {
     this.gridApi = params.api;
+    this.updateRowData();
+  }
 
-    if (!this.initialSettings?.selected) {
+  resetSettings() {
+    if (!this.defaultSettings || !this.gridApi) {
       return;
     }
 
-    const selected = this.initialSettings.selected;
-
-    this.gridApi.forEachNode(node=> {
-      if (selected.includes(node.data.colId!)) {
-        node.setSelected(true);
-      }
-    });
+    this.initialSettings = this.defaultSettings;
+    this.updateRowData();
   }
 
-  comparator(columnA: DatatableColumn, columnB: DatatableColumn): number {
+  private updateRowData() {
+    if (!this.gridApi) {
+      return;
+    }
+
+    this.rowData = [...this.allColumns].sort(this.comparator.bind(this));
+    this.gridApi.setRowData(this.rowData);
+    this.setInitialSelected();
+  }
+
+  private comparator(columnA: DatatableColumn, columnB: DatatableColumn): number {
     if (!this.initialSettings?.order) {
       return 0;
     }
@@ -95,5 +107,19 @@ export class ColumnSettingsModalComponent {
     const colIdB = columnB.colId!;
 
     return order.indexOf(colIdA) - order.indexOf(colIdB);
+  }
+
+  private setInitialSelected() {
+    if (!this.initialSettings?.selected || !this.gridApi) {
+      return;
+    }
+
+    const selected = this.initialSettings.selected;
+
+    this.gridApi.forEachNode(node=> {
+      if (selected.includes(node.data.colId!)) {
+        node.setSelected(true);
+      }
+    });
   }
 }

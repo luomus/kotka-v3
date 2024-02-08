@@ -5,7 +5,6 @@
     class="ag-theme-alpine grid"
     [gridOptions]="gridOptions"
     [columnDefs]="colDefs"
-    [rowData]="rowData"
     [rowSelection]="'multiple'"
     [rowMultiSelectWithClick]="true"
     [headerHeight]="0"
@@ -14,6 +13,13 @@
   ></ag-grid-angular>
 </div>
 <div class="modal-footer">
+  <button
+    type="button"
+    class="btn btn-default me-auto"
+    (click)="resetSettings()"
+  >
+    Reset settings
+  </button>
   <button
     ngbAutofocus
     type="button"

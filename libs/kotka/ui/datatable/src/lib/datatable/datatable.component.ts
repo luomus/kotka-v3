@@ -167,8 +167,10 @@ export class DatatableComponent implements OnChanges {
       size: 'md',
       modalDialogClass: 'column-settings-modal'
     });
+
     modalRef.componentInstance.columns = this.allColumns;
     modalRef.componentInstance.settings = this.getColumnSettings();
+    modalRef.componentInstance.defaultSettings = { selected: this.getDefaultSelectedColumns() };
 
     from(modalRef.result).subscribe({
       'next': (settings) => {
