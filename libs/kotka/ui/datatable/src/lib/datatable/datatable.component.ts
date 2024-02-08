@@ -22,6 +22,7 @@ import { from } from 'rxjs';
 import { ColumnSettingsModalComponent } from '../column-settings-modal/column-settings-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LocalStorage } from 'ngx-webstorage';
+import { isEqual } from 'lodash';
 
 export interface DatatableColumn extends ColDef {
   hideDefaultHeaderTooltip?: boolean;
@@ -249,6 +250,10 @@ export class DatatableComponent implements OnChanges {
   }
 
   private updateSettingsAfterColumnUpdate(selected: string[]) {
+    if (isEqual(selected, this.getColumnSettings().selected)) {
+      return;
+    }
+
     const order = this.getColumnSettings().order;
 
     if (order) {
