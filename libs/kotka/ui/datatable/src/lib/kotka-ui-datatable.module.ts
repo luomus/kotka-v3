@@ -10,9 +10,11 @@ import { URICellRendererComponent } from './renderers/uri-cell-renderer.componen
 import { EnumCellRendererComponent } from './renderers/enum-cell-renderer.component';
 import { PipesModule } from '@kotka/pipes';
 import { LabelCellRendererComponent } from './renderers/label-cell-renderer.component';
-import { YearCellRendererComponent } from './renderers/year-cell-renderer.component';
+import { DateCellRendererComponent } from './renderers/date-cell-renderer.component';
 import { ColumnSettingsModalComponent } from './column-settings-modal/column-settings-modal.component';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
+import { TransactionCountRendererComponent } from './renderers/transaction-count-renderer.component';
+import { DueDaysRendererComponent } from './renderers/due-days-renderer.component';
 
 ModuleRegistry.registerModules([CsvExportModule, InfiniteRowModelModule, ClientSideRowModelModule]);
 
@@ -31,8 +33,10 @@ ModuleRegistry.registerModules([CsvExportModule, InfiniteRowModelModule, ClientS
     URICellRendererComponent,
     EnumCellRendererComponent,
     LabelCellRendererComponent,
-    YearCellRendererComponent,
-    ColumnSettingsModalComponent
+    DateCellRendererComponent,
+    ColumnSettingsModalComponent,
+    TransactionCountRendererComponent,
+    DueDaysRendererComponent
   ],
 })
 export class KotkaUiDatatableModule {}

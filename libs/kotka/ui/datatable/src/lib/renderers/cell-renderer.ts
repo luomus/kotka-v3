@@ -6,10 +6,14 @@ export class CellRendererComponent<T extends ICellRendererParams = ICellRenderer
 
   agInit(params: T): void {
     this.params = params;
+    this.paramsChange();
   }
 
   refresh(params: T): boolean {
     this.params = params;
+    this.paramsChange();
     return true;
   }
+
+  paramsChange(): void {}
 }

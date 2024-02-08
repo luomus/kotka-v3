@@ -4,7 +4,8 @@ import {
   DatatableSource,
   GetRowsParams,
   LabelCellRendererComponent,
-  YearCellRendererComponent
+  DateCellRendererComponent,
+  TransactionCountRendererComponent, DueDaysRendererComponent
 } from '@kotka/ui/datatable';
 import { URICellRendererComponent, EnumCellRendererComponent } from '@kotka/ui/datatable';
 import { DatatableDataService, DEFAULT_DOMAIN, FormService } from '@kotka/services';
@@ -89,13 +90,39 @@ export class TransactionTableComponent {
         hideDefaultTooltip: true
       },
       {
-        headerName: 'Year received',
-        field: 'incomingReceived',
-        cellRenderer: YearCellRendererComponent,
+        headerName: 'Outgoing sent',
+        field: 'outgoingSent',
+        cellRenderer: DateCellRendererComponent,
         hideDefaultTooltip: true
       },
       {
-        headerName: 'Corresponding organization',
+        colId: 'outgoingSentYear',
+        headerName: 'Outgoing sent year',
+        field: 'outgoingSent',
+        cellRenderer: DateCellRendererComponent,
+        cellRendererParams: {
+          format: 'YYYY'
+        },
+        hideDefaultTooltip: true
+      },
+      {
+        headerName: 'Incoming received',
+        field: 'incomingReceived',
+        cellRenderer: DateCellRendererComponent,
+        hideDefaultTooltip: true
+      },
+      {
+        colId: 'incomingReceivedYear',
+        headerName: 'Incoming received year',
+        field: 'incomingReceived',
+        cellRenderer: DateCellRendererComponent,
+        cellRendererParams: {
+          format: 'YYYY'
+        },
+        hideDefaultTooltip: true
+      },
+      {
+        headerName: 'Counterparty organization',
         field: 'correspondentOrganization',
         cellRenderer: LabelCellRendererComponent,
         hideDefaultTooltip: true
@@ -107,7 +134,7 @@ export class TransactionTableComponent {
         hideDefaultTooltip: true
       },
       {
-        headerName: 'Correspondent',
+        headerName: 'Counterparty researcher',
         field: 'correspondentResearcher'
       },
       {
@@ -126,6 +153,44 @@ export class TransactionTableComponent {
         headerName: 'Material',
         field: 'material'
       },
+      {
+        colId: 'balance',
+        headerName: 'Balance',
+        cellRenderer: TransactionCountRendererComponent,
+        cellRendererParams: {
+          type: 'balance'
+        },
+        hideDefaultTooltip: true
+      },
+      {
+        colId: 'totalCount',
+        headerName: 'Total count',
+        cellRenderer: TransactionCountRendererComponent,
+        cellRendererParams: {
+          type: 'total'
+        },
+        hideDefaultTooltip: true
+      },
+      {
+        colId: 'returnedCount',
+        headerName: 'Returned count',
+        cellRenderer: TransactionCountRendererComponent,
+        cellRendererParams: {
+          type: 'returned'
+        },
+        hideDefaultTooltip: true
+      },
+      {
+        colId: 'dueDays',
+        headerName: 'Due days',
+        field: 'dueDate',
+        cellRenderer: DueDaysRendererComponent,
+        hideDefaultTooltip: true
+      },
+      {
+        headerName: 'Old transaction number',
+        field: 'legacyID'
+      }
     ];
     this.cdr.markForCheck();
   }
