@@ -1,10 +1,17 @@
 @page {
-  size: A4;
   margin: 10mm;
+  size: 210mm 297mm;
 }
 
 .avoid-page-break {
   page-break-inside: avoid;
+}
+
+.page {
+  width: 190mm;
+  height: 277mm;
+  page-break-inside: avoid;
+  page-break-after: always;
 }
 
 body {
