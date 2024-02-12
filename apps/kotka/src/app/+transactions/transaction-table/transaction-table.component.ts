@@ -24,21 +24,7 @@ export class TransactionTableComponent {
   loading = false;
   totalCount?: number;
 
-  datasource: DatatableSource = {
-    rowCount: 3,
-    getRows: (params: GetRowsParams) => {
-      this.loading = true;
-      this.cdr.markForCheck();
-
-      this.dataService.getData(KotkaDocumentObjectType.transaction, params.startRow, params.endRow, params.sortModel, params.filterModel).subscribe(result => {
-        this.totalCount = result.totalItems;
-        this.loading = false;
-        this.cdr.markForCheck();
-
-        params.successCallback(result.member, result.totalItems);
-      });
-    }
-  };
+  datasource?: DatatableSource;
 
   constructor(
     private dataService: DatatableDataService,
@@ -46,13 +32,14 @@ export class TransactionTableComponent {
     private cdr: ChangeDetectorRef
   ) {
     this.formService.getFieldData(globals.transactionFormId).subscribe(fieldData => {
-      this.setColumns(fieldData);
+      this.columns = this.getColumns(fieldData);
+      this.datasource = this.getDatasource(this.columns);
       this.cdr.markForCheck();
     });
   }
 
-  private setColumns(fieldData: Record<string, LajiForm.Field>) {
-    this.columns = [
+  private getColumns(fieldData: Record<string, LajiForm.Field>): DatatableColumn[] {
+    return [
       {
         headerName: 'URI',
         field: 'id',
@@ -192,6 +179,30 @@ export class TransactionTableComponent {
         field: 'legacyID'
       }
     ];
-    this.cdr.markForCheck();
+  }
+
+  private getDatasource(columns: DatatableColumn[]): DatatableSource {
+    return {
+      rowCount: 3,
+      getRows: (params: GetRowsParams) => {
+        this.loading = true;
+        this.cdr.markForCheck();
+
+        this.dataService.getData(
+          KotkaDocumentObjectType.transaction,
+          columns,
+          params.startRow,
+          params.endRow,
+          params.sortModel,
+          params.filterModel
+        ).subscribe(result => {
+          this.totalCount = result.totalItems;
+          this.loading = false;
+          this.cdr.markForCheck();
+
+          params.successCallback(result.member, result.totalItems);
+        });
+      }
+    };
   }
 }

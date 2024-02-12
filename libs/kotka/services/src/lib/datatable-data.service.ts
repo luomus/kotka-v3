@@ -2,6 +2,7 @@ import { Observable } from 'rxjs';
 import { KotkaDocumentObject, ListResponse, KotkaDocumentObjectType, SortModel } from '@kotka/shared/models';
 import { DataService} from './data.service';
 import { Injectable } from '@angular/core';
+import { DatatableColumn } from '@kotka/ui/datatable';
 
 type FilterModel = Record<string, any>;
 
@@ -14,16 +15,31 @@ export class DatatableDataService {
     private dataService: DataService
   ) {}
 
-  getData(dataType: KotkaDocumentObjectType, startRow: number, endRow: number, sortModel: SortModel[], filterModel: FilterModel): Observable<ListResponse<KotkaDocumentObject>> {
+  getData(dataType: KotkaDocumentObjectType, columns: DatatableColumn[], startRow: number, endRow: number, sortModel: SortModel[], filterModel: FilterModel): Observable<ListResponse<KotkaDocumentObject>> {
     const pageSize = endRow - startRow;
     const page = (startRow / pageSize) + 1;
-    const sort = this.sortModelToSortString(sortModel);
+
+    const colIdFieldMap = this.getColIdFieldMap(columns);
+    const sort = this.sortModelToSortString(sortModel, colIdFieldMap);
     const searchQuery = this.filterModelToSearchQuery(filterModel);
+
     return this.dataService.getData(dataType, page, pageSize, sort, searchQuery);
   }
 
-  private sortModelToSortString(sortModel: SortModel[]): string {
-    return sortModel.map(sort => sort.colId + ' ' + sort.sort).join(',');
+  private getColIdFieldMap(columns: DatatableColumn[]): Record<string, string> {
+    const result: Record<string, string> = {};
+
+    columns.forEach(column => {
+      if (column.field) {
+        result[column.colId || column.field] = column.field;
+      }
+    });
+
+    return result;
+  }
+
+  private sortModelToSortString(sortModel: SortModel[], colIdFieldMap: Record<string, string>): string {
+    return sortModel.map(sort => colIdFieldMap[sort.colId] + ' ' + sort.sort).join(',');
   }
 
   private filterModelToSearchQuery(filterModel: FilterModel): string {

@@ -42,7 +42,14 @@ export class DatasetTableComponent {
       this.loading = true;
       this.cdr.markForCheck();
 
-      this.dataService.getData(KotkaDocumentObjectType.dataset, params.startRow, params.endRow, params.sortModel, params.filterModel).subscribe(result => {
+      this.dataService.getData(
+        KotkaDocumentObjectType.dataset,
+        this.columns,
+        params.startRow,
+        params.endRow,
+        params.sortModel,
+        params.filterModel
+      ).subscribe(result => {
         this.totalCount = result.totalItems;
         this.loading = false;
         this.cdr.markForCheck();
