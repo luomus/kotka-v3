@@ -64,6 +64,7 @@
     "rfc6902": "^5.0.1",
     "rxjs": "7.8.1",
     "tslib": "^2.6.2",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.1/xlsx-0.20.1.tgz",
     "zone.js": "0.14.3"
   },
   "devDependencies": {

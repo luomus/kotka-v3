@@ -3,9 +3,11 @@ import { ICellRendererParams } from '@ag-grid-community/core';
 import { LajiForm } from '@kotka/shared/models';
 import { CellRendererComponent } from './cell-renderer';
 
-interface RendererParams extends ICellRendererParams {
+interface RendererExtraParams {
   field: LajiForm.Field
 }
+
+type RendererParams = ICellRendererParams & RendererExtraParams;
 
 @Component({
   selector: 'kui-enum-cell-renderer',
@@ -16,4 +18,13 @@ interface RendererParams extends ICellRendererParams {
   `,
   styles: []
 })
-export class EnumCellRendererComponent extends CellRendererComponent<RendererParams> {}
+export class EnumCellRendererComponent extends CellRendererComponent<RendererParams> {
+  static override getExportValue(value: string|undefined, row: any, params: RendererExtraParams): string {
+    if (!value) {
+      return '';
+    }
+
+    const valueOptions = params.field.options?.value_options;
+    return valueOptions?.[value || ''] || '';
+  }
+}

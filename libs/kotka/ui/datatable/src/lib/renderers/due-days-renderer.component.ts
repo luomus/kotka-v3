@@ -17,16 +17,28 @@ export class DueDaysRendererComponent extends CellRendererComponent {
       return;
     }
 
-    const date1 = new Date();
-    const date2 = new Date(this.params.value);
-
-    this.result = this.dateDiffInDays(date1, date2);
+    this.result = DueDaysRendererComponent.getDueDate(this.params.value);
   }
 
-  dateDiffInDays(date1: Date, date2: Date) {
+  static getDueDate(value: string) {
+    const date1 = new Date();
+    const date2 = new Date(value);
+
+    return this.dateDiffInDays(date1, date2);
+  }
+
+  static dateDiffInDays(date1: Date, date2: Date) {
     const msPerDay = 1000 * 60 * 60 * 24;
     const utc1 = Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate());
     const utc2 = Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate());
     return Math.floor((utc2 - utc1) / msPerDay);
+  }
+
+  static override getExportValue(value: string|undefined): string {
+    if (!value) {
+      return '';
+    }
+
+    return '' + DueDaysRendererComponent.getDueDate(value);
   }
 }

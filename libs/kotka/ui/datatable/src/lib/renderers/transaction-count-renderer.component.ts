@@ -2,10 +2,15 @@ import { Component } from '@angular/core';
 import { CellRendererComponent } from './cell-renderer';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { asSpecimenTransaction } from '@kotka/shared/models';
+import { SpecimenTransaction } from '@luomus/laji-schema';
 
-interface RendererParams extends ICellRendererParams {
-  type: 'balance'|'total'|'returned'
+type TransactionCountType = 'balance'|'total'|'returned';
+
+interface RendererExtraParams {
+  type: TransactionCountType
 }
+
+type RendererParams = ICellRendererParams & RendererExtraParams;
 
 @Component({
   selector: 'kui-transaction-count-renderer',
@@ -24,16 +29,24 @@ export class TransactionCountRendererComponent extends CellRendererComponent<Ren
     }
 
     const transaction = asSpecimenTransaction(this.params.data);
+    this.result = TransactionCountRendererComponent.getTransactionCount(transaction, this.params.type);
+  }
+
+  static getTransactionCount(transaction: SpecimenTransaction, countType: TransactionCountType) {
     const awayCount = (transaction.awayIDs || []).length + (transaction.awayCount || 0);
     const returnedCount = (transaction.returnedIDs || []).length + (transaction.returnedCount || 0);
     const missingCount = (transaction.missingIDs || []).length + (transaction.missingCount || 0);
 
-    if (this.params.type === 'balance') {
-      this.result = awayCount * -1;
-    } else if (this.params.type === 'total') {
-      this.result = awayCount + returnedCount + missingCount;
+    if (countType === 'balance') {
+      return awayCount * -1;
+    } else if (countType === 'total') {
+      return  awayCount + returnedCount + missingCount;
     } else {
-      this.result = returnedCount;
+      return returnedCount;
     }
+  }
+
+  static override getExportValue(value: undefined, row: SpecimenTransaction, params: RendererExtraParams): string {
+    return '' + TransactionCountRendererComponent.getTransactionCount(row, params.type);
   }
 }

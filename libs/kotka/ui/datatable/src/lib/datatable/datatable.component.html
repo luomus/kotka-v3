@@ -1,5 +1,6 @@
 <div class="clearfix mb-1">
   <div class="float-sm-end">
+    <button *ngIf="enableFileExport" class="btn btn-secondary" (click)="exportData()">Export data</button>
     <button *ngIf="enableColumnSelection" class="btn btn-secondary" (click)="openColumnSettingsModal()">
       <i class="fa-solid fa-gear"></i> Select columns
     </button>

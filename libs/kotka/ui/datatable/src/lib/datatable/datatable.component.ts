@@ -23,6 +23,7 @@ import { ColumnSettingsModalComponent } from '../column-settings-modal/column-se
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LocalStorage } from 'ngx-webstorage';
 import { isEqual } from 'lodash';
+import { DatatableExportService } from '../services/datatable-export.service';
 
 export interface DatatableColumn extends ColDef {
   hideDefaultHeaderTooltip?: boolean;
@@ -67,6 +68,12 @@ export class DatatableComponent implements OnChanges {
   public loading? = false;
 
   @Input()
+  public totalCount?: number; // should be provided when enableFileExport is true
+
+  @Input()
+  public enableFileExport? = false;
+
+  @Input()
   public enableColumnSelection? = false;
 
   @Input()
@@ -108,6 +115,7 @@ export class DatatableComponent implements OnChanges {
 
   constructor(
     private modalService: NgbModal,
+    private datatableExportService: DatatableExportService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -156,7 +164,7 @@ export class DatatableComponent implements OnChanges {
     if (this.enableColumnSelection) {
       const selected = this.gridColumnApi
         .getAllDisplayedColumns()
-        .map((c) => c.getColDef().colId!);
+        .map((c) => c.getColId());
 
       this.updateSettingsAfterColumnUpdate(selected);
     }
@@ -181,6 +189,14 @@ export class DatatableComponent implements OnChanges {
       },
       'error': () => undefined
     });
+  }
+
+  exportData() {
+    if (!this.datasource || !this.totalCount) {
+      return;
+    }
+
+    this.datatableExportService.exportData(this.colDefs, this.datasource, this.totalCount);
   }
 
   private updateColumns() {

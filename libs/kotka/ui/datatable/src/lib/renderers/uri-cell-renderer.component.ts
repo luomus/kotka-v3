@@ -2,9 +2,11 @@ import { Component } from '@angular/core';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { CellRendererComponent } from './cell-renderer';
 
-interface RendererParams extends ICellRendererParams {
+interface RendererExtraParams {
   domain: string;
 }
+
+type RendererParams = ICellRendererParams & RendererExtraParams;
 
 @Component({
   selector: 'kui-uri-cell-renderer',
@@ -43,4 +45,11 @@ interface RendererParams extends ICellRendererParams {
     }
   `]
 })
-export class URICellRendererComponent extends CellRendererComponent<RendererParams> {}
+export class URICellRendererComponent extends CellRendererComponent<RendererParams> {
+  static override getExportValue(value: string, row: any, params: RendererExtraParams): string {
+    if (!value) {
+      return '';
+    }
+    return params.domain + value;
+  }
+}
