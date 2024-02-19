@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ColumnSettings, DatatableColumn } from '../datatable/datatable.component';
 import { ColDef, GridApi, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
 import { combineLatest, ReplaySubject, take } from 'rxjs';
+import { ColumnSettings, DatatableColumn } from '@kotka/shared/models';
 
 @Component({
   selector: 'kui-column-settings-modal',

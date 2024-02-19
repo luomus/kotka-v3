@@ -1,15 +1,18 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import {
-  DatatableColumn,
-  DatatableSource,
-  GetRowsParams,
   LabelCellRendererComponent,
   DateCellRendererComponent,
   TransactionCountRendererComponent, DueDaysRendererComponent
 } from '@kotka/ui/datatable';
 import { URICellRendererComponent, EnumCellRendererComponent } from '@kotka/ui/datatable';
 import { DatatableDataService, DEFAULT_DOMAIN, FormService } from '@kotka/services';
-import { KotkaDocumentObjectType, LajiForm } from '@kotka/shared/models';
+import {
+  DatatableColumn,
+  DatatableSource,
+  GetRowsParams,
+  KotkaDocumentObjectType,
+  LajiForm
+} from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
 
 @Component({

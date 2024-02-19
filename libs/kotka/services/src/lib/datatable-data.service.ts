@@ -1,8 +1,13 @@
 import { Observable } from 'rxjs';
-import { KotkaDocumentObject, ListResponse, KotkaDocumentObjectType, SortModel } from '@kotka/shared/models';
+import {
+  KotkaDocumentObject,
+  ListResponse,
+  KotkaDocumentObjectType,
+  SortModel,
+  DatatableColumn
+} from '@kotka/shared/models';
 import { DataService} from './data.service';
 import { Injectable } from '@angular/core';
-import { DatatableColumn } from '@kotka/ui/datatable';
 
 type FilterModel = Record<string, any>;
 

@@ -1,9 +1,9 @@
-import { DatatableColumn, DatatableSource, GetRowsParams } from '../datatable/datatable.component';
 import { Observable, switchMap } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CellRendererComponent } from '../renderers/cell-renderer';
 import { ExportService } from '@kotka/services';
 import { Injectable } from '@angular/core';
+import { DatatableColumn, DatatableSource, GetRowsParams } from '@kotka/shared/models';
 
 @Injectable({
   providedIn: 'root'

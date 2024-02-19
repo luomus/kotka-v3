@@ -12,38 +12,17 @@ import {
   ColumnApi,
   GridApi,
   GridOptions,
-  IGetRowsParams,
   Module,
   RowModelType
 } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
-import { SortModel } from '@kotka/shared/models';
+import { ColumnSettings, DatatableColumn, DatatableSource } from '@kotka/shared/models';
 import { from } from 'rxjs';
 import { ColumnSettingsModalComponent } from '../column-settings-modal/column-settings-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LocalStorage } from 'ngx-webstorage';
 import { isEqual } from 'lodash';
 import { DatatableExportService } from '../services/datatable-export.service';
-
-export interface DatatableColumn extends ColDef {
-  hideDefaultHeaderTooltip?: boolean;
-  hideDefaultTooltip?: boolean;
-  defaultSelected?: boolean;
-}
-
-export interface GetRowsParams extends IGetRowsParams {
-  sortModel: SortModel[];
-}
-
-export interface DatatableSource {
-  rowCount?: number;
-  getRows: (params: GetRowsParams) => void;
-}
-
-export interface ColumnSettings {
-  selected?: string[];
-  order?: string[];
-}
 
 type CustomColumnKey = keyof Pick<DatatableColumn, 'hideDefaultTooltip'|'hideDefaultHeaderTooltip'|'defaultSelected'>;
 

@@ -1,4 +1,26 @@
+import { ColDef, IGetRowsParams } from '@ag-grid-community/core';
+
 export interface SortModel {
   colId: string;
   sort: 'asc' | 'desc';
+}
+
+export interface DatatableColumn extends ColDef {
+  hideDefaultHeaderTooltip?: boolean;
+  hideDefaultTooltip?: boolean;
+  defaultSelected?: boolean;
+}
+
+export interface GetRowsParams extends IGetRowsParams {
+  sortModel: SortModel[];
+}
+
+export interface DatatableSource {
+  rowCount?: number;
+  getRows: (params: GetRowsParams) => void;
+}
+
+export interface ColumnSettings {
+  selected?: string[];
+  order?: string[];
 }
