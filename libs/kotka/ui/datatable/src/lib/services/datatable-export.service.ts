@@ -55,7 +55,6 @@ export class DatatableExportService {
   }
 
   private getExportData(columns: DatatableColumn[], data: any[], extraData: Record<string, any>): string[][] {
-    console.log(extraData);
     const result: string[][] = [];
     result.push(columns.map(col => col.headerName || ''));
 
@@ -71,7 +70,7 @@ export class DatatableExportService {
             rawValue, item, col.cellRendererParams, extraData[col.colId || '']
           );
         } else {
-          value = '' + rawValue;
+          value = CellRendererComponent.getExportValue(rawValue, item);
         }
 
         rowResult.push(value);
