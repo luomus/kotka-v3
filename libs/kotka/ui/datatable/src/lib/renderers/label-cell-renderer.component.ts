@@ -1,4 +1,4 @@
-import { Component, inject, Injector } from '@angular/core';
+import { Component, Injector } from '@angular/core';
 import { CellRendererComponent } from './cell-renderer';
 import { forkJoin, Observable, of, tap } from 'rxjs';
 import { LabelService } from '@kotka/services';
