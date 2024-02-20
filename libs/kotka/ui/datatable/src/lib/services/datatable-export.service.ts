@@ -37,7 +37,6 @@ export class DatatableExportService {
         observables.push(
           (col.cellRenderer as typeof CellRendererComponent).fetchDataNeededForExport(col, data, this.injector).pipe(
             tap(data => {
-              console.log(data);
               if (col.colId) {
                 result[col.colId] = data;
               }

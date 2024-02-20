@@ -19,11 +19,19 @@ export class ExportService {
 
   private getBufferFromAoa(aoa: string[][]): any {
     const sheet = utils.aoa_to_sheet(aoa);
+    sheet['!cols'] = this.getColsData(aoa);
 
     const book = utils.book_new();
     utils.book_append_sheet(book, sheet);
 
     return write(book, { bookType: 'xlsx', type: 'array' });
+  }
+
+  private getColsData(aoa: string[][]) {
+    // get maximum character of each column
+    return aoa[0].map((a, i) => (
+      { wch: Math.max(...aoa.map(a2 => a2[i].length)) }
+    ));
   }
 
   private exportArrayBuffer(buffer: any, fileName: string) {
