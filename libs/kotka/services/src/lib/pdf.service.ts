@@ -1,6 +1,6 @@
 import { ComponentRef, Inject, Injectable, Type } from '@angular/core';
 import * as FileSaver from 'file-saver';
-import { Observable } from 'rxjs';
+import { Observable, switchMap } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiClient } from './api-client';
 import { HttpClient } from '@angular/common/http';
@@ -23,12 +23,13 @@ export class PdfService {
     private componentService: ComponentService
   ) {}
 
-  downloadSheet<T extends ComponentWithContext>(componentClass: Type<T>, context: unknown, fileName: string) {
-    this.getHtml(componentClass, context).subscribe(html => {
-      this.apiClient.htmlToPdf(html).subscribe(res => {
+  downloadSheet<T extends ComponentWithContext>(componentClass: Type<T>, context: unknown, fileName: string): Observable<void> {
+    return this.getHtml(componentClass, context).pipe(
+      switchMap(html => this.apiClient.htmlToPdf(html)),
+      map(res => {
         FileSaver.saveAs(res, fileName);
-      });
-    });
+      })
+    );
   }
 
   private getHtml<T extends ComponentWithContext>(componentClass: Type<T>, context: unknown): Observable<string> {
