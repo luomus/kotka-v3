@@ -17,7 +17,7 @@ import { switchMap } from 'rxjs';
 @Component({
   selector: 'kotka-transaction-pdf-sheets',
   template: `
-    <div class="d-xs-flex mb-2 position-relative">
+    <div class="d-sm-inline-block mb-2 position-relative">
       <kui-spinner [overlay]="true" [spinning]="loading">
         <div class="btn-group-vertical col-12">
           <button class="btn btn-light" (click)="downloadDispatchSheet()" [disabled]="loading">Dispatch sheet (PDF)</button>
@@ -37,7 +37,12 @@ import { switchMap } from 'rxjs';
       </kui-spinner>
     </div>
   `,
-  styles: [],
+  styles: [`
+    :host {
+      display: block;
+      text-align: right;
+    }
+  `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransactionPdfSheetsComponent implements OnChanges {
