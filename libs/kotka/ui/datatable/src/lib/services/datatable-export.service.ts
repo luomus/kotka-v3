@@ -14,11 +14,11 @@ export class DatatableExportService {
     private injector: Injector
   ) {}
 
-  exportData(columns: DatatableColumn[], datasource: DatatableSource, totalCount: number, sortModel: SortModel[], filterModel: FilterModel) {
-    this.fetchRawData(datasource, totalCount, sortModel, filterModel).pipe(
+  exportData(columns: DatatableColumn[], datasource: DatatableSource, totalCount: number, sortModel: SortModel[], filterModel: FilterModel): Observable<void> {
+    return this.fetchRawData(datasource, totalCount, sortModel, filterModel).pipe(
       switchMap(data => this.getProcessedData(columns, data)),
       switchMap(data => this.exportService.export(data, 'export'))
-    ).subscribe();
+    );
   }
 
   private getProcessedData(columns: DatatableColumn[], data: any[]): Observable<string[][]> {

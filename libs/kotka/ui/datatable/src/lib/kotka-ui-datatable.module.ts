@@ -15,6 +15,7 @@ import { ColumnSettingsModalComponent } from './column-settings-modal/column-set
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { TransactionCountRendererComponent } from './renderers/transaction-count-renderer.component';
 import { DueDaysRendererComponent } from './renderers/due-days-renderer.component';
+import { KotkaUiSpinnerModule } from '@kotka/ui/spinner';
 
 ModuleRegistry.registerModules([CsvExportModule, InfiniteRowModelModule, ClientSideRowModelModule]);
 
@@ -23,7 +24,8 @@ ModuleRegistry.registerModules([CsvExportModule, InfiniteRowModelModule, ClientS
     CommonModule,
     AgGridModule,
     RouterModule,
-    PipesModule
+    PipesModule,
+    KotkaUiSpinnerModule
   ],
   exports: [
     DatatableComponent,

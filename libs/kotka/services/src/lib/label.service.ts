@@ -79,7 +79,12 @@ export class LabelService {
         next: label => cache[key] = label,
         error: () => delete cache[key]
       }),
-      catchError(() => of(key)),
+      catchError((e) => {
+        if (e?.status === 404) {
+          return of(key);
+        }
+        throw e;
+      }),
       share()
     );
 

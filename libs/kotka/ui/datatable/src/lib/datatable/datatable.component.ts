@@ -59,6 +59,8 @@ export class DatatableComponent implements OnChanges {
 
   totalCount?: number;
 
+  exportLoading = false;
+
   modules: Module[] = [InfiniteRowModelModule];
   colDefs: ColDef[] = [];
   defaultColDef: ColDef = {
@@ -154,7 +156,20 @@ export class DatatableComponent implements OnChanges {
       return;
     }
 
-    this.datatableExportService.exportData(this.colDefs, this.datasource, this.totalCount, this.sortModel, this.filterModel);
+    this.exportLoading = true;
+
+    this.datatableExportService.exportData(
+      this.colDefs, this.datasource, this.totalCount, this.sortModel, this.filterModel
+    ).subscribe({
+      'next': () => {
+        this.exportLoading = false;
+        this.cdr.markForCheck();
+      },
+      'error': () => {
+        this.exportLoading = false;
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   private updateDatasource() {
