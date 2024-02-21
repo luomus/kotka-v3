@@ -24,9 +24,6 @@ import { globals } from '../../../environments/globals';
 export class TransactionTableComponent {
   columns?: DatatableColumn[];
 
-  loading = false;
-  totalCount?: number;
-
   datasource?: DatatableSource;
 
   constructor(
@@ -186,11 +183,7 @@ export class TransactionTableComponent {
 
   private getDatasource(columns: DatatableColumn[]): DatatableSource {
     return {
-      rowCount: 3,
       getRows: (params: GetRowsParams) => {
-        this.loading = true;
-        this.cdr.markForCheck();
-
         this.dataService.getData(
           KotkaDocumentObjectType.transaction,
           columns,
@@ -199,10 +192,6 @@ export class TransactionTableComponent {
           params.sortModel,
           params.filterModel
         ).subscribe(result => {
-          this.totalCount = result.totalItems;
-          this.loading = false;
-          this.cdr.markForCheck();
-
           params.successCallback(result.member, result.totalItems);
         });
       }

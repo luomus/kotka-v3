@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { URICellRendererComponent } from '@kotka/ui/datatable';
 import { DatatableDataService, DEFAULT_DOMAIN } from '@kotka/services';
 import { DatatableColumn, DatatableSource, GetRowsParams, KotkaDocumentObjectType } from '@kotka/shared/models';
@@ -32,15 +32,8 @@ export class DatasetTableComponent {
     flex: 6
   }];
 
-  loading = false;
-  totalCount?: number;
-
   datasource: DatatableSource = {
-    rowCount: 3,
     getRows: (params: GetRowsParams) => {
-      this.loading = true;
-      this.cdr.markForCheck();
-
       this.dataService.getData(
         KotkaDocumentObjectType.dataset,
         this.columns,
@@ -49,17 +42,12 @@ export class DatasetTableComponent {
         params.sortModel,
         params.filterModel
       ).subscribe(result => {
-        this.totalCount = result.totalItems;
-        this.loading = false;
-        this.cdr.markForCheck();
-
         params.successCallback(result.member, result.totalItems);
       });
     }
   };
 
   constructor(
-    private dataService: DatatableDataService,
-    private cdr: ChangeDetectorRef
+    private dataService: DatatableDataService
   ) { }
 }

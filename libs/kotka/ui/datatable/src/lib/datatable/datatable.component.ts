@@ -5,7 +5,7 @@ import {
   Input,
   OnChanges,
   Output,
-  SimpleChanges,
+  SimpleChanges, TemplateRef,
 } from '@angular/core';
 import {
   ColDef,
@@ -16,7 +16,12 @@ import {
   RowModelType
 } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
-import { ColumnSettings, DatatableColumn, DatatableSource } from '@kotka/shared/models';
+import {
+  ColumnSettings,
+  DatatableColumn,
+  DatatableSource,
+  GetRowsParams
+} from '@kotka/shared/models';
 import { from } from 'rxjs';
 import { ColumnSettingsModalComponent } from '../column-settings-modal/column-settings-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -40,30 +45,23 @@ interface GridReadyEvent {
 export class DatatableComponent implements OnChanges {
   @Input() columns: DatatableColumn[] = [];
 
-  @Input()
-  public datasource?: DatatableSource;
+  @Input() datasource?: DatatableSource;
 
-  @Input()
-  public loading? = false;
+  @Input() enableFileExport? = false;
 
-  @Input()
-  public totalCount?: number; // should be provided when enableFileExport is true
+  @Input() enableColumnSelection? = false;
 
-  @Input()
-  public enableFileExport? = false;
+  @Input() settingsKey?: string;
 
-  @Input()
-  public enableColumnSelection? = false;
+  @Input() totalCountTpl?: TemplateRef<any>;
 
-  @Input()
-  public settingsKey?: string;
+  @Output() rowClicked = new EventEmitter();
 
-  @Output()
-  rowClicked = new EventEmitter();
+  totalCount?: number;
 
-  public modules: Module[] = [InfiniteRowModelModule];
-  public colDefs: ColDef[] = [];
-  public defaultColDef: ColDef = {
+  modules: Module[] = [InfiniteRowModelModule];
+  colDefs: ColDef[] = [];
+  defaultColDef: ColDef = {
     flex: 1,
     resizable: true,
     minWidth: 120,
@@ -71,22 +69,22 @@ export class DatatableComponent implements OnChanges {
     filter: true,
     floatingFilter: true
   };
-  public rowBuffer = 0;
-  public rowSelection: 'single'|'multiple'|undefined = 'multiple';
-  public rowModelType: RowModelType = 'infinite';
-  public paginationPageSize = 100;
-  public cacheOverflowSize = 2;
-  public maxConcurrentDatasourceRequests = 1;
-  public infiniteInitialRowCount = 1;
-  public maxBlocksInCache = 10;
-  public rowData = [];
-  public gridOptions: GridOptions = {
+  rowBuffer = 0;
+  rowSelection: 'single'|'multiple'|undefined = 'multiple';
+  rowModelType: RowModelType = 'infinite';
+  paginationPageSize = 100;
+  cacheOverflowSize = 2;
+  maxConcurrentDatasourceRequests = 1;
+  infiniteInitialRowCount = 1;
+  maxBlocksInCache = 10;
+  rowData = [];
+  gridOptions: GridOptions = {
     rowGroupPanelShow: 'always',
     suppressFieldDotNotation: true,
   };
 
-  public gridApi?: GridApi;
-  public gridColumnApi?: ColumnApi;
+  private gridApi?: GridApi;
+  private gridColumnApi?: ColumnApi;
 
   private allColumns: DatatableColumn[] = [];
 
@@ -98,17 +96,7 @@ export class DatatableComponent implements OnChanges {
     private cdr: ChangeDetectorRef
   ) {}
 
-  onGridReady(params: GridReadyEvent) {
-    this.gridApi = params.api;
-    this.gridColumnApi = params.columnApi;
-    this.updateDatasource();
-    this.updateLoading();
-  }
-
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['loading']) {
-      this.updateLoading();
-    }
     if (changes['datasource']) {
       this.updateDatasource();
     }
@@ -117,22 +105,10 @@ export class DatatableComponent implements OnChanges {
     }
   }
 
-  updateDatasource() {
-    if (!this.gridApi || !this.datasource) {
-      return;
-    }
-    this.gridApi.setDatasource(this.datasource);
-  }
-
-  updateLoading() {
-    if (!this.gridApi) {
-      return;
-    }
-    if (this.loading) {
-      this.gridApi.showLoadingOverlay();
-    } else {
-      this.gridApi.hideOverlay();
-    }
+  onGridReady(params: GridReadyEvent) {
+    this.gridApi = params.api;
+    this.gridColumnApi = params.columnApi;
+    this.updateDatasource();
   }
 
   columnUpdated() {
@@ -176,6 +152,39 @@ export class DatatableComponent implements OnChanges {
     }
 
     this.datatableExportService.exportData(this.colDefs, this.datasource, this.totalCount);
+  }
+
+  private updateDatasource() {
+    if (!this.gridApi || !this.datasource) {
+      return;
+    }
+
+    this.gridApi.setDatasource({ ...this.datasource, getRows: this.getRows.bind(this) });
+  }
+
+  private getRows(params: GetRowsParams) {
+    const originalSuccessCallback = params.successCallback;
+
+    const newSuccessCallback = (results: any[], totalItems: number) => {
+      this.updateLoading(false);
+      this.totalCount = totalItems;
+      this.cdr.markForCheck();
+      originalSuccessCallback(results, totalItems);
+    };
+
+    this.updateLoading(true);
+    this.datasource!.getRows({ ...params, successCallback: newSuccessCallback });
+  }
+
+  private updateLoading(loading: boolean) {
+    if (!this.gridApi) {
+      return;
+    }
+    if (loading) {
+      this.gridApi.showLoadingOverlay();
+    } else {
+      this.gridApi.hideOverlay();
+    }
   }
 
   private updateColumns() {
