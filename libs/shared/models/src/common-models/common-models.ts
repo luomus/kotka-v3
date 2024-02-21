@@ -5,6 +5,8 @@ export interface SortModel {
   sort: 'asc' | 'desc';
 }
 
+export type FilterModel = Record<string, any>;
+
 export interface DatatableColumn extends ColDef {
   hideDefaultHeaderTooltip?: boolean;
   hideDefaultTooltip?: boolean;

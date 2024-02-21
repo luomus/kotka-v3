@@ -19,8 +19,8 @@ import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
 import {
   ColumnSettings,
   DatatableColumn,
-  DatatableSource,
-  GetRowsParams
+  DatatableSource, FilterModel,
+  GetRowsParams, SortModel
 } from '@kotka/shared/models';
 import { from } from 'rxjs';
 import { ColumnSettingsModalComponent } from '../column-settings-modal/column-settings-modal.component';
@@ -88,6 +88,9 @@ export class DatatableComponent implements OnChanges {
 
   private allColumns: DatatableColumn[] = [];
 
+  private sortModel: SortModel[] = [];
+  private filterModel: FilterModel = {};
+
   @LocalStorage('datatable-settings', {}) private settings!: Record<string, ColumnSettings>;
 
   constructor(
@@ -151,7 +154,7 @@ export class DatatableComponent implements OnChanges {
       return;
     }
 
-    this.datatableExportService.exportData(this.colDefs, this.datasource, this.totalCount);
+    this.datatableExportService.exportData(this.colDefs, this.datasource, this.totalCount, this.sortModel, this.filterModel);
   }
 
   private updateDatasource() {
@@ -166,11 +169,15 @@ export class DatatableComponent implements OnChanges {
     const originalSuccessCallback = params.successCallback;
 
     const newSuccessCallback = (results: any[], totalItems: number) => {
-      this.updateLoading(false);
       this.totalCount = totalItems;
       this.cdr.markForCheck();
+
+      this.updateLoading(false);
       originalSuccessCallback(results, totalItems);
     };
+
+    this.sortModel = params.sortModel;
+    this.filterModel = params.filterModel;
 
     this.updateLoading(true);
     this.datasource!.getRows({ ...params, successCallback: newSuccessCallback });

@@ -4,12 +4,11 @@ import {
   ListResponse,
   KotkaDocumentObjectType,
   SortModel,
-  DatatableColumn
+  DatatableColumn,
+  FilterModel
 } from '@kotka/shared/models';
 import { DataService} from './data.service';
 import { Injectable } from '@angular/core';
-
-type FilterModel = Record<string, any>;
 
 @Injectable({
   providedIn: 'root'

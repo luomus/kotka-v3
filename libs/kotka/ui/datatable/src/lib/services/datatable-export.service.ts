@@ -3,7 +3,7 @@ import { map } from 'rxjs/operators';
 import { CellRendererComponent } from '../renderers/cell-renderer';
 import { ExportService } from '@kotka/services';
 import { Injectable, Injector } from '@angular/core';
-import { DatatableColumn, DatatableSource, GetRowsParams } from '@kotka/shared/models';
+import { DatatableColumn, DatatableSource, FilterModel, GetRowsParams, SortModel } from '@kotka/shared/models';
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +14,8 @@ export class DatatableExportService {
     private injector: Injector
   ) {}
 
-  exportData(columns: DatatableColumn[], datasource: DatatableSource, totalCount: number) {
-    this.fetchRawData(datasource, totalCount).pipe(
+  exportData(columns: DatatableColumn[], datasource: DatatableSource, totalCount: number, sortModel: SortModel[], filterModel: FilterModel) {
+    this.fetchRawData(datasource, totalCount, sortModel, filterModel).pipe(
       switchMap(data => this.getProcessedData(columns, data)),
       switchMap(data => this.exportService.export(data, 'export'))
     ).subscribe();
@@ -81,16 +81,16 @@ export class DatatableExportService {
     return result;
   }
 
-  private fetchRawData(datasource: DatatableSource, totalCount: number): Observable<any[]> {
+  private fetchRawData(datasource: DatatableSource, totalCount: number, sortModel: SortModel[], filterModel: FilterModel): Observable<any[]> {
     return new Observable(
       observer => {
         const params: GetRowsParams = {
           startRow: 0,
           endRow: totalCount,
-          sortModel: [],
+          sortModel,
           successCallback: (data: any[]) => { observer.next(data); },
           failCallback: () => { observer.error(); },
-          filterModel: {},
+          filterModel,
           context: {}
         };
 
