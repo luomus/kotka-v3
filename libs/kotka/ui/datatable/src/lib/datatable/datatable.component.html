@@ -3,12 +3,12 @@
 </ng-container>
 <div class="clearfix mb-1">
   <div class="float-sm-end">
-    <button *ngIf="enableFileExport" class="btn btn-secondary position-relative" (click)="exportData()" [disabled]="exportLoading">
+    <button *ngIf="enableFileExport" class="btn btn-secondary position-relative" (click)="exportData()" [disabled]="exportLoading" data-cy="export-data">
       <kui-spinner [overlay]="true" [spinning]="exportLoading">
         Export data
       </kui-spinner>
     </button>
-    <button *ngIf="enableColumnSelection" class="btn btn-secondary" (click)="openColumnSettingsModal()">
+    <button *ngIf="enableColumnSelection" class="btn btn-secondary" (click)="openColumnSettingsModal()" data-cy="select-columns">
       <i class="fa-solid fa-gear"></i> Select columns
     </button>
   </div>

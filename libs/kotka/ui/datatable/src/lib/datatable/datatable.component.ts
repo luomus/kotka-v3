@@ -197,7 +197,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
       if (this.isDestroyed) {
         return;
       }
-      
+
       this.totalCount = totalItems;
       this.cdr.markForCheck();
 
