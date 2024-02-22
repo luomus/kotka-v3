@@ -93,10 +93,10 @@ export class LabelService {
 
   private getOrganizationFullName(organization: Organization): string {
     const nameKeys: OrganizationLevelKey[] = [
-      'organizationLevel1',
-      'organizationLevel2',
+      'organizationLevel4',
       'organizationLevel3',
-      'organizationLevel4'
+      'organizationLevel2',
+      'organizationLevel1'
     ];
     return nameKeys.map(key => organization[key]?.en).filter(name => !!name).join(', ');
   }
