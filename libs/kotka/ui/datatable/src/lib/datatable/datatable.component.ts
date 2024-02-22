@@ -3,7 +3,7 @@ import {
   Component,
   EventEmitter,
   Input,
-  OnChanges,
+  OnChanges, OnDestroy,
   Output,
   SimpleChanges, TemplateRef,
 } from '@angular/core';
@@ -42,7 +42,7 @@ interface GridReadyEvent {
   templateUrl: './datatable.component.html',
   styleUrls: ['./datatable.component.scss'],
 })
-export class DatatableComponent implements OnChanges {
+export class DatatableComponent implements OnChanges, OnDestroy {
   @Input() columns: DatatableColumn[] = [];
 
   @Input() datasource?: DatatableSource;
@@ -93,6 +93,8 @@ export class DatatableComponent implements OnChanges {
   private sortModel: SortModel[] = [];
   private filterModel: FilterModel = {};
 
+  private isDestroyed = false;
+
   @LocalStorage('datatable-settings', {}) private settings!: Record<string, ColumnSettings>;
 
   constructor(
@@ -108,6 +110,10 @@ export class DatatableComponent implements OnChanges {
     if (changes['columns'] || changes['enableColumnSelection']) {
       this.updateColumns();
     }
+  }
+
+  ngOnDestroy() {
+    this.isDestroyed = true;
   }
 
   onGridReady(params: GridReadyEvent) {
@@ -181,9 +187,17 @@ export class DatatableComponent implements OnChanges {
   }
 
   private getRows(params: GetRowsParams) {
+    if (this.isDestroyed) {
+      return;
+    }
+
     const originalSuccessCallback = params.successCallback;
 
     const newSuccessCallback = (results: any[], totalItems: number) => {
+      if (this.isDestroyed) {
+        return;
+      }
+      
       this.totalCount = totalItems;
       this.cdr.markForCheck();
 
