@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ApiClient } from '@kotka/services';
-import { SpecimenTransaction } from '@luomus/laji-schema';
-import { LajiForm, LajiOrganization } from '@kotka/shared/models';
+import { Organization, SpecimenTransaction } from '@luomus/laji-schema';
+import { LajiForm } from '@kotka/shared/models';
 import { forkJoin, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { globals } from '../../../environments/globals';
@@ -9,8 +9,8 @@ import { FormService } from '@kotka/services';
 
 export interface TransactionSheetContext {
   data: SpecimenTransaction,
-  ownerOrganization?: LajiOrganization,
-  correspondingOrganization?: LajiOrganization,
+  ownerOrganization?: Organization,
+  correspondingOrganization?: Organization,
   fieldData: Record<string, LajiForm.Field>
 }
 
@@ -28,7 +28,7 @@ export class TransactionPdfSheetsContextService {
   ) {}
 
   getSheetContext(data: SpecimenTransaction): Observable<TransactionSheetContext> {
-    type ForkJoinReturnType = [LajiOrganization|undefined, LajiOrganization|undefined, Record<string, LajiForm.Field>];
+    type ForkJoinReturnType = [Organization|undefined, Organization|undefined, Record<string, LajiForm.Field>];
 
     return forkJoin([
       this.getOrganization(data.owner),
@@ -47,7 +47,7 @@ export class TransactionPdfSheetsContextService {
     return of({ data });
   }
 
-  private getOrganization(organizationId?: string): Observable<LajiOrganization|undefined> {
+  private getOrganization(organizationId?: string): Observable<Organization|undefined> {
     return organizationId ? this.apiClient.getOrganization(organizationId) : of(undefined);
   }
 }

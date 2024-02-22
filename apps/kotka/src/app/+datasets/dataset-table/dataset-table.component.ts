@@ -1,8 +1,7 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
-import { DatatableColumn, DatatableSource, GetRowsParams} from '@kotka/ui/datatable';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { URICellRendererComponent } from '@kotka/ui/datatable';
 import { DatatableDataService, DEFAULT_DOMAIN } from '@kotka/services';
-import { KotkaDocumentObjectType } from '@kotka/shared/models';
+import { DatatableColumn, DatatableSource, GetRowsParams, KotkaDocumentObjectType } from '@kotka/shared/models';
 
 @Component({
   selector: 'kotka-dataset-table',
@@ -33,27 +32,22 @@ export class DatasetTableComponent {
     flex: 6
   }];
 
-  loading = false;
-  totalCount?: number;
-
   datasource: DatatableSource = {
-    rowCount: 3,
     getRows: (params: GetRowsParams) => {
-      this.loading = true;
-      this.cdr.markForCheck();
-
-      this.dataService.getData(KotkaDocumentObjectType.dataset, params.startRow, params.endRow, params.sortModel, params.filterModel).subscribe(result => {
-        this.totalCount = result.totalItems;
-        this.loading = false;
-        this.cdr.markForCheck();
-
+      this.dataService.getData(
+        KotkaDocumentObjectType.dataset,
+        this.columns,
+        params.startRow,
+        params.endRow,
+        params.sortModel,
+        params.filterModel
+      ).subscribe(result => {
         params.successCallback(result.member, result.totalItems);
       });
     }
   };
 
   constructor(
-    private dataService: DatatableDataService,
-    private cdr: ChangeDetectorRef
+    private dataService: DatatableDataService
   ) { }
 }

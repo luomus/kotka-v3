@@ -1,10 +1,12 @@
 <kui-main-content [header]="'Tags'">
-  <span *ngIf="totalCount !== undefined"><span data-cy="tag-count">{{ totalCount }}</span> tags found</span>
+  <ng-template #totalCountTpl let-value="value">
+    <span *ngIf="value !== undefined"><span data-cy="tag-count">{{ value }}</span> tags found</span>
+  </ng-template>
   <kui-datatable
     style="height: calc(100vh - 190px)"
     [columns]="columns"
     [datasource]="datasource"
-    [loading]="loading"
+    [totalCountTpl]="totalCountTpl"
   >
   </kui-datatable>
 </kui-main-content>

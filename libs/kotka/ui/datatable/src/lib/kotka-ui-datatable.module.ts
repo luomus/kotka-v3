@@ -10,16 +10,22 @@ import { URICellRendererComponent } from './renderers/uri-cell-renderer.componen
 import { EnumCellRendererComponent } from './renderers/enum-cell-renderer.component';
 import { PipesModule } from '@kotka/pipes';
 import { LabelCellRendererComponent } from './renderers/label-cell-renderer.component';
-import { YearCellRendererComponent } from './renderers/year-cell-renderer.component';
+import { DateCellRendererComponent } from './renderers/date-cell-renderer.component';
+import { ColumnSettingsModalComponent } from './column-settings-modal/column-settings-modal.component';
+import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
+import { TransactionCountRendererComponent } from './renderers/transaction-count-renderer.component';
+import { DueDaysRendererComponent } from './renderers/due-days-renderer.component';
+import { KotkaUiSpinnerModule } from '@kotka/ui/spinner';
 
-ModuleRegistry.registerModules([CsvExportModule, InfiniteRowModelModule]);
+ModuleRegistry.registerModules([CsvExportModule, InfiniteRowModelModule, ClientSideRowModelModule]);
 
 @NgModule({
   imports: [
     CommonModule,
     AgGridModule,
     RouterModule,
-    PipesModule
+    PipesModule,
+    KotkaUiSpinnerModule
   ],
   exports: [
     DatatableComponent,
@@ -29,7 +35,10 @@ ModuleRegistry.registerModules([CsvExportModule, InfiniteRowModelModule]);
     URICellRendererComponent,
     EnumCellRendererComponent,
     LabelCellRendererComponent,
-    YearCellRendererComponent
+    DateCellRendererComponent,
+    ColumnSettingsModalComponent,
+    TransactionCountRendererComponent,
+    DueDaysRendererComponent
   ],
 })
 export class KotkaUiDatatableModule {}

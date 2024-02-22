@@ -1,8 +1,7 @@
 import { Component, Input } from '@angular/core';
-import { SpecimenTransaction } from '@luomus/laji-schema';
+import { Organization, SpecimenTransaction } from '@luomus/laji-schema';
 import { CommonModule } from '@angular/common';
 import { PipesModule } from '@kotka/pipes';
-import { LajiOrganization } from '@kotka/shared/models';
 
 @Component({
   standalone: true,
@@ -12,5 +11,5 @@ import { LajiOrganization } from '@kotka/shared/models';
 })
 export class TransactionSheetHeaderComponent {
   @Input({ required: true }) data!: SpecimenTransaction;
-  @Input({ required: true }) ownerOrganization?: LajiOrganization;
+  @Input({ required: true }) ownerOrganization?: Organization;
 }

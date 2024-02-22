@@ -4,8 +4,11 @@ import { map, tap, share } from 'rxjs/operators';
 import { UserService } from './user.service';
 import { DatePipe } from '@angular/common';
 import { ApiClient } from './api-client';
+import { Organization } from '@luomus/laji-schema';
 
 export type LabelKey = string|number|boolean;
+
+type OrganizationLevelKey = keyof Pick<Organization, 'organizationLevel1'|'organizationLevel2'|'organizationLevel3'|'organizationLevel4'>;
 
 const cache: Record<string, string|Observable<string>> = {};
 
@@ -67,7 +70,7 @@ export class LabelService {
       );
     } else {
       observable = this.apiCient.getOrganization(key).pipe(
-        map(organization => organization.fullName)
+        map(organization => this.getOrganizationFullName(organization))
       );
     }
 
@@ -76,10 +79,25 @@ export class LabelService {
         next: label => cache[key] = label,
         error: () => delete cache[key]
       }),
-      catchError(() => of(key)),
+      catchError((e) => {
+        if (e?.status === 404) {
+          return of(key);
+        }
+        throw e;
+      }),
       share()
     );
 
     return cache[key] as Observable<string>;
+  }
+
+  private getOrganizationFullName(organization: Organization): string {
+    const nameKeys: OrganizationLevelKey[] = [
+      'organizationLevel1',
+      'organizationLevel2',
+      'organizationLevel3',
+      'organizationLevel4'
+    ];
+    return nameKeys.map(key => organization[key]?.en).filter(name => !!name).join(', ');
   }
 }

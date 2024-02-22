@@ -1,0 +1,39 @@
+<div class="modal-body">
+  <h1>Select columns</h1>
+  <ag-grid-angular
+    id="columnSettingsGrid"
+    class="ag-theme-alpine grid"
+    [gridOptions]="gridOptions"
+    [columnDefs]="colDefs"
+    [rowSelection]="'multiple'"
+    [rowMultiSelectWithClick]="true"
+    [headerHeight]="0"
+    [domLayout]="'autoHeight'"
+    (gridReady)="onGridReady($event)"
+  ></ag-grid-angular>
+</div>
+<div class="modal-footer">
+  <button
+    type="button"
+    class="btn btn-default me-auto"
+    (click)="resetSettings()"
+  >
+    Reset settings
+  </button>
+  <button
+    ngbAutofocus
+    type="button"
+    class="btn btn-primary"
+    (click)="onConfirm()"
+    data-cy="confirm-ok"
+  >
+    OK
+  </button>
+  <button
+    type="button"
+    class="btn btn-default"
+    (click)="modal.dismiss()"
+  >
+    Cancel
+  </button>
+</div>

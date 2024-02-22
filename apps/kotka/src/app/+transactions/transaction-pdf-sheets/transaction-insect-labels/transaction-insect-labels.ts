@@ -5,6 +5,12 @@ import { TransactionShelfSlipContext } from '../transaction-pdf-sheets-context-s
 import { ComponentWithContext } from '@kotka/services';
 import { PipesModule } from '@kotka/pipes';
 
+interface SpecimenWithinPage {
+  id: string;
+  row: number;
+  col: number;
+}
+
 @Component({
   standalone: true,
   imports: [
@@ -17,8 +23,47 @@ import { PipesModule } from '@kotka/pipes';
 export class TransactionInsectLabelsComponent implements ComponentWithContext {
   @Input({ required: true }) context!: TransactionShelfSlipContext;
 
+  specimensPerRow = 7;
+  specimensPerCol = 25;
+
   get data(): SpecimenTransaction {
     return this.context.data;
+  }
+
+  get pagedSpecimens(): SpecimenWithinPage[][] {
+    const result: SpecimenWithinPage[][] = [];
+
+    const allSpecimens = [...this.allSpecimens];
+
+    let isFirstPage = true;
+
+    while (allSpecimens.length > 0) {
+      const pageResult: SpecimenWithinPage[] = [];
+      const specimensPerCol = this.specimensPerCol - (isFirstPage ? 1 : 0);
+      const pageSpecimens = allSpecimens.splice(0, this.specimensPerRow * specimensPerCol);
+
+      let col = 0;
+      while (pageSpecimens.length > 0) {
+        const colSpecimens = pageSpecimens.splice(0, specimensPerCol);
+        for (let row = 0; row < colSpecimens.length; row++) {
+          pageResult.push({
+            id: colSpecimens[row],
+            row,
+            col
+          });
+        }
+        col++;
+      }
+
+      result.push(pageResult);
+      isFirstPage = false;
+    }
+
+    if (result.length === 0) {
+      result.push([]);
+    }
+
+    return result;
   }
 
   get allSpecimens(): string[] {

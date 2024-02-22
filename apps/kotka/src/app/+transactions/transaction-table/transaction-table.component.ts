@@ -1,14 +1,18 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import {
-  DatatableColumn,
-  DatatableSource,
-  GetRowsParams,
   LabelCellRendererComponent,
-  YearCellRendererComponent
+  DateCellRendererComponent,
+  TransactionCountRendererComponent, DueDaysRendererComponent
 } from '@kotka/ui/datatable';
 import { URICellRendererComponent, EnumCellRendererComponent } from '@kotka/ui/datatable';
 import { DatatableDataService, DEFAULT_DOMAIN, FormService } from '@kotka/services';
-import { KotkaDocumentObjectType, LajiForm } from '@kotka/shared/models';
+import {
+  DatatableColumn,
+  DatatableSource,
+  GetRowsParams,
+  KotkaDocumentObjectType,
+  LajiForm
+} from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
 
 @Component({
@@ -20,24 +24,7 @@ import { globals } from '../../../environments/globals';
 export class TransactionTableComponent {
   columns?: DatatableColumn[];
 
-  loading = false;
-  totalCount?: number;
-
-  datasource: DatatableSource = {
-    rowCount: 3,
-    getRows: (params: GetRowsParams) => {
-      this.loading = true;
-      this.cdr.markForCheck();
-
-      this.dataService.getData(KotkaDocumentObjectType.transaction, params.startRow, params.endRow, params.sortModel, params.filterModel).subscribe(result => {
-        this.totalCount = result.totalItems;
-        this.loading = false;
-        this.cdr.markForCheck();
-
-        params.successCallback(result.member, result.totalItems);
-      });
-    }
-  };
+  datasource?: DatatableSource;
 
   constructor(
     private dataService: DatatableDataService,
@@ -45,13 +32,14 @@ export class TransactionTableComponent {
     private cdr: ChangeDetectorRef
   ) {
     this.formService.getFieldData(globals.transactionFormId).subscribe(fieldData => {
-      this.setColumns(fieldData);
+      this.columns = this.getColumns(fieldData);
+      this.datasource = this.getDatasource(this.columns);
       this.cdr.markForCheck();
     });
   }
 
-  private setColumns(fieldData: Record<string, LajiForm.Field>) {
-    this.columns = [
+  private getColumns(fieldData: Record<string, LajiForm.Field>): DatatableColumn[] {
+    return [
       {
         headerName: 'URI',
         field: 'id',
@@ -59,13 +47,15 @@ export class TransactionTableComponent {
         cellRendererParams: {
           domain: DEFAULT_DOMAIN
         },
-        hideDefaultTooltip: true
+        hideDefaultTooltip: true,
+        defaultSelected: true
       },
       {
         headerName: 'Team',
         field: 'owner',
         cellRenderer: LabelCellRendererComponent,
-        hideDefaultTooltip: true
+        hideDefaultTooltip: true,
+        defaultSelected: true
       },
       {
         headerName: 'Transaction status',
@@ -74,7 +64,8 @@ export class TransactionTableComponent {
         cellRendererParams: {
           field: fieldData['status']
         },
-        hideDefaultTooltip: true
+        hideDefaultTooltip: true,
+        defaultSelected: true
       },
       {
         headerName: 'Transaction type',
@@ -86,14 +77,40 @@ export class TransactionTableComponent {
         hideDefaultTooltip: true
       },
       {
-        headerName: 'Year received',
-        field: 'incomingReceived',
-        cellRenderer: YearCellRendererComponent,
+        headerName: 'Outgoing sent',
+        field: 'outgoingSent',
+        cellRenderer: DateCellRendererComponent,
         hideDefaultTooltip: true
       },
       {
-        headerName: 'Corresponding organization',
-        field: 'owner',
+        colId: 'outgoingSentYear',
+        headerName: 'Outgoing sent year',
+        field: 'outgoingSent',
+        cellRenderer: DateCellRendererComponent,
+        cellRendererParams: {
+          format: 'YYYY'
+        },
+        hideDefaultTooltip: true
+      },
+      {
+        headerName: 'Incoming received',
+        field: 'incomingReceived',
+        cellRenderer: DateCellRendererComponent,
+        hideDefaultTooltip: true
+      },
+      {
+        colId: 'incomingReceivedYear',
+        headerName: 'Incoming received year',
+        field: 'incomingReceived',
+        cellRenderer: DateCellRendererComponent,
+        cellRendererParams: {
+          format: 'YYYY'
+        },
+        hideDefaultTooltip: true
+      },
+      {
+        headerName: 'Counterparty organization',
+        field: 'correspondentOrganization',
         cellRenderer: LabelCellRendererComponent,
         hideDefaultTooltip: true
       },
@@ -104,7 +121,7 @@ export class TransactionTableComponent {
         hideDefaultTooltip: true
       },
       {
-        headerName: 'Correspondent',
+        headerName: 'Counterparty researcher',
         field: 'correspondentResearcher'
       },
       {
@@ -123,7 +140,61 @@ export class TransactionTableComponent {
         headerName: 'Material',
         field: 'material'
       },
+      {
+        colId: 'balance',
+        headerName: 'Balance',
+        cellRenderer: TransactionCountRendererComponent,
+        cellRendererParams: {
+          type: 'balance'
+        },
+        hideDefaultTooltip: true
+      },
+      {
+        colId: 'totalCount',
+        headerName: 'Total count',
+        cellRenderer: TransactionCountRendererComponent,
+        cellRendererParams: {
+          type: 'total'
+        },
+        hideDefaultTooltip: true
+      },
+      {
+        colId: 'returnedCount',
+        headerName: 'Returned count',
+        cellRenderer: TransactionCountRendererComponent,
+        cellRendererParams: {
+          type: 'returned'
+        },
+        hideDefaultTooltip: true
+      },
+      {
+        colId: 'dueDays',
+        headerName: 'Due days',
+        field: 'dueDate',
+        cellRenderer: DueDaysRendererComponent,
+        hideDefaultTooltip: true
+      },
+      {
+        headerName: 'Old transaction number',
+        field: 'legacyID'
+      }
     ];
-    this.cdr.markForCheck();
+  }
+
+  private getDatasource(columns: DatatableColumn[]): DatatableSource {
+    return {
+      getRows: (params: GetRowsParams) => {
+        this.dataService.getData(
+          KotkaDocumentObjectType.transaction,
+          columns,
+          params.startRow,
+          params.endRow,
+          params.sortModel,
+          params.filterModel
+        ).subscribe(result => {
+          params.successCallback(result.member, result.totalItems);
+        });
+      }
+    };
   }
 }

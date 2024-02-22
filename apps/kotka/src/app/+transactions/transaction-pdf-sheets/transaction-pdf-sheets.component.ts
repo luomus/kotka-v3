@@ -1,5 +1,5 @@
 import {
-  ChangeDetectionStrategy,
+  ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
   Input,
   OnChanges, Type
@@ -12,29 +12,37 @@ import { TransactionIncomingSheetComponent } from './transaction-incoming-sheet/
 import { TransactionInquirySheetComponent } from './transaction-inquiry-sheet/transaction-inquiry-sheet';
 import { TransactionReturnSheetComponent } from './transaction-return-sheet/transaction-return-sheet';
 import { TransactionInsectLabelsComponent } from './transaction-insect-labels/transaction-insect-labels';
+import { switchMap } from 'rxjs';
 
 @Component({
   selector: 'kotka-transaction-pdf-sheets',
   template: `
-    <div class="d-xs-flex mb-2">
-      <div class="btn-group-vertical col-12">
-        <button class="btn btn-light" (click)="downloadDispatchSheet()">Dispatch sheet (PDF)</button>
-        <button class="btn btn-light" (click)="downloadIncomingSheet()">Incoming receipt (PDF)</button>
-        <button class="btn btn-light" (click)="downloadInquirySheet()">Inquiry sheet (PDF)</button>
-        <button class="btn btn-light mb-3" (click)="downloadReturnSheet()">Return sheet (PDF)</button>
-        <button class="btn btn-light" (click)="downloadInsectLabels()">Insect labels (PDF)</button>
-        <div class="px-3 py-2 w-100 text-center">
-          <a
-            [href]='("/specimens/search?identifier=" + specimenIdQuery) | oldKotkaUrl'
-            target="_blank"
-          >
-            Export specimens to Excel
-          </a>
+    <div class="d-sm-inline-block mb-2 position-relative">
+      <kui-spinner [overlay]="true" [spinning]="loading">
+        <div class="btn-group-vertical col-12">
+          <button class="btn btn-light" (click)="downloadDispatchSheet()" [disabled]="loading">Dispatch sheet (PDF)</button>
+          <button class="btn btn-light" (click)="downloadIncomingSheet()" [disabled]="loading">Incoming receipt (PDF)</button>
+          <button class="btn btn-light" (click)="downloadInquirySheet()" [disabled]="loading">Inquiry sheet (PDF)</button>
+          <button class="btn btn-light mb-3" (click)="downloadReturnSheet()" [disabled]="loading">Return sheet (PDF)</button>
+          <button class="btn btn-light" (click)="downloadInsectLabels()" [disabled]="loading">Insect labels (PDF)</button>
+          <div class="px-3 py-2 w-100 text-center">
+            <a
+              [href]='("/specimens/search?identifier=" + specimenIdQuery) | oldKotkaUrl'
+              target="_blank"
+            >
+              Export specimens to Excel
+            </a>
+          </div>
         </div>
-      </div>
+      </kui-spinner>
     </div>
   `,
-  styles: [],
+  styles: [`
+    :host {
+      display: block;
+      text-align: right;
+    }
+  `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransactionPdfSheetsComponent implements OnChanges {
@@ -42,9 +50,12 @@ export class TransactionPdfSheetsComponent implements OnChanges {
 
   specimenIdQuery = '';
 
+  loading = false;
+
   constructor(
     private transactionPdfSheetsContext: TransactionPdfSheetsContextService,
-    private pdfService: PdfService
+    private pdfService: PdfService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnChanges() {
@@ -77,12 +88,19 @@ export class TransactionPdfSheetsComponent implements OnChanges {
       return;
     }
 
-    this.transactionPdfSheetsContext.getSheetContext(this.data).subscribe(context => {
-      this.pdfService.downloadSheet(
-        componentClass,
-        context,
-        `${name}_${this.data?.id}.pdf`
-      );
+    this.loading = true;
+
+    this.transactionPdfSheetsContext.getSheetContext(this.data).pipe(
+      switchMap(context => this.download(componentClass, context, name))
+    ).subscribe({
+      'next': () => {
+        this.loading = false;
+        this.cdr.markForCheck();
+      },
+      'error': () => {
+        this.loading = false;
+        this.cdr.markForCheck();
+      }
     });
   }
 
@@ -91,12 +109,27 @@ export class TransactionPdfSheetsComponent implements OnChanges {
       return;
     }
 
-    this.transactionPdfSheetsContext.getShelfSlipContext(this.data).subscribe(context => {
-      this.pdfService.downloadSheet(
-        componentClass,
-        context,
-        `${name}_${this.data?.id}.pdf`
-      );
+    this.loading = true;
+
+    this.transactionPdfSheetsContext.getShelfSlipContext(this.data).pipe(
+      switchMap(context => this.download(componentClass, context, name))
+    ).subscribe( {
+      'next': () => {
+        this.loading = false;
+        this.cdr.markForCheck();
+      },
+      'error': () => {
+        this.loading = false;
+        this.cdr.markForCheck();
+      }
     });
+  }
+
+  private download(componentClass: Type<ComponentWithContext>, context: any, name: string) {
+    return this.pdfService.downloadSheet(
+      componentClass,
+      context,
+      `${name}_${this.data?.id}.pdf`
+    );
   }
 }

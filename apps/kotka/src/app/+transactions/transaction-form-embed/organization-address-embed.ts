@@ -1,11 +1,10 @@
 import {
-  ChangeDetectorRef,
   Component
 } from '@angular/core';
 import { Observable, of, ReplaySubject, switchMap } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { ApiClient } from '@kotka/services';
-import { LajiOrganization } from '@kotka/shared/models';
+import { Organization } from '@luomus/laji-schema';
 
 @Component({
   selector: 'kotka-organization-address-embed',
@@ -27,21 +26,20 @@ export class OrganizationAddressEmbedComponent {
     this.organizationSubject.next(organization);
   };
 
-  data$: Observable<LajiOrganization|undefined>;
+  data$: Observable<Organization|undefined>;
 
   private organizationSubject = new ReplaySubject<string|null|undefined>(1);
   private organization$ = this.organizationSubject.asObservable().pipe(distinctUntilChanged());
 
   constructor(
-    private apiClient: ApiClient,
-    private cdr: ChangeDetectorRef
+    private apiClient: ApiClient
   ) {
     this.data$ = this.organization$.pipe(
       switchMap(organizationId => this.getOrganization(organizationId))
     );
   }
 
-  private getOrganization(organizationId?: string|null): Observable<LajiOrganization|undefined> {
+  private getOrganization(organizationId?: string|null): Observable<Organization|undefined> {
     if (!organizationId) {
       return of(undefined);
     }

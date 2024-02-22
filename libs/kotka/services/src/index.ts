@@ -16,3 +16,4 @@ export * from './lib/logger/logger.service';
 export * from './lib/logger/logger.interface';
 export * from './lib/logger/console-logger.service';
 export * from './lib/logger/http-logger.service';
+export * from './lib/export.service';

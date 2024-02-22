@@ -4,6 +4,16 @@ describe('transactions', () => {
     cy.visit('/transactions');
   });
 
+  describe('transaction table', () => {
+    it('should be able to add a column', () => {
+      cy.get('.ag-header-row-column .ag-header-cell').should('have.length', 3);
+      cy.get('[data-cy=select-columns]').click();
+      cy.get('.ag-selection-checkbox').eq(3).click();
+      cy.get('[data-cy=confirm-ok]').click();
+      cy.get('.ag-header-row-column .ag-header-cell').should('have.length', 4);
+    });
+  });
+
   describe('transaction form', () => {
     beforeEach(() => {
       cy.get('#transactions-menu').click();
