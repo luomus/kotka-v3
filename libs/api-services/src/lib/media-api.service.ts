@@ -7,7 +7,7 @@ import https from 'https';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import FormData from 'form-data';
 import { merge } from 'lodash';
-import { catchError, lastValueFrom, map } from 'rxjs';
+import { catchError, map } from 'rxjs';
 import { Person, Image } from '@kotka/shared/models';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Multer } from 'multer';

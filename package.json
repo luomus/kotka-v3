@@ -34,7 +34,7 @@
     "@angular/router": "17.1.1",
     "@fortawesome/fontawesome-free": "^6.4.2",
     "@luomus/laji-form": "^15.1.11",
-    "@luomus/laji-schema": "^1.0.4",
+    "@luomus/laji-schema": "^2.0.9",
     "@luomus/laji-validate": "0.0.120",
     "@nestjs/axios": "^3.0.0",
     "@nestjs/common": "10.2.7",
