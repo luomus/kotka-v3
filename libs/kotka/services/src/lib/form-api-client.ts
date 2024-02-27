@@ -6,6 +6,7 @@ import { ToastService } from './toast.service';
 import { apiBase, lajiApiBase } from './constants';
 
 const AUTOCOMPLETE_ORGANIZATION_RESOURCE = '/autocomplete/organization';
+const AUTOCOMPLETE_COLLECTION_RESOURCE = '/autocomplete/collection';
 const VALIDATE_RESOURCE = '/documents/validate';
 
 @Injectable({
@@ -32,7 +33,10 @@ export class FormApiClient {
 
     switch (resource) {
       case AUTOCOMPLETE_ORGANIZATION_RESOURCE:
-        queryParameters['includePersonToken'] = true;
+        path = apiBase + '/organization/autocomplete';
+        break;
+      case AUTOCOMPLETE_COLLECTION_RESOURCE:
+        path = apiBase + '/collection/autocomplete';
         break;
       case VALIDATE_RESOURCE:
         path = apiBase + '/validate';

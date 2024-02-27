@@ -12,9 +12,25 @@ import { RedisModule } from './shared-modules/redis/redis.module';
 import { SpecimenModule } from './specimen/specimen.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { MediaModule } from './media/media.module';
+import { CollectionModule } from './collection/collection.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import * as redisStore from 'cache-manager-ioredis';
+import { REDIS } from './shared-modules/redis/redis.constants';
+import Redis from 'ioredis';
 
 @Module({
   imports: [
+    CacheModule.registerAsync({
+      isGlobal: true,
+      imports: [RedisModule],
+      inject: [REDIS],
+      useFactory: (redisClient: Redis) => {
+        return {
+          store: redisStore,
+          redisInstance: redisClient
+        };
+      }
+    }),
     RedisModule,
     ValidateModule,
     SharedModule,
@@ -26,7 +42,8 @@ import { MediaModule } from './media/media.module';
     SpecimenModule,
     TransactionModule,
     MediaModule,
-    OrganizationModule
+    OrganizationModule,
+    CollectionModule
   ],
   controllers: [],
   providers: []
