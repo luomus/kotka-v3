@@ -17,7 +17,8 @@ import {
   RangeResponse,
   LoginResponse
 } from '@kotka/api-interfaces';
-import { Organization } from '@luomus/laji-schema';
+import { Organization, Collection } from '@luomus/laji-schema';
+import { map } from 'rxjs/operators';
 
 const path = apiBase + '/';
 const authPath = apiBase + '/auth/';
@@ -86,6 +87,24 @@ export class ApiClient {
 
   getOrganization(id: string): Observable<Organization> {
     return this.httpClient.get<Organization>(`${path}organization/${id}`);
+  }
+
+  getOrganizations(ids: string[]): Observable<Organization[]> {
+    const params = new HttpParams().set('ids', ids.join(','));
+    return this.httpClient.get<ListResponse<Organization>>(`${path}organization`, { params }).pipe(
+      map(result => result.member)
+    );
+  }
+
+  getCollection(id: string): Observable<Collection> {
+    return this.httpClient.get<Collection>(`${path}collection/${id}`);
+  }
+
+  getCollections(ids: string[]): Observable<Collection[]> {
+    const params = new HttpParams().set('ids', ids.join(','));
+    return this.httpClient.get<ListResponse<Collection>>(`${path}collection`, { params }).pipe(
+      map(result => result.member)
+    );
   }
 
   getPerson(id: string): Observable<Person> {

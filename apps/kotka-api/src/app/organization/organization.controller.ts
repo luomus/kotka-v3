@@ -5,7 +5,7 @@ https://docs.nestjs.com/controllers#controllers
 import {
   Controller, DefaultValuePipe,
   Get,
-  Param, ParseIntPipe, Query,
+  Param, ParseArrayPipe, ParseIntPipe, Query,
   UseGuards
 } from '@nestjs/common';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
@@ -23,7 +23,7 @@ export class OrganizationController {
   ) {}
 
   @Get('autocomplete')
-  async getOrganizationAutocomplete(@Query('q') query = '', @Query('limit', new DefaultValuePipe('10'), ParseIntPipe) limit = 10) {
+  async getOrganizationAutocomplete(@Query('q') query = '', @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit = 10) {
     const jsonData = await this.oldKotkaDataService.getAllObjects<Organization>('MOS.organization', 'allOrganizations');
     const data = jsonData.map(item => ({ ...item, fullName: getOrganizationFullName(item) }));
     return this.autocompleteService.getAutocompleteResults(data, 'fullName', query, limit);
@@ -32,5 +32,11 @@ export class OrganizationController {
   @Get(':id')
   async getOrganization(@Param('id') id) {
     return this.oldKotkaDataService.getObject('MOS.organization', id);
+  }
+
+  @Get('')
+  async getOrganizations(@Query('ids', new DefaultValuePipe([]), ParseArrayPipe) ids: string[]) {
+    const jsonData = await this.oldKotkaDataService.getObjects('MOS.organization', ids);
+    return { 'member': jsonData };
   }
 }

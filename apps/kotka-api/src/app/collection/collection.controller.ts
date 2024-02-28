@@ -5,7 +5,7 @@ https://docs.nestjs.com/controllers#controllers
 import {
   Controller, DefaultValuePipe,
   Get,
-  Param, ParseIntPipe, Query,
+  Param, ParseArrayPipe, ParseIntPipe, Query,
   UseGuards
 } from '@nestjs/common';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
@@ -30,5 +30,11 @@ export class CollectionController {
   @Get(':id')
   async getCollection(@Param('id') id) {
     return this.oldKotkaDataService.getObject('MY.collection', id);
+  }
+
+  @Get('')
+  async getCollections(@Query('ids', new DefaultValuePipe([]), ParseArrayPipe) ids: string[]) {
+    const jsonData = await this.oldKotkaDataService.getObjects('MY.collection', ids);
+    return { 'member': jsonData };
   }
 }

@@ -1,8 +1,7 @@
 import { Component, Injector } from '@angular/core';
 import { CellRendererComponent } from './cell-renderer';
-import { forkJoin, Observable, of, tap } from 'rxjs';
-import { LabelService } from '@kotka/services';
-import { map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { LabelKey, LabelService } from '@kotka/services';
 import { DatatableColumn } from '@kotka/shared/models';
 
 @Component({
@@ -20,29 +19,20 @@ export class LabelCellRendererComponent extends CellRendererComponent {
     return fetchData[value];
   }
 
-  static override fetchDataNeededForExport(col: DatatableColumn, data: any[], injector: Injector): Observable<any> {
-    const result: Record<string, string> = {};
-
-    const uniqueKeys: string[] = [];
+  static override fetchDataNeededForExport(col: DatatableColumn, data: any[], injector: Injector): Observable<Record<string, string>> {
+    const uniqueKeys: LabelKey[] = [];
     data.forEach(item => {
       const value = item[col.field || ''];
-      if (value && !uniqueKeys.includes(value)) {
+      if (value != null && !uniqueKeys.includes(value)) {
         uniqueKeys.push(value);
       }
     });
 
-    const labelService = injector.get(LabelService);
-
-    const observables = uniqueKeys.map(key => labelService.getLabel(key).pipe(
-      tap(label => {
-        result[key] = label;
-      })
-    ));
-
-    if (observables.length === 0) {
-      return of(result);
+    if (uniqueKeys.length === 0) {
+      return of({});
     }
 
-    return forkJoin(observables).pipe(map(() => result));
+    const labelService = injector.get(LabelService);
+    return labelService.getMultipleLabelsWithSameType(uniqueKeys);
   }
 }

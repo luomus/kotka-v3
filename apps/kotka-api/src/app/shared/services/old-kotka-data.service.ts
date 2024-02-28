@@ -37,6 +37,15 @@ export class OldKotkaDataService {
     }
   }
 
+  async getObjects(type: string, ids: string[]) {
+    return await lastValueFrom(
+      this.triplestoreService.search({ type, subject: ids.join(',') }).pipe(
+        map(data => data.data),
+        switchMap(data => this.triplestoreMapperService.triplestoreToJson(data, type)),
+      )
+    );
+  }
+
   async getAllObjects<T>(type: string, cacheKey: string, cacheTtl = 30 * 60 * 1000): Promise<T[]> {
     const lock = await this.redlock.acquire(['lock:' + cacheKey], cacheTtl - 1);
 

@@ -2,7 +2,7 @@ import { Organization } from '@luomus/laji-schema';
 
 type OrganizationLevelKey = keyof Pick<Organization, 'organizationLevel1'|'organizationLevel2'|'organizationLevel3'|'organizationLevel4'>;
 
-export function getOrganizationFullName(organization: Organization) {
+export function getOrganizationFullName(organization: Organization): string {
   const prefix = organization.abbreviation ? organization.abbreviation + ' - ' : '';
 
   const levelKeys: OrganizationLevelKey[] = [
