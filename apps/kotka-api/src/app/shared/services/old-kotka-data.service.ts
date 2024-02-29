@@ -1,33 +1,68 @@
-import { HttpStatus, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { TriplestoreService } from '@kotka/api-services';
 import { TriplestoreMapperService } from '@kotka/mappers';
+import { Collection, Organization } from '@luomus/laji-schema';
 import { lastValueFrom, map, switchMap } from 'rxjs';
-import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
-import { REDIS } from '../../shared-modules/redis/redis.constants';
-import Redis from 'ioredis';
-import Redlock from 'redlock';
+import { Cached } from '../decorators/cached.decorator';
+import { Cron, CronExpression } from '@nestjs/schedule';
+
+const collectionType = 'MY.collection';
+const organizationType = 'MOS.organization';
 
 @Injectable()
 export class OldKotkaDataService {
-  private redlock: Redlock;
-
   constructor(
     private readonly triplestoreService: TriplestoreService,
-    private readonly triplestoreMapperService: TriplestoreMapperService,
-    @Inject(CACHE_MANAGER) private cacheService: Cache,
-    @Inject(REDIS) private readonly redisClient: Redis
+    private readonly triplestoreMapperService: TriplestoreMapperService
   ) {
-    this.redlock = new Redlock([this.redisClient], { retryCount: 20, retryDelay: 1000 });
+    this.updateCollectionsCache();
+    this.updateOrganizationsCache();
   };
 
-  async getObject(type: string, id: string) {
+  async getCollection(id: string) {
+    return this.getObject<Collection>(collectionType, id);
+  }
+
+  async getCollections(ids: string[]) {
+    return this.getObjects<Collection>(collectionType, ids);
+  }
+
+  @Cached('allCollections', 12 * 60 * 60 * 1000) // 12 h
+  async getAllCollections() {
+    return this.getAllObjects<Collection>(collectionType);
+  }
+
+  @Cron(CronExpression.EVERY_10_MINUTES)
+  async updateCollectionsCache() {
+    await this.getAllCollections();
+  }
+
+  async getOrganization(id: string) {
+    return this.getObject<Organization>(organizationType, id);
+  }
+
+  async getOrganizations(ids: string[]) {
+    return this.getObjects<Organization>(organizationType, ids);
+  }
+
+  @Cached('allOrganizations', 12 * 60 * 60 * 1000) // 12 h
+  async getAllOrganizations() {
+    return this.getAllObjects<Organization>(organizationType);
+  }
+
+  @Cron(CronExpression.EVERY_10_MINUTES)
+  async updateOrganizationsCache() {
+    await this.getAllOrganizations();
+  }
+
+  private async getObject<T>(type: string, id: string) {
     try {
       return await lastValueFrom(
         this.triplestoreService.get(id).pipe(
           map(data => data.data),
           switchMap(data => this.triplestoreMapperService.triplestoreToJson(data, type)),
         )
-      );
+      ) as T;
     } catch (err) {
       if (err.response.status === HttpStatus.NOT_FOUND) {
         throw new NotFoundException();
@@ -37,32 +72,17 @@ export class OldKotkaDataService {
     }
   }
 
-  async getObjects(type: string, ids: string[]) {
+  private async getObjects<T>(type: string, ids: string[]) {
     return await lastValueFrom(
       this.triplestoreService.search({ type, subject: ids.join(',') }).pipe(
         map(data => data.data),
         switchMap(data => this.triplestoreMapperService.triplestoreToJson(data, type)),
       )
-    );
+    ) as T[];
   }
 
-  async getAllObjects<T>(type: string, cacheKey: string, cacheTtl = 30 * 60 * 1000): Promise<T[]> {
-    const lock = await this.redlock.acquire(['lock:' + cacheKey], cacheTtl - 1);
-
-    try {
-      const cachedData = await this.cacheService.get<T[]>(cacheKey);
-      if (cachedData) {
-        return cachedData;
-      }
-
-      const triplestoreData = await lastValueFrom(this.triplestoreService.search({type}));
-      const data = await this.triplestoreMapperService.triplestoreToJson(triplestoreData.data, type) as T[];
-
-      await this.cacheService.set(cacheKey, data, cacheTtl);
-
-      return data;
-    } finally {
-      await lock.unlock();
-    }
+  private async getAllObjects<T>(type: string): Promise<T[]> {
+    const triplestoreData = await lastValueFrom(this.triplestoreService.search({type}));
+    return await this.triplestoreMapperService.triplestoreToJson(triplestoreData.data, type) as T[];
   }
 }

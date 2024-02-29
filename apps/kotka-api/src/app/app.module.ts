@@ -14,9 +14,10 @@ import { TransactionModule } from './transaction/transaction.module';
 import { MediaModule } from './media/media.module';
 import { CollectionModule } from './collection/collection.module';
 import { CacheModule } from '@nestjs/cache-manager';
-import * as redisStore from 'cache-manager-ioredis';
+import { redisInsStore } from 'cache-manager-ioredis-yet';
 import { REDIS } from './shared-modules/redis/redis.constants';
 import Redis from 'ioredis';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -26,11 +27,11 @@ import Redis from 'ioredis';
       inject: [REDIS],
       useFactory: (redisClient: Redis) => {
         return {
-          store: redisStore,
-          redisInstance: redisClient
+          store: redisInsStore(redisClient)
         };
       }
     }),
+    ScheduleModule.forRoot(),
     RedisModule,
     ValidateModule,
     SharedModule,

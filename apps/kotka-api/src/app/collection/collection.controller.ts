@@ -9,7 +9,6 @@ import {
   UseGuards
 } from '@nestjs/common';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
-import { Collection } from '@luomus/laji-schema';
 import { AutocompleteService } from '../shared/services/autocomplete.service';
 import { OldKotkaDataService } from '../shared/services/old-kotka-data.service';
 
@@ -23,18 +22,18 @@ export class CollectionController {
 
   @Get('autocomplete')
   async getCollectionAutocomplete(@Query('q') query = '', @Query('limit', new DefaultValuePipe('10'), ParseIntPipe) limit = 10) {
-    const jsonData = await this.oldKotkaDataService.getAllObjects<Collection>('MY.collection', 'allCollections');
+    const jsonData = await this.oldKotkaDataService.getAllCollections();
     return this.autocompleteService.getAutocompleteResults(jsonData, 'collectionName.en', query, limit);
   }
 
   @Get(':id')
   async getCollection(@Param('id') id) {
-    return this.oldKotkaDataService.getObject('MY.collection', id);
+    return this.oldKotkaDataService.getCollection(id);
   }
 
   @Get('')
   async getCollections(@Query('ids', new DefaultValuePipe([]), ParseArrayPipe) ids: string[]) {
-    const jsonData = await this.oldKotkaDataService.getObjects('MY.collection', ids);
+    const jsonData = await this.oldKotkaDataService.getCollections(ids);
     return { 'member': jsonData };
   }
 }
