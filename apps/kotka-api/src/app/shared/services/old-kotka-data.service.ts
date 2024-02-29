@@ -4,7 +4,7 @@ import { TriplestoreMapperService } from '@kotka/mappers';
 import { Collection, Organization } from '@luomus/laji-schema';
 import { lastValueFrom, map, switchMap } from 'rxjs';
 import { Cached } from '../decorators/cached.decorator';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Cron, CronExpression, Timeout } from '@nestjs/schedule';
 
 const collectionType = 'MY.collection';
 const organizationType = 'MOS.organization';
@@ -14,10 +14,7 @@ export class OldKotkaDataService {
   constructor(
     private readonly triplestoreService: TriplestoreService,
     private readonly triplestoreMapperService: TriplestoreMapperService
-  ) {
-    this.updateCollectionsCache();
-    this.updateOrganizationsCache();
-  };
+  ) {};
 
   async getCollection(id: string) {
     return this.getObject<Collection>(collectionType, id);
@@ -32,6 +29,7 @@ export class OldKotkaDataService {
     return this.getAllObjects<Collection>(collectionType);
   }
 
+  @Timeout(0)
   @Cron(CronExpression.EVERY_10_MINUTES)
   async updateCollectionsCache() {
     await this.getAllCollections();
@@ -50,6 +48,7 @@ export class OldKotkaDataService {
     return this.getAllObjects<Organization>(organizationType);
   }
 
+  @Timeout(0)
   @Cron(CronExpression.EVERY_10_MINUTES)
   async updateOrganizationsCache() {
     await this.getAllOrganizations();
