@@ -35,7 +35,8 @@ export function Cached(cacheKey: string, ttl: number = 10 * 60 * 1000) {
       let lock: Redlock.Lock;
       try {
         lock = await redlock.acquire(['lock:' + cacheKey], ttl - 1);
-      } catch (e) {
+      } catch (err) {
+        console.warn(err);
         return getResult();
       }
 
