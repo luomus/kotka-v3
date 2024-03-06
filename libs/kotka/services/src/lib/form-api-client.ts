@@ -99,7 +99,7 @@ export class FormApiClient {
   }
 
   private getResourceType(resource: string): ResourceType {
-    if (pathIs[resource]) {
+    if (pathIs[resource] !== undefined) {
       return pathIs[resource];
     }
     for (const path of Object.keys(pathStartsWith)) {
