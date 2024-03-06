@@ -63,7 +63,7 @@ export class FormApiClient {
     ).pipe(
       map((response) => ({...response, json: () => response.body})),
       catchError(err => {
-        if (!(resource === VALIDATE_RESOURCE && err.status === 422)) {
+        if (!(err.status === 404 || (resource === VALIDATE_RESOURCE && err.status === 422))) {
           this.toastService.showGenericError({pause: true});
         }
         return of({...err, json: () => err.error});
