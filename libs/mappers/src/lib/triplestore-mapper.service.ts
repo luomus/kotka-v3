@@ -15,6 +15,7 @@ const documentTypes = [
   'GX.dataset',
   'HRA.transaction',
   'MOS.organization',
+  'MY.collection'
 ];
 
 const baseUrl = 'http://tun.fi/';
