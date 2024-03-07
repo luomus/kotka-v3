@@ -26,7 +26,7 @@ export class LoginComponent implements OnInit {
       if (next) {
         this.userService.login().subscribe({
           'next': next => {
-            this.router.navigate([next]);
+            this.router.navigateByUrl(next);
           },
           'error': err => {
             this.errorMsg = err.status === 401 ? 'Missing access rights to application' : 'Unexpected error occurred';

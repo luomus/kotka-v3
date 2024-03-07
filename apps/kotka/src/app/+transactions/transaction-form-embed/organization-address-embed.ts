@@ -1,7 +1,7 @@
 import {
   Component
 } from '@angular/core';
-import { Observable, of, ReplaySubject, switchMap } from 'rxjs';
+import { catchError, Observable, of, ReplaySubject, switchMap } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { ApiClient } from '@kotka/services';
 import { Organization } from '@luomus/laji-schema';
@@ -43,6 +43,14 @@ export class OrganizationAddressEmbedComponent {
     if (!organizationId) {
       return of(undefined);
     }
-    return this.apiClient.getOrganization(organizationId);
+
+    return this.apiClient.getOrganization(organizationId).pipe(
+      catchError(e => {
+        if (e?.status === 404) {
+          return of(undefined);
+        }
+        throw e;
+      })
+    );
   }
 }

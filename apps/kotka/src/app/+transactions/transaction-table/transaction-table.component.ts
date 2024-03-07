@@ -147,7 +147,9 @@ export class TransactionTableComponent {
         cellRendererParams: {
           type: 'balance'
         },
-        hideDefaultTooltip: true
+        hideDefaultTooltip: true,
+        sortable: false,
+        filter: false
       },
       {
         colId: 'totalCount',
@@ -156,7 +158,9 @@ export class TransactionTableComponent {
         cellRendererParams: {
           type: 'total'
         },
-        hideDefaultTooltip: true
+        hideDefaultTooltip: true,
+        sortable: false,
+        filter: false
       },
       {
         colId: 'returnedCount',
@@ -165,14 +169,17 @@ export class TransactionTableComponent {
         cellRendererParams: {
           type: 'returned'
         },
-        hideDefaultTooltip: true
+        hideDefaultTooltip: true,
+        sortable: false,
+        filter: false
       },
       {
         colId: 'dueDays',
         headerName: 'Due days',
         field: 'dueDate',
         cellRenderer: DueDaysRendererComponent,
-        hideDefaultTooltip: true
+        hideDefaultTooltip: true,
+        filter: false
       },
       {
         headerName: 'Old transaction number',
