@@ -15,7 +15,8 @@ import { Observable } from 'rxjs';
 import { apiBase, lajiApiBase } from './constants';
 import {
   RangeResponse,
-  LoginResponse
+  LoginResponse,
+  AutocompleteResult
 } from '@kotka/api-interfaces';
 import { Organization, Collection } from '@luomus/laji-schema';
 import { map } from 'rxjs/operators';
@@ -96,6 +97,11 @@ export class ApiClient {
     );
   }
 
+  getOrganizationAutocomplete(query = ''): Observable<AutocompleteResult[]> {
+    const params = new HttpParams().set('q', query);
+    return this.httpClient.get<AutocompleteResult[]>(`${path}organization/autocomplete`, { params });
+  }
+
   getCollection(id: string): Observable<Collection> {
     return this.httpClient.get<Collection>(`${path}collection/${id}`);
   }
@@ -105,6 +111,11 @@ export class ApiClient {
     return this.httpClient.get<ListResponse<Collection>>(`${path}collection`, { params }).pipe(
       map(result => result.member)
     );
+  }
+
+  getCollectionAutocomplete(query = ''): Observable<AutocompleteResult[]> {
+    const params = new HttpParams().set('q', query);
+    return this.httpClient.get<AutocompleteResult[]>(`${path}collection/autocomplete`, { params });
   }
 
   getPerson(id: string): Observable<Person> {

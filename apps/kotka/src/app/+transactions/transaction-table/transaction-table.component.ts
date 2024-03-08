@@ -4,7 +4,7 @@ import {
   DateCellRendererComponent,
   TransactionCountRendererComponent, DueDaysRendererComponent
 } from '@kotka/ui/datatable';
-import { URICellRendererComponent, EnumCellRendererComponent } from '@kotka/ui/datatable';
+import { URICellRendererComponent, EnumCellRendererComponent, AutocompleteFloatingFilterComponent } from '@kotka/ui/datatable';
 import { DatatableDataService, DEFAULT_DOMAIN, FormService } from '@kotka/services';
 import {
   DatatableColumn,
@@ -55,7 +55,13 @@ export class TransactionTableComponent {
         field: 'owner',
         cellRenderer: LabelCellRendererComponent,
         hideDefaultTooltip: true,
-        defaultSelected: true
+        defaultSelected: true,
+        floatingFilterComponent: AutocompleteFloatingFilterComponent,
+        floatingFilterComponentParams: {
+          type: 'organization'
+        },
+        suppressFloatingFilterButton: true,
+        sortable: false
       },
       {
         headerName: 'Transaction status',
@@ -112,13 +118,25 @@ export class TransactionTableComponent {
         headerName: 'Counterparty organization',
         field: 'correspondentOrganization',
         cellRenderer: LabelCellRendererComponent,
-        hideDefaultTooltip: true
+        hideDefaultTooltip: true,
+        floatingFilterComponent: AutocompleteFloatingFilterComponent,
+        floatingFilterComponentParams: {
+          type: 'organization'
+        },
+        suppressFloatingFilterButton: true,
+        sortable: false
       },
       {
         headerName: 'Collection',
         field: 'collectionID',
         cellRenderer: LabelCellRendererComponent,
-        hideDefaultTooltip: true
+        hideDefaultTooltip: true,
+        floatingFilterComponent: AutocompleteFloatingFilterComponent,
+        floatingFilterComponentParams: {
+          type: 'collection'
+        },
+        suppressFloatingFilterButton: true,
+        sortable: false
       },
       {
         headerName: 'Counterparty researcher',

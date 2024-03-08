@@ -6,3 +6,4 @@ export * from './lib/renderers/label-cell-renderer.component';
 export * from './lib/renderers/date-cell-renderer.component';
 export * from './lib/renderers/transaction-count-renderer.component';
 export * from './lib/renderers/due-days-renderer.component';
+export * from './lib/filters/autocomplete-floating-filter.component';

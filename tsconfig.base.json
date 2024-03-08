@@ -27,6 +27,7 @@
       "@kotka/ui/main-content": ["libs/kotka/ui/main-content/src/index.ts"],
       "@kotka/ui/spinner": ["libs/kotka/ui/spinner/src/index.ts"],
       "@kotka/ui/viewer": ["libs/kotka/ui/viewer/src/index.ts"],
+      "@kotka/ui/autocomplete": ["libs/kotka/ui/autocomplete/src/index.ts"],
       "@kotka/util-services": ["libs/util-services/src/index.ts"],
       "@kotka/utils": ["libs/utils/src/index.ts"]
     }

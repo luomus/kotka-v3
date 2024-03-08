@@ -42,4 +42,9 @@ export interface RangeResponse {
   items?: string[];
 }
 
+export type AutocompleteResult = {
+  key: string;
+  value: string;
+}
+
 export type StatusResponse = HealthCheckResult;
