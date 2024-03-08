@@ -16,6 +16,12 @@ export enum KotkaDocumentObjectType {
   sample = 'sample'
 }
 
+export interface MultiLanguage {
+  en?: string;
+  fi?: string;
+  sv?: string;
+}
+
 export interface StoreVersion {
   version: number;
   created: string;
@@ -45,4 +51,17 @@ export interface KotkaVersionDifferenceObject {
 
 export function isDifferenceObjectPatch(value: DifferenceObjectValue|undefined|null): value is DifferenceObjectPatch {
   return value !== undefined && value !== null && 'op' in value;
+}
+
+export function isMultiLanguageObject(value: any): value is MultiLanguage {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const languages = ['en', 'fi', 'sv'];
+  const keys = Object.keys(value);
+  const hasLanguageKeys = languages.some(lang => keys.includes(lang));
+  const hasExtraKeys = keys.some(key => !languages.includes(key));
+
+  return hasLanguageKeys && !hasExtraKeys;
 }

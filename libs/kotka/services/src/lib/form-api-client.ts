@@ -6,6 +6,7 @@ import { ToastService } from './toast.service';
 import { apiBase, lajiApiBase } from './constants';
 import { getOrganizationFullName } from '@kotka/utils';
 import { Organization } from '@luomus/laji-schema';
+import { isMultiLanguageObject } from '@kotka/shared/models';
 
 enum ResourceType {
   autocompleteOrganizationResource,
@@ -112,9 +113,34 @@ export class FormApiClient {
 
   private processResult(resourceType: ResourceType, result: any) {
     if (resourceType === ResourceType.getOrganizationResource) {
-      return { ...result, fullName: getOrganizationFullName(result as Organization) };
+      result = { ...result, fullName: getOrganizationFullName(result as Organization) };
+    }
+    if ([ResourceType.getOrganizationResource, ResourceType.getCollectionResource].includes(resourceType)) {
+      result = this.processMultiLanguageObject(result);
     }
 
     return result;
+  }
+
+  private processMultiLanguageObject(object: any): any {
+    if (Array.isArray(object)) {
+      return object.map(item => this.processMultiLanguageObject(item));
+    } else if (typeof object === 'object') {
+      if (Object.keys(object).length === 0) {
+        return undefined;
+      }
+
+      if (isMultiLanguageObject(object)) {
+        return object.en;
+      }
+
+      const newObject: Record<string, any> = {};
+      for (const key in object) {
+        newObject[key] = this.processMultiLanguageObject(object[key]);
+      }
+      return newObject;
+    }
+
+    return object;
   }
 }
