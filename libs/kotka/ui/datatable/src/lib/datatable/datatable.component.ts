@@ -63,7 +63,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
   exportLoading = false;
 
   modules: Module[] = [InfiniteRowModelModule];
-  components = {
+  components: Record<string, any> = {
     agDateInput: CustomDatepickerComponent
   };
   colDefs: ColDef[] = [];

@@ -115,12 +115,4 @@ export class CustomDatepickerComponent implements IDateAngularComp {
     this.date = date || null;
     this.datepickerModel = this.date;
   }
-
-  setInputPlaceholder(placeholder: string) {
-    this.inputElem.nativeElement.setAttribute('placeholder', placeholder);
-  }
-
-  setInputAriaLabel(label: string) {
-    this.inputElem.nativeElement.setAttribute('aria-label', label);
-  }
 }
