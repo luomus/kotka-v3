@@ -96,7 +96,11 @@ export class TransactionTableComponent {
         headerName: 'Outgoing sent',
         field: 'outgoingSent',
         cellRenderer: DateCellRendererComponent,
-        hideDefaultTooltip: true
+        hideDefaultTooltip: true,
+        filter: 'agDateColumnFilter',
+        filterParams: {
+          inRangeFloatingFilterDateFormat: 'DD.MM.YYYY'
+        }
       },
       {
         colId: 'outgoingSentYear',
@@ -112,7 +116,11 @@ export class TransactionTableComponent {
         headerName: 'Incoming received',
         field: 'incomingReceived',
         cellRenderer: DateCellRendererComponent,
-        hideDefaultTooltip: true
+        hideDefaultTooltip: true,
+        filter: 'agDateColumnFilter',
+        filterParams: {
+          inRangeFloatingFilterDateFormat: 'DD.MM.YYYY'
+        }
       },
       {
         colId: 'incomingReceivedYear',

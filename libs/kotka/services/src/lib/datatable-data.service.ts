@@ -53,13 +53,20 @@ export class DatatableDataService {
   }
 
   private filterModelEntryToSearchQuery(key: string, filterModel: FilterModel): string {
-    if (filterModel['filterType'] !== 'text') {
-      return '';
+    if (!['text', 'date'].includes(filterModel['filterType'])) {
+      throw new Error('Filter type ' + filterModel['filterType'] + ' is not supported!');
     }
 
     const type = filterModel['type'];
     if (type) {
-      const filter = this.escapeFilterString(filterModel['filter']);
+      let filter: string, filter2: string;
+      if (filterModel['filterType'] === 'date') {
+        filter = this.getDateFilter(filterModel['dateFrom']);
+        filter2 = this.getDateFilter(filterModel['dateTo']);
+      } else {
+        filter = this.escapeFilterString(filterModel['filter']);
+      }
+
       switch(type) {
         case 'contains': {
           return `${key}:(*${filter}*)`;
@@ -85,6 +92,15 @@ export class DatatableDataService {
         case 'notBlank': {
           return `_exists_:${key}`;
         }
+        case 'lessThan': {
+          return `${key}:[* TO ${filter}]`;
+        }
+        case 'greaterThan': {
+          return `${key}:[${filter} TO *]`;
+        }
+        case 'inRange': {
+          return `${key}:[${filter} TO ${filter2!}]`;
+        }
         default: {
           break;
         }
@@ -96,6 +112,10 @@ export class DatatableDataService {
     }
 
     return '';
+  }
+
+  private getDateFilter(searchQuery: string): string {
+    return searchQuery ? searchQuery.split(' ')[0] : '';
   }
 
   private escapeFilterString(searchQuery: string): string {
