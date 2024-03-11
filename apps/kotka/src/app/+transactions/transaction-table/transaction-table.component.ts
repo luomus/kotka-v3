@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/
 import {
   LabelCellRendererComponent,
   DateCellRendererComponent,
-  TransactionCountRendererComponent, DueDaysRendererComponent
+  TransactionCountRendererComponent, DueDaysRendererComponent, EnumFloatingFilterComponent
 } from '@kotka/ui/datatable';
 import { URICellRendererComponent, EnumCellRendererComponent, AutocompleteFloatingFilterComponent } from '@kotka/ui/datatable';
 import { DatatableDataService, DEFAULT_DOMAIN, FormService } from '@kotka/services';
@@ -71,7 +71,12 @@ export class TransactionTableComponent {
           field: fieldData['status']
         },
         hideDefaultTooltip: true,
-        defaultSelected: true
+        defaultSelected: true,
+        floatingFilterComponent: EnumFloatingFilterComponent,
+        floatingFilterComponentParams: {
+          field: fieldData['status']
+        },
+        suppressFloatingFilterButton: true
       },
       {
         headerName: 'Transaction type',
@@ -80,7 +85,12 @@ export class TransactionTableComponent {
         cellRendererParams: {
           field: fieldData['type']
         },
-        hideDefaultTooltip: true
+        hideDefaultTooltip: true,
+        floatingFilterComponent: EnumFloatingFilterComponent,
+        floatingFilterComponentParams: {
+          field: fieldData['type']
+        },
+        suppressFloatingFilterButton: true
       },
       {
         headerName: 'Outgoing sent',
