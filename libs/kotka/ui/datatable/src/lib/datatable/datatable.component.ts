@@ -28,6 +28,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LocalStorage } from 'ngx-webstorage';
 import { isEqual } from 'lodash';
 import { DatatableExportService } from '../services/datatable-export.service';
+import { CustomDatepickerComponent } from '../components/custom-datepicker.component';
 
 type CustomColumnKey = keyof Pick<DatatableColumn, 'hideDefaultTooltip'|'hideDefaultHeaderTooltip'|'defaultSelected'>;
 
@@ -62,6 +63,9 @@ export class DatatableComponent implements OnChanges, OnDestroy {
   exportLoading = false;
 
   modules: Module[] = [InfiniteRowModelModule];
+  components = {
+    agDateInput: CustomDatepickerComponent
+  };
   colDefs: ColDef[] = [];
   defaultColDef: ColDef = {
     flex: 1,

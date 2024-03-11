@@ -110,7 +110,11 @@ export class TransactionTableComponent {
         cellRendererParams: {
           format: 'YYYY'
         },
-        hideDefaultTooltip: true
+        hideDefaultTooltip: true,
+        filter: 'agDateColumnFilter',
+        filterParams: {
+          inRangeFloatingFilterDateFormat: 'YYYY'
+        }
       },
       {
         headerName: 'Incoming received',
