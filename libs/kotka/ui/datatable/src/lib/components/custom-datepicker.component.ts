@@ -14,8 +14,8 @@ import { FormsModule } from '@angular/forms';
  */
 @Injectable()
 export class CustomAdapter extends NgbDateAdapter<Date> {
-  fromModel(value: Date | null): NgbDateStruct | null {
-    if (value) {
+  fromModel(value: Date | string | null): NgbDateStruct | null {
+    if (value && typeof value !== 'string') {
       return {
         day: value.getDate(),
         month: value.getMonth() + 1,
