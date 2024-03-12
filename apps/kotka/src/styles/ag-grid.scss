@@ -1,3 +1,7 @@
-.ag-floating-filter-full-body > ng-component {
+.ag-floating-filter-full-body {
+  overflow: initial;
+}
+
+.ag-floating-filter ng-component {
   width: 100%;
 }

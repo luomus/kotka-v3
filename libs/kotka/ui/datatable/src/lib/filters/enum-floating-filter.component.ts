@@ -22,13 +22,21 @@ interface FilterExtraParams {
   ],
   template: `
     <div class="ag-floating-filter-input">
-      <select class="ag-picker-field-wrapper" [ngModel]="currentFilter" (ngModelChange)="changeFilterValue($event)">
-        <option *ngFor="let item of valueOptions | keyvalue" [value]="item.key">
-          {{ item.value }}
-        </option>
-      </select>
+      <div class="ag-select ag-filter-select">
+        <select class="ag-picker-field-wrapper" [ngModel]="currentFilter" (ngModelChange)="changeFilterValue($event)">
+          <option *ngFor="let item of valueOptions | keyvalue" [value]="item.key">
+            {{ item.value }}
+          </option>
+        </select>
+      </div>
     </div>
   `,
+  styles: [`
+    .ag-picker-field-wrapper {
+      height: var(--ag-list-item-height);
+      border-radius: var(--ag-border-radius);
+    }
+  `]
 })
 export class EnumFloatingFilterComponent implements IFloatingFilterAngularComp<TextFilter> {
   valueOptions!: Record<string, string>;

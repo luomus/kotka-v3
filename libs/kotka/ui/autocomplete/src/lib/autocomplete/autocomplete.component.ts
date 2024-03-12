@@ -11,6 +11,7 @@ export type FetchAutocompleteResultsFunc = (term: string) => Observable<Autocomp
   template: `
     <input
       type="text"
+      placeholder="Search..."
       [className]="inputClassName"
       [(ngModel)]="typeaheadValue"
       [ngbTypeahead]="search"

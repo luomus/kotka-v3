@@ -64,27 +64,39 @@ export class CustomDateParserFormatter extends NgbDateParserFormatter {
     FormsModule
   ],
   template: `
-    <form class="row row-cols-sm-auto">
-      <div class="col-12">
-        <div class="input-group">
-          <input
-            class="form-control"
-            name="datepicker"
-            placeholder="dd.mm.yyyy"
-            [(ngModel)]="datepickerModel"
-            (ngModelChange)="onDateChanged()"
-            ngbDatepicker
-            #datepicker="ngbDatepicker"
-            [container]="'body'"
-            [datepickerClass]="'ag-custom-component-popup'"
-          />
-          <button class="btn btn-outline-secondary" (click)="datepicker.toggle()" type="button">
-            <i class="fa fa-calendar-days"></i>
-          </button>
-        </div>
-      </div>
-    </form>
+    <div class="input-group">
+      <input
+        class="ag-input-field-input ag-text-field-input"
+        name="datepicker"
+        placeholder="dd.mm.yyyy"
+        [(ngModel)]="datepickerModel"
+        (ngModelChange)="onDateChanged()"
+        ngbDatepicker
+        #datepicker="ngbDatepicker"
+        [container]="'body'"
+        [datepickerClass]="'ag-custom-component-popup'"
+      />
+      <button class="btn btn-outline-secondary" (click)="datepicker.toggle()" type="button">
+        <i class="fa fa-calendar-days"></i>
+      </button>
+    </div>
   `,
+  styles: [`
+    input {
+      position: relative;
+      flex: 1 1 auto;
+      width: 1%;
+      min-width: 0;
+      height: var(--ag-list-item-height);
+    }
+
+    button {
+      height: var(--ag-list-item-height);
+      font-size: 0.7rem;
+      padding-top: 0.1rem;
+      padding-bottom: 0.1rem;
+    }
+  `],
   providers: [
     { provide: NgbDateAdapter, useClass: CustomAdapter },
     { provide: NgbDateParserFormatter, useClass: CustomDateParserFormatter },
