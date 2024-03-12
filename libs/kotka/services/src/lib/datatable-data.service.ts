@@ -25,7 +25,7 @@ export class DatatableDataService {
 
     const colIdFieldMap = this.getColIdFieldMap(columns);
     const sort = this.sortModelToSortString(sortModel, colIdFieldMap);
-    const searchQuery = this.filterModelToSearchQuery(filterModel);
+    const searchQuery = this.filterModelToSearchQuery(filterModel, colIdFieldMap);
 
     return this.dataService.getData(dataType, page, pageSize, sort, searchQuery);
   }
@@ -46,13 +46,13 @@ export class DatatableDataService {
     return sortModel.map(sort => colIdFieldMap[sort.colId] + ' ' + sort.sort).join(',');
   }
 
-  private filterModelToSearchQuery(filterModel: FilterModel): string {
+  private filterModelToSearchQuery(filterModel: FilterModel, colIdFieldMap: Record<string, string>): string {
     return Object.keys(filterModel).map(
-      key => this.filterModelEntryToSearchQuery(key, filterModel[key])
+      key => this.filterModelEntryToSearchQuery(colIdFieldMap[key], filterModel[key])
     ).join(' AND ');
   }
 
-  private filterModelEntryToSearchQuery(key: string, filterModel: FilterModel): string {
+  private filterModelEntryToSearchQuery(field: string, filterModel: FilterModel): string {
     if (!['text', 'date'].includes(filterModel['filterType'])) {
       throw new Error('Filter type ' + filterModel['filterType'] + ' is not supported!');
     }
@@ -69,45 +69,45 @@ export class DatatableDataService {
 
       switch(type) {
         case 'contains': {
-          return `${key}:(*${filter}*)`;
+          return `${field}:(*${filter}*)`;
         }
         case 'notContains': {
-          return `${key}:(NOT *${filter}*)`;
+          return `${field}:(NOT *${filter}*)`;
         }
         case 'equals': {
-          return `${key}:(${filter})`;
+          return `${field}:(${filter})`;
         }
         case 'notEqual': {
-          return `${key}:(NOT ${filter})`;
+          return `${field}:(NOT ${filter})`;
         }
         case 'startsWith': {
-          return `${key}:(${filter}*)`;
+          return `${field}:(${filter}*)`;
         }
         case 'endsWith': {
-          return `${key}:(*${filter})`;
+          return `${field}:(*${filter})`;
         }
         case 'blank': {
-          return `_exists_:(NOT ${key})`;
+          return `_exists_:(NOT ${field})`;
         }
         case 'notBlank': {
-          return `_exists_:${key}`;
+          return `_exists_:${field}`;
         }
         case 'lessThan': {
-          return `${key}:[* TO ${filter}]`;
+          return `${field}:[* TO ${filter}]`;
         }
         case 'greaterThan': {
-          return `${key}:[${filter} TO *]`;
+          return `${field}:[${filter} TO *]`;
         }
         case 'inRange': {
-          return `${key}:[${filter} TO ${filter2!}]`;
+          return `${field}:[${filter} TO ${filter2!}]`;
         }
         default: {
           break;
         }
       }
     } else if (filterModel['operator']) {
-      const condition1 = this.filterModelEntryToSearchQuery(key, filterModel['condition1']);
-      const condition2 = this.filterModelEntryToSearchQuery(key, filterModel['condition2']);
+      const condition1 = this.filterModelEntryToSearchQuery(field, filterModel['condition1']);
+      const condition2 = this.filterModelEntryToSearchQuery(field, filterModel['condition2']);
       return `${condition1} ${filterModel['operator']} ${condition2}`;
     }
 

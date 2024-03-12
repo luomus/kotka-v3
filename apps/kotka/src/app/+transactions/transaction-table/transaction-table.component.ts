@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/
 import {
   LabelCellRendererComponent,
   DateCellRendererComponent,
-  TransactionCountRendererComponent, DueDaysRendererComponent, EnumFloatingFilterComponent
+  TransactionCountRendererComponent, DueDaysRendererComponent, EnumFloatingFilterComponent, YearFloatingFilterComponent
 } from '@kotka/ui/datatable';
 import { URICellRendererComponent, EnumCellRendererComponent, AutocompleteFloatingFilterComponent } from '@kotka/ui/datatable';
 import { DatatableDataService, DEFAULT_DOMAIN, FormService } from '@kotka/services';
@@ -112,9 +112,8 @@ export class TransactionTableComponent {
         },
         hideDefaultTooltip: true,
         filter: 'agDateColumnFilter',
-        filterParams: {
-          inRangeFloatingFilterDateFormat: 'YYYY'
-        }
+        floatingFilterComponent: YearFloatingFilterComponent,
+        suppressFloatingFilterButton: true
       },
       {
         headerName: 'Incoming received',

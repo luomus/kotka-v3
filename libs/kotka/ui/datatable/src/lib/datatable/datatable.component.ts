@@ -73,7 +73,8 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     minWidth: 120,
     sortable: true,
     filter: true,
-    floatingFilter: true
+    floatingFilter: true,
+    suppressHeaderMenuButton: true
   };
   rowBuffer = 0;
   rowSelection: 'single'|'multiple'|undefined = 'multiple';
