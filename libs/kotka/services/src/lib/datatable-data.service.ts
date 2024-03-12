@@ -114,19 +114,23 @@ export class DatatableDataService {
     return '';
   }
 
-  private getDateFilter(searchQuery: string): string {
+  private getDateFilter(searchQuery?: string): string {
     return searchQuery ? searchQuery.split(' ')[0] : '';
   }
 
-  private escapeFilterString(searchQuery: string): string {
+  private escapeFilterString(searchQuery?: string): string {
+    if (!searchQuery) {
+      return '';
+    }
+
     const escapedChars = ['\\', '*', '?', '+', '-', '&&', '||', '!', '(', ')', '{', '}', '[', ']', '^', '~', ':', '"', '=', '/', ' '];
     escapedChars.forEach(char => {
-      searchQuery = searchQuery.split(char).join('\\' + char);
+      searchQuery = searchQuery!.split(char).join('\\' + char);
     });
 
     const removedChars = ['<', '>'];
     removedChars.forEach(char => {
-      searchQuery = searchQuery.split(char).join('');
+      searchQuery = searchQuery!.split(char).join('');
     });
 
     return searchQuery;
