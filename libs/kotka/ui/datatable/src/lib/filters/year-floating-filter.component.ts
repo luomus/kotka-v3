@@ -48,7 +48,7 @@ export class YearFloatingFilterComponent implements IFloatingFilterAngularComp<D
     this.params = params;
   }
 
-  onParentModelChanged(parentModel: DateFilterModel) {
+  onParentModelChanged(parentModel: DateFilterModel|null) {
     if (!parentModel?.dateFrom) {
       this.currentFilter = undefined;
     } else {

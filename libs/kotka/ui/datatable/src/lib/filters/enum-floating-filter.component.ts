@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import {
   IFloatingFilterParams,
-  ISimpleFilter
+  TextFilter,
+  TextFilterModel
 } from '@ag-grid-community/core';
 import { IFloatingFilterAngularComp } from '@ag-grid-community/angular';
 import { LajiForm } from '@kotka/shared/models';
@@ -22,24 +23,27 @@ interface FilterExtraParams {
   template: `
     <div class="ag-floating-filter-input">
       <select class="ag-picker-field-wrapper" [ngModel]="currentFilter" (ngModelChange)="changeFilterValue($event)">
-        <option *ngFor="let item of params.field.options?.value_options | keyvalue" [value]="item.key">
+        <option *ngFor="let item of valueOptions | keyvalue" [value]="item.key">
           {{ item.value }}
         </option>
       </select>
     </div>
   `,
 })
-export class EnumFloatingFilterComponent implements IFloatingFilterAngularComp {
-  params!: IFloatingFilterParams & FilterExtraParams;
+export class EnumFloatingFilterComponent implements IFloatingFilterAngularComp<TextFilter> {
+  valueOptions!: Record<string, string>;
 
   currentFilter?: string;
 
-  agInit(params: IFloatingFilterParams<ISimpleFilter> & FilterExtraParams): void {
+  private params!: IFloatingFilterParams & FilterExtraParams;
+
+  agInit(params: IFloatingFilterParams<TextFilter> & FilterExtraParams): void {
     this.params = params;
+    this.valueOptions = {...params.field.options?.value_options, '':''};
   }
 
-  onParentModelChanged(parentModel: any) {
-    if (!parentModel) {
+  onParentModelChanged(parentModel: TextFilterModel|null) {
+    if (!parentModel?.filter) {
       this.currentFilter = undefined;
     } else {
       this.currentFilter = parentModel.filter;

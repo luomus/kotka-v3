@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import {
   IFloatingFilterParams,
-  ISimpleFilter
+  TextFilter,
+  TextFilterModel
 } from '@ag-grid-community/core';
 import { IFloatingFilterAngularComp } from '@ag-grid-community/angular';
 import { ApiClient } from '@kotka/services';
@@ -25,7 +26,7 @@ interface FilterExtraParams {
     </div>
   `,
 })
-export class AutocompleteFloatingFilterComponent implements IFloatingFilterAngularComp {
+export class AutocompleteFloatingFilterComponent implements IFloatingFilterAngularComp<TextFilter> {
   params!: IFloatingFilterParams & FilterExtraParams;
 
   currentFilter?: string;
@@ -37,12 +38,12 @@ export class AutocompleteFloatingFilterComponent implements IFloatingFilterAngul
     this.fetchResultsFunc = this.getAutocompleteResults.bind(this);
   }
 
-  agInit(params: IFloatingFilterParams<ISimpleFilter> & FilterExtraParams): void {
+  agInit(params: IFloatingFilterParams<TextFilter> & FilterExtraParams): void {
     this.params = params;
   }
 
-  onParentModelChanged(parentModel: any) {
-    if (!parentModel) {
+  onParentModelChanged(parentModel: TextFilterModel|null) {
+    if (!parentModel?.filter) {
       this.currentFilter = undefined;
     } else {
       this.currentFilter = parentModel.filter;
