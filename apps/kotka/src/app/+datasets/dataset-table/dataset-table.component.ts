@@ -16,8 +16,7 @@ export class DatasetTableComponent {
     cellRenderer: URICellRendererComponent,
     cellRendererParams: {
       domain: DEFAULT_DOMAIN
-    },
-    hideDefaultTooltip: true
+    }
   }, {
     headerName: 'Name',
     field: 'datasetName.en',

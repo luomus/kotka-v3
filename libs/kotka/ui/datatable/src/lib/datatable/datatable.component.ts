@@ -30,7 +30,7 @@ import { isEqual } from 'lodash';
 import { DatatableExportService } from '../services/datatable-export.service';
 import { CustomDatepickerComponent } from '../components/custom-datepicker.component';
 
-type CustomColumnKey = keyof Pick<DatatableColumn, 'hideDefaultTooltip'|'hideDefaultHeaderTooltip'|'defaultSelected'>;
+type CustomColumnKey = keyof Pick<DatatableColumn, 'hideDefaultHeaderTooltip'|'defaultSelected'>;
 
 interface GridReadyEvent {
   type: string;
@@ -249,7 +249,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
       if (!col.hideDefaultHeaderTooltip) {
         newCol.headerTooltip = col.headerName;
       }
-      if (!col.hideDefaultTooltip) {
+      if (!col.cellRenderer) {
         newCol.tooltipField = col.field;
       }
 
@@ -281,7 +281,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     return columns.map(col => {
       col = {...col};
 
-      const customKeys: CustomColumnKey[] = ['hideDefaultHeaderTooltip', 'hideDefaultTooltip', 'defaultSelected'];
+      const customKeys: CustomColumnKey[] = ['hideDefaultHeaderTooltip', 'defaultSelected'];
       for (const key of customKeys) {
         delete col[key];
       }

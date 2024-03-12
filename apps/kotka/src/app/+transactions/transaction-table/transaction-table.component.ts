@@ -47,21 +47,19 @@ export class TransactionTableComponent {
         cellRendererParams: {
           domain: DEFAULT_DOMAIN
         },
-        hideDefaultTooltip: true,
         defaultSelected: true
       },
       {
         headerName: 'Team',
         field: 'owner',
         cellRenderer: LabelCellRendererComponent,
-        hideDefaultTooltip: true,
-        defaultSelected: true,
         floatingFilterComponent: AutocompleteFloatingFilterComponent,
         floatingFilterComponentParams: {
           type: 'organization'
         },
         suppressFloatingFilterButton: true,
-        sortable: false
+        sortable: false,
+        defaultSelected: true
       },
       {
         headerName: 'Transaction status',
@@ -70,13 +68,12 @@ export class TransactionTableComponent {
         cellRendererParams: {
           field: fieldData['status']
         },
-        hideDefaultTooltip: true,
-        defaultSelected: true,
         floatingFilterComponent: EnumFloatingFilterComponent,
         floatingFilterComponentParams: {
           field: fieldData['status']
         },
-        suppressFloatingFilterButton: true
+        suppressFloatingFilterButton: true,
+        defaultSelected: true
       },
       {
         headerName: 'Transaction type',
@@ -85,7 +82,6 @@ export class TransactionTableComponent {
         cellRendererParams: {
           field: fieldData['type']
         },
-        hideDefaultTooltip: true,
         floatingFilterComponent: EnumFloatingFilterComponent,
         floatingFilterComponentParams: {
           field: fieldData['type']
@@ -96,7 +92,6 @@ export class TransactionTableComponent {
         headerName: 'Outgoing sent',
         field: 'outgoingSent',
         cellRenderer: DateCellRendererComponent,
-        hideDefaultTooltip: true,
         filter: 'agDateColumnFilter',
         filterParams: {
           inRangeFloatingFilterDateFormat: 'DD.MM.YYYY'
@@ -110,7 +105,6 @@ export class TransactionTableComponent {
         cellRendererParams: {
           format: 'YYYY'
         },
-        hideDefaultTooltip: true,
         filter: 'agDateColumnFilter',
         floatingFilterComponent: YearFloatingFilterComponent,
         suppressFloatingFilterButton: true
@@ -119,7 +113,6 @@ export class TransactionTableComponent {
         headerName: 'Incoming received',
         field: 'incomingReceived',
         cellRenderer: DateCellRendererComponent,
-        hideDefaultTooltip: true,
         filter: 'agDateColumnFilter',
         filterParams: {
           inRangeFloatingFilterDateFormat: 'DD.MM.YYYY'
@@ -133,13 +126,14 @@ export class TransactionTableComponent {
         cellRendererParams: {
           format: 'YYYY'
         },
-        hideDefaultTooltip: true
+        filter: 'agDateColumnFilter',
+        floatingFilterComponent: YearFloatingFilterComponent,
+        suppressFloatingFilterButton: true
       },
       {
         headerName: 'Counterparty organization',
         field: 'correspondentOrganization',
         cellRenderer: LabelCellRendererComponent,
-        hideDefaultTooltip: true,
         floatingFilterComponent: AutocompleteFloatingFilterComponent,
         floatingFilterComponentParams: {
           type: 'organization'
@@ -151,7 +145,6 @@ export class TransactionTableComponent {
         headerName: 'Collection',
         field: 'collectionID',
         cellRenderer: LabelCellRendererComponent,
-        hideDefaultTooltip: true,
         floatingFilterComponent: AutocompleteFloatingFilterComponent,
         floatingFilterComponentParams: {
           type: 'collection'
@@ -186,7 +179,6 @@ export class TransactionTableComponent {
         cellRendererParams: {
           type: 'balance'
         },
-        hideDefaultTooltip: true,
         sortable: false,
         filter: false
       },
@@ -197,7 +189,6 @@ export class TransactionTableComponent {
         cellRendererParams: {
           type: 'total'
         },
-        hideDefaultTooltip: true,
         sortable: false,
         filter: false
       },
@@ -208,7 +199,6 @@ export class TransactionTableComponent {
         cellRendererParams: {
           type: 'returned'
         },
-        hideDefaultTooltip: true,
         sortable: false,
         filter: false
       },
@@ -217,7 +207,6 @@ export class TransactionTableComponent {
         headerName: 'Due days',
         field: 'dueDate',
         cellRenderer: DueDaysRendererComponent,
-        hideDefaultTooltip: true,
         filter: false
       },
       {
