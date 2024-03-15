@@ -7,12 +7,13 @@ import {
 import { TransactionDispatchSheetComponent } from './transaction-dispatch-sheet/transaction-dispatch-sheet';
 import { SpecimenTransaction } from '@luomus/laji-schema';
 import { TransactionPdfSheetsContextService } from './transaction-pdf-sheets-context-service';
-import { ComponentWithContext, PdfService } from '@kotka/services';
+import { PdfTemplateComponent, PdfService } from '@kotka/services';
 import { TransactionIncomingSheetComponent } from './transaction-incoming-sheet/transaction-incoming-sheet';
 import { TransactionInquirySheetComponent } from './transaction-inquiry-sheet/transaction-inquiry-sheet';
 import { TransactionReturnSheetComponent } from './transaction-return-sheet/transaction-return-sheet';
 import { TransactionInsectLabelsComponent } from './transaction-insect-labels/transaction-insect-labels';
-import { switchMap } from 'rxjs';
+import { Observable, switchMap } from 'rxjs';
+import { TransactionBotanyLabelsComponent } from './transaction-botany-labels/transaction-botany-labels';
 
 @Component({
   selector: 'kotka-transaction-pdf-sheets',
@@ -25,6 +26,7 @@ import { switchMap } from 'rxjs';
           <button class="btn btn-light" (click)="downloadInquirySheet()" [disabled]="loading">Inquiry sheet (PDF)</button>
           <button class="btn btn-light mb-3" (click)="downloadReturnSheet()" [disabled]="loading">Return sheet (PDF)</button>
           <button class="btn btn-light" (click)="downloadInsectLabels()" [disabled]="loading">Insect labels (PDF)</button>
+          <button class="btn btn-light" (click)="downloadBotanyLabels()" [disabled]="loading">Botany labels (PDF)</button>
           <div class="px-3 py-2 w-100 text-center">
             <a
               [href]='("/specimens/search?identifier=" + specimenIdQuery) | oldKotkaUrl'
@@ -80,17 +82,29 @@ export class TransactionPdfSheetsComponent implements OnChanges {
   }
 
   downloadInsectLabels() {
-    this.downloadShelfSlip(TransactionInsectLabelsComponent, 'insectlabels');
+    if (!this.data) {
+      return;
+    }
+    const context$ = this.transactionPdfSheetsContext.getInsectShelfSlipContext(this.data);
+    this.downloadSheet(TransactionInsectLabelsComponent, 'insectlabels', context$);
   }
 
-  private downloadSheet(componentClass: Type<ComponentWithContext>, name: string) {
+  downloadBotanyLabels() {
+    if (!this.data) {
+      return;
+    }
+    const context$ = this.transactionPdfSheetsContext.getBotanyShelfSlipContext(this.data);
+    this.downloadSheet(TransactionBotanyLabelsComponent,'botanylabels', context$);
+  }
+
+  private downloadSheet(componentClass: Type<PdfTemplateComponent>, name: string, context$?: Observable<any>) {
     if (!this.data) {
       return;
     }
 
     this.loading = true;
 
-    this.transactionPdfSheetsContext.getSheetContext(this.data).pipe(
+    (context$ || this.transactionPdfSheetsContext.getSheetContext(this.data)).pipe(
       switchMap(context => this.download(componentClass, context, name))
     ).subscribe({
       'next': () => {
@@ -104,28 +118,7 @@ export class TransactionPdfSheetsComponent implements OnChanges {
     });
   }
 
-  private downloadShelfSlip(componentClass: Type<ComponentWithContext>, name: string) {
-    if (!this.data) {
-      return;
-    }
-
-    this.loading = true;
-
-    this.transactionPdfSheetsContext.getShelfSlipContext(this.data).pipe(
-      switchMap(context => this.download(componentClass, context, name))
-    ).subscribe( {
-      'next': () => {
-        this.loading = false;
-        this.cdr.markForCheck();
-      },
-      'error': () => {
-        this.loading = false;
-        this.cdr.markForCheck();
-      }
-    });
-  }
-
-  private download(componentClass: Type<ComponentWithContext>, context: any, name: string) {
+  private download(componentClass: Type<PdfTemplateComponent>, context: any, name: string) {
     return this.pdfService.downloadSheet(
       componentClass,
       context,

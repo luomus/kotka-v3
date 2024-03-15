@@ -14,8 +14,13 @@ export interface TransactionSheetContext {
   fieldData: Record<string, LajiForm.Field>
 }
 
-export interface TransactionShelfSlipContext {
+export interface TransactionInsectShelfSlipContext {
   data: SpecimenTransaction
+}
+
+export interface TransactionBotanyShelfSlipContext {
+  data: SpecimenTransaction,
+  correspondingOrganization?: Organization
 }
 
 @Injectable({
@@ -43,8 +48,17 @@ export class TransactionPdfSheetsContextService {
     })));
   }
 
-  getShelfSlipContext(data: SpecimenTransaction): Observable<TransactionShelfSlipContext> {
+  getInsectShelfSlipContext(data: SpecimenTransaction): Observable<TransactionInsectShelfSlipContext> {
     return of({ data });
+  }
+
+  getBotanyShelfSlipContext(data: SpecimenTransaction): Observable<TransactionBotanyShelfSlipContext> {
+    return this.getOrganization(data.correspondentOrganization).pipe(
+      map(correspondingOrganization => ({
+        data,
+        correspondingOrganization
+      }))
+    );
   }
 
   private getOrganization(organizationId?: string): Observable<Organization|undefined> {

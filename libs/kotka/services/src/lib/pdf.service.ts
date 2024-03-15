@@ -1,15 +1,16 @@
 import { ComponentRef, Inject, Injectable, Type } from '@angular/core';
 import * as FileSaver from 'file-saver';
-import { Observable, switchMap } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, of, switchMap } from 'rxjs';
+import { map, take } from 'rxjs/operators';
 import { ApiClient } from './api-client';
 import { HttpClient } from '@angular/common/http';
 import { ComponentService } from './component.service';
 import { PdfBaseComponent } from './components/pdf-base.component';
 import { DOCUMENT } from '@angular/common';
 
-export interface ComponentWithContext {
+export interface PdfTemplateComponent {
   context?: unknown;
+  componentIsReady?: Observable<true>;
 }
 
 @Injectable({
@@ -23,7 +24,7 @@ export class PdfService {
     private componentService: ComponentService
   ) {}
 
-  downloadSheet<T extends ComponentWithContext>(componentClass: Type<T>, context: unknown, fileName: string): Observable<void> {
+  downloadSheet<T extends PdfTemplateComponent>(componentClass: Type<T>, context: unknown, fileName: string): Observable<void> {
     return this.getHtml(componentClass, context).pipe(
       switchMap(html => this.apiClient.htmlToPdf(html)),
       map(res => {
@@ -32,8 +33,8 @@ export class PdfService {
     );
   }
 
-  private getHtml<T extends ComponentWithContext>(componentClass: Type<T>, context: unknown): Observable<string> {
-    return this.getStyleElement().pipe(map(styleElem => {
+  private getHtml<T extends PdfTemplateComponent>(componentClass: Type<T>, context: unknown): Observable<string> {
+    return this.getStyleElement().pipe(switchMap(styleElem => {
       const baseComponentRef = this.componentService.createComponentFromType(PdfBaseComponent);
 
       const head= baseComponentRef.instance.head.nativeElement;
@@ -42,16 +43,20 @@ export class PdfService {
       head.appendChild(styleElem);
       const componentRef = this.addContentComponentToBody(componentClass, context, body);
 
-      const html = baseComponentRef.location.nativeElement.innerHTML;
+      const componentIsReady$ = componentRef.instance.componentIsReady || of(true);
 
-      baseComponentRef.destroy();
-      componentRef.destroy();
+      return componentIsReady$.pipe(take(1), map(() => {
+        const html = baseComponentRef.location.nativeElement.innerHTML;
 
-      return html;
+        baseComponentRef.destroy();
+        componentRef.destroy();
+
+        return html;
+      }));
     }));
   }
 
-  private addContentComponentToBody<T extends ComponentWithContext>(componentClass: Type<T>, context: unknown, bodyElem: HTMLBodyElement): ComponentRef<T> {
+  private addContentComponentToBody<T extends PdfTemplateComponent>(componentClass: Type<T>, context: unknown, bodyElem: HTMLBodyElement): ComponentRef<T> {
     const componentRef = this.componentService.createComponentFromType(componentClass, bodyElem);
 
     componentRef.instance.context = context;

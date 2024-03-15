@@ -17,7 +17,8 @@ enum TypeEnum {
   transactionIncoming = 'transactionIncoming',
   transactionInquiry = 'transactionInquiry',
   transactionReturn = 'transactionReturn',
-  transactionInsectLabels = 'transactionInsectLabels'
+  transactionInsectLabels = 'transactionInsectLabels',
+  transactionBotanyLabels = 'transactionBotanyLabels'
 }
 
 @Component({
@@ -56,7 +57,9 @@ export class PdfDemoComponent {
         data = asSpecimenTransaction(data);
 
         if (params.type === TypeEnum.transactionInsectLabels) {
-          return this.transactionPdfSheetsContextService.getShelfSlipContext(data);
+          return this.transactionPdfSheetsContextService.getInsectShelfSlipContext(data);
+        } else if (params.type === TypeEnum.transactionBotanyLabels) {
+          return this.transactionPdfSheetsContextService.getBotanyShelfSlipContext(data);
         }
 
         return this.transactionPdfSheetsContextService.getSheetContext(data);

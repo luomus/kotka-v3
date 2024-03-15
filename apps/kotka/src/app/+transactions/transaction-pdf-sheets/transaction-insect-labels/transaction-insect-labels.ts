@@ -1,8 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { SpecimenTransaction } from '@luomus/laji-schema';
 import { CommonModule } from '@angular/common';
-import { TransactionShelfSlipContext } from '../transaction-pdf-sheets-context-service';
-import { ComponentWithContext } from '@kotka/services';
+import { TransactionInsectShelfSlipContext } from '../transaction-pdf-sheets-context-service';
+import { PdfTemplateComponent } from '@kotka/services';
 import { PipesModule } from '@kotka/pipes';
 
 interface SpecimenWithinPage {
@@ -20,8 +20,8 @@ interface SpecimenWithinPage {
   selector: 'kotka-transaction-insect-labels',
   templateUrl: './transaction-insect-labels.html'
 })
-export class TransactionInsectLabelsComponent implements ComponentWithContext {
-  @Input({ required: true }) context!: TransactionShelfSlipContext;
+export class TransactionInsectLabelsComponent implements PdfTemplateComponent {
+  @Input({ required: true }) context!: TransactionInsectShelfSlipContext;
 
   specimensPerRow = 7;
   specimensPerCol = 25;

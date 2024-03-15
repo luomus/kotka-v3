@@ -39,8 +39,16 @@ hr {
   margin: 5mm 0;
 }
 
+qrcode img {
+  width: 100%;
+}
+
 .multi-line span {
   display: block;
+}
+
+.multi-line.multi-line-with-margin-bottom span {
+  margin-bottom: 3mm;
 }
 
 .content-block + .content-block {

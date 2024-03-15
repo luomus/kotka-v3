@@ -1,0 +1,25 @@
+<div class="page" style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: end; grid-column-gap: 20mm">
+  <div *ngFor="let i of [0, 1]">
+    <h3 style="margin-bottom: 5mm">LOAN NO.: {{ data.id | toFullUri }}</h3>
+    <div class="multi-line multi-line-with-margin-bottom">
+      <span><strong>Species:</strong></span>
+      <span><strong>No. of specimens:</strong></span>
+      <span style="margin-bottom: 10mm"><strong>Herb. numbers / ID:</strong></span>
+      <span><strong>Specimen location:</strong></span>
+      <span><strong>Borrower:</strong> {{ data.correspondentResearcher }}</span>
+      <span><strong>City / Museum:</strong> {{ context.correspondingOrganization?.locality }} / {{ context.correspondingOrganization?.abbreviation }}</span>
+      <span><strong>Date of loan:</strong> {{ data.outgoingSent | date: 'dd MMM Y' }}</span>
+    </div>
+    <div style="float: right">
+      <qrcode
+        [style.display]="'block'"
+        [style.width]="15 + 'mm'"
+        [margin]="0"
+        [qrdata]="data.id | toFullUri"
+        [width]="100"
+        [errorCorrectionLevel]="'M'"
+        elementType="img"
+      ></qrcode>
+    </div>
+  </div>
+</div>

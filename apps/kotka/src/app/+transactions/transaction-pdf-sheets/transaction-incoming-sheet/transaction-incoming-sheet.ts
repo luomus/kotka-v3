@@ -3,7 +3,7 @@ import { SpecimenTransaction } from '@luomus/laji-schema';
 import { CommonModule } from '@angular/common';
 import { TransactionTypeLabelPipe } from '../pipes/transaction-type-label.pipe';
 import { TransactionSheetContext } from '../transaction-pdf-sheets-context-service';
-import { ComponentWithContext } from '@kotka/services';
+import { PdfTemplateComponent } from '@kotka/services';
 import { PipesModule } from '@kotka/pipes';
 import { TransactionSheetHeaderComponent } from '../sheet-components/transaction-sheet-header/transaction-sheet-header';
 import { TransactionSheetMaterialComponent } from '../sheet-components/transaction-sheet-material/transaction-sheet-material';
@@ -30,7 +30,7 @@ import {
   selector: 'kotka-transaction-incoming-sheet',
   templateUrl: './transaction-incoming-sheet.html'
 })
-export class TransactionIncomingSheetComponent implements ComponentWithContext {
+export class TransactionIncomingSheetComponent implements PdfTemplateComponent {
   @Input({ required: true }) context!: TransactionSheetContext;
 
   get data(): SpecimenTransaction {

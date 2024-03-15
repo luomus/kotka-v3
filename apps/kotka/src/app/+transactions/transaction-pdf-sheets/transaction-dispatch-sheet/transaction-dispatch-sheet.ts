@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { SpecimenTransaction } from '@luomus/laji-schema';
 import { CommonModule } from '@angular/common';
 import { TransactionSheetContext } from '../transaction-pdf-sheets-context-service';
-import { ComponentWithContext } from '@kotka/services';
+import { PdfTemplateComponent } from '@kotka/services';
 import { PipesModule } from '@kotka/pipes';
 import { TransactionDispatchLabelPipe } from '../pipes/transaction-dispatch-label.pipe';
 import { TransactionSheetHeaderComponent } from '../sheet-components/transaction-sheet-header/transaction-sheet-header';
@@ -28,7 +28,7 @@ import {
   selector: 'kotka-transaction-dispatch-sheet',
   templateUrl: './transaction-dispatch-sheet.html'
 })
-export class TransactionDispatchSheetComponent implements ComponentWithContext {
+export class TransactionDispatchSheetComponent implements PdfTemplateComponent {
   @Input({ required: true }) context!: TransactionSheetContext;
 
   get data(): SpecimenTransaction {
