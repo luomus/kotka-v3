@@ -3,9 +3,7 @@
   <div class="content-block">
     <strong>Total number of specimens: {{ totalAwayCount }}</strong>
   </div>
-  <div *ngIf="data.material" class="content-block">
-    {{ data.material }}
-  </div>
+  <div *ngIf="data.material" class="content-block text-with-line-breaks">{{ data.material }}</div>
   <div *ngIf="data.awayIDs?.length" class="content-block" style="display: grid; grid-template-columns: repeat(3, 33%)">
     <span *ngFor="let awayID of data.awayIDs">{{ awayID }}</span>
   </div>

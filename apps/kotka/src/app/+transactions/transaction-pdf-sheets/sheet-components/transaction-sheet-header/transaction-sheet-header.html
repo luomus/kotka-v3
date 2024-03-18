@@ -17,7 +17,7 @@
       <div class="sub-content-block" *ngIf="ownerOrganization.courierAddress">
         Street address for couriers:
       </div>
-      <div class="sub-content-block" *ngIf="ownerOrganization.courierAddress" style="white-space: pre-wrap">{{ ownerOrganization.courierAddress }}</div>
+      <div class="sub-content-block text-with-line-breaks" *ngIf="ownerOrganization.courierAddress">{{ ownerOrganization.courierAddress }}</div>
       <div class="sub-content-block" *ngIf="ownerOrganization.phone">
         Tel. {{ ownerOrganization.phone }}
       </div>

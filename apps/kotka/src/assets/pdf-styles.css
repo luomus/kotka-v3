@@ -7,6 +7,10 @@
   page-break-inside: avoid;
 }
 
+.page-break-before {
+  break-before: page;
+}
+
 .page {
   width: 190mm;
   height: 277mm;
@@ -61,6 +65,10 @@ qrcode img {
 
 .font-bold {
   font-weight: bold;
+}
+
+.text-with-line-breaks {
+  white-space: pre-wrap;
 }
 
 .signature-space {
