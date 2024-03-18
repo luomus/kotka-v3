@@ -49,10 +49,10 @@ export class ViewerFieldsetFieldComponent {
   isMultiLangField(field: LajiForm.Field): boolean {
     const differenceValue = isDifferenceObjectPatch(this.differenceData) ? this.differenceData.value : undefined;
 
-    return field.type === 'text' && (this.isMultiLangValue(this.data) || this.isMultiLangValue(differenceValue));
+    return field.type === 'text' && (this.isNotString(this.data) || this.isNotString(differenceValue));
   }
 
-  private isMultiLangValue(value?: any): boolean {
+  private isNotString(value?: any): boolean {
     if (value === undefined || value === null) {
       return false;
     }

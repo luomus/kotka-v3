@@ -61,7 +61,7 @@ export class ViewerFieldComponent implements OnChanges {
       this.differenceDataPatchArray = this.differenceData;
     }
 
-    const hasData = this.data != null && (!this.isArray || this.data?.length > 0);
+    const hasData = this.data != null && this.data !== '' && (!this.isArray || this.data?.length > 0);
     const hasDiffData = this.differenceData != null && (!this.isArray || (
       !['add', 'remove'].includes(this.differenceDataPatch?.op || '') || this.differenceDataPatch?.value?.length > 0
     ));
