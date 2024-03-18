@@ -23,7 +23,7 @@ import {
   isErrorViewModel,
   isSuccessViewModel
 } from './form-view.facade';
-import { filter } from 'rxjs/operators';
+import { filter, take } from 'rxjs/operators';
 import { FormViewUtils } from './form-view-utils';
 import { DataService, IdService, ToastService, DialogService } from '@kotka/services';
 import { Utils } from '../../../shared/services/utils';
@@ -213,6 +213,7 @@ export class FormViewComponent implements OnChanges, OnDestroy {
 
     return this.navigateToAdd().pipe(
       switchMap(() => this.formViewFacade.formData$), // wait that the initial form data has loaded
+      take(1),
       filter(formData => formData !== undefined)
     ).subscribe(() => {
       this.formViewFacade.setCopiedFormData(newData);
