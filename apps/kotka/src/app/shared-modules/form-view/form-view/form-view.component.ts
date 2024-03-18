@@ -213,8 +213,8 @@ export class FormViewComponent implements OnChanges, OnDestroy {
 
     return this.navigateToAdd().pipe(
       switchMap(() => this.formViewFacade.formData$), // wait that the initial form data has loaded
-      take(1),
-      filter(formData => formData !== undefined)
+      filter(formData => formData !== undefined),
+      take(1)
     ).subscribe(() => {
       this.formViewFacade.setCopiedFormData(newData);
       this.lajiForm?.unBlock();
