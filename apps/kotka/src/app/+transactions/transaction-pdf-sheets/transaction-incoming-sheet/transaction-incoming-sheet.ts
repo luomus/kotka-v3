@@ -6,14 +6,13 @@ import { TransactionSheetContext } from '../transaction-pdf-sheets-context-servi
 import { PdfTemplateComponent } from '@kotka/services';
 import { PipesModule } from '@kotka/pipes';
 import { TransactionSheetHeaderComponent } from '../sheet-components/transaction-sheet-header/transaction-sheet-header';
-import { TransactionSheetMaterialComponent } from '../sheet-components/transaction-sheet-material/transaction-sheet-material';
 import { TransactionSheetRemarksComponent } from '../sheet-components/transaction-sheet-remarks/transaction-sheet-remarks';
-import {
-  TransactionSheetSignatureComponent
-} from '../sheet-components/transaction-sheet-signature/transaction-sheet-signature';
 import {
   TransactionSheetIncomingDetailsComponent
 } from '../sheet-components/transaction-sheet-incoming-details/transaction-sheet-incoming-details';
+import {
+  TransactionSheetSignatureAndMaterialComponent
+} from '../sheet-components/transaction-sheet-signature-and-material/transaction-sheet-signature-and-material';
 
 @Component({
   standalone: true,
@@ -22,10 +21,9 @@ import {
     PipesModule,
     TransactionTypeLabelPipe,
     TransactionSheetHeaderComponent,
-    TransactionSheetMaterialComponent,
     TransactionSheetRemarksComponent,
-    TransactionSheetSignatureComponent,
-    TransactionSheetIncomingDetailsComponent
+    TransactionSheetIncomingDetailsComponent,
+    TransactionSheetSignatureAndMaterialComponent
   ],
   selector: 'kotka-transaction-incoming-sheet',
   templateUrl: './transaction-incoming-sheet.html'
