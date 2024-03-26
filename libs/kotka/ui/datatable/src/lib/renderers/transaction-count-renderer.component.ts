@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CellRendererComponent } from './cell-renderer';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { asSpecimenTransaction } from '@kotka/shared/models';
@@ -17,7 +17,8 @@ type RendererParams = ICellRendererParams & RendererExtraParams;
   template: `
     <span title="{{ result }}">{{ result }}</span>
   `,
-  styles: []
+  styles: [],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransactionCountRendererComponent extends CellRendererComponent<RendererParams> {
   result?: number;

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { LajiForm } from '@kotka/shared/models';
 import { CellRendererComponent } from './cell-renderer';
@@ -16,7 +16,8 @@ type RendererParams = ICellRendererParams & RendererExtraParams;
       {{ params.value | enum: params.field }}
     </span>
   `,
-  styles: []
+  styles: [],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EnumCellRendererComponent extends CellRendererComponent<RendererParams> {
   static override getExportValue(value: string|undefined, row: any, params: RendererExtraParams): string {

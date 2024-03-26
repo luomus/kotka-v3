@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { CellRendererComponent } from './cell-renderer';
 
@@ -43,7 +43,8 @@ type RendererParams = ICellRendererParams & RendererExtraParams;
       grid-area: id;
       line-height: initial;
     }
-  `]
+  `],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class URICellRendererComponent extends CellRendererComponent<RendererParams> {
   static override getExportValue(value: string, row: any, params: RendererExtraParams): string {

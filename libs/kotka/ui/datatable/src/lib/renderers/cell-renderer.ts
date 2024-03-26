@@ -32,4 +32,9 @@ export class CellRendererComponent<T extends ICellRendererParams = ICellRenderer
   static fetchDataNeededForExport(col: DatatableColumn, data: any[], injector: Injector): Observable<any> {
     return of(undefined);
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  static fetchDataToCache(col: DatatableColumn, data: any[], injector: Injector): Observable<any> {
+    return of(undefined);
+  }
 }

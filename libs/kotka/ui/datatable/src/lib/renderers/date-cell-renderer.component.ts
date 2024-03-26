@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CellRendererComponent } from './cell-renderer';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { formatDate } from '@angular/common';
@@ -16,7 +16,8 @@ const DEFAULT_FORMAT = 'dd.MM.YYYY';
   template: `
     <span title="{{ params.value | date:(params.format || defaultFormat) }}">{{ params.value | date:(params.format || defaultFormat) }}</span>
   `,
-  styles: []
+  styles: [],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DateCellRendererComponent extends CellRendererComponent<RendererParams> {
   defaultFormat = DEFAULT_FORMAT;
