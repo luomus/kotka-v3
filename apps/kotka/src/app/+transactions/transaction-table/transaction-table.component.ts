@@ -87,7 +87,8 @@ export class TransactionTableComponent {
         floatingFilterComponentParams: {
           field: fieldData['type']
         },
-        suppressFloatingFilterButton: true
+        suppressFloatingFilterButton: true,
+        defaultSelected: true
       },
       {
         headerName: 'Outgoing sent',
@@ -140,7 +141,8 @@ export class TransactionTableComponent {
           type: 'organization'
         },
         suppressFloatingFilterButton: true,
-        sortable: false
+        sortable: false,
+        defaultSelected: true
       },
       {
         headerName: 'Collection',
