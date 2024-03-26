@@ -47,7 +47,8 @@ export class TransactionTableComponent {
         cellRendererParams: {
           domain: DEFAULT_DOMAIN
         },
-        defaultSelected: true
+        defaultSelected: true,
+        lockPosition: 'left'
       },
       {
         headerName: 'Team',

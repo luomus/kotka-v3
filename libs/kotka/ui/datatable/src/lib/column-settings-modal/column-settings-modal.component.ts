@@ -1,6 +1,12 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ColDef, GridApi, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
+import {
+  ColDef,
+  GridApi,
+  GridOptions,
+  GridReadyEvent,
+  RowSelectedEvent
+} from '@ag-grid-community/core';
 import { combineLatest, ReplaySubject, take } from 'rxjs';
 import { ColumnSettings, DatatableColumn } from '@kotka/shared/models';
 
@@ -33,6 +39,7 @@ export class ColumnSettingsModalComponent {
 
   private allColumns: DatatableColumn[] = [];
   private initialSettings?: ColumnSettings;
+  private rowIsDragged = false;
   private gridApi?: GridApi;
 
   constructor(
@@ -46,7 +53,18 @@ export class ColumnSettingsModalComponent {
       this.initialSettings = settings;
 
       this.colDefs = [
-        { field: 'headerName', rowDrag: true, checkboxSelection: true, resizable: false, flex: 1 }
+        {
+          field: 'headerName',
+          rowDrag: (params) => {
+            return !params.data.lockPosition;
+          },
+          checkboxSelection: (params) => {
+            return !params.data.lockPosition;
+          },
+          resizable: false,
+          flex: 1,
+          showDisabledCheckboxes: true
+        }
       ];
       this.updateRowData();
 
@@ -84,6 +102,59 @@ export class ColumnSettingsModalComponent {
 
     this.initialSettings = this.defaultSettings;
     this.updateRowData();
+  }
+
+  onRowSelect(e: RowSelectedEvent) {
+    const node = e.node;
+    if (node.data.lockPosition && !node.isSelected()) {
+      node.setSelected(true);
+    }
+  }
+
+  onRowDragMove() {
+    this.rowIsDragged = true;
+  }
+
+  onDragStopped() {
+    if (this.rowIsDragged) {
+      this.onRowDragEnd();
+    }
+  }
+
+  onRowDragEnd() {
+    function moveInArray(arr: any[], fromIndex: number, toIndex: number) {
+      const element = arr[fromIndex];
+      arr.splice(fromIndex, 1);
+      arr.splice(toIndex, 0, element);
+    }
+
+    const originalOrder = this.allColumns.map(col => col.colId);
+
+    const selected: string[] = [];
+    const order: string[] = [];
+    let hasChanges = false;
+
+    this.gridApi!.forEachNodeAfterFilterAndSort((node, idx) => {
+      if (node.isSelected()) {
+        selected.push(node.data.colId);
+      }
+      order.push(node.data.colId);
+
+      if (node.data.lockPosition && idx !== originalOrder.indexOf(node.data.colId)) {
+        if (node.isSelected()) {
+          moveInArray(selected, idx, 0);
+        }
+        moveInArray(order, idx, 0);
+        hasChanges = true;
+      }
+    });
+
+    if (hasChanges) {
+      this.initialSettings = { selected, order };
+      this.updateRowData();
+    }
+
+    this.rowIsDragged = false;
   }
 
   private updateRowData() {

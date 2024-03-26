@@ -10,6 +10,10 @@
     [headerHeight]="0"
     [domLayout]="'autoHeight'"
     (gridReady)="onGridReady($event)"
+    (rowDragMove)="onRowDragMove()"
+    (rowDragEnd)="onRowDragEnd()"
+    (dragStopped)="onDragStopped()"
+    (rowSelected)="onRowSelect($event)"
   ></ag-grid-angular>
 </div>
 <div class="modal-footer">
