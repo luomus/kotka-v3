@@ -1,4 +1,4 @@
-import { Component, Injector } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Injector } from '@angular/core';
 import { CellRendererComponent } from './cell-renderer';
 import { Observable, of } from 'rxjs';
 import { LabelKey, LabelService } from '@kotka/services';
@@ -7,9 +7,10 @@ import { DatatableColumn } from '@kotka/shared/models';
 @Component({
   selector: 'kui-label-cell-renderer',
   template: `
-    <span title="{{ params.value | label }}">{{ params.value | label }}</span>
+    <span title="{{ params.value | label }}">{{ params.value | label:'Loading...' }}</span>
   `,
-  styles: []
+  styles: [],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LabelCellRendererComponent extends CellRendererComponent {
   static override getExportValue(value: string, row: any, params: undefined, fetchData: Record<string, string>): string {
@@ -34,5 +35,9 @@ export class LabelCellRendererComponent extends CellRendererComponent {
 
     const labelService = injector.get(LabelService);
     return labelService.getMultipleLabelsWithSameType(uniqueKeys);
+  }
+
+  static override fetchDataToCache(col: DatatableColumn, data: any[], injector: Injector): Observable<Record<string, string>> {
+    return LabelCellRendererComponent.fetchDataNeededForExport(col, data, injector);
   }
 }

@@ -2,10 +2,13 @@ import {
   ChangeDetectorRef,
   Component,
   EventEmitter,
+  Injector,
   Input,
-  OnChanges, OnDestroy,
+  OnChanges,
+  OnDestroy,
   Output,
-  SimpleChanges, TemplateRef,
+  SimpleChanges,
+  TemplateRef,
 } from '@angular/core';
 import {
   ColDef,
@@ -22,13 +25,14 @@ import {
   DatatableSource, FilterModel,
   GetRowsParams, SortModel
 } from '@kotka/shared/models';
-import { from } from 'rxjs';
+import { forkJoin, from, Observable, Subscription } from 'rxjs';
 import { ColumnSettingsModalComponent } from '../column-settings-modal/column-settings-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LocalStorage } from 'ngx-webstorage';
 import { isEqual } from 'lodash';
 import { DatatableExportService } from '../services/datatable-export.service';
 import { CustomDatepickerComponent } from '../components/custom-datepicker.component';
+import { CellRendererComponent } from '../renderers/cell-renderer';
 
 type CustomColumnKey = keyof Pick<DatatableColumn, 'hideDefaultHeaderTooltip'|'defaultSelected'>;
 
@@ -99,12 +103,14 @@ export class DatatableComponent implements OnChanges, OnDestroy {
   private filterModel: FilterModel = {};
 
   private isDestroyed = false;
+  private loadCellRendererDataToCacheSub: Subscription = new Subscription();
 
   @LocalStorage('datatable-settings', {}) private settings!: Record<string, ColumnSettings>;
 
   constructor(
     private modalService: NgbModal,
     private datatableExportService: DatatableExportService,
+    private injector: Injector,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -119,6 +125,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
 
   ngOnDestroy() {
     this.isDestroyed = true;
+    this.loadCellRendererDataToCacheSub.unsubscribe();
   }
 
   onGridReady(params: GridReadyEvent) {
@@ -203,6 +210,8 @@ export class DatatableComponent implements OnChanges, OnDestroy {
         return;
       }
 
+      this.loadCellRendererDataToCache(results);
+
       this.totalCount = totalItems;
       this.cdr.markForCheck();
 
@@ -225,6 +234,22 @@ export class DatatableComponent implements OnChanges, OnDestroy {
       this.gridApi.showLoadingOverlay();
     } else {
       this.gridApi.hideOverlay();
+    }
+  }
+
+  private loadCellRendererDataToCache(rowData: any[]) {
+    const observables: Observable<any>[] = [];
+
+    this.colDefs.forEach(col => {
+      if (col.cellRenderer) {
+        observables.push(
+          (col.cellRenderer as typeof CellRendererComponent).fetchDataToCache(col, rowData, this.injector)
+        );
+      }
+    });
+
+    if (observables.length > 0) {
+      this.loadCellRendererDataToCacheSub.add(forkJoin(observables).subscribe());
     }
   }
 

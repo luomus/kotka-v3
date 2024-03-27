@@ -6,6 +6,7 @@ export * from './lib/component.service';
 export * from './lib/data.service';
 export * from './lib/datatable-data.service';
 export * from './lib/user.service';
+export * from './lib/api-label.service';
 export * from './lib/label.service';
 export * from './lib/dialog.service';
 export * from './lib/form.service';

@@ -72,12 +72,21 @@ export class OldKotkaDataService {
   }
 
   private async getObjects<T>(type: string, ids: string[]) {
-    return await lastValueFrom(
-      this.triplestoreService.search({ type, subject: ids.join(',') }).pipe(
-        map(data => data.data),
-        switchMap(data => this.triplestoreMapperService.triplestoreToJson(data, type)),
-      )
-    ) as T[];
+    try {
+      return await lastValueFrom(
+        this.triplestoreService.search({type, subject: ids.join(',')}).pipe(
+          map(data => data.data),
+          switchMap(data => this.triplestoreMapperService.triplestoreToJson(data, type)),
+          map(data => Array.isArray(data) ? data : [data])
+        )
+      ) as T[];
+    } catch (err) {
+      if (err.response.status === HttpStatus.NOT_FOUND) {
+        return [];
+      }
+      console.error(err);
+      throw new InternalServerErrorException(err.message);
+    }
   }
 
   private async getAllObjects<T>(type: string): Promise<T[]> {

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CellRendererComponent } from './cell-renderer';
 
 @Component({
@@ -6,7 +6,8 @@ import { CellRendererComponent } from './cell-renderer';
   template: `
     <span title="{{ result }}">{{ result }}</span>
   `,
-  styles: []
+  styles: [],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DueDaysRendererComponent extends CellRendererComponent {
   result?: number;

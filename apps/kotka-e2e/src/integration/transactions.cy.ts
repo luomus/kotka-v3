@@ -6,11 +6,11 @@ describe('transactions', () => {
 
   describe('transaction table', () => {
     it('should be able to add a column', () => {
-      cy.get('.ag-header-row-column .ag-header-cell').should('have.length', 3);
+      cy.get('.ag-header-row-column .ag-header-cell').should('have.length', 5);
       cy.get('[data-cy=select-columns]').click();
-      cy.get('.ag-selection-checkbox').eq(3).click();
+      cy.get('.ag-selection-checkbox').eq(4).click();
       cy.get('[data-cy=confirm-ok]').click();
-      cy.get('.ag-header-row-column .ag-header-cell').should('have.length', 4);
+      cy.get('.ag-header-row-column .ag-header-cell').should('have.length', 6);
     });
   });
 
