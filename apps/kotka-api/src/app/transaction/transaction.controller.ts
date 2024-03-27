@@ -13,6 +13,7 @@ import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.gu
 import { TimedDocumentAccessGuard } from '../shared/guards/timed-document-access.guard';
 import { OrganizationGuard } from '../shared/guards/organization.guard';
 import { SpecimenTransaction } from '@luomus/laji-schema';
+import { NonOrgPropertyFilter } from '../shared/decorators/non-org-property-filter.decorator';
 
 const type = 'HRX.specimenTransaction';
 const useTriplestore = false;
@@ -21,6 +22,7 @@ const useTriplestore = false;
 @ControllerType(type)
 @TimedAccessSet({ del: { 'd': 14 }})
 @InUseTypesSet(['MY.document', 'MOS.organization'])
+@NonOrgPropertyFilter(['attachments', 'permitFile'])
 @UseGuards(
   AuthenticateCookieGuard,
   OrganizationGuard,

@@ -25,6 +25,7 @@ export interface MultiLanguage {
 export interface StoreVersion {
   version: number;
   created: string;
+  patch?: StorePatch[];
 }
 
 export interface StorePatch {
