@@ -94,14 +94,15 @@ export class FormViewFacade implements OnDestroy {
     this.inputs$.next(inputs);
   }
 
-  setFormData(formData: Partial<KotkaDocumentObject>) {
-    this.setState({ ...this._state, formData, formHasChanges: true });
+  setFormData(formData: Partial<KotkaDocumentObject>, formHasChanges = true) {
+    const mediaMetadata = this._state.mediaMetadata ? { ...this._state.mediaMetadata, intellectualOwner: formData.owner || ''} : undefined;
+    this.setState({ ...this._state, formData, formHasChanges, mediaMetadata });
   }
 
   setCopiedFormData(formData: Partial<KotkaDocumentObject>) {
     this.getEmptyFormData$().pipe(take(1)).subscribe(emptyFormData => {
       formData = { ...emptyFormData, ...formData };
-      this.setState({ ...this._state, formData, formHasChanges: false });
+      this.setFormData(formData, false);
     });
   }
 
@@ -214,17 +215,17 @@ export class FormViewFacade implements OnDestroy {
       disabled,
       showDeleteButton,
       showCopyButton,
-      mediaMetadata: this.getMediaMetadata(user),
+      mediaMetadata: this.getMediaMetadata(user, formData),
       formHasChanges: false,
       disabledAlertDismissed: false,
       showDeleteTargetInUseAlert: false
     };
   }
 
-  private getMediaMetadata(user: Person): KotkaMediaMetadata {
+  private getMediaMetadata(user: Person, formData: Partial<KotkaDocumentObject>): KotkaMediaMetadata {
     return {
       intellectualRights: 'MZ.intellectualRightsARR',
-      intellectualOwner: user.fullName,
+      intellectualOwner: formData.owner || '',
       capturerVerbatim: user.fullName,
       publicityRestrictions: 'MZ.publicityRestrictionsPrivate'
     };
