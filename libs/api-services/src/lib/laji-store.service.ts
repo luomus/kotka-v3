@@ -3,6 +3,7 @@ https://docs.nestjs.com/providers#services
 */
 
 import { StoreGetQuery, StoreQueryResult } from '@kotka/api-interfaces';
+import { StoreVersion } from '@kotka/shared/models';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 
@@ -40,10 +41,10 @@ export class LajiStoreService {
   }
 
   getVersionHistory(type: string, id: string, includeDiff = false) {
-    return this.httpService.get(`${this.urlBase}${type}/${id}/_ver`, Object.assign({ params: { include_diff: includeDiff }}, this.baseConfig));
+    return this.httpService.get<StoreVersion[]>(`${this.urlBase}${type}/${id}/_ver`, Object.assign({ params: { include_diff: includeDiff }}, this.baseConfig));
   }
 
-  getVersion(type: string, id: string, ver: string) {
-    return this.httpService.get(`${this.urlBase}${type}/${id}/_ver/${ver}`, this.baseConfig);
+  getVersion<T>(type: string, id: string, ver: string) {
+    return this.httpService.get<T>(`${this.urlBase}${type}/${id}/_ver/${ver}`, this.baseConfig);
   }
 }

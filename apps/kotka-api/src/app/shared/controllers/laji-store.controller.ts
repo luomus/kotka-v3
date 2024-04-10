@@ -27,7 +27,7 @@ import { UserInterceptor } from '../interceptors/user.interceptor';
 import { DateInterceptor } from '../interceptors/date.interceptor';
 import { ValidatorInterceptor } from '../interceptors/validator.interceptor';
 import { createPatch } from 'rfc6902';
-import { NonOrgPropertyFilterInterceptor } from '../interceptors/non-org-property-filter.interceptor';
+import { MediaIntellectualOwnerInterceptor } from '../interceptors/media-intellectual-owner.interceptor';
 
 export abstract class LajiStoreController<T extends StoreObject> {
   constructor (
@@ -39,7 +39,6 @@ export abstract class LajiStoreController<T extends StoreObject> {
   ) {
   }
 
-  @UseInterceptors(NonOrgPropertyFilterInterceptor)
   @Get()
   async getAll(@Query() query: StoreGetQuery) {
     try {
@@ -76,7 +75,6 @@ export abstract class LajiStoreController<T extends StoreObject> {
     }
   }
 
-  @UseInterceptors(NonOrgPropertyFilterInterceptor)
   @Get(':id')
   async get(@Param('id') id: string) {
     try {
@@ -92,7 +90,7 @@ export abstract class LajiStoreController<T extends StoreObject> {
     }
   }
 
-  @UseInterceptors(UserInterceptor, DateInterceptor, ValidatorInterceptor)
+  @UseInterceptors(UserInterceptor, DateInterceptor, ValidatorInterceptor, MediaIntellectualOwnerInterceptor)
   @Put(':id')
   async put(@Req() req, @Param('id') id: string, @Body() body: T) {
     try {
@@ -128,7 +126,6 @@ export abstract class LajiStoreController<T extends StoreObject> {
     }
   }
 
-  @UseInterceptors(NonOrgPropertyFilterInterceptor)
   @Get(':id/_ver')
   async getVerHistory(@Param('id') id: string, @Query('includeDiff') includeDiff: boolean) {
     try {
@@ -141,7 +138,6 @@ export abstract class LajiStoreController<T extends StoreObject> {
     }
   }
 
-  @UseInterceptors(NonOrgPropertyFilterInterceptor)
   @Get(':id/_ver/:ver')
   async getVer(@Param('id') id: string, @Param('ver') ver: string) {
     try {
@@ -154,7 +150,6 @@ export abstract class LajiStoreController<T extends StoreObject> {
     }
   }
 
-  @UseInterceptors(NonOrgPropertyFilterInterceptor)
   @Get(':id/_ver/:ver1/diff/:ver2')
   async getVerDiff(@Param('id') id: string, @Param('ver1') ver1: string, @Param('ver2') ver2: string) {
 

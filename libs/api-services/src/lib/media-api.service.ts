@@ -181,22 +181,24 @@ export class MediaApiService {
     switch (type) {
       case 'pdf':
         return this.metaToPDF(media);
+      default:
+        return;
     };
   }
 
   metaToPDF(media: Media) {
     const { meta, secretKey } = media;
 
-    const urls = {...media.urls};
-    Object.keys(urls).forEach(key => {
-      if (urls[key]) {
-        urls[key] = urls[key] + '?secret=' + secretKey;
+    const urls: Urls = {...media.urls};
+    Object.keys(urls).forEach((key: string) => {
+      if (urls[key as keyof Urls]) {
+        urls[key as keyof Urls] = urls[key as keyof Urls] + '?secret=' + secretKey;
       }
     });
 
     return {
       caption: meta.caption,
-      documentURI: [ meta.documentId ],
+      documentURI: meta.documentId ? [ meta.documentId ] : [],
       fullURL: urls.full,
       intellectualOwner: meta.rightsOwner,
       intellectualRights: meta.license,

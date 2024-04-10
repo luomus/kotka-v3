@@ -7,6 +7,7 @@ import { TriplestoreService } from './triplestore.service';
 import { FormService } from './form.service';
 import { OldKotkaApiService } from './old-kotka-api.service';
 import { AbschService } from './absch.service';
+import { MediaApiService } from './media-api.service';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { AbschService } from './absch.service';
     SchemaService,
     FormService,
     OldKotkaApiService,
-    AbschService
+    AbschService,
+    MediaApiService
   ],
   exports: [
     LajiApiService,
@@ -29,7 +31,8 @@ import { AbschService } from './absch.service';
     SchemaService,
     FormService,
     OldKotkaApiService,
-    AbschService
+    AbschService,
+    MediaApiService
   ],
 })
 export class ApiServicesModule {}
