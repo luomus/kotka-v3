@@ -7,6 +7,8 @@ import { apiBase, lajiApiBase } from './constants';
 import { getOrganizationFullName } from '@kotka/utils';
 import { Organization } from '@luomus/laji-schema';
 import { isMultiLanguageObject } from '@kotka/shared/models';
+import { DialogService } from './dialog.service';
+import { ErrorMessages } from '@kotka/api-interfaces';
 
 enum ResourceType {
   autocompleteOrganizationResource,
@@ -36,6 +38,7 @@ export class FormApiClient {
   constructor(
     private httpClient: HttpClient,
     private toastService: ToastService,
+    private dialogService: DialogService
   ) { }
 
   public fetch(
@@ -91,7 +94,9 @@ export class FormApiClient {
         {...response, json: () => (this.processResult(resourceType, response.body))})
       ),
       catchError(err => {
-        if (!(err.status === 404 || (resourceType === ResourceType.validateResource && err.status === 422))) {
+        if (resourceType === ResourceType.pdfResource && err.status === 400 && err.error?.message === ErrorMessages.missingIntellectualOwner) {
+          this.dialogService.alert('Please fill the "Owner of record" field before attaching any files.');
+        } else if (!(err.status === 404 || (resourceType === ResourceType.validateResource && err.status === 422))) {
           this.toastService.showGenericError({pause: true});
         }
         return of({...err, json: () => err.error});

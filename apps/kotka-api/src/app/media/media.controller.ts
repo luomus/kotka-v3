@@ -2,12 +2,13 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { Body, Controller, Get, Param, Post, Put, Req, Res, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Post, Put, Req, Res, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
 import { MediaApiService, NewMediaFile } from '@kotka/api-services';
 import { map } from 'rxjs';
 import { Image } from '@luomus/laji-schema';
 import { MediaAccessInterceptor } from '../shared/interceptors/media-access.interceptor';
+import { ErrorMessages } from '@kotka/api-interfaces';
 
 @Controller('media')
 @UseGuards(AuthenticateCookieGuard)
@@ -23,6 +24,9 @@ export class MediaController {
 
   @Post(':type/:tempId')
   postMetadata(@Req() request, @Param('type') type: string, @Param('tempId') tempId: string, @Body() body: Image) {
+    if (!body.intellectualOwner) {
+      throw new BadRequestException(ErrorMessages.missingIntellectualOwner);
+    }
     const profile = request.user.profile;
     const newMedia: NewMediaFile[] = [
       {

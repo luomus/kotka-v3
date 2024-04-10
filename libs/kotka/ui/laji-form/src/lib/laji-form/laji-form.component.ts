@@ -72,7 +72,7 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
       return;
     }
 
-    if (changes['form'] || changes['formData']) {
+    if (changes['form'] || changes['formData'] || changes['mediaMetadata']) {
       const form = this.form as LajiFormModel.SchemaForm;
 
       this.ngZone.runOutsideAngular(() => {
@@ -80,6 +80,8 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
           schema: form.schema,
           uiSchema: form.uiSchema,
           formData: this.formData,
+          formContext: {}, // TODO remove after laji-form has a fix for not noticing media metadata change
+          mediaMetadata: this.mediaMetadata,
           validators: form.validators,
           warnings: form.warnings
         });

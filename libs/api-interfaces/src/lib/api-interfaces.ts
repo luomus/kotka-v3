@@ -29,7 +29,8 @@ export interface StoreQueryResult<T> {
 }
 
 export enum ErrorMessages {
-  deletionTargetInUse = 'Deletion target is in use.'
+  deletionTargetInUse = 'Deletion target is in use.',
+  missingIntellectualOwner = 'Missing an intellectualOwner'
 }
 
 export interface LoginResponse {

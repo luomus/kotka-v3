@@ -29,6 +29,7 @@ export class AutocompleteComponent {
   @Input() value?: string;
   @Input() fetchResultsFunc?: FetchAutocompleteResultsFunc;
   @Input() inputClassName = 'form-control';
+  @Input() minCharacters = 1;
 
   typeaheadValue: string|AutocompleteResult = '';
 
@@ -62,7 +63,7 @@ export class AutocompleteComponent {
       debounceTime(200),
       distinctUntilChanged(),
       switchMap((term) =>
-        (term.length < 2 || !this.fetchResultsFunc) ? of([]) : this.fetchResultsFunc(term)
+        (term.length < this.minCharacters || !this.fetchResultsFunc) ? of([]) : this.fetchResultsFunc(term)
       ),
     );
 }
