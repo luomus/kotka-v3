@@ -26,14 +26,19 @@ export class MediaIntellectualOwnerInterceptor implements NestInterceptor {
       .handle()
       .pipe(
         mergeMap(doc => {
+          const req = context.switchToHttp().getRequest();
           const owner = doc.owner;
           const targets: MediaTarget = this.reflector.get('intellectualOwnerMedia', context.getClass());
+          const oldOwner = req.oldDoc?.owner;
 
-          return this.lajiStoreService.getVersionHistory(doc['@type'], doc.id, true).pipe(
-            map(res => res.data),
-            map(data => {
-              const changeOfOwner = !!data.pop()?.patch?.filter(patch => patch.path === '/owner')?.length;
-
+          return ((oldOwner || req.method === 'POST')?
+            of(req.method === 'POST' || owner !== oldOwner) :
+            this.lajiStoreService.getVersionHistory(doc['@type'], doc.id, true).pipe(
+              map(res => res.data),
+              map(data => !!data.pop()?.patch?.filter(patch => patch.path === '/owner')?.length)
+            )
+          ).pipe(
+            map(changeOfOwner => {
               if(!changeOfOwner) return doc;
 
               const media = this.findMediaValues(doc, targets);
@@ -54,7 +59,12 @@ export class MediaIntellectualOwnerInterceptor implements NestInterceptor {
       images.forEach(image => {
         this.mediaApiService.getMedia(image, key).pipe(
           mergeMap(media => {
-            const meta = media.meta;            
+            const meta = media.meta;
+
+            if (meta.rightsOwner === owner) {
+              return of();
+            }
+
             meta.rightsOwner = owner;
 
             return this.mediaApiService.putMetadata(image, key, meta);

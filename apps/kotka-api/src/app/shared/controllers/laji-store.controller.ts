@@ -51,7 +51,7 @@ export abstract class LajiStoreController<T extends StoreObject> {
     }
   }
 
-  @UseInterceptors(UserInterceptor, DateInterceptor, ValidatorInterceptor)
+  @UseInterceptors(UserInterceptor, DateInterceptor, ValidatorInterceptor, MediaIntellectualOwnerInterceptor)
   @Post()
   async post(@Req() req, @Body() body: T) {
     try {
