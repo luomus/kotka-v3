@@ -31,7 +31,7 @@ export class MediaIntellectualOwnerInterceptor implements NestInterceptor {
           const targets: MediaTarget = this.reflector.get('intellectualOwnerMedia', context.getClass());
           const oldOwner = req.oldDoc?.owner;
 
-          if (!targets) return doc;
+          if (!targets) return of(doc);
 
           return ((oldOwner || req.method === 'POST')?
             of(req.method === 'POST' || owner !== oldOwner) :
