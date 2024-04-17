@@ -10,7 +10,7 @@ import { AbschService, LinkData } from '@kotka/services';
       In this section it is possible to fill in the information about permits, agreements and other such documentation
       related to the specimens in the transaction (for example Nagoya protocol).  More information about the Nagoya protocol:
       <a href="https://absch.cbd.int/" target="_blank">absch.cbd.int</a> and
-      <a target="_blank" href="https://www.biodiversity.fi/geneticresources/home">biodiversity.fi/geneticresources/home</a>.
+      <a target="_blank" href="https://www.ymparisto.fi/en/permits-and-obligations/import-notification-genetic-resources">ymparisto.fi/en/permits-and-obligations/import-notification-genetic-resources</a>.
       <div *ngIf="country$ | async as country" class="mt-2">
         ABSCH links
         <ul>
