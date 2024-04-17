@@ -80,7 +80,6 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
           schema: form.schema,
           uiSchema: form.uiSchema,
           formData: this.formData,
-          formContext: {}, // TODO remove after laji-form has a fix for not noticing media metadata change
           mediaMetadata: this.mediaMetadata,
           validators: form.validators,
           warnings: form.warnings
