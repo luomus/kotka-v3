@@ -163,7 +163,7 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
             theme: this.lajiFormTheme,
             schema: form.schema,
             uiSchema: { ...form.uiSchema, 'ui:readonly': this.disabled },
-            uiSchemaContext: form.uiSchemaContext,
+            uiSchemaContext: { ...form.uiSchemaContext, 'isEdit': !this.disabled },
             formData: this.formData,
             validators: form.validators,
             warnings: form.warnings,
