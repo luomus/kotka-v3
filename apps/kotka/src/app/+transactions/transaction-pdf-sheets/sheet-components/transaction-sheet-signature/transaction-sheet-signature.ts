@@ -11,4 +11,5 @@ import { TransactionTypeLabelPipe } from '../../pipes/transaction-type-label.pip
 })
 export class TransactionSheetSignatureComponent {
   @Input({ required: true }) data!: SpecimenTransaction;
+  @Input() showCommitToTermsText = true;
 }
