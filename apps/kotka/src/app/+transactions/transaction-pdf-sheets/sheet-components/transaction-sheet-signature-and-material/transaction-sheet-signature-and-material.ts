@@ -14,4 +14,5 @@ import { TransactionSheetSignatureComponent } from '../transaction-sheet-signatu
 })
 export class TransactionSheetSignatureAndMaterialComponent {
   @Input({ required: true }) data!: SpecimenTransaction;
+  @Input() showCommitToTermsText = true;
 }
