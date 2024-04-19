@@ -35,4 +35,15 @@ export class IdService {
     
     return defaultDomain + value;
   }
+
+  getIdWithoutPrefix (value: string): string {
+    if (typeof value !== 'string' || value === '') return value;
+
+    const idx = value.indexOf(':');
+    if (idx !== -1) {
+      return value.substring(idx + 1);
+    }
+
+    return value;
+  }
 };
