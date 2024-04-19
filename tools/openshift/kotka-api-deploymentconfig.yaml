@@ -107,6 +107,11 @@ spec:
                 secretKeyRef:
                   name: kotka-secret
                   key: MEDIA_API_AUTH
+            - name: OLD_KOTKA_AUTH
+              valueFrom:
+                secretKeyRef:
+                  name: kotka-secret
+                  key: OLD_KOTKA_AUTH
           resources: {}
           imagePullPolicy: Always
       restartPolicy: Always

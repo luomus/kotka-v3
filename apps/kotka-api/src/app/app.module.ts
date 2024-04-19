@@ -12,6 +12,7 @@ import { RedisModule } from './shared-modules/redis/redis.module';
 import { SpecimenModule } from './specimen/specimen.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { MediaModule } from './media/media.module';
+import { OldKotkaModule } from './old-kotka/old-kotka.module'
 import { CollectionModule } from './collection/collection.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisInsStore } from 'cache-manager-ioredis-yet';
@@ -43,6 +44,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     SpecimenModule,
     TransactionModule,
     MediaModule,
+    OldKotkaModule,
     OrganizationModule,
     CollectionModule
   ],
