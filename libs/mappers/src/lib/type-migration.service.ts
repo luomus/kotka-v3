@@ -38,6 +38,26 @@ export class TypeMigrationService {
     ]
   };
 
+  private ignoreProperty = {
+    'HRA.transaction': [
+      'availableForGeneticResearchNotes',
+      'HRA.geneticResearchAllowed',
+      'correspondenceHeaderOrganizationCode',
+      'localDepartment',
+
+
+    ]
+  };
+
+  private multiLangToString = {
+    'HRA.transaction': {
+      'material': 'en',
+      'internalRemarks': 'en',
+      'publicRemarks': 'en',
+      'numberOfParcels': 'en'
+    }
+  };
+
   private valueMap = {
     'HRA.transaction': {
       'status': {
@@ -45,7 +65,7 @@ export class TypeMigrationService {
         target: "HRA.transactionStatus",
         replacer: "HRX.status",
       },
-      'sentType': {
+      'transportMethod': {
         type: 'partial',
         target: "HRA.sentType",
         replacer: "HRX.transportMethod",
@@ -84,6 +104,8 @@ export class TypeMigrationService {
       const value = object[key];
       const newKey = this.typeMap[type][key] || key;
 
+      if (this.ignoreProperty[type].includes(newKey)) return;
+
       if (Array.isArray(newKey)) {
         newKey.forEach(key => {
           this.mapProp(type, key, value, toReturn);
@@ -106,7 +128,11 @@ export class TypeMigrationService {
         }
       });
     } else if (typeof value === 'object' && value !== null) {
-      to[key] = this.migrate(type, value);
+      if (this.multiLangToString[type][key]) {
+        to[key] = this.getValue(type, key, value[this.multiLangToString[type][key]]);
+      } else {
+        to[key] = this.migrate(type, value);
+      }
     } else {
       to[key] = this.getValue(type, key, value);
     }
@@ -115,6 +141,7 @@ export class TypeMigrationService {
   private getValue (type, key, value) {
     if (key === '@type') return this.mapClasses[value] || value;
     if (this.ignoreValue[type].includes(key)) {
+
       return value;
     }
 
@@ -133,6 +160,25 @@ export class TypeMigrationService {
 
     if (typeof value === 'string' && value.startsWith(this.prefixes[type]['old'])) {
       return value.replace(this.prefixes[type]['old'], this.prefixes[type]['new']);
+    }
+
+    //Fix incorrect date format in some genetic resource aquisition dates if needed.
+    //if (key === 'geneticResourceAcquisitionDate' && typeof value === 'string' && value.includes('.')) {
+    //  value = value.split('.').reverse().join('-');
+    //};
+
+    return value;
+  }
+
+  reverseValueMap(type: string, field: string, value: string) {
+    if (!value || typeof value !== 'string') return value;
+
+    if (this.valueMap[type][field]) {
+      return value.replace(this.valueMap[type][field].replacer, this.valueMap[type][field].target);
+    }
+
+    if (this.prefixes[type] && value.startsWith(this.prefixes[type].new)) {
+      return value.replace(this.prefixes[type].new, this.prefixes[type].old);
     }
 
     return value;
