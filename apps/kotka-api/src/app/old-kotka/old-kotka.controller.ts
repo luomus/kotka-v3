@@ -59,9 +59,9 @@ export class OldKotkaController {
         return transactions.map((transaction: SpecimenTransaction) => {
           let type;
 
-          if (transaction.returnedIDs?.findIndex(id => id.endsWith(specimenId)) !== -1) {
+          if (transaction.returnedIDs && transaction.returnedIDs?.findIndex(id => id.endsWith(specimenId)) !== -1) {
             type = 'returned';
-          } else if (transaction.awayIDs?.findIndex(id => id.endsWith(specimenId)) !== -1) {
+          } else if (transaction.awayIDs && transaction.awayIDs?.findIndex(id => id.endsWith(specimenId)) !== -1) {
             type = 'away';
           }
 
