@@ -10,4 +10,5 @@ module.exports = defineConfig({
     specPattern: './src/integration/**/*.cy.{js,jsx,ts,tsx}',
     supportFile: './src/support/index.ts',
   },
+  retries: 2
 });
