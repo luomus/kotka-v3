@@ -51,7 +51,7 @@ export class TransactionTableComponent {
         lockPosition: 'left'
       },
       {
-        headerName: 'Team',
+        headerName: 'Owner',
         field: 'owner',
         cellRenderer: LabelCellRendererComponent,
         floatingFilterComponent: AutocompleteFloatingFilterComponent,
