@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { TransactionInsectShelfSlipContext } from '../transaction-pdf-sheets-context-service';
 import { PdfTemplateComponent } from '@kotka/services';
 import { PipesModule } from '@kotka/pipes';
+import { TransactionTypeLabelPipe } from '../pipes/transaction-type-label.pipe';
 
 interface SpecimenWithinPage {
   id: string;
@@ -15,7 +16,8 @@ interface SpecimenWithinPage {
   standalone: true,
   imports: [
     CommonModule,
-    PipesModule
+    PipesModule,
+    TransactionTypeLabelPipe
   ],
   selector: 'kotka-transaction-insect-labels',
   templateUrl: './transaction-insect-labels.html'

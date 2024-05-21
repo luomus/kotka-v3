@@ -11,6 +11,7 @@ import {
 import {
   TransactionSheetSignatureAndMaterialComponent
 } from '../sheet-components/transaction-sheet-signature-and-material/transaction-sheet-signature-and-material';
+import { TransactionTypeLabelPipe } from '../pipes/transaction-type-label.pipe';
 
 @Component({
   standalone: true,
@@ -19,7 +20,8 @@ import {
     TransactionSheetHeaderComponent,
     TransactionSheetRemarksComponent,
     TransactionSheetIncomingDetailsComponent,
-    TransactionSheetSignatureAndMaterialComponent
+    TransactionSheetSignatureAndMaterialComponent,
+    TransactionTypeLabelPipe
   ],
   selector: 'kotka-transaction-return-sheet',
   templateUrl: './transaction-return-sheet.html'

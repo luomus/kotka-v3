@@ -8,6 +8,6 @@
     <span *ngFor="let awayID of data.awayIDs">{{ awayID }}</span>
   </div>
   <div *ngIf="data.awayCount" class="content-block">
-    In addition, loan includes {{ data.awayCount }} specimen(s) not specified in this list.
+    In addition, {{ data.type | transactionTypeLabel }} includes {{ data.awayCount }} specimen(s) not specified in this list.
   </div>
 </div>

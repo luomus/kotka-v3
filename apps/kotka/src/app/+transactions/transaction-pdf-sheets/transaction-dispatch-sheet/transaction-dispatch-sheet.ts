@@ -13,18 +13,20 @@ import {
 import {
     TransactionSheetSignatureAndMaterialComponent
 } from '../sheet-components/transaction-sheet-signature-and-material/transaction-sheet-signature-and-material';
+import { TransactionTypeLabelPipe } from '../pipes/transaction-type-label.pipe';
 
 @Component({
   standalone: true,
-    imports: [
-      CommonModule,
-      PipesModule,
-      TransactionDispatchLabelPipe,
-      TransactionSheetHeaderComponent,
-      TransactionSheetRemarksComponent,
-      TransactionSheetOutgoingDetailsComponent,
-      TransactionSheetSignatureAndMaterialComponent
-    ],
+  imports: [
+    CommonModule,
+    PipesModule,
+    TransactionDispatchLabelPipe,
+    TransactionSheetHeaderComponent,
+    TransactionSheetRemarksComponent,
+    TransactionSheetOutgoingDetailsComponent,
+    TransactionSheetSignatureAndMaterialComponent,
+    TransactionTypeLabelPipe
+  ],
   selector: 'kotka-transaction-dispatch-sheet',
   templateUrl: './transaction-dispatch-sheet.html'
 })

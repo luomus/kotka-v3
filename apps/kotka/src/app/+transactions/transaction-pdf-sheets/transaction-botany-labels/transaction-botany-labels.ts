@@ -5,13 +5,15 @@ import { TransactionBotanyShelfSlipContext } from '../transaction-pdf-sheets-con
 import { PdfTemplateComponent } from '@kotka/services';
 import { PipesModule } from '@kotka/pipes';
 import { QRCodeModule } from 'angularx-qrcode';
+import { TransactionTypeLabelPipe } from '../pipes/transaction-type-label.pipe';
 
 @Component({
   standalone: true,
   imports: [
     CommonModule,
     PipesModule,
-    QRCodeModule
+    QRCodeModule,
+    TransactionTypeLabelPipe
   ],
   selector: 'kotka-transaction-botany-labels',
   templateUrl: './transaction-botany-labels.html'

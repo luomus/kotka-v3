@@ -18,7 +18,7 @@
       <span>{{ data.correspondentPerson }}</span>
     </div>
     <div *ngIf="data.externalID" class="multi-line content-block">
-      Sender's loan ID: {{ data.externalID }}
+      Sender's {{ data.type | transactionTypeLabel }} ID: {{ data.externalID }}
     </div>
   </div>
   <div>
@@ -34,8 +34,8 @@
       <span>{{ data.localResearcher }}</span>
     </div>
     <div class="multi-line content-block">
-      <span>Recipient loan ID: {{ data.id | toFullUri }}</span>
-      <span *ngIf="data.incomingReceived">Loan received: {{ data.incomingReceived | date:'dd MMMM Y' }}</span>
+      <span>Recipient {{ data.type | transactionTypeLabel }} ID: {{ data.id | toFullUri }}</span>
+      <span *ngIf="data.incomingReceived">{{ data.type | transactionTypeLabel | capitalizeFirstLetter }} received: {{ data.incomingReceived | date:'dd MMMM Y' }}</span>
       <span *ngIf="data.dueDate">Due date: {{ data.dueDate | date:'dd MMMM Y' }}</span>
     </div>
     <div *ngIf="data.localHandler || data.localHandlerEmail" class="multi-line content-block">

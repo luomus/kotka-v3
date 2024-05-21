@@ -24,11 +24,11 @@
   </div>
   <div>
     <h4>
-      {{ data.type | transactionTypeLabel | titlecase }} ID: {{ data.id | toFullUri }}
+      {{ data.type | transactionTypeLabel | capitalizeFirstLetter }} ID: {{ data.id | toFullUri }}
       <ng-container *ngIf="data.dueDate"><br>Due date: {{ data.dueDate | date:'dd MMMM Y' }}</ng-container>
     </h4>
     <div *ngIf="data.requestReceived || data.outgoingSent || data.transportMethod" class="multi-line content-block">
-      <span *ngIf="data.requestReceived">Loan request received: {{ data.requestReceived | date:'dd MMMM Y' }}</span>
+      <span *ngIf="data.requestReceived">{{ data.type | transactionTypeLabel | capitalizeFirstLetter }} request received: {{ data.requestReceived | date:'dd MMMM Y' }}</span>
       <span *ngIf="data.outgoingSent">Sent to you on: {{ data.outgoingSent | date:'dd MMMM Y' }}</span>
       <span *ngIf="data.transportMethod">Sent by: {{ data.transportMethod | enum: fieldData['transportMethod'] }}</span>
       <span *ngIf="data.numberOfParcels">Parcels: {{ data.numberOfParcels }}</span>

@@ -10,6 +10,7 @@ import { TransactionSheetRemarksComponent } from '../sheet-components/transactio
 import {
   TransactionSheetOutgoingDetailsComponent
 } from '../sheet-components/transaction-sheet-outgoing-details/transaction-sheet-outgoing-details';
+import { TransactionTypeLabelPipe } from '../pipes/transaction-type-label.pipe';
 
 @Component({
   standalone: true,
@@ -19,7 +20,8 @@ import {
     TransactionSheetHeaderComponent,
     TransactionSheetMaterialComponent,
     TransactionSheetRemarksComponent,
-    TransactionSheetOutgoingDetailsComponent
+    TransactionSheetOutgoingDetailsComponent,
+    TransactionTypeLabelPipe
   ],
   selector: 'kotka-transaction-inquiry-sheet',
   templateUrl: './transaction-inquiry-sheet.html'

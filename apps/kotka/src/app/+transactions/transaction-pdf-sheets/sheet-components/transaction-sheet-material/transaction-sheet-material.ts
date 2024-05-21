@@ -2,10 +2,11 @@ import { Component, Input } from '@angular/core';
 import { SpecimenTransaction } from '@luomus/laji-schema';
 import { CommonModule } from '@angular/common';
 import { PipesModule } from '@kotka/pipes';
+import { TransactionTypeLabelPipe } from '../../pipes/transaction-type-label.pipe';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, PipesModule],
+  imports: [CommonModule, PipesModule, TransactionTypeLabelPipe],
   selector: 'kotka-transaction-sheet-material',
   templateUrl: './transaction-sheet-material.html'
 })
