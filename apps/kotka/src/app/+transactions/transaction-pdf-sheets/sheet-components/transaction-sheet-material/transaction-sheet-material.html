@@ -1,13 +1,26 @@
 <div class="avoid-page-break">
-  <h4>Material</h4>
+  <div *ngIf="data.material" class="content-block">
+    <h4>Description:</h4>
+    <div class="content-block text-with-line-breaks">{{ data.material }}</div>
+  </div>
   <div class="content-block">
-    <strong>Total number of specimens: {{ totalAwayCount }}</strong>
-  </div>
-  <div *ngIf="data.material" class="content-block text-with-line-breaks">{{ data.material }}</div>
-  <div *ngIf="data.awayIDs?.length" class="content-block" style="display: grid; grid-template-columns: repeat(3, 33%)">
-    <span *ngFor="let awayID of data.awayIDs">{{ awayID }}</span>
-  </div>
-  <div *ngIf="data.awayCount" class="content-block">
-    In addition, {{ data.type | transactionTypeLabel }} includes {{ data.awayCount }} specimen(s) not specified in this list.
+    <h4>Specimens:</h4>
+    <div class="content-block">
+      <strong>Total/Original number of specimens: {{ originalTotalCount }}</strong>
+    </div>
+    <div *ngIf="allSpecimens.length" class="content-block" style="display: grid; grid-template-columns: repeat(3, 33%)">
+      <span *ngFor="let specimenID of allSpecimens">{{ specimenID }}</span>
+    </div>
+    <div *ngIf="originalCountWithIds > 0 && originalCountWithoutIds > 0" class="content-block">
+      In addition, {{ data.type | transactionTypeLabel }} includes {{ originalCountWithoutIds }} specimen(s) not specified in this list.
+    </div>
+    <div *ngIf="data.transactionEvents" class="content-block">
+      <div *ngFor="let event of data.transactionEvents">
+        {{ event.eventType === 'HRX.eventTypeReturn' ? 'Returned' : 'Added' }} {{ event.eventDate | date:'dd MMM Y' }}: {{ event.eventNotes }}
+      </div>
+    </div>
+    <div class="content-block">
+      <strong>Currently on loan: {{ awayTotalCount }} specimens</strong>
+    </div>
   </div>
 </div>
