@@ -14,6 +14,7 @@ import {
     TransactionSheetSignatureAndMaterialComponent
 } from '../sheet-components/transaction-sheet-signature-and-material/transaction-sheet-signature-and-material';
 import { TransactionTypeLabelPipe } from '../pipes/transaction-type-label.pipe';
+import { TransactionUtils } from '../services/transaction-utils';
 
 @Component({
   standalone: true,
@@ -34,6 +35,10 @@ export class TransactionDispatchSheetComponent implements PdfTemplateComponent {
   @Input({ required: true }) context!: TransactionSheetContext;
 
   get data(): SpecimenTransaction {
-    return this.context!.data;
+    return this.context.data;
+  }
+
+  isGiftOrExchange(): boolean {
+    return TransactionUtils.isGiftOrExchange(this.context.data);
   }
 }

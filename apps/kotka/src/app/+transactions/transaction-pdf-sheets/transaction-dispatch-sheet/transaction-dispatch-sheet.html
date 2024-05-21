@@ -6,12 +6,14 @@
 <p>We are sending you the material indicated here. Upon receiving the specimens/data, please sign and return one copy of this form to the above address<ng-container *ngIf="data.localHandlerEmail"> or email to {{ data.localHandlerEmail }}</ng-container>. This form, along with the attachments, constitutes the full {{ data.type | transactionTypeLabel }} agreement.</p>
 <p>Please reference the identifier {{ data.id | toFullUri }} in all correspondence related to this material.</p>
 <p>Please cite specimens/data using their unique identifiers and inform us about publications based on this material. If you image (photograph, scan) the specimens, send the digital files to us by email. See attachments for more information.</p>
-<p>All {{ data.type | transactionDispatchLabel }}s are governed by our terms and conditions as outlined in the attached documents. </p>
+<p *ngIf="!isGiftOrExchange()">All {{ data.type | transactionDispatchLabel }}s are governed by our terms and conditions as outlined in the attached documents. </p>
 <h4>Attached documents:</h4>
 <div style="display: grid; grid-template-columns: 50% 50%">
   <div>
-    [&nbsp;&nbsp;]&nbsp;&nbsp; {{ data.type | transactionDispatchLabel | capitalizeFirstLetter }} terms<br>
-    [&nbsp;&nbsp;]&nbsp;&nbsp; Additional {{ data.type | transactionTypeLabel }} terms<br>
+    <ng-container *ngIf="!isGiftOrExchange()">
+      [&nbsp;&nbsp;]&nbsp;&nbsp; {{ data.type | transactionDispatchLabel | capitalizeFirstLetter }} terms<br>
+      [&nbsp;&nbsp;]&nbsp;&nbsp; Additional {{ data.type | transactionTypeLabel }} terms<br>
+    </ng-container>
     [&nbsp;&nbsp;]&nbsp;&nbsp; Specimen data (printout or file by email)<br>
     [&nbsp;&nbsp;]&nbsp;&nbsp; Permits
   </div>
@@ -31,4 +33,5 @@
 ></kotka-transaction-sheet-remarks>
 <kotka-transaction-sheet-signature-and-material
   [data]="data"
+  [showCommitToTermsText]="!isGiftOrExchange()"
 ></kotka-transaction-sheet-signature-and-material>

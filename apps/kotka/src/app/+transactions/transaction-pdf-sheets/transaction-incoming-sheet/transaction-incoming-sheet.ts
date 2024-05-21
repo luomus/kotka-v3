@@ -13,6 +13,7 @@ import {
 import {
   TransactionSheetSignatureAndMaterialComponent
 } from '../sheet-components/transaction-sheet-signature-and-material/transaction-sheet-signature-and-material';
+import { TransactionUtils } from '../services/transaction-utils';
 
 @Component({
   standalone: true,
@@ -33,5 +34,9 @@ export class TransactionIncomingSheetComponent implements PdfTemplateComponent {
 
   get data(): SpecimenTransaction {
     return this.context.data;
+  }
+
+  isGiftOrExchange(): boolean {
+    return TransactionUtils.isGiftOrExchange(this.context.data);
   }
 }
