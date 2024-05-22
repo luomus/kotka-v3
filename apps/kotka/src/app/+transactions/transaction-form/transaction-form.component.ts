@@ -9,15 +9,12 @@ import {
   KotkaDocumentObjectType,
   LajiForm,
   SpecimenTransaction,
-  SpecimenTransactionEvent,
   isSpecimenTransaction,
   asSpecimenTransaction
 } from '@kotka/shared/models';
-import { from, Observable, of, Subscription, switchMap } from 'rxjs';
+import { Observable, of, Subscription, switchMap } from 'rxjs';
 import { FormService, DialogService } from '@kotka/services';
 import { FormViewComponent } from '../../shared-modules/form-view/form-view/form-view.component';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { TransactionEventFormComponent } from './transaction-event-form.component';
 import {
   LajiFormComponent,
 } from '@kotka/ui/laji-form';
@@ -26,7 +23,6 @@ import { TransactionFormEmbedService } from '../transaction-form-embed/transacti
 import { globals } from '../../../environments/globals';
 import { FormViewContainerComponent } from '../../shared-modules/form-view/form-view/form-view-container';
 
-type SpecimenIdKey = keyof Pick<SpecimenTransaction, 'awayIDs'|'returnedIDs'|'missingIDs'|'damagedIDs'>;
 
 @Component({
   selector: 'kotka-transaction-form',
@@ -49,17 +45,11 @@ export class TransactionFormComponent extends FormViewContainerComponent impleme
 
   private specimenRangeButtonClickSubscription?: Subscription;
 
-  private eventTypeSpecimenIdFieldMap: Record<SpecimenTransactionEvent['eventType'], SpecimenIdKey|undefined> = {
-    'HRX.eventTypeReturn': 'returnedIDs',
-    'HRX.eventTypeAddition': 'awayIDs'
-  };
-
   private disabled = false;
 
   constructor(
     private apiClient: ApiClient,
     private formService: FormService,
-    private modalService: NgbModal,
     dialogService: DialogService,
     private transactionFormEmbedService: TransactionFormEmbedService
   ) {
@@ -71,9 +61,7 @@ export class TransactionFormComponent extends FormViewContainerComponent impleme
   }
 
   onFormInit(lajiForm: LajiFormComponent) {
-    this.transactionFormEmbedService.initEmbeddedComponents(
-      lajiForm, this.formData || {}, this.onAddTransactionEventButtonClick.bind(this)
-    );
+    this.transactionFormEmbedService.initEmbeddedComponents(lajiForm, this.formData || {});
     this.specimenRangeButtonClickSubscription = this.transactionFormEmbedService.specimenRangeClick$?.subscribe(range => (
       this.specimenRangeClick(range)
     ));
@@ -100,41 +88,6 @@ export class TransactionFormComponent extends FormViewContainerComponent impleme
       form.schema.properties.geneticResourceAcquisitionCountry.oneOf = countries;
       return of(form);
     }));
-  }
-
-  private onAddTransactionEventButtonClick(event: MouseEvent) {
-    event.stopPropagation();
-
-    const modalRef = this.modalService.open(TransactionEventFormComponent, {
-      backdrop: 'static',
-      size: 'lg',
-      modalDialogClass: 'transaction-event-modal'
-    });
-    modalRef.componentInstance.transactionType = this.formData?.type;
-
-    from(modalRef.result).subscribe({
-      'next': result => this.addTransactionEvent(result),
-      'error': () => undefined
-    });
-  }
-
-  private addTransactionEvent(transactionEvent: SpecimenTransactionEvent) {
-    let formData = { ...this.formData || {} };
-    const transactionEvents = [...(formData.transactionEvents || []), transactionEvent];
-    formData = { ...formData, transactionEvents };
-
-    const specimenIdField = this.eventTypeSpecimenIdFieldMap[transactionEvent.eventType];
-    const eventIds = transactionEvent.eventDocumentIDs || [];
-
-    if (specimenIdField) {
-      const specimenIdFields: SpecimenIdKey[] = ['awayIDs', 'returnedIDs', 'missingIDs'];
-      specimenIdFields.forEach(field => {
-        formData[field] = (formData[field] || []).filter(id => !eventIds.includes(id));
-      });
-      formData[specimenIdField] = [...(formData[specimenIdField] || []), ...eventIds];
-    }
-
-    this.formView.setFormData(formData);
   }
 
   specimenRangeClick(range: string) {

@@ -20,7 +20,7 @@ export class TransactionFormEmbedService {
   ) {}
 
 
-  initEmbeddedComponents(lajiFormComponent: LajiFormComponent, formData?: Partial<SpecimenTransaction>, transactionEventAddListener?: (event: MouseEvent) => void) {
+  initEmbeddedComponents(lajiFormComponent: LajiFormComponent, formData?: Partial<SpecimenTransaction>) {
     const lajiFormEmbedService = new LajiFormEmbedService(this.injector, lajiFormComponent);
 
     this.organizationAddressRef = lajiFormEmbedService.embedComponent(OrganizationAddressEmbedComponent, {
@@ -40,10 +40,6 @@ export class TransactionFormEmbedService {
       positionToAnchor: 'firstChild'
     });
     this.specimenRangeClick$ = this.specimenRangeSelectRef.instance.specimenRangeClick;
-
-    if (transactionEventAddListener) {
-      lajiFormEmbedService.addOnClickEventListener('root_transactionEvents-add', transactionEventAddListener);
-    }
   }
 
 
