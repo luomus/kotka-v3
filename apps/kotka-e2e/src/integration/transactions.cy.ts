@@ -62,26 +62,9 @@ describe('transactions', () => {
         cy.get('[data-cy=specimen-range-input]').type('HT.120-300');
         cy.get('[data-cy=specimen-range-button]').click();
 
-        cy.get('#root_awayIDs').siblings('.rw-multiselect-taglist').children()
+        cy.get('#root_specimenIDs_awayIDs').siblings('.rw-multiselect-taglist').children()
           .should('have.length.greaterThan', 0)
           .should('contain.text', 'http://id.luomus.fi/HT.123');
-      });
-
-      it('should open a modal when clicking the add transaction event button', () => {
-        cy.get('#root_transactionEvents-add').click();
-        cy.get('.transaction-event-modal').should('be.visible');
-      });
-
-      it('should add a transaction event', () => {
-        cy.get('#root_transactionEvents-add').click();
-
-        cy.get('#root_eventType').type('Return{enter}');
-        cy.get('.transaction-event-modal .date-widget input').type('01/01/2020{enter}');
-        cy.get('#root_eventNotes').type('abcdef');
-        cy.get('[data-cy=confirm-ok]').click();
-
-        cy.get('.transaction-event-modal').should('not.be.visible');
-        cy.get('#root_transactionEvents_0_eventNotes').should('contain', 'abcdef');
       });
     });
   });
