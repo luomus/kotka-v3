@@ -19,7 +19,7 @@
         {{ event.eventType === 'HRX.eventTypeReturn' ? 'Returned' : 'Added' }} {{ event.eventDate | date:'dd MMM Y' }}: {{ event.eventNotes }}
       </div>
     </div>
-    <div class="content-block">
+    <div *ngIf="data.type === 'HRX.typeLoanIncoming' || data.type === 'HRX.typeLoanOutgoing'" class="content-block">
       <strong>Currently on loan: {{ awayTotalCount }} specimens</strong>
     </div>
   </div>
