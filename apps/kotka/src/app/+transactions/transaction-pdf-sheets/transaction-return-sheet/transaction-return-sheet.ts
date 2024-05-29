@@ -6,8 +6,8 @@ import { PdfTemplateComponent } from '@kotka/services';
 import { TransactionSheetHeaderComponent } from '../sheet-components/transaction-sheet-header/transaction-sheet-header';
 import { TransactionSheetRemarksComponent } from '../sheet-components/transaction-sheet-remarks/transaction-sheet-remarks';
 import {
-  TransactionSheetIncomingDetailsComponent
-} from '../sheet-components/transaction-sheet-incoming-details/transaction-sheet-incoming-details';
+  TransactionSheetIncomingReturnDetailsComponent
+} from '../sheet-components/transaction-sheet-incoming-return-details/transaction-sheet-incoming-return-details';
 import {
   TransactionSheetSignatureAndMaterialComponent
 } from '../sheet-components/transaction-sheet-signature-and-material/transaction-sheet-signature-and-material';
@@ -19,7 +19,7 @@ import { TransactionTypeLabelPipe } from '../pipes/transaction-type-label.pipe';
     CommonModule,
     TransactionSheetHeaderComponent,
     TransactionSheetRemarksComponent,
-    TransactionSheetIncomingDetailsComponent,
+    TransactionSheetIncomingReturnDetailsComponent,
     TransactionSheetSignatureAndMaterialComponent,
     TransactionTypeLabelPipe
   ],

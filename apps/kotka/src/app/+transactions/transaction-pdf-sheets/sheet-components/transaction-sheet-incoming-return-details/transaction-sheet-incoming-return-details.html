@@ -1,0 +1,39 @@
+<div class="avoid-page-break" style="display: grid; grid-template-columns: 50% 50%">
+  <div>
+    <div *ngIf="correspondingOrganization" class="multi-line content-block">
+      <span>{{ correspondingOrganization.organizationLevel4?.en }}<ng-container *ngIf="correspondingOrganization.abbreviation"> ({{ correspondingOrganization.abbreviation }})</ng-container></span>
+      <span>{{ correspondingOrganization.organizationLevel1.en }}</span>
+      <span>{{ correspondingOrganization.organizationLevel2?.en }}</span>
+      <span>{{ correspondingOrganization.organizationLevel3?.en }}</span>
+      <span *ngIf="correspondingOrganization.postOfficeBox">P.O. Box {{ correspondingOrganization.postOfficeBox }}</span>
+      <span>{{ correspondingOrganization.streetAddress }}</span>
+      <span>{{ correspondingOrganization.postalCode }}</span>
+      <span>{{ correspondingOrganization.locality }}</span>
+      <span>{{ correspondingOrganization.region }}</span>
+      <span>{{ correspondingOrganization.country }}</span>
+    </div>
+    <div *ngIf="data.correspondentPerson" class="multi-line content-block">
+      <span>Corresponding person:</span>
+      <span>{{ data.correspondentPerson }}</span>
+    </div>
+    <div *ngIf="data.externalID" class="multi-line content-block">
+      {{ data.type | transactionTypeLabel | capitalizeFirstLetter }} ID: {{ data.externalID }}
+    </div>
+  </div>
+  <div>
+    <div class="multi-line content-block" *ngIf="data.incomingReceived || data.dueDate">
+      <span *ngIf="data.incomingReceived">{{ data.type | transactionTypeLabel | capitalizeFirstLetter }} received: {{ data.incomingReceived | date:'dd MMMM Y' }}</span>
+      <span *ngIf="data.dueDate">Due date: {{ data.dueDate | date:'dd MMMM Y' }}</span>
+    </div>
+    <div *ngIf="data.localHandler || data.localHandlerEmail" class="multi-line content-block">
+      <span>Handler:</span>
+      <span>{{ data.localHandler }}</span>
+      <span>{{ data.localHandlerEmail }}</span>
+    </div>
+    <div *ngIf="data.localPerson || data.localPersonEmail" class="multi-line content-block">
+      <span>Person responsible:</span>
+      <span>{{ data.localPerson }}</span>
+      <span>{{ data.localPersonEmail }}</span>
+    </div>
+  </div>
+</div>

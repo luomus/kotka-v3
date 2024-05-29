@@ -5,11 +5,11 @@
 <h2>{{ data.type | transactionTypeLabel | uppercase }} RETURN</h2>
 <p>We are returning the material indicated here belonging to the {{ data.type | transactionTypeLabel }} {{ data.externalID }}. After receiving the specimens, please sign and return one copy of this form to the above address<ng-container *ngIf="data.localHandlerEmail"> or via email to {{ data.localHandlerEmail }}</ng-container>. Thank you.</p>
 <hr>
-<kotka-transaction-sheet-incoming-details
+<kotka-transaction-sheet-incoming-return-details
   [data]="data"
   [ownerOrganization]="context.ownerOrganization"
   [correspondingOrganization]="context.correspondingOrganization"
-></kotka-transaction-sheet-incoming-details>
+></kotka-transaction-sheet-incoming-return-details>
 <kotka-transaction-sheet-remarks
   [data]="data"
 ></kotka-transaction-sheet-remarks>
