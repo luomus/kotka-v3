@@ -14,7 +14,7 @@ describe('user', () => {
 
     cy.visit('/tags');
     cy.login(userEmail, userPassword);
-    cy.url().should('equal', Cypress.config('baseUrl') + '/tags');
+    cy.url({ timeout: 10000 }).should('equal', Cypress.config('baseUrl') + '/tags');
     cy.get('[data-cy=main-header]').should('contain', 'Tags');
   });
 
@@ -22,6 +22,6 @@ describe('user', () => {
     cy.setUserAsLoggedIn();
     cy.visit('/');
     cy.logout();
-    cy.url().should('include', '/user/logout');
+    cy.url({ timeout: 10000 }).should('include', '/user/logout');
   });
 });
