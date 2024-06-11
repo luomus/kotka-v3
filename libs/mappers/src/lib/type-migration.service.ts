@@ -20,14 +20,29 @@ export class TypeMigrationService {
       'localPerson': [ 'localPerson', 'localHandler' ],
       'away': 'awayIDs',
       'awayOther': 'awayCount',
+      'HRA.away': 'awayCount',
       'returned': 'returnedIDs',
       'returnedOther': 'returnedCount',
+      'HRA.returned': 'returnedCount',
       'missing': 'missingIDs',
       'missingOther': 'missingCount',
+      'HRA.missing': 'missingCount',
       'damaged': 'damagedIDs',
-      'damagedOther': 'damagedCount'
+      'damagedOther': 'damagedCount',
+      'HRA.damaged': 'damagedCount'
     }
   };
+
+  integerValues = [
+    'HRA.away',
+    'awayOther',
+    'HRA.returned',
+    'returnedOther',
+    'HRA.missing',
+    'missingOther',
+    'HRA.damaged',
+    'damagedOther'
+  ];
 
   private ignoreValue = {
     'HRA.transaction': [
@@ -44,8 +59,7 @@ export class TypeMigrationService {
       'HRA.geneticResearchAllowed',
       'correspondenceHeaderOrganizationCode',
       'localDepartment',
-
-
+      'ids'
     ]
   };
 
@@ -105,6 +119,10 @@ export class TypeMigrationService {
       const newKey = this.typeMap[type][key] || key;
 
       if (this.ignoreProperty[type].includes(newKey)) return;
+
+      if (this.integerValues.includes(key)) {
+        return toReturn[newKey] = Math.abs(Number.parseInt(value));
+      }
 
       if (Array.isArray(newKey)) {
         newKey.forEach(key => {

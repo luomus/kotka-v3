@@ -43,10 +43,21 @@ export class TriplestoreMapperService implements OnModuleInit {
 
   private parseChild(parent, childId, json) {
     const child = json.find(part => part['id'] === childId);
-    const childType = this.getType(child['@type']);
-    const parentType = this.getType(parent['@type']);
+
+    if (!child) {
+      if (Array.isArray(parent['MZ.hasPart'])) {
+        parent['MZ.hasPart'] = parent['MZ.hasPart'].filter(part => part.id !== childId);
+      } else {
+        delete parent['MZ.hasPart'];
+      }
+
+      return;
+    }
 
     this.parseChildren(child, json);
+
+    const childType = this.getType(child['@type']);
+    const parentType = this.getType(parent['@type']);
 
     if (!parent[this.childMaps[parentType][childType]['target']] && this.childMaps[parentType][childType]['isArray']) {
       parent[this.childMaps[parentType][childType]['target']] = [ child ];
@@ -101,7 +112,10 @@ export class TriplestoreMapperService implements OnModuleInit {
             if (!data['@type'][0]) continue;
 
             const subType = this.getType(data['@type']);
-            if(!this.fromContext[subType]) {
+
+            if (subType ==='HRAB.transactionItemClass') continue;
+
+            if (!this.fromContext[subType]) {
               await this.initContext(subType);
             }
 
