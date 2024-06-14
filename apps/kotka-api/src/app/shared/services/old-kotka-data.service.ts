@@ -94,7 +94,7 @@ export class OldKotkaDataService {
     let stop = false;
     let i = 0;
     do {
-      const triplestoreData = await lastValueFrom(this.triplestoreService.search({type}, {limit: 100, offset: i * 100}));
+      const triplestoreData = await lastValueFrom(this.triplestoreService.search({type}, { limit: 1000, offset: i * 1000 }));
       i++;
 
       const jsonData = await this.triplestoreMapperService.triplestoreToJson(triplestoreData.data, type) as T[];
