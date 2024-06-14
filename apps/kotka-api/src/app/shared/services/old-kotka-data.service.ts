@@ -111,7 +111,7 @@ export class OldKotkaDataService {
 
       return objects;
     } catch (err) {
-      if (err.response.status === HttpStatus.NOT_FOUND) {
+      if (err.response && err.response.status === HttpStatus.NOT_FOUND) {
         return [];
       }
 
