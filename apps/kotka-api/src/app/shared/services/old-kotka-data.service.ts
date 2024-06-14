@@ -92,22 +92,15 @@ export class OldKotkaDataService {
   private async getAllObjects<T>(type: string): Promise<T[]> {
     try {
       const objects: T[] = [];
-      let stop = false;
-      let i = 0;
+      const getPage = async (current: number) => {
+        const triplestoreData = await lastValueFrom(this.triplestoreService.search({ type }, { limit: 1000, offset: current * 1000 }));
+        return await this.triplestoreMapperService.triplestoreToJson(triplestoreData.data, type) as T[];
+      };
 
-      do {
-        const triplestoreData = await lastValueFrom(this.triplestoreService.search({type}, { limit: 1000, offset: i * 1000 }));
-        i++;
-
-        const jsonData = await this.triplestoreMapperService.triplestoreToJson(triplestoreData.data, type) as T[];
-
-        if (!jsonData?.length) {
-          stop = true;
-          continue;
-        }
-
-        objects.push(...jsonData);
-      } while (!stop);
+      const paginatedIterator = this.getAllPaginatedIterator(getPage);
+      for await (const page of paginatedIterator) {
+        objects.push(...page);
+      }
 
       return objects;
     } catch (err) {
@@ -118,5 +111,26 @@ export class OldKotkaDataService {
       console.error(err);
       throw new InternalServerErrorException(err.message);
     }
+  }
+
+  getAllPaginatedIterator<T>(fun: (current: number) => Promise<T[]>) {
+    return {
+      [Symbol.asyncIterator]() {
+        let current = 0;
+        const last = 100;
+        return {
+          async next() {
+            const data = await fun(current);
+            current++;
+
+            if (this.current === last || !data.length) {
+              return { done: true, value: data };
+            } else {
+              return { done: false, value: data };
+            }
+          },
+        };
+      }
+    };
   }
 }
