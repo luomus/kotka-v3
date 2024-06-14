@@ -90,7 +90,23 @@ export class OldKotkaDataService {
   }
 
   private async getAllObjects<T>(type: string): Promise<T[]> {
-    const triplestoreData = await lastValueFrom(this.triplestoreService.search({type}));
-    return await this.triplestoreMapperService.triplestoreToJson(triplestoreData.data, type) as T[];
+    const objects: T[] = [];
+    let stop = false;
+    let i = 0;
+    do {
+      const triplestoreData = await lastValueFrom(this.triplestoreService.search({type}, {limit: 100, offset: i * 100}));
+      i++;
+
+      const jsonData = await this.triplestoreMapperService.triplestoreToJson(triplestoreData.data, type) as T[];
+
+      if (!jsonData?.length) {
+        stop = true;
+        continue;
+      }
+
+      objects.push(...jsonData);
+    } while (!stop);
+
+    return objects;
   }
 }
