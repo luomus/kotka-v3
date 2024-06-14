@@ -29,12 +29,6 @@ export class OldKotkaDataService {
     return this.getAllObjects<Collection>(collectionType);
   }
 
-  @Timeout(0)
-  @Cron(CronExpression.EVERY_10_MINUTES)
-  async updateCollectionsCache() {
-    await this.getAllCollections();
-  }
-
   async getOrganization(id: string) {
     return this.getObject<Organization>(organizationType, id);
   }
@@ -48,9 +42,10 @@ export class OldKotkaDataService {
     return this.getAllObjects<Organization>(organizationType);
   }
 
-  @Timeout(0)
+  @Timeout(10000)
   @Cron(CronExpression.EVERY_10_MINUTES)
-  async updateOrganizationsCache() {
+  async updateTriplestoreCache() {
+    await this.getAllCollections();
     await this.getAllOrganizations();
   }
 
