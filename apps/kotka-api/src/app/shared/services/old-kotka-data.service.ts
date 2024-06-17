@@ -42,10 +42,15 @@ export class OldKotkaDataService {
     return this.getAllObjects<Organization>(organizationType);
   }
 
-  @Timeout(10000)
+  @Timeout(0)
   @Cron(CronExpression.EVERY_10_MINUTES)
-  async updateTriplestoreCache() {
+  async updateCollections() {
     await this.getAllCollections();
+  }
+
+  @Timeout(0)
+  @Cron(CronExpression.EVERY_10_MINUTES)
+  async updateOrganizations() {
     await this.getAllOrganizations();
   }
 
@@ -88,7 +93,7 @@ export class OldKotkaDataService {
     try {
       const objects: T[] = [];
       const getPage = async (current: number) => {
-        const triplestoreData = await lastValueFrom(this.triplestoreService.search({ type }, { limit: 5000, offset: current * 5000 }));
+        const triplestoreData = await lastValueFrom(this.triplestoreService.search({ type }, { limit: 1000, offset: current * 1000 }));
         return await this.triplestoreMapperService.triplestoreToJson(triplestoreData.data, type) as T[];
       };
 
@@ -115,11 +120,13 @@ export class OldKotkaDataService {
         const last = 100;
         return {
           async next() {
+            //Allegedly might help with ECONNRESET error, otherwise does nothing
+            await new Promise(resolve => setTimeout(resolve, 0));
             const data = await fun(current);
             current++;
 
             if (this.current === last || !data.length) {
-              return { done: true, value: data };
+              return { done: true };
             } else {
               return { done: false, value: data };
             }
