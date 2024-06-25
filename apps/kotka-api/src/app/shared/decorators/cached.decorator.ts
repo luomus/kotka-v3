@@ -1,49 +1,20 @@
-import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject } from '@nestjs/common';
-import Redlock from 'redlock';
-import { REDIS } from '../../shared-modules/redis/redis.constants';
+import { CachedService } from '../services/cached.service';
 
 export function Cached(cacheKey: string, ttl: number = 10 * 60 * 1000) {
-  const injectCacheService = Inject(CACHE_MANAGER);
-  const injectRedisClientService = Inject(REDIS);
+  const injectCachedService = Inject(CachedService);
 
   return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
-    injectCacheService(target, 'cacheService');
-    injectRedisClientService(target, 'redisClient');
-
-    let redlock: Redlock;
+    injectCachedService(target, 'cachedService');
     const original = descriptor.value;
 
     descriptor.value = async function(...args: any[]) {
-      const getResult = async () => {
-        const cacheService: Cache = this.cacheService;
+      const cachedService = this.cachedService as CachedService;
 
-        const cachedData = await cacheService.get(cacheKey);
-        if (cachedData) {
-          return cachedData;
-        }
-
-        const result = await original.apply(this, args);
-        await cacheService.set(cacheKey, result, ttl);
-        return result;
-      };
-
-      if (!redlock) {
-        redlock = new Redlock([this.redisClient]);
-      }
-
-      let lock: Redlock.Lock;
       try {
-        lock = await redlock.acquire(['lock:' + cacheKey], ttl - 1);
+        return cachedService.getValueWithRefresh(cacheKey, ttl, original, args);
       } catch (err) {
-        console.warn(err);
-        return getResult();
-      }
-
-      try {
-        return getResult();
-      } finally {
-        await lock.unlock();
+        console.error(err.message);
       }
     };
   };

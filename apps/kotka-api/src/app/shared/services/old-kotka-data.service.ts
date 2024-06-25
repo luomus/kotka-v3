@@ -5,15 +5,18 @@ import { Collection, Organization } from '@luomus/laji-schema';
 import { lastValueFrom, map, switchMap } from 'rxjs';
 import { Cached } from '../decorators/cached.decorator';
 import { Cron, CronExpression, Timeout } from '@nestjs/schedule';
+import { CachedService } from './cached.service';
 
 const collectionType = 'MY.collection';
 const organizationType = 'MOS.organization';
-
+const cache_ttl = 12 * 60 * 60 * 1000;// 12 h
 @Injectable()
 export class OldKotkaDataService {
+
   constructor(
     private readonly triplestoreService: TriplestoreService,
-    private readonly triplestoreMapperService: TriplestoreMapperService
+    private readonly triplestoreMapperService: TriplestoreMapperService,
+    private readonly cachedService: CachedService,
   ) {};
 
   async getCollection(id: string) {
@@ -24,7 +27,7 @@ export class OldKotkaDataService {
     return this.getObjects<Collection>(collectionType, ids);
   }
 
-  @Cached('allCollections', 12 * 60 * 60 * 1000) // 12 h
+  @Cached('allCollections', cache_ttl)
   async getAllCollections() {
     return this.getAllObjects<Collection>(collectionType);
   }
@@ -37,21 +40,31 @@ export class OldKotkaDataService {
     return this.getObjects<Organization>(organizationType, ids);
   }
 
-  @Cached('allOrganizations', 12 * 60 * 60 * 1000) // 12 h
+  @Cached('allOrganizations', cache_ttl)
   async getAllOrganizations() {
     return this.getAllObjects<Organization>(organizationType);
   }
 
   @Timeout(0)
+  async initialzeCollections() {
+    this.updateCollections();
+  }
+
   @Cron(CronExpression.EVERY_10_MINUTES)
   async updateCollections() {
-    await this.getAllCollections();
+    const collections = await this.getAllObjects<Collection>(collectionType);
+    return await this.cachedService.setValue('allCollections', collections, cache_ttl);
   }
 
   @Timeout(0)
+  async initialzeOrganizations() {
+    this.updateOrganizations();
+  }
+
   @Cron(CronExpression.EVERY_10_MINUTES)
   async updateOrganizations() {
-    await this.getAllOrganizations();
+    const organizations = await this.getAllObjects<Organization>(organizationType);
+    return await this.cachedService.setValue('allOrganizations', organizations, cache_ttl);
   }
 
   private async getObject<T>(type: string, id: string) {
