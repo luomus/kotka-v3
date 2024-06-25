@@ -5,18 +5,18 @@ import { Collection, Organization } from '@luomus/laji-schema';
 import { lastValueFrom, map, switchMap } from 'rxjs';
 import { Cached } from '../decorators/cached.decorator';
 import { Cron, CronExpression, Timeout } from '@nestjs/schedule';
-import { CachedService } from './cached.service';
+import { CacheService } from './cache.service';
 
 const collectionType = 'MY.collection';
 const organizationType = 'MOS.organization';
-const cache_ttl = 12 * 60 * 60 * 1000;// 12 h
+const cache_ttl = 12 * 60 * 60 * 1000; // 12 h
 @Injectable()
 export class OldKotkaDataService {
 
   constructor(
     private readonly triplestoreService: TriplestoreService,
     private readonly triplestoreMapperService: TriplestoreMapperService,
-    private readonly cachedService: CachedService,
+    private readonly cacheService: CacheService,
   ) {};
 
   async getCollection(id: string) {
@@ -47,24 +47,24 @@ export class OldKotkaDataService {
 
   @Timeout(0)
   async initialzeCollections() {
-    this.updateCollections();
+    await this.updateCollections();
   }
 
   @Cron(CronExpression.EVERY_10_MINUTES)
   async updateCollections() {
-    const collections = await this.getAllObjects<Collection>(collectionType);
-    return await this.cachedService.setValue('allCollections', collections, cache_ttl);
+    const getDataFunc = async () => await this.getAllObjects<Collection>(collectionType);
+    await this.cacheService.getValue('allCollections', cache_ttl, getDataFunc, true);
   }
 
   @Timeout(0)
   async initialzeOrganizations() {
-    this.updateOrganizations();
+    await this.updateOrganizations();
   }
 
-  @Cron(CronExpression.EVERY_10_MINUTES)
+  @Cron(CronExpression.EVERY_MINUTE)
   async updateOrganizations() {
-    const organizations = await this.getAllObjects<Organization>(organizationType);
-    return await this.cachedService.setValue('allOrganizations', organizations, cache_ttl);
+    const getDataFunc = async () => await this.getAllObjects<Organization>(organizationType);
+    await this.cacheService.getValue('allOrganizations', cache_ttl, getDataFunc, true);
   }
 
   private async getObject<T>(type: string, id: string) {

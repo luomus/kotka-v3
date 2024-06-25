@@ -9,12 +9,12 @@ import { AutocompleteService } from './services/autocomplete.service';
 import { MappersModule } from '@kotka/mappers';
 import { OldKotkaDataService } from './services/old-kotka-data.service';
 import { RedisModule } from '../shared-modules/redis/redis.module';
-import { CachedService } from './services/cached.service';
+import { CacheService } from './services/cache.service';
 
 @Module({
     imports: [ApiServicesModule, MappersModule, RedisModule],
     controllers: [],
-    providers: [ValidationService, AutocompleteService, OldKotkaDataService, CachedService],
-    exports: [ValidationService, AutocompleteService, OldKotkaDataService, CachedService]
+    providers: [ValidationService, AutocompleteService, OldKotkaDataService, CacheService],
+    exports: [ValidationService, AutocompleteService, OldKotkaDataService, CacheService]
 })
 export class SharedModule {}

@@ -1,18 +1,20 @@
 import { Inject } from '@nestjs/common';
-import { CachedService } from '../services/cached.service';
+import { CacheService } from '../services/cache.service';
 
 export function Cached(cacheKey: string, ttl: number = 10 * 60 * 1000) {
-  const injectCachedService = Inject(CachedService);
+  const injectCacheService = Inject(CacheService);
 
   return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
-    injectCachedService(target, 'cachedService');
+    injectCacheService(target, 'cacheService');
     const original = descriptor.value;
 
     descriptor.value = async function(...args: any[]) {
-      const cachedService = this.cachedService as CachedService;
+      const cacheService = this.cacheService as CacheService;
+
+      const getDataFunc = async () => await original.apply(this, args);
 
       try {
-        return cachedService.getValueWithRefresh(cacheKey, ttl, original, args);
+        return cacheService.getValue(cacheKey, ttl, getDataFunc);
       } catch (err) {
         console.error(err.message);
       }
