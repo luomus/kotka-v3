@@ -61,7 +61,7 @@ export class OldKotkaDataService {
     await this.updateOrganizations();
   }
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_10_MINUTES)
   async updateOrganizations() {
     const getDataFunc = async () => await this.getAllObjects<Organization>(organizationType);
     await this.cacheService.getValue('allOrganizations', cache_ttl, getDataFunc, true);
