@@ -25,22 +25,23 @@ export class CacheService {
       }
     }
 
-    const lock = await this.acquireLock(cacheKey, ttl);
+    const lock = await this.acquireLock(cacheKey);
 
-    const data = await getDataFunc();
-    await this.cacheService.set(cacheKey, data, ttl);
-
-    await this.unlockLock(lock);
-
-    return data;
+    try {
+      const data = await getDataFunc();
+      await this.cacheService.set(cacheKey, data, ttl);
+      return data;
+    } finally {
+      await this.unlockLock(lock);
+    }
   }
 
-  private async acquireLock(cacheKey: string, ttl: number): Promise<Redlock.Lock|undefined> {
+  private async acquireLock(cacheKey: string): Promise<Redlock.Lock|undefined> {
     if (!this.redlock) {
       this.redlock = new Redlock([this.redisClient as any], { retryCount: 10, retryDelay: 1000 });
     }
     try {
-      return await this.redlock.acquire(['lock:' + cacheKey], ttl - 1);
+      return await this.redlock.acquire(['lock:' + cacheKey], 10 * 1000);
     } catch (err) {
       console.warn(err);
     }
