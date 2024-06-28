@@ -41,7 +41,7 @@ export class CacheService {
       this.redlock = new Redlock([this.redisClient as any], { retryCount: 10, retryDelay: 1000 });
     }
     try {
-      return await this.redlock.acquire(['lock:' + cacheKey], 10 * 1000);
+      return await this.redlock.acquire(['lock:' + cacheKey], 10 * 60 * 1000);
     } catch (err) {
       console.warn(err);
     }
