@@ -18,15 +18,14 @@ export class CacheService {
   ) {}
 
   async getValue<T>(cacheKey: string, ttl: number, getDataFunc: () => Promise<T>, forceUpdate = false): Promise<T> {
-    const lock = await this.acquireLock(cacheKey, ttl);
-
     if (!forceUpdate) {
       const cachedData = await this.cacheService.get<T>(cacheKey);
       if (cachedData) {
-        await this.unlockLock(lock);
         return cachedData;
       }
     }
+
+    const lock = await this.acquireLock(cacheKey, ttl);
 
     const data = await getDataFunc();
     await this.cacheService.set(cacheKey, data, ttl);
