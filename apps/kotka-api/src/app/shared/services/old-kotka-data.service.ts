@@ -46,23 +46,22 @@ export class OldKotkaDataService {
   }
 
   @Timeout(0)
-  async initialzeCollections() {
-    await this.updateCollections();
+  async initializeAll() {
+    await this.updateAll();
   }
 
   @Cron(CronExpression.EVERY_10_MINUTES)
-  async updateCollections() {
+  async updateAll() {
+    await this.updateCollections();
+    await this.updateOrganizations();
+  }
+
+  private async updateCollections() {
     const getDataFunc = async () => await this.getAllObjects<Collection>(collectionType);
     await this.cacheService.getValue('allCollections', cache_ttl, getDataFunc, true);
   }
 
-  @Timeout(0)
-  async initialzeOrganizations() {
-    await this.updateOrganizations();
-  }
-
-  @Cron(CronExpression.EVERY_10_MINUTES)
-  async updateOrganizations() {
+  private async updateOrganizations() {
     const getDataFunc = async () => await this.getAllObjects<Organization>(organizationType);
     await this.cacheService.getValue('allOrganizations', cache_ttl, getDataFunc, true);
   }
@@ -126,7 +125,7 @@ export class OldKotkaDataService {
     }
   }
 
-  getAllPaginatedIterator<T>(fun: (current: number) => Promise<T[]>) {
+  private getAllPaginatedIterator<T>(fun: (current: number) => Promise<T[]>) {
     return {
       [Symbol.asyncIterator]() {
         let current = 0;
