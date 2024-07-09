@@ -5,7 +5,7 @@ https://docs.nestjs.com/controllers#controllers
 import { LajiStoreService } from '@kotka/api-services';
 import { TypeMigrationService } from '@kotka/mappers';
 import { IdService } from '@kotka/util-services';
-import { SpecimenTransaction } from '@luomus/laji-schema';
+import { Dataset, SpecimenTransaction } from '@luomus/laji-schema';
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import moment from 'moment';
 import { map } from 'rxjs';
@@ -19,6 +19,21 @@ export class OldKotkaController {
     private readonly idService: IdService,
     private readonly typeMigrationService: TypeMigrationService
   ) {}
+
+  @Get('tagsSelect')
+  getTagsSelect() {
+    return this.lajiStoreService.getAll<Dataset>('dataset', { fields: "id,datasetName.en", sort: 'datasetName.en', page_size: 1000 }).pipe(
+      map(res => res.data),
+      map(data => data.member),
+      map(datasets => {
+        const selectMap = {};
+        datasets.forEach(dataset => {
+          selectMap[dataset.id] = dataset.datasetName.en;
+        });
+        return selectMap;
+      })
+    );
+  }
 
   @Get('transaction/isLoaned/:specimenId')
   getTransactionIsLoaned(@Param('specimenId') specimenId) {

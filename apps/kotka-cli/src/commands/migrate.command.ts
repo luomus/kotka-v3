@@ -255,7 +255,6 @@ export class MigrateCommand {
       const triplestoreData = await this.triplestoreMapperService.jsonToTriplestore(lajistoreData, type);
 
       await lastValueFrom(this.triplestoreService.put(id, triplestoreData));
-      console.log(triplestoreData);
     } catch (err) {
       console.log(err);
     }
