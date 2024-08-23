@@ -172,7 +172,7 @@ export class TransactionTableComponent {
         field: 'localPerson'
       },
       {
-        headerName: 'Material',
+        headerName: 'Material description',
         field: 'material'
       },
       {
