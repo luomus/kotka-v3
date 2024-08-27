@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy, ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges
+} from '@angular/core';
 import { KeyCode } from '@ag-grid-community/core';
 import { AutocompleteResult } from '@kotka/api-interfaces';
 import { debounceTime, distinctUntilChanged, Observable, of, OperatorFunction, switchMap } from 'rxjs';
@@ -14,6 +22,7 @@ export type FetchAutocompleteResultsFunc = (term: string) => Observable<Autocomp
       placeholder="Search..."
       [className]="inputClassName"
       [(ngModel)]="typeaheadValue"
+      [disabled]="loading"
       [ngbTypeahead]="search"
       [inputFormatter]="formatter"
       [resultFormatter]="formatter"
@@ -25,25 +34,53 @@ export type FetchAutocompleteResultsFunc = (term: string) => Observable<Autocomp
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AutocompleteComponent {
+export class AutocompleteComponent implements OnChanges {
   @Input() value?: string;
-  @Input() fetchResultsFunc?: FetchAutocompleteResultsFunc;
+  @Input({ required: true }) fetchResultsFunc!: FetchAutocompleteResultsFunc;
   @Input() inputClassName = 'form-control';
   @Input() minCharacters = 1;
 
+  loading = false;
   typeaheadValue: string|AutocompleteResult = '';
 
-  @Output() valueChange = new EventEmitter<string>();
+  @Output() valueChange = new EventEmitter<string|undefined>();
+
+  constructor(
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.value) {
+      if (!this.value) {
+        this.typeaheadValue = '';
+      } else if (typeof this.typeaheadValue !== 'object' || this.typeaheadValue.key !== this.value) {
+        this.loading = true;
+
+        this.fetchResultsFunc(this.value).subscribe(result => {
+          if (result.length < 1) {
+            this.typeaheadValue = '';
+            this.clearValue();
+          } else {
+            this.typeaheadValue = result[0];
+          }
+
+          this.loading = false;
+          this.cdr.markForCheck();
+        });
+      }
+    }
+  }
 
   onSelectItem(value: NgbTypeaheadSelectItemEvent<AutocompleteResult>) {
-    this.valueChange.emit(value.item.key);
+    this.value = value.item.key;
+    this.valueChange.emit(this.value);
   }
 
   onBlur() {
     if (typeof this.typeaheadValue !== 'object') {
       this.typeaheadValue = '';
       if (this.value) {
-        this.valueChange.emit();
+        this.clearValue();
       }
     }
   };
@@ -51,7 +88,7 @@ export class AutocompleteComponent {
   onKeyDown(event: KeyboardEvent) {
     if (event.key === KeyCode.ENTER) {
       if (this.typeaheadValue === '' && this.value) {
-        this.valueChange.emit();
+        this.clearValue();
       }
     }
   }
@@ -63,7 +100,12 @@ export class AutocompleteComponent {
       debounceTime(200),
       distinctUntilChanged(),
       switchMap((term) =>
-        (term.length < this.minCharacters || !this.fetchResultsFunc) ? of([]) : this.fetchResultsFunc(term)
+        (term.length < this.minCharacters) ? of([]) : this.fetchResultsFunc(term)
       ),
     );
+
+  private clearValue() {
+    this.value = undefined;
+    this.valueChange.emit(this.value);
+  }
 }

@@ -11,6 +11,7 @@ export interface DatatableColumn extends ColDef {
   hideDefaultHeaderTooltip?: boolean;
   hideDefaultTooltip?: boolean;
   defaultSelected?: boolean;
+  rememberFilters?: boolean;
 }
 
 export interface GetRowsParams extends IGetRowsParams {

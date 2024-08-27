@@ -60,7 +60,8 @@ export class TransactionTableComponent {
         },
         suppressFloatingFilterButton: true,
         sortable: false,
-        defaultSelected: true
+        defaultSelected: true,
+        rememberFilters: true
       },
       {
         headerName: 'Transaction status',

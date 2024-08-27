@@ -29,7 +29,7 @@ import { forkJoin, from, Observable, Subscription } from 'rxjs';
 import { ColumnSettingsModalComponent } from '../column-settings-modal/column-settings-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LocalStorage } from 'ngx-webstorage';
-import { isEqual } from 'lodash';
+import { isEqual, cloneDeep } from 'lodash';
 import { DatatableExportService } from '../services/datatable-export.service';
 import { CustomDatepickerComponent } from '../components/custom-datepicker.component';
 import { CellRendererComponent } from '../renderers/cell-renderer';
@@ -106,6 +106,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
   private loadCellRendererDataToCacheSub: Subscription = new Subscription();
 
   @LocalStorage('datatable-settings', {}) private settings!: Record<string, ColumnSettings>;
+  @LocalStorage('datatable-filters', {}) private filters!: Record<string, FilterModel>;
 
   constructor(
     private modalService: NgbModal,
@@ -121,6 +122,10 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     if (changes['columns'] || changes['enableColumnSelection']) {
       this.updateColumns();
     }
+    if (changes['settingsKey'] && this.settingsKey) {
+      this.filterModel = cloneDeep(this.filters[this.settingsKey] || {});
+      this.gridApi?.setFilterModel(this.filterModel);
+    }
   }
 
   ngOnDestroy() {
@@ -131,6 +136,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
   onGridReady(params: GridReadyEvent) {
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
+    this.gridApi.setFilterModel(this.filterModel);
     this.updateDatasource();
   }
 
@@ -221,6 +227,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
 
     this.sortModel = params.sortModel;
     this.filterModel = params.filterModel;
+    this.updateStoredFilters(this.filterModel);
 
     this.updateLoading(true);
     this.datasource!.getRows({ ...params, successCallback: newSuccessCallback });
@@ -343,6 +350,22 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     this.setColumnSettings({ selected, order });
   }
 
+  private updateStoredFilters(filterModel: FilterModel) {
+    if (!this.settingsKey) {
+      return;
+    }
+
+    const colFilters: FilterModel = {};
+    Object.keys(filterModel).forEach(colId => {
+      const col = this.allColumns.filter(col => col.colId === colId)[0];
+      if (col?.rememberFilters) {
+        colFilters[colId] = cloneDeep(filterModel[colId]);
+      }
+    });
+
+   this.filters = { ...this.filters, [this.settingsKey]: colFilters };
+  }
+
   private getColumnSettings() {
     if (!this.settingsKey) {
       throw Error('A settingsKey should be provided when the enableColumnSelection options is on');
@@ -360,8 +383,6 @@ export class DatatableComponent implements OnChanges, OnDestroy {
       throw Error('A settingsKey should be provided when the enableColumnSelection options is on');
     }
 
-    const settings = this.settings;
-    settings[this.settingsKey] = columnSettings;
-    this.settings = settings;
+    this.settings = { ...this.settings, [this.settingsKey]: columnSettings };
   }
 }
