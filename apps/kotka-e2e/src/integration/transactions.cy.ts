@@ -12,6 +12,22 @@ describe('transactions', () => {
       cy.get('[data-cy=confirm-ok]').click();
       cy.get('.ag-header-row-column .ag-header-cell').should('have.length', 6);
     });
+
+    it('should remember owner selection', () => {
+      const autocompleteSelector = '.ag-header-row-column-filter kui-autocomplete input';
+      const organizationName = 'IT Team, General Services Unit, Finnish Museum of Natural History, University of Helsinki';
+
+      cy.get(autocompleteSelector).first().type(organizationName.substring(0, 7));
+      cy.get('ngb-typeahead-window .dropdown-item').first().click();
+      cy.get(autocompleteSelector).first().should('have.value', organizationName);
+
+      cy.visit('/tags');
+      cy.get('[data-cy=main-header]').should('contain', 'Tags');
+      cy.visit('/transactions');
+      cy.get('[data-cy=main-header]').should('contain', 'Transactions');
+
+      cy.get(autocompleteSelector).first().should('have.value', organizationName);
+    });
   });
 
   describe('transaction form', () => {
