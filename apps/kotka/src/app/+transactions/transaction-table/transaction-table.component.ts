@@ -161,6 +161,10 @@ export class TransactionTableComponent {
         field: 'correspondentResearcher'
       },
       {
+        headerName: 'Counterparty person/contact info',
+        field: 'correspondentPerson'
+      },
+      {
         headerName: 'Sender\'s transaction ID',
         field: 'externalID'
       },

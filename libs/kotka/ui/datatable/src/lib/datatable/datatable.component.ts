@@ -20,7 +20,6 @@ import {
 } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
 import {
-  ColumnSettings,
   DatatableColumn,
   DatatableSource, FilterModel,
   GetRowsParams, SortModel
@@ -28,11 +27,12 @@ import {
 import { forkJoin, from, Observable, Subscription } from 'rxjs';
 import { ColumnSettingsModalComponent } from '../column-settings-modal/column-settings-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { LocalStorage } from 'ngx-webstorage';
-import { isEqual, cloneDeep } from 'lodash';
+import { cloneDeep } from 'lodash';
 import { DatatableExportService } from '../services/datatable-export.service';
 import { CustomDatepickerComponent } from '../components/custom-datepicker.component';
 import { CellRendererComponent } from '../renderers/cell-renderer';
+import { DatatableColumnSettingsService } from '../services/datatable-column-settings.service';
+import { DatatableFilterStoreService } from '../services/datatable-filter-store.service';
 
 type CustomColumnKey = keyof Pick<DatatableColumn, 'hideDefaultHeaderTooltip'|'defaultSelected'>;
 
@@ -105,12 +105,11 @@ export class DatatableComponent implements OnChanges, OnDestroy {
   private isDestroyed = false;
   private loadCellRendererDataToCacheSub: Subscription = new Subscription();
 
-  @LocalStorage('datatable-settings', {}) private settings!: Record<string, ColumnSettings>;
-  @LocalStorage('datatable-filters', {}) private filters!: Record<string, FilterModel>;
-
   constructor(
     private modalService: NgbModal,
     private datatableExportService: DatatableExportService,
+    private datatableColumnSettingsService: DatatableColumnSettingsService,
+    private datatableFilterStoreService: DatatableFilterStoreService,
     private injector: Injector,
     private cdr: ChangeDetectorRef
   ) {}
@@ -119,11 +118,13 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     if (changes['datasource']) {
       this.updateDatasource();
     }
-    if (changes['columns'] || changes['enableColumnSelection']) {
+
+    if (changes['columns'] || changes['enableColumnSelection'] || changes['settingsKey']) {
       this.updateColumns();
     }
-    if (changes['settingsKey'] && this.settingsKey) {
-      this.filterModel = cloneDeep(this.filters[this.settingsKey] || {});
+
+    if (changes['settingsKey']) {
+      this.filterModel = cloneDeep(this.datatableFilterStoreService.getFilters(this.settingsKey));
       this.gridApi?.setFilterModel(this.filterModel);
     }
   }
@@ -150,7 +151,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
         .getAllDisplayedColumns()
         .map((c) => c.getColId());
 
-      this.updateSettingsAfterColumnUpdate(selected);
+      this.datatableColumnSettingsService.updateSelected(this.settingsKey, selected);
     }
   }
 
@@ -162,12 +163,12 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     });
 
     modalRef.componentInstance.columns = this.allColumns;
-    modalRef.componentInstance.settings = this.getColumnSettings();
+    modalRef.componentInstance.settings = this.datatableColumnSettingsService.getSettings(this.settingsKey);
     modalRef.componentInstance.defaultSettings = { selected: this.getDefaultSelectedColumns() };
 
     from(modalRef.result).subscribe({
       'next': (settings) => {
-        this.setColumnSettings(settings);
+        this.datatableColumnSettingsService.setSettings(this.settingsKey, settings);
         this.updateColumns();
         this.cdr.markForCheck();
       },
@@ -227,7 +228,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
 
     this.sortModel = params.sortModel;
     this.filterModel = params.filterModel;
-    this.updateStoredFilters(this.filterModel);
+    this.datatableFilterStoreService.updateFilters(this.settingsKey, this.filterModel, this.allColumns);
 
     this.updateLoading(true);
     this.datasource!.getRows({ ...params, successCallback: newSuccessCallback });
@@ -265,6 +266,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
 
     let columns = this.allColumns;
     if (this.enableColumnSelection) {
+      this.datatableColumnSettingsService.cleanSettings(this.settingsKey, this.allColumns);
       columns = this.filterAndSortColumns(columns);
     }
 
@@ -294,12 +296,8 @@ export class DatatableComponent implements OnChanges, OnDestroy {
   }
 
   private filterAndSortColumns(columns: DatatableColumn[]): DatatableColumn[] {
-    const settings = this.getColumnSettings();
-
-    if (!settings.selected) {
-      settings.selected = this.getDefaultSelectedColumns();
-    }
-    const selected = settings.selected;
+    const settings = this.datatableColumnSettingsService.getSettings(this.settingsKey);
+    const selected = settings.selected ? settings.selected : this.getDefaultSelectedColumns();
 
     columns = columns.filter(col => selected.includes(col.colId!));
     columns.sort((columnA, columnB) => (
@@ -324,65 +322,5 @@ export class DatatableComponent implements OnChanges, OnDestroy {
 
   private getDefaultSelectedColumns(): string[] {
     return this.allColumns.filter(col => col.defaultSelected).map(col => col.colId!);
-  }
-
-  private updateSettingsAfterColumnUpdate(selected: string[]) {
-    if (isEqual(selected, this.getColumnSettings().selected)) {
-      return;
-    }
-
-    const order = this.getColumnSettings().order;
-
-    if (order) {
-      const getSortIndex = (value: string): number => {
-        let index = selected.indexOf(value);
-        if (index === -1) {
-          index = selected.length;
-        }
-        return index;
-      };
-
-      order.sort((valueA, valueB) => (
-        getSortIndex(valueA) - getSortIndex(valueB)
-      ));
-    }
-
-    this.setColumnSettings({ selected, order });
-  }
-
-  private updateStoredFilters(filterModel: FilterModel) {
-    if (!this.settingsKey) {
-      return;
-    }
-
-    const colFilters: FilterModel = {};
-    Object.keys(filterModel).forEach(colId => {
-      const col = this.allColumns.filter(col => col.colId === colId)[0];
-      if (col?.rememberFilters) {
-        colFilters[colId] = cloneDeep(filterModel[colId]);
-      }
-    });
-
-   this.filters = { ...this.filters, [this.settingsKey]: colFilters };
-  }
-
-  private getColumnSettings() {
-    if (!this.settingsKey) {
-      throw Error('A settingsKey should be provided when the enableColumnSelection options is on');
-    }
-
-    if (!this.settings[this.settingsKey]) {
-      this.settings[this.settingsKey] = {};
-    }
-
-    return this.settings[this.settingsKey];
-  }
-
-  private setColumnSettings(columnSettings: ColumnSettings) {
-    if (!this.settingsKey) {
-      throw Error('A settingsKey should be provided when the enableColumnSelection options is on');
-    }
-
-    this.settings = { ...this.settings, [this.settingsKey]: columnSettings };
   }
 }
