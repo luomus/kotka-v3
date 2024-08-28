@@ -27,7 +27,10 @@ export class ColumnSettingsModalComponent {
     this.settingsSubject.next(settings);
   }
 
-  @Input() defaultSettings?: ColumnSettings;
+  defaultSettingsSubject: ReplaySubject<ColumnSettings> = new ReplaySubject(1);
+  @Input() set defaultSettings(defaultSettings: ColumnSettings) {
+    this.defaultSettingsSubject.next(defaultSettings);
+  }
 
   colDefs: ColDef[] = [];
   rowData: DatatableColumn[] = [];
@@ -46,11 +49,18 @@ export class ColumnSettingsModalComponent {
     public modal: NgbActiveModal,
     private cdr: ChangeDetectorRef
   ) {
-    combineLatest([this.columnsSubject, this.settingsSubject]).pipe(
+    combineLatest([this.columnsSubject, this.settingsSubject, this.defaultSettingsSubject]).pipe(
       take(1)
-    ).subscribe(([columns, settings]: [DatatableColumn[], ColumnSettings]) => {
+    ).subscribe(([columns, settings, defaultSettings]: [DatatableColumn[], ColumnSettings, ColumnSettings]) => {
       this.allColumns = columns;
       this.initialSettings = settings;
+
+      if (!this.initialSettings.selected) {
+        this.initialSettings.selected = defaultSettings.selected;
+      }
+      if (!this.initialSettings.order) {
+        this.initialSettings.order = defaultSettings.order;
+      }
 
       this.colDefs = [
         {
