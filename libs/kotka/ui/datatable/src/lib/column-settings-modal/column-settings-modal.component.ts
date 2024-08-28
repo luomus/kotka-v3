@@ -132,7 +132,7 @@ export class ColumnSettingsModalComponent {
 
     const selected: string[] = [];
     const order: string[] = [];
-    let hasChanges = false;
+    let orderHasChanges = false;
 
     this.gridApi!.forEachNodeAfterFilterAndSort((node, idx) => {
       if (node.isSelected()) {
@@ -140,16 +140,18 @@ export class ColumnSettingsModalComponent {
       }
       order.push(node.data.colId);
 
-      if (node.data.lockPosition && idx !== originalOrder.indexOf(node.data.colId)) {
-        if (node.isSelected()) {
-          moveInArray(selected, idx, 0);
+      // if the column has a lockPosition property, return it to its original place
+      if (node.data.lockPosition) {
+        const originalOrderIdx = originalOrder.indexOf(node.data.colId);
+        if (idx !== originalOrderIdx) {
+          moveInArray(order, idx, originalOrderIdx);
+          orderHasChanges = true;
         }
-        moveInArray(order, idx, 0);
-        hasChanges = true;
       }
     });
 
-    if (hasChanges) {
+    if (orderHasChanges) {
+      selected.sort((colId1, colId2) => order.indexOf(colId1) - order.indexOf(colId2));
       this.initialSettings = { selected, order };
       this.updateRowData();
     }

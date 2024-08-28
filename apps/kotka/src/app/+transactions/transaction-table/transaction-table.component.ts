@@ -61,7 +61,8 @@ export class TransactionTableComponent {
         suppressFloatingFilterButton: true,
         sortable: false,
         defaultSelected: true,
-        rememberFilters: true
+        rememberFilters: true,
+        lockPosition: 'left'
       },
       {
         headerName: 'Transaction status',
