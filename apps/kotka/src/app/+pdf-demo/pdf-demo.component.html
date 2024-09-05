@@ -1,0 +1,28 @@
+<ng-container *ngIf="context$ | async as context">
+  <ng-container [ngSwitch]="type$ | async">
+    <kotka-transaction-dispatch-sheet
+      *ngSwitchCase="typeEnum.transactionDispatch"
+      [context]="context"
+    ></kotka-transaction-dispatch-sheet>
+    <kotka-transaction-incoming-sheet
+      *ngSwitchCase="typeEnum.transactionIncoming"
+      [context]="context"
+    ></kotka-transaction-incoming-sheet>
+    <kotka-transaction-inquiry-sheet
+      *ngSwitchCase="typeEnum.transactionInquiry"
+      [context]="context"
+    ></kotka-transaction-inquiry-sheet>
+    <kotka-transaction-return-sheet
+      *ngSwitchCase="typeEnum.transactionReturn"
+      [context]="context"
+    ></kotka-transaction-return-sheet>
+    <kotka-transaction-insect-labels
+      *ngSwitchCase="typeEnum.transactionInsectLabels"
+      [context]="context"
+    ></kotka-transaction-insect-labels>
+    <kotka-transaction-botany-labels
+      *ngSwitchCase="typeEnum.transactionBotanyLabels"
+      [context]="context"
+    ></kotka-transaction-botany-labels>
+  </ng-container>
+</ng-container>

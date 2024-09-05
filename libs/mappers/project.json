@@ -1,21 +1,18 @@
 {
+  "name": "mappers",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/mappers/src",
   "projectType": "library",
   "targets": {
     "lint": {
-      "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["libs/mappers/**/*.ts"]
-      }
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/mappers"],
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/mappers"],
       "options": {
-        "jestConfig": "libs/mappers/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "libs/mappers/jest.config.ts"
       }
     }
   },

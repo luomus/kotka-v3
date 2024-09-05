@@ -1,7 +1,8 @@
 ARG TARGET
-FROM node:14 as builder
+FROM node:20 as builder
 ARG CONFIGURATION=production
 ENV NODE_ENV build
+ENV CYPRESS_INSTALL_BINARY 0
 
 WORKDIR /app
 RUN chown -Rh node:node /app
@@ -14,7 +15,7 @@ RUN npm ci \
  && npm cache clean --force
 
 # Copy only the files that are needed for building the projects
-COPY --chown=node:node ./tsconfig.base.json ./nx.json ./angular.json ./
+COPY --chown=node:node ./tsconfig.base.json ./nx.json ./
 COPY --chown=node:node ./apps ./apps
 COPY --chown=node:node ./libs ./libs
 
@@ -38,7 +39,7 @@ RUN chmod a+r /usr/share/nginx/html/favicon.ico
 EXPOSE 8080
 
 
-FROM node:14 as kotka-api
+FROM node:20 as kotka-api
 ENV NODE_ENV production
 ENV HOST "0.0.0.0"
 

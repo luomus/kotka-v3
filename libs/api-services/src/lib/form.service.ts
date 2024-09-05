@@ -7,7 +7,8 @@ import { lastValueFrom } from 'rxjs';
 import { LajiApiService } from './laji-api.service';
 
 const types: {[ type: string]: string} = {
-  'GX.dataset': 'MHL.731'
+  'GX.dataset': 'MHL.731',
+  'HRX.specimenTransaction': 'MHL.930'
 };
 
 @Injectable()

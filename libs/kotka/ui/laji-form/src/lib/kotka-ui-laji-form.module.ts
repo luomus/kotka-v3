@@ -6,6 +6,6 @@ import { FormFooterComponent } from './form-footer/form-footer.component';
 @NgModule({
   imports: [CommonModule],
   declarations: [LajiFormComponent, FormFooterComponent],
-  exports: [LajiFormComponent],
+  exports: [LajiFormComponent]
 })
 export class KotkaUiLajiFormModule {}

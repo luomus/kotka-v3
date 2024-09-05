@@ -1,0 +1,14 @@
+@media not print {
+  kotka-pdf-demo-component {
+    display: block;
+    padding: 10mm;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto !important;
+    border: 1px dashed lightgrey;
+  }
+
+  .page {
+    border: 1px dashed lightgrey;
+  }
+}

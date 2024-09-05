@@ -20,7 +20,7 @@ export class TriplestoreService {
   }
 
   public search(search: Record<string, string>, params = {}) {
-    return this.httpService.get( this.baseUrl + 'search/', { headers: this.headers, params: Object.assign({}, this.baseParams, params, search) });
+    return this.httpService.get( this.baseUrl + 'search', { headers: this.headers, params: Object.assign({}, this.baseParams, params, search) });
   }
 
   public delete(resource: string, params = {}) {

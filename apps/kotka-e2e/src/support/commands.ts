@@ -20,20 +20,22 @@ declare namespace Cypress {
 }
 
 Cypress.Commands.add('setUserAsLoggedIn', (email, password) => {
-  cy.fixture('test-user').then((defaultUser: { email: string, password: string }) => {
-    const userEmail = email || defaultUser.email;
-    const userPassword = password || defaultUser.password;
+  const userEmail = email || Cypress.env('TEST_EMAIL');
+  const userPassword = password || Cypress.env('TEST_PASSWORD');
 
-    cy.session([userEmail, userPassword], () => {
+  if (!userEmail || !userPassword) {
+    throw Error('Missing test email or password');
+  }
+
+  cy.session([userEmail, userPassword], () => {
+    cy.visit('/');
+    cy.login(userEmail, userPassword);
+    cy.url({ timeout: 7000 }).should('equal', Cypress.config('baseUrl') + '/'); // wait for login to complete
+  },{
+    validate() {
       cy.visit('/');
-      cy.login(userEmail, userPassword);
-      cy.url({ timeout: 7000 }).should('equal', Cypress.config('baseUrl') + '/'); // wait for login to complete
-    },{
-      validate() {
-        cy.visit('/');
-        cy.get('#user-menu,#local-login').invoke('attr', 'id').should('eq', 'user-menu');
-      }
-    });
+      cy.get('#user-menu,#local-login').invoke('attr', 'id').should('eq', 'user-menu');
+    }
   });
 });
 

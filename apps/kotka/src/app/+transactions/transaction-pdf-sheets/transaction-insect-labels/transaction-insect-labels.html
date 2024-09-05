@@ -1,0 +1,10 @@
+<div class="page" *ngFor="let pageSpecimens of pagedSpecimens; let first = first" style="display: grid; justify-items: center; align-items: center" [style.grid-template-columns]="'repeat(' + specimensPerRow + ', 1fr)'" [style.grid-template-rows]="'repeat(' + specimensPerCol + ', 1fr)'">
+  <div *ngIf="first" style="font-size: 11pt; grid-row: 1; grid-column-start: 1; grid-column-end: -1; justify-self: start; align-self: start">
+    Labels for {{ data.type | transactionTypeLabel }} <strong>{{ data.id | toFullUri }}</strong>, sent {{ data.outgoingSent | date:'dd MMMM Y' }}
+  </div>
+  <div *ngFor="let pageSpecimen of pageSpecimens" class="multi-line avoid-page-break" style="font-size: 6pt; line-height: 6pt; width: 25mm" [style.grid-column]="pageSpecimen.col + 1" [style.grid-row]="pageSpecimen.row + (first ? 2 : 1)">
+    <span>{{ pageSpecimen.id }}</span>
+    <span>{{ data.type | transactionTypeLabel | capitalizeFirstLetter }} <span style="display: inline-block">{{ data.id | toFullUri }}</span></span>
+    <span>{{ data.outgoingSent | date:'dd MMMM Y' }}</span>
+  </div>
+</div>

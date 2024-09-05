@@ -3,7 +3,6 @@ import { lastValueFrom } from 'rxjs';
 import { AuthenticateCookieGuard } from './authenticateCookie.guard';
 import { AuthenticatePersonTokenGuard } from './authenticatePersonToken.guard';
 import { AuthenticationService } from './authentication.service';
-import { LoginResponse } from '@kotka/api-interfaces';
 import { LoginExceptionsFilter } from './loginExceptions.filter';
 
 @Controller('auth')

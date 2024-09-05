@@ -1,0 +1,19 @@
+<kotka-transaction-sheet-header
+  [data]="data"
+  [ownerOrganization]="context.ownerOrganization"
+></kotka-transaction-sheet-header>
+<h2>INCOMING {{ data.type | transactionTypeLabel | uppercase }}</h2>
+<p>We have received the material indicated here from your institution. Please reference the identifier <strong>{{ data.id | toFullUri }}</strong> in all correspondence related to this material. Thank you.</p>
+<hr>
+<kotka-transaction-sheet-incoming-details
+  [data]="data"
+  [ownerOrganization]="context.ownerOrganization"
+  [correspondingOrganization]="context.correspondingOrganization"
+></kotka-transaction-sheet-incoming-details>
+<kotka-transaction-sheet-remarks
+  [data]="data"
+></kotka-transaction-sheet-remarks>
+<kotka-transaction-sheet-signature-and-material
+  [data]="data"
+  [showCommitToTermsText]="!isGiftOrExchange()"
+></kotka-transaction-sheet-signature-and-material>

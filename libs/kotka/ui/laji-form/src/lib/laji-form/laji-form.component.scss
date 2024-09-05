@@ -1,0 +1,9 @@
+.form-with-footer {
+  margin-bottom: 60px;
+}
+
+@media (max-width: 540px) {
+  .form-with-footer {
+    margin-bottom: 130px;
+  }
+}

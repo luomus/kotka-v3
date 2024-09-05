@@ -4,20 +4,24 @@ import {
   Input,
   Output,
   EventEmitter,
-  ViewEncapsulation
 } from '@angular/core';
 
 @Component({
   selector: 'kui-form-footer',
   templateUrl: './form-footer.component.html',
-  styleUrls: ['./form-footer.component.css'],
-  encapsulation: ViewEncapsulation.Emulated,
+  styleUrls: ['./form-footer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormFooterComponent {
-  @Input() disabled = false;
-  @Input() showDeleteButton = false;
+  @Input() hasChanges? = false;
+  @Input() disabled? = false;
+  @Input() hasOnlyWarnings? = false;
+  @Input() showDeleteButton? = false;
+  @Input() showCopyButton? = false;
 
   @Output() saveForm: EventEmitter<void> = new EventEmitter<void>();
+  @Output() highlightErrors: EventEmitter<void> = new EventEmitter<void>();
   @Output() delete: EventEmitter<void> = new EventEmitter<void>();
+  @Output() copyForm: EventEmitter<void> = new EventEmitter<void>();
+  @Output() saveAndCopyForm: EventEmitter<void> = new EventEmitter<void>();
 }

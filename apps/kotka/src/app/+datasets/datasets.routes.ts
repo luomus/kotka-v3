@@ -1,26 +1,36 @@
 import { RouterModule, Routes } from '@angular/router';
 import { ModuleWithProviders } from '@angular/core';
-import { DatasetsComponent } from './datasets.component';
+import { DatasetTableComponent } from './dataset-table/dataset-table.component';
 import { DatasetFormComponent } from './dataset-form/dataset-form.component';
+import { Utils } from '../shared/services/utils';
+import { ComponentCanDeactivateGuard } from '../shared/services/guards/component-can-deactivate.guard';
+import { DatasetVersionHistoryComponent } from './dataset-version-history/dataset-version-history.component';
 
 export const datasetsRoutes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    component: DatasetsComponent,
+    component: DatasetTableComponent,
     data: { title: 'Tags' }
   },
   {
-    path: 'add',
-    pathMatch: 'full',
+    matcher: Utils.formMatcher,
     component: DatasetFormComponent,
-    data: { title: 'Add tag' }
+    data: {
+      add: { title: 'Add tag' },
+      edit: { title: 'Edit tag', addUriToTitle: true }
+    },
+    canDeactivate: [ ComponentCanDeactivateGuard ],
+    runGuardsAndResolvers: 'always'
   },
   {
-    path: 'edit',
+    path: 'history',
     pathMatch: 'full',
-    component: DatasetFormComponent,
-    data: { title: 'Edit tag', addUriToTitle: true }
+    component: DatasetVersionHistoryComponent,
+    data: {
+      title: 'Transaction',
+      addUriToTitle: true
+    }
   }
 ];
 

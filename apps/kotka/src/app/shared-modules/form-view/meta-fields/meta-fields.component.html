@@ -1,0 +1,12 @@
+<div class="row mb-1">
+  <div *ngIf="extraSectionTpl" class="col-lg-6 col-md-5 col-sm-4 col-12 order-sm-last">
+    <ng-container *ngTemplateOutlet="extraSectionTpl"></ng-container>
+  </div>
+  <div *ngIf="editMode && formData" class="col-lg-6 col-md-7 col-sm-8 col-12 order-sm-first">
+    <strong class="d-block">Last edited by</strong>
+    <span>{{ (formData.editor || '') | label }} on {{ formData.dateEdited | date:'dd.MM.YYYY HH:mm' }} </span>
+    <a *ngIf="dataURI" [routerLink]="['..', 'history']" [queryParams]="{ uri: dataURI }">view history</a>
+    <strong class="d-block">Originally created by</strong>
+    <span>{{ (formData.creator || '') | label }} on {{ formData.dateCreated | date:'dd.MM.YYYY HH:mm' }}</span>
+  </div>
+</div>

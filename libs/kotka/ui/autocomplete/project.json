@@ -1,0 +1,20 @@
+{
+  "name": "autocomplete",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/kotka/ui/autocomplete/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/kotka/ui/autocomplete"],
+      "options": {
+        "jestConfig": "libs/kotka/ui/autocomplete/jest.config.ts"
+      }
+    }
+  },
+  "tags": []
+}

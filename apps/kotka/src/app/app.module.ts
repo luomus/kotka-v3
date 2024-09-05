@@ -5,17 +5,12 @@ import { SharedModule } from './shared/shared.module';
 import { QuicklinkModule } from 'ngx-quicklink';
 import { AppRoutingModule } from './app-routing.module';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { ModalModule } from 'ngx-bootstrap/modal';
-import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { AppComponent } from './shared/components/app/app.component';
-import { NgtUniversalModule } from '@ng-toolkit/universal';
-import { Logger } from './shared/services/logger/logger.service';
-import { ILogger } from './shared/services/logger/logger.interface';
-import { HttpLogger } from './shared/services/logger/http-logger.service';
-import { ConsoleLogger } from './shared/services/logger/console-logger.service';
+import { Logger, ILogger, HttpLogger, ConsoleLogger } from '@kotka/services';
 import { environment } from '../environments/environment';
 import { ErrorHandlerService } from './shared/services/error-handler/error-handler.service';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
+import { NgxWebstorageModule } from 'ngx-webstorage';
 
 export function createLoggerLoader(httpClient: HttpClient): ILogger {
   if (environment.production) {
@@ -30,20 +25,19 @@ export function createLoggerLoader(httpClient: HttpClient): ILogger {
     BrowserAnimationsModule,
     HttpClientModule,
     QuicklinkModule,
-    NgtUniversalModule,
     AppRoutingModule,
     SharedModule.forRoot(),
-    ModalModule.forRoot(),
-    BsDropdownModule.forRoot()
+    NgxWebstorageModule.forRoot({prefix: 'kotka-', separator: ''}),
   ],
   providers: [
-    {provide: ErrorHandler, useClass: ErrorHandlerService},
-    {provide: LocationStrategy, useClass: PathLocationStrategy},
+    { provide: ErrorHandler, useClass: ErrorHandlerService },
+    { provide: LocationStrategy, useClass: PathLocationStrategy },
     {
       provide: Logger,
       deps: [HttpClient],
       useFactory: createLoggerLoader
     },
+    { provide: 'Window', useValue: window }
   ],
   bootstrap: [AppComponent]
 })

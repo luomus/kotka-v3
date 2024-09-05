@@ -24,11 +24,11 @@ describe('InUseGuard', () => {
     inUseGuard = moduleRef.get<InUseGuard>(InUseGuard);
     reflector = moduleRef.get<Reflector>(Reflector);
 
-    jest.useFakeTimers().setSystemTime(new Date('2022-11-22T12:00:00.000Z'));
+    jest.useFakeTimers();
   });
 
   it('Using any other request methods that DELETE grants access, no calls to reflector', async () => {
-    const mockReflectorGet = jest.spyOn(reflector, 'get').mockImplementation((key, target) => []);
+    const mockReflectorGet = jest.spyOn(reflector, 'get').mockImplementation(() => []);
     const mockContext = createMock<ExecutionContext>();
 
     mockContext.switchToHttp().getRequest.mockReturnValue({ method: 'GET' });
@@ -51,7 +51,7 @@ describe('InUseGuard', () => {
   it('Request method of DELETE continues to reflector getting called twice for correct keys, and missing inUseTypes results in granted access', async () => {
     const mockContext = createMock<ExecutionContext>();
     mockContext.switchToHttp().getRequest.mockReturnValue({ method: 'DELETE' });
-    const mockReflectorGet = jest.spyOn(reflector, 'get').mockImplementation((key, target) => []);
+    const mockReflectorGet = jest.spyOn(reflector, 'get').mockImplementation(() => []);
 
     const canActivate = await inUseGuard.canActivate(mockContext);
     expect(canActivate).toBe(true);
@@ -63,7 +63,7 @@ describe('InUseGuard', () => {
   it('Request method of DELETE and found inUseTypes results in call to triplestore, found documents and organizations result into denied access with forbidden error', async () => {
     const mockContext = createMock<ExecutionContext>();
     mockContext.switchToHttp().getRequest.mockReturnValue({ method: 'DELETE', params: { id: 'GX.1' } });
-    const mockReflectorGet = jest.spyOn(reflector, 'get').mockImplementation((key, target) => {
+    const mockReflectorGet = jest.spyOn(reflector, 'get').mockImplementation((key) => {
       if (key === 'controllerType') {
         return 'GX.dataset';
       } else if (key === 'inUseTypes') {
@@ -73,8 +73,8 @@ describe('InUseGuard', () => {
         ];
       }
     });
-    const mockTriplestoreServiceSearch = jest.spyOn(triplestoreService, 'search').mockImplementation((search, params) => of({
-      data: { 
+    const mockTriplestoreServiceSearch = jest.spyOn(triplestoreService, 'search').mockImplementation(() => of({
+      data: {
         'rdf:RDF': {
           'xmlns':	'http://tun.fi/',
           'MY.document': [],
@@ -96,7 +96,7 @@ describe('InUseGuard', () => {
   it('Request method of DELETE and found inUseTypes results in call to triplestore, no found documents and organizations result into granted access', async () => {
     const mockContext = createMock<ExecutionContext>();
     mockContext.switchToHttp().getRequest.mockReturnValue({ method: 'DELETE', params: { id: 'GX.1' } });
-    const mockReflectorGet = jest.spyOn(reflector, 'get').mockImplementation((key, target) => {
+    const mockReflectorGet = jest.spyOn(reflector, 'get').mockImplementation((key) => {
       if (key === 'controllerType') {
         return 'GX.dataset';
       } else if (key === 'inUseTypes') {
@@ -106,8 +106,8 @@ describe('InUseGuard', () => {
         ];
       }
     });
-    const mockTriplestoreServiceSearch = jest.spyOn(triplestoreService, 'search').mockImplementation((search, params) => of({
-      data: { 
+    const mockTriplestoreServiceSearch = jest.spyOn(triplestoreService, 'search').mockImplementation(() => of({
+      data: {
         'rdf:RDF': {
           'xmlns':	'http://tun.fi/'
         }

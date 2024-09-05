@@ -1,0 +1,27 @@
+<kotka-transaction-sheet-header
+  [data]="data"
+  [ownerOrganization]="context.ownerOrganization"
+></kotka-transaction-sheet-header>
+<h2>OVERDUE {{ data.type | transactionTypeLabel | uppercase }}</h2>
+<p>Dear Colleague,</p>
+<p>Our records show that you have borrowed material from us, with {{ data.type | transactionTypeLabel }} identifier {{ data.id | toFullUri }}<ng-container *ngIf="data.legacyID"> (old identifier {{ data.legacyID }})</ng-container><ng-container *ngIf="data.dueDate"> and due date of {{ data.dueDate }}</ng-container>.</p>
+<p>Please inform us of the progress of your study as soon as possible by completing and returning this form to the above address<ng-container *ngIf="data.localHandlerEmail"> or via email to {{ data.localHandlerEmail }}</ng-container>.</p>
+<p>
+  [&nbsp;&nbsp;]&nbsp;&nbsp; I have completed my work and am returning the material immediately.<br>
+  [&nbsp;&nbsp;]&nbsp;&nbsp; I wish an extension of this {{ data.type | transactionTypeLabel }} for approximately __________ months.<br>
+  [&nbsp;&nbsp;]&nbsp;&nbsp; The material was returned on ____________________________, please recheck your records.
+</p>
+<p>Please also check your contact details below and correct them if needed.</p>
+<hr>
+<kotka-transaction-sheet-outgoing-details
+  [data]="data"
+  [correspondingOrganization]="context.correspondingOrganization"
+  [fieldData]="context.fieldData"
+></kotka-transaction-sheet-outgoing-details>
+<kotka-transaction-sheet-remarks
+  [data]="data"
+></kotka-transaction-sheet-remarks>
+<hr class="page-break-before">
+<kotka-transaction-sheet-material
+  [data]="data"
+></kotka-transaction-sheet-material>

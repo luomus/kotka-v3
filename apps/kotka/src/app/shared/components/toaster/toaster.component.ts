@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, TemplateRef, HostBinding } from '@angular/core';
-import { ToastService } from '../../services/toast.service';
+import { ToastService } from '@kotka/services';
 
 @Component({
   selector: 'kotka-toaster',
@@ -14,7 +14,7 @@ export class ToasterComponent {
     public toastService: ToastService
   ) {}
 
-  asTemplate(tpl: any): TemplateRef<any>|undefined {
+  asTemplate(tpl: TemplateRef<unknown>|string): TemplateRef<unknown>|undefined {
     return tpl instanceof TemplateRef ? tpl : undefined;
   }
 }

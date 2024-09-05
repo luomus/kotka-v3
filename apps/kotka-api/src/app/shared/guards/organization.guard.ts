@@ -38,6 +38,8 @@ export class OrganizationGuard implements CanActivate {
       if (!allowAccessByOrganization(res.data, req.user.profile)) {
         throw new ForbiddenException(`Uset may only ${req.method} a ${type} which belongs to one of their own organizations.`);
       }
+
+      req['oldDoc'] = res.data;
     }
 
     return true;

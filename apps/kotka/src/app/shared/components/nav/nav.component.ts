@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { UserService } from '../../services/user.service';
+import { UserService } from '@kotka/services';
 import { NavigationEnd, Router } from '@angular/router';
 
 @Component({

@@ -1,16 +1,19 @@
 {
+  "name": "kotka-cli",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/kotka-cli/src",
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nrwl/node:webpack",
+      "executor": "@nrwl/webpack:webpack",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/kotka-cli",
         "main": "apps/kotka-cli/src/main.ts",
         "tsConfig": "apps/kotka-cli/tsconfig.app.json",
-        "assets": ["apps/kotka-cli/src/assets"]
+        "assets": ["apps/kotka-cli/src/assets"],
+        "target": "node",
+        "compiler": "tsc"
       },
       "configurations": {
         "production": {
@@ -27,7 +30,7 @@
       }
     },
     "serve": {
-      "executor": "@nrwl/node:node",
+      "executor": "@nx/js:node",
       "options": {
         "buildTarget": "kotka-cli:build"
       },
@@ -38,18 +41,14 @@
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["apps/kotka-cli/**/*.ts"]
-      }
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/apps/kotka-cli"],
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/apps/kotka-cli"],
       "options": {
-        "jestConfig": "apps/kotka-cli/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "apps/kotka-cli/jest.config.ts"
       }
     }
   },

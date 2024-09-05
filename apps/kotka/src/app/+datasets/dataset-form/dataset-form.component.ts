@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { DataType } from '../../shared/services/data.service';
-import { Dataset, Person, isDataset } from '@kotka/shared/models';
+import { asDataset, isDataset, KotkaDocumentObjectType } from '@kotka/shared/models';
+import { globals } from '../../../environments/globals';
+import { FormViewContainerComponent } from '../../shared-modules/form-view/form-view/form-view-container';
 
 @Component({
   selector: 'kotka-dataset-form',
@@ -8,21 +9,10 @@ import { Dataset, Person, isDataset } from '@kotka/shared/models';
   styleUrls: ['./dataset-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DatasetFormComponent {
-  dataType = DataType.dataset;
+export class DatasetFormComponent extends FormViewContainerComponent {
+  formId = globals.datasetFormId;
+  dataType = KotkaDocumentObjectType.dataset;
 
-  getInitialFormData(user: Person): Partial<Dataset> {
-    const formData: Partial<Dataset> = {};
-    if (user?.organisation && user.organisation.length === 1) {
-      formData.owner = user.organisation[0];
-    }
-    return formData;
-  }
-
-  asDataset(value: any): Dataset|undefined {
-    if (isDataset(value)) {
-      return value as Dataset;
-    }
-    return undefined;
-  }
+  protected readonly isDataset = isDataset;
+  protected readonly asDataset = asDataset;
 }

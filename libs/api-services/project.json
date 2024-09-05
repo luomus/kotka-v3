@@ -1,24 +1,19 @@
 {
+  "name": "api-services",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/api-services/src",
   "prefix": "kotka",
   "targets": {
     "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/api-services"],
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/api-services"],
       "options": {
-        "jestConfig": "libs/api-services/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "libs/api-services/jest.config.ts"
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
-      "options": {
-        "lintFilePatterns": [
-          "libs/api-services/**/*.ts",
-          "libs/api-services/**/*.html"
-        ]
-      }
+      "executor": "@nx/eslint:lint"
     }
   },
   "tags": []

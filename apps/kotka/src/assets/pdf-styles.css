@@ -1,0 +1,91 @@
+@page {
+  margin: 10mm;
+  size: 210mm 297mm;
+}
+
+.avoid-page-break {
+  page-break-inside: avoid;
+}
+
+.page-break-before {
+  break-before: page;
+}
+
+.page {
+  width: 190mm;
+  height: 277mm;
+  page-break-inside: avoid;
+  page-break-after: always;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-size: 10pt;
+  overflow-wrap: anywhere;
+}
+
+h2 {
+  margin-top: 15mm;
+  margin-bottom: 5mm;
+}
+
+h4 {
+  margin-top: 0;
+  margin-bottom: 3mm;
+}
+
+p {
+  margin-bottom: 5mm;
+}
+
+hr {
+  margin: 5mm 0;
+}
+
+qrcode img {
+  width: 100%;
+}
+
+.multi-line span {
+  display: block;
+}
+
+.multi-line.multi-line-with-margin-bottom span {
+  margin-bottom: 3mm;
+}
+
+.content-block + .content-block {
+  margin-top: 5mm;
+}
+
+.sub-content-block + .sub-content-block {
+  margin-top: 2mm;
+}
+
+.font-bold {
+  font-weight: bold;
+}
+
+.text-with-line-breaks {
+  white-space: pre-wrap;
+}
+
+.signature-space {
+  height: 10mm;
+}
+
+.transaction-header {
+  display: flex;
+}
+.transaction-header-left {
+  flex: 1;
+}
+.transaction-header-center {
+  flex: 0;
+  text-align: center;
+}
+.transaction-header-right {
+  flex: 1;
+  text-align: right;
+}

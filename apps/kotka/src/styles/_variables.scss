@@ -40,6 +40,8 @@ $nav-link-padding-y:        .4rem;
 $navbar-nav-link-padding-x: .4rem;
 $navbar-padding-y:           calc($spacer / 4);
 
+$font-family-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Segoe UI Symbol";
+
 $h1-font-size:               calc($font-size-base * 2);
 $h2-font-size:               calc($font-size-base * 1.75);
 $h3-font-size:               calc($font-size-base * 1.5);
@@ -69,6 +71,7 @@ $grid-breakpoints: (
 
 $dropdown-link-active-color: $body-color;
 $dropdown-link-active-bg: $gray-400;
+$enable-caret: false;
 
 $input-btn-padding-y-sm:      .1rem;
 $input-btn-padding-x-sm:      .25rem;

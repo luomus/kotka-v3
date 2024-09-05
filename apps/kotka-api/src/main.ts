@@ -6,7 +6,7 @@ import { Request } from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { AppModule } from './app/app.module';
 import Redis from 'ioredis';
-import connectRedis from 'connect-redis';
+import RedisStore from 'connect-redis';
 import { AuthenticationService } from './app/authentication/authentication.service';
 import { Person } from '@kotka/shared/models';
 import { REDIS } from './app/shared-modules/redis/redis.constants';
@@ -50,8 +50,6 @@ async function bootstrap() {
   const host = process.env.HOST || 'localhost';
   const port = process.env.PORT || 3333;
 
-  const RedisStore = connectRedis(session);
-
   app.use(
     session({
       store: new RedisStore({
@@ -74,8 +72,8 @@ async function bootstrap() {
   app.use(passport.session());
 
   const lajiApiBase = '/api/laji';
-  const allowedGetPaths = ['/autocomplete', '/forms', '/organization', '/person'];
-  const allowedPostPaths = ['/logger'];
+  const allowedGetPaths = ['/autocomplete', '/forms', '/organization', '/person', '/areas'];
+  const allowedPostPaths = ['/logger', '/html-to-pdf'];
 
   const externalProxyFilter = (pathname: string, req: UserRequest) => {
     const path = pathname.replace(lajiApiBase, '');
@@ -99,7 +97,7 @@ async function bootstrap() {
 
       return newPath;
     },
-    onProxyRes: (proxyRes, req: UserRequest, res) => {
+    onProxyRes: (proxyRes, req: UserRequest) => {
       const data = [];
       proxyRes.on('data', (chunk) => {
         data.push(chunk);

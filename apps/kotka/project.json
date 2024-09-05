@@ -1,4 +1,6 @@
 {
+  "name": "kotka",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "sourceRoot": "apps/kotka/src",
   "prefix": "kotka",
@@ -19,11 +21,15 @@
       },
       "configurations": {
         "production": {
+          "index": {
+            "input": "apps/kotka/src/index.prod.html",
+            "output": "index.html"
+          },
           "budgets": [
             {
               "type": "initial",
-              "maximumWarning": "1mb",
-              "maximumError": "2mb"
+              "maximumWarning": "2mb",
+              "maximumError": "5mb"
             },
             {
               "type": "anyComponentStyle",
@@ -43,8 +49,8 @@
           "budgets": [
             {
               "type": "initial",
-              "maximumWarning": "1mb",
-              "maximumError": "2mb"
+              "maximumWarning": "2mb",
+              "maximumError": "5mb"
             },
             {
               "type": "anyComponentStyle",
@@ -75,13 +81,13 @@
       "executor": "@angular-devkit/build-angular:dev-server",
       "configurations": {
         "production": {
-          "browserTarget": "kotka:build:production"
+          "buildTarget": "kotka:build:production"
         },
         "beta": {
-          "browserTarget": "kotka:build:beta"
+          "buildTarget": "kotka:build:beta"
         },
         "development": {
-          "browserTarget": "kotka:build:development"
+          "buildTarget": "kotka:build:development"
         }
       },
       "defaultConfiguration": "development",
@@ -92,21 +98,17 @@
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
-        "browserTarget": "kotka:build"
+        "buildTarget": "kotka:build"
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
-      "options": {
-        "lintFilePatterns": ["apps/kotka/**/*.ts", "apps/kotka/**/*.html"]
-      }
+      "executor": "@nx/eslint:lint"
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/apps/kotka"],
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/apps/kotka"],
       "options": {
-        "jestConfig": "apps/kotka/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "apps/kotka/jest.config.ts"
       }
     }
   },

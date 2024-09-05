@@ -26,20 +26,23 @@ import { cloneDeep } from 'lodash';
 import { UserInterceptor } from '../interceptors/user.interceptor';
 import { DateInterceptor } from '../interceptors/date.interceptor';
 import { ValidatorInterceptor } from '../interceptors/validator.interceptor';
+import { createPatch } from 'rfc6902';
+import { MediaIntellectualOwnerInterceptor } from '../interceptors/media-intellectual-owner.interceptor';
 
-export abstract class LajiStoreController {
+export abstract class LajiStoreController<T extends StoreObject> {
   constructor (
     protected readonly lajiStoreService: LajiStoreService,
     protected readonly triplestoreService: TriplestoreService,
     protected readonly triplestoreMapperService: TriplestoreMapperService,
     protected readonly type: string,
+    protected readonly useTriplestore: boolean = true
   ) {
   }
 
   @Get()
   async getAll(@Query() query: StoreGetQuery) {
     try {
-      const res = await lastValueFrom(this.lajiStoreService.getAll(this.type, query));
+      const res = await lastValueFrom(this.lajiStoreService.getAll<T>(this.type, query));
 
       return res.data;
     } catch (err) {
@@ -48,15 +51,22 @@ export abstract class LajiStoreController {
     }
   }
 
-  @UseInterceptors(UserInterceptor, DateInterceptor, ValidatorInterceptor)
+  @UseInterceptors(UserInterceptor, DateInterceptor, ValidatorInterceptor, MediaIntellectualOwnerInterceptor)
   @Post()
-  async post(@Req() req, @Body() body: StoreObject) {
+  async post(@Req() req, @Body() body: T) {
     try {
-      const res = await lastValueFrom(this.lajiStoreService.post(this.type, body));
+      const res = await lastValueFrom(this.lajiStoreService.post<T>(this.type, body));
 
-      const rdfXml = await this.triplestoreMapperService.jsonToTriplestore(cloneDeep(res.data), this.type);
+      if (this.useTriplestore) {
+        try {
+        const rdfXml = await this.triplestoreMapperService.jsonToTriplestore(cloneDeep(res.data), this.type);
 
-      await lastValueFrom(this.triplestoreService.put(res.data.id, rdfXml));
+        await lastValueFrom(this.triplestoreService.put(res.data.id, rdfXml));
+        } catch (err) {
+          await lastValueFrom(this.lajiStoreService.delete(this.type, res.data.id));
+          throw err;
+        }
+      }
 
       return res.data;
     } catch (err) {
@@ -68,7 +78,7 @@ export abstract class LajiStoreController {
   @Get(':id')
   async get(@Param('id') id: string) {
     try {
-      const res = await lastValueFrom(this.lajiStoreService.get(this.type, id));
+      const res = await lastValueFrom(this.lajiStoreService.get<T>(this.type, id));
 
       return res.data;
     } catch (err) {
@@ -80,15 +90,17 @@ export abstract class LajiStoreController {
     }
   }
 
-  @UseInterceptors(UserInterceptor, DateInterceptor, ValidatorInterceptor)
+  @UseInterceptors(UserInterceptor, DateInterceptor, ValidatorInterceptor, MediaIntellectualOwnerInterceptor)
   @Put(':id')
-  async put(@Req() req, @Param('id') id: string, @Body() body: StoreObject) {
+  async put(@Req() req, @Param('id') id: string, @Body() body: T) {
     try {
-      const res = await lastValueFrom(this.lajiStoreService.put(this.type, id, body));
+      const res = await lastValueFrom(this.lajiStoreService.put<T>(this.type, id, body));
 
-      const rdfXml = await this.triplestoreMapperService.jsonToTriplestore(cloneDeep(res.data), this.type);
+      if (this.useTriplestore) {
+        const rdfXml = await this.triplestoreMapperService.jsonToTriplestore(cloneDeep(res.data), this.type);
 
-      await lastValueFrom(this.triplestoreService.put(res.data.id, rdfXml));
+        await lastValueFrom(this.triplestoreService.put(res.data.id, rdfXml));
+      }
 
       return res.data;
     } catch (err) {
@@ -104,11 +116,67 @@ export abstract class LajiStoreController {
     try {
       await lastValueFrom(this.lajiStoreService.delete(this.type, id));
 
-      await lastValueFrom(this.triplestoreService.delete(id));
+      if (this.useTriplestore) {
+        await lastValueFrom(this.triplestoreService.delete(id));
+      }
 
     } catch (err) {
       console.error(err);
       throw new InternalServerErrorException(err.message);
     }
+  }
+
+  @Get(':id/_ver')
+  async getVerHistory(@Param('id') id: string, @Query('includeDiff') includeDiff: boolean) {
+    try {
+      const res = await lastValueFrom(this.lajiStoreService.getVersionHistory(this.type, id, includeDiff));
+
+      return res.data;
+    } catch (err) {
+      console.error(err);
+      throw new InternalServerErrorException(err.message);
+    }
+  }
+
+  @Get(':id/_ver/:ver')
+  async getVer(@Param('id') id: string, @Param('ver') ver: string) {
+    try {
+      const res = await lastValueFrom(this.lajiStoreService.getVersion(this.type, id, ver));
+
+      return res.data;
+    } catch (err) {
+      console.error(err);
+      throw new InternalServerErrorException(err.message);
+    }
+  }
+
+  @Get(':id/_ver/:ver1/diff/:ver2')
+  async getVerDiff(@Param('id') id: string, @Param('ver1') ver1: string, @Param('ver2') ver2: string) {
+
+    let firstDoc;
+    let lastDoc;
+
+    try {
+      firstDoc = (await lastValueFrom(this.lajiStoreService.getVersion(this.type, id, ver1))).data;
+      lastDoc = (await lastValueFrom(this.lajiStoreService.getVersion(this.type, id, ver2))).data;
+    } catch (err) {
+      console.error(err);
+      throw new InternalServerErrorException(err.message);
+    }
+
+    if (!firstDoc) {
+      throw new InternalServerErrorException(`Could not find version ${ver1} for ${this.type} ${id}`);
+    }
+
+    if (!lastDoc) {
+      throw new InternalServerErrorException(`Could not find version ${ver2} for ${this.type} ${id}`);
+    }
+
+    const diff = createPatch(firstDoc, lastDoc);
+
+    return {
+      original: firstDoc,
+      patch: diff
+    };
   }
 }

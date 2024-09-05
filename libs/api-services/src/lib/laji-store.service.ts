@@ -2,8 +2,8 @@
 https://docs.nestjs.com/providers#services
 */
 
-import { StoreGetQuery } from '@kotka/api-interfaces';
-import { StoreObject } from '@kotka/shared/models';
+import { StoreGetQuery, StoreQueryResult } from '@kotka/api-interfaces';
+import { StoreVersion } from '@kotka/shared/models';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 
@@ -16,26 +16,35 @@ export class LajiStoreService {
   private urlBase = process.env['LAJI_STORE_URL'];
   private baseConfig = { headers: { Authorization: 'Basic ' + process.env['LAJI_STORE_AUTH'] }};
 
-  getAll(type: string, query: StoreGetQuery = {}) {
-    return this.httpService.get(`${this.urlBase}${type}`, Object.assign({ params: query }, this.baseConfig));
+  getAll<T>(type: string, query: StoreGetQuery = {}) {
+    return this.httpService.get<StoreQueryResult<T>>(`${this.urlBase}${type}`, Object.assign({ params: query }, this.baseConfig));
   }
 
-  post(type: string, body: StoreObject) {
-    return this.httpService.post(`${this.urlBase}${type}`, body, this.baseConfig);
-  }
-  get(type: string, id: string) {
-    return this.httpService.get(`${this.urlBase}${type}/${id}`, this.baseConfig);
+  post<T>(type: string, body: T) {
+    return this.httpService.post<T>(`${this.urlBase}${type}`, body, this.baseConfig);
   }
 
-  put(type: string, id: string, body: StoreObject) {
-    return this.httpService.put(`${this.urlBase}${type}/${id}`, body, this.baseConfig);
+  get<T>(type: string, id: string) {
+    return this.httpService.get<T>(`${this.urlBase}${type}/${id}`, this.baseConfig);
+  }
+
+  put<T>(type: string, id: string, body: T) {
+    return this.httpService.put<T>(`${this.urlBase}${type}/${id}`, body, this.baseConfig);
   }
 
   delete(type: string, id: string) {
     return this.httpService.delete(`${this.urlBase}${type}/${id}`, this.baseConfig);
   }
 
-  search(type: string, body: Record<string, unknown>) {
-    return this.httpService.post(`${this.urlBase}${type}/_search`, body, this.baseConfig);
+  search<T>(type: string, body: Record<string, unknown>) {
+    return this.httpService.post<StoreQueryResult<T>>(`${this.urlBase}${type}/_search`, body, this.baseConfig);
+  }
+
+  getVersionHistory(type: string, id: string, includeDiff = false) {
+    return this.httpService.get<StoreVersion[]>(`${this.urlBase}${type}/${id}/_ver`, Object.assign({ params: { include_diff: includeDiff }}, this.baseConfig));
+  }
+
+  getVersion<T>(type: string, id: string, ver: string) {
+    return this.httpService.get<T>(`${this.urlBase}${type}/${id}/_ver/${ver}`, this.baseConfig);
   }
 }

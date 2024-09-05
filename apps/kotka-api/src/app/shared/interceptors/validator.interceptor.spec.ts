@@ -140,8 +140,8 @@ describe('ValidationInterceptor', () => {
     formService = moduleRef.get<FormService>(FormService);
     reflector = moduleRef.get<Reflector>(Reflector);
 
-    jest.spyOn(formService, 'getForm').mockImplementation((type) => new Promise((resolve, reject) => resolve(mockForm) ));
-    jest.spyOn(reflector, 'get').mockImplementation((key, target) => 'GX.dataset');
+    jest.spyOn(formService, 'getForm').mockImplementation(() => new Promise((resolve) => resolve(mockForm) ));
+    jest.spyOn(reflector, 'get').mockImplementation(() => 'GX.dataset');
     jest.spyOn(lajiStoreService, 'search').mockImplementation((type, body) => { console.log(type, body); return of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [] }});});
   });
 
@@ -263,7 +263,7 @@ describe('ValidationInterceptor', () => {
   });
 
   it('Failure to fetch the mock form results in no calls to next handler and thrown error', async () => {
-    jest.spyOn(formService, 'getForm').mockImplementation((type) => new Promise((resolve, reject) => { throw new InternalServerErrorException('Unable to fetch form for validation.', 'Message'); }));
+    jest.spyOn(formService, 'getForm').mockImplementation(() => new Promise(() => { throw new InternalServerErrorException('Unable to fetch form for validation.', 'Message'); }));
     const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
       getRequest: () => ({
         method: 'POST',
