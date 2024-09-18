@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { LocalStorage } from 'ngx-webstorage';
+import { LocalStorageService } from 'ngx-webstorage';
 import { DatatableColumn, FilterModel } from '@kotka/shared/models';
 import { cloneDeep } from 'lodash';
 
@@ -7,14 +7,16 @@ import { cloneDeep } from 'lodash';
   providedIn: 'root'
 })
 export class DatatableFilterStoreService {
-  @LocalStorage('datatable-filters', {}) private filters!: Record<string, FilterModel>;
+  constructor(
+    private storage: LocalStorageService
+  ) {}
 
   getFilters(settingsKey: string|undefined): FilterModel {
     if (!settingsKey) {
       return {};
     }
 
-    return this.filters[settingsKey] || {};
+    return this.storage.retrieve(settingsKey + '-filters');
   }
 
   updateFilters(settingsKey: string|undefined, filterModel: FilterModel, allColumns: DatatableColumn[]) {
@@ -30,6 +32,6 @@ export class DatatableFilterStoreService {
       }
     });
 
-    this.filters = { ...this.filters, [settingsKey]: columnFilters };
+    this.storage.store(settingsKey + '-filters', columnFilters);
   }
 }

@@ -27,7 +27,6 @@ import {
 import { forkJoin, from, Observable, Subscription } from 'rxjs';
 import { ColumnSettingsModalComponent } from '../column-settings-modal/column-settings-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { cloneDeep } from 'lodash';
 import { DatatableExportService } from '../services/datatable-export.service';
 import { CustomDatepickerComponent } from '../components/custom-datepicker.component';
 import { CellRendererComponent } from '../renderers/cell-renderer';
@@ -124,7 +123,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     }
 
     if (changes['settingsKey']) {
-      this.filterModel = cloneDeep(this.datatableFilterStoreService.getFilters(this.settingsKey));
+      this.filterModel = this.datatableFilterStoreService.getFilters(this.settingsKey);
       this.gridApi?.setFilterModel(this.filterModel);
     }
   }

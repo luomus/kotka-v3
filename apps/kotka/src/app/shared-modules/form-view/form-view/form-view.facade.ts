@@ -130,18 +130,6 @@ export class FormViewFacade implements OnDestroy {
     );
   }
 
-  private getUser$(): Observable<Person> {
-    return this.userService.user$.pipe(
-      map(user => {
-        if (!user) {
-          throw new Error('Missing user information!');
-        }
-        return user;
-      }),
-      take(1)
-    );
-  }
-
   private getAugmentedForm$(inputs: FormInputs): Observable<LajiForm.SchemaForm> {
     return this.formService.getFormWithUserContext(inputs.formId).pipe(
       switchMap(form => inputs.augmentFormFunc ? inputs.augmentFormFunc(form) : of(form))
@@ -157,7 +145,7 @@ export class FormViewFacade implements OnDestroy {
   }
 
   private getEmptyFormData$(): Observable<Partial<KotkaDocumentObject>> {
-    return this.getUser$().pipe(map(user => {
+    return this.userService.getCurrentLoggedInUser().pipe(map(user => {
       const formData: Partial<KotkaDocumentObject> = {};
       if (user?.organisation && user.organisation.length === 1) {
         formData.owner = user.organisation[0];
@@ -187,7 +175,7 @@ export class FormViewFacade implements OnDestroy {
         forkJoin([
           this.getAugmentedForm$(inputs),
           this.getInitialFormData$(inputs),
-          this.getUser$()
+          this.userService.getCurrentLoggedInUser()
         ]).pipe(
           map(([form, formData, user]) => (
             this.getInitialFormState(inputs, form, formData, user)

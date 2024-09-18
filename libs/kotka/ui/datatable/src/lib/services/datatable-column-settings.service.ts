@@ -1,24 +1,22 @@
 import { Injectable } from '@angular/core';
 import { isEqual } from 'lodash';
 import { ColumnSettings, DatatableColumn } from '@kotka/shared/models';
-import { LocalStorage } from 'ngx-webstorage';
+import { LocalStorageService } from 'ngx-webstorage';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DatatableColumnSettingsService {
-  @LocalStorage('datatable-settings', {}) private settings!: Record<string, ColumnSettings>;
+  constructor(
+    private storage: LocalStorageService
+  ) {}
 
   getSettings(settingsKey: string|undefined): ColumnSettings {
     if (!settingsKey) {
       throw Error('A settingsKey should be provided when the enableColumnSelection options is on');
     }
 
-    if (!this.settings[settingsKey]) {
-      this.settings[settingsKey] = {};
-    }
-
-    return this.settings[settingsKey];
+    return this.storage.retrieve(settingsKey + '-columns') || {};
   }
 
   setSettings(settingsKey: string|undefined, columnSettings: ColumnSettings) {
@@ -26,7 +24,7 @@ export class DatatableColumnSettingsService {
       throw Error('A settingsKey should be provided when the enableColumnSelection options is on');
     }
 
-    this.settings = { ...this.settings, [settingsKey]: columnSettings };
+    this.storage.store(settingsKey + '-columns', columnSettings);
   }
 
   cleanSettings(settingsKey: string|undefined, allColumns: DatatableColumn[]) {
@@ -53,11 +51,13 @@ export class DatatableColumnSettingsService {
   }
 
   updateSelected(settingsKey: string|undefined, selected: string[]) {
-    if (isEqual(selected, this.getSettings(settingsKey).selected)) {
+    const settings = this.getSettings(settingsKey);
+
+    if (isEqual(selected, settings.selected)) {
       return;
     }
 
-    const order = this.getSettings(settingsKey).order;
+    const order = settings.order;
 
     if (order) {
       const getSortIndex = (value: string): number => {

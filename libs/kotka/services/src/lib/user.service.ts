@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, Observable, of, switchMap } from 'rxjs';
-import { map, tap, distinctUntilChanged, share } from 'rxjs/operators';
+import { map, tap, distinctUntilChanged, share, take } from 'rxjs/operators';
 import { Person } from '@kotka/shared/models';
 import { apiBase } from './constants';
 import { ApiClient } from './api-client';
@@ -96,5 +96,17 @@ export class UserService {
 
   isICTAdmin(user: Person): boolean {
     return (user.role || []).includes('MA.admin');
+  }
+
+  getCurrentLoggedInUser(): Observable<Person> {
+    return this.user$.pipe(
+      map(user => {
+        if (!user) {
+          throw new Error('Missing user information!');
+        }
+        return user;
+      }),
+      take(1)
+    );
   }
 }

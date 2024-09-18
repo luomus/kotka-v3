@@ -5,7 +5,7 @@ import {
   TransactionCountRendererComponent, DueDaysRendererComponent, EnumFloatingFilterComponent, YearFloatingFilterComponent
 } from '@kotka/ui/datatable';
 import { URICellRendererComponent, EnumCellRendererComponent, AutocompleteFloatingFilterComponent } from '@kotka/ui/datatable';
-import { DatatableDataService, DEFAULT_DOMAIN, FormService } from '@kotka/services';
+import { DatatableDataService, DEFAULT_DOMAIN, FormService, UserService } from '@kotka/services';
 import {
   DatatableColumn,
   DatatableSource,
@@ -26,14 +26,22 @@ export class TransactionTableComponent {
 
   datasource?: DatatableSource;
 
+  settingsKey?: string;
+
   constructor(
     private dataService: DatatableDataService,
     private formService: FormService,
+    private userService: UserService,
     private cdr: ChangeDetectorRef
   ) {
     this.formService.getFieldData(globals.transactionFormId).subscribe(fieldData => {
       this.columns = this.getColumns(fieldData);
       this.datasource = this.getDatasource(this.columns);
+      this.cdr.markForCheck();
+    });
+
+    this.userService.getCurrentLoggedInUser().subscribe(user => {
+      this.settingsKey = 'transaction-table-' + user.id;
       this.cdr.markForCheck();
     });
   }
