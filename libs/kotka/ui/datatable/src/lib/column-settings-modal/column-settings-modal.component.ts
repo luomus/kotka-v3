@@ -42,6 +42,7 @@ export class ColumnSettingsModalComponent {
 
   private allColumns: DatatableColumn[] = [];
   private initialSettings?: ColumnSettings;
+  private _defaultSettings?: ColumnSettings;
   private rowIsDragged = false;
   private gridApi?: GridApi;
 
@@ -54,6 +55,7 @@ export class ColumnSettingsModalComponent {
     ).subscribe(([columns, settings, defaultSettings]: [DatatableColumn[], ColumnSettings, ColumnSettings]) => {
       this.allColumns = columns;
       this.initialSettings = settings;
+      this._defaultSettings = defaultSettings;
 
       if (!this.initialSettings.selected) {
         this.initialSettings.selected = defaultSettings.selected;
@@ -106,11 +108,11 @@ export class ColumnSettingsModalComponent {
   }
 
   resetSettings() {
-    if (!this.defaultSettings || !this.gridApi) {
+    if (!this._defaultSettings || !this.gridApi) {
       return;
     }
 
-    this.initialSettings = this.defaultSettings;
+    this.initialSettings = this._defaultSettings;
     this.updateRowData();
   }
 
