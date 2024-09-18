@@ -113,11 +113,10 @@ export class MigrateCommand {
     let offset = this.parseOptionToInt(options.offset);
     let stop = false;
     let maxSeq = 0;
+    let count = 0;
 
     const spin = ora();
     spin.start('Transfering items from Triplestore to laji-store');
-
-    let count = 0;
 
     do {
       try {
@@ -190,11 +189,7 @@ export class MigrateCommand {
           if (tempMaxSeq > maxSeq) maxSeq = tempMaxSeq;
         }
 
-        if (Array.isArray(jsonData)) {
-          count += jsonData.length;
-        } else {
-          count++;
-        }
+        count += Array.isArray(jsonData) ? jsonData.length : 1;
 
         if (options['dryRun']) {
           if (Array.isArray(jsonData)) {
