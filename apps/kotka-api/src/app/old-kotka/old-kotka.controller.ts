@@ -22,7 +22,7 @@ export class OldKotkaController {
 
   @Get('tagsSelect')
   getTagsSelect() {
-    return this.lajiStoreService.getAll<Dataset>('dataset', { fields: "id,datasetName.en", sort: 'datasetName.en', page_size: 1000 }).pipe(
+    return this.lajiStoreService.getAll<Dataset>('dataset', { fields: "id,datasetName.en", sort: 'datasetName.en', page_size: 5000 }).pipe(
       map(res => res.data),
       map(data => data.member),
       map(datasets => {
