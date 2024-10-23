@@ -63,9 +63,9 @@ export class OldKotkaController {
 
   @Get('transaction/forSpecimen/:specimenId')
   getTransactionsForSpecimen(@Param('specimenId') specimenId) {
-    specimenId = this.idService.getIdWithoutPrefix(specimenId);
+    specimenId = this.idService.getUri(specimenId);
     return this.lajiStoreService.getAll('HRX.specimenTransaction', {
-      q: `awayIDs:(*${specimenId}) OR returnedIDs:(*${specimenId})`,
+      q: `awayIDs:(${specimenId}) OR returnedIDs:(${specimenId})`,
       page_size: 1000,
     }).pipe(
       map(res => res.data),
