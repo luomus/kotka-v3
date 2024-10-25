@@ -37,7 +37,7 @@ export class OldKotkaController {
 
   @Get('transaction/isLoaned/:specimenId')
   getTransactionIsLoaned(@Param('specimenId') specimenId) {
-    specimenId = this.idService.getIdWithoutPrefix(specimenId);
+    specimenId = this.idService.getUri(specimenId);
     return this.lajiStoreService.getAll('HRX.specimenTransaction', {
       q: `awayIDs:(*${specimenId})`,
       page_size: 1000,
