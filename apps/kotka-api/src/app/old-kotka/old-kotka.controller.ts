@@ -39,7 +39,7 @@ export class OldKotkaController {
   getTransactionIsLoaned(@Param('specimenId') specimenId) {
     specimenId = this.idService.getIdWithoutPrefix(specimenId);
     return this.lajiStoreService.getAll('HRX.specimenTransaction', {
-      q: `awayIDs:(*${specimenId})`,
+      q: `awayIDs:("${specimenId}")`,
       page_size: 1000,
       fields: 'id,type'
     }).pipe(
@@ -65,7 +65,7 @@ export class OldKotkaController {
   getTransactionsForSpecimen(@Param('specimenId') specimenId) {
     specimenId = this.idService.getUri(specimenId);
     return this.lajiStoreService.getAll('HRX.specimenTransaction', {
-      q: `awayIDs:(${specimenId}) OR returnedIDs:(${specimenId})`,
+      q: `awayIDs:("${specimenId}") OR returnedIDs:("${specimenId}")`,
       page_size: 1000,
     }).pipe(
       map(res => res.data),
