@@ -4,7 +4,7 @@ import { globals } from '../../../environments/globals';
 import { FormViewContainerComponent } from '../../shared-modules/form-view/form-view/form-view-container';
 
 @Component({
-  selector: 'kotka-dataset-form',
+  selector: 'kotka-organization-form',
   templateUrl: './dataset-form.component.html',
   styleUrls: ['./dataset-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

@@ -87,19 +87,19 @@ export class ApiClient {
   }
 
   getOrganization(id: string): Observable<Organization> {
-    return this.httpClient.get<Organization>(`${path}organization/${id}`);
+    return this.httpClient.get<Organization>(`${path}organization/old/${id}`);
   }
 
   getOrganizations(ids: string[]): Observable<Organization[]> {
     const params = new HttpParams().set('ids', ids.join(','));
-    return this.httpClient.get<ListResponse<Organization>>(`${path}organization`, { params }).pipe(
+    return this.httpClient.get<ListResponse<Organization>>(`${path}organization/old`, { params }).pipe(
       map(result => result.member)
     );
   }
 
   getOrganizationAutocomplete(query = ''): Observable<AutocompleteResult[]> {
     const params = new HttpParams().set('q', query);
-    return this.httpClient.get<AutocompleteResult[]>(`${path}organization/autocomplete`, { params });
+    return this.httpClient.get<AutocompleteResult[]>(`${path}organization/old/autocomplete`, { params });
   }
 
   getCollection(id: string): Observable<Collection> {

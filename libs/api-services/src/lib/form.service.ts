@@ -8,6 +8,7 @@ import { LajiApiService } from './laji-api.service';
 
 const types: {[ type: string]: string} = {
   'GX.dataset': 'MHL.731',
+  'MOS.organization': 'MHL.1152',
   'HRX.specimenTransaction': 'MHL.930'
 };
 
