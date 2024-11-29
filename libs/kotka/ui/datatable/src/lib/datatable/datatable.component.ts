@@ -57,7 +57,8 @@ export class DatatableComponent implements OnChanges, OnDestroy {
 
   @Input() settingsKey?: string;
 
-  @Input() totalCountTpl?: TemplateRef<any>;
+  @Input() dataTypeName = 'item';
+  @Input() dataTypeNamePlural?: string;
 
   @Output() rowClicked = new EventEmitter();
 

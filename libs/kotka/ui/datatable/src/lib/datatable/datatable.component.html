@@ -1,6 +1,8 @@
-<ng-container *ngIf="totalCountTpl">
-  <ng-container *ngTemplateOutlet="totalCountTpl; context: { value: totalCount }"></ng-container>
-</ng-container>
+<kui-total-count
+  [value]="totalCount"
+  [dataTypeName]="dataTypeName"
+  [dataTypeNamePlural]="dataTypeNamePlural"
+></kui-total-count>
 <div class="clearfix mb-1">
   <div class="float-sm-end">
     <button *ngIf="enableFileExport" class="btn btn-secondary position-relative" (click)="exportData()" [disabled]="exportLoading" data-cy="export-data">

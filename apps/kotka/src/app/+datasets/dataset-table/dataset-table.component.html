@@ -1,12 +1,9 @@
-<kui-main-content [header]="'Tags'">
-  <ng-template #totalCountTpl let-value="value">
-    <span *ngIf="value !== undefined"><span data-cy="tag-count">{{ value }}</span> tags found</span>
-  </ng-template>
+<kui-main-content header="Tags" containerClass="container-fluid">
   <kui-datatable
     style="height: calc(100vh - 190px)"
     [columns]="columns"
     [datasource]="datasource"
-    [totalCountTpl]="totalCountTpl"
+    [dataTypeName]="'tag'"
   >
   </kui-datatable>
 </kui-main-content>

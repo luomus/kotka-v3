@@ -1,12 +1,9 @@
-<kui-main-content [header]="'Organizations'">
-  <ng-template #totalCountTpl let-value="value">
-    <span *ngIf="value !== undefined"><span data-cy="organization-count">{{ value }}</span> organizations found</span>
-  </ng-template>
+<kui-main-content header="Organizations" containerClass="container-fluid">
   <kui-datatable
     style="height: calc(100vh - 190px)"
     [columns]="columns"
     [datasource]="datasource"
-    [totalCountTpl]="totalCountTpl"
+    [dataTypeName]="'organization'"
   >
   </kui-datatable>
 </kui-main-content>

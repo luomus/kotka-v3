@@ -1,7 +1,4 @@
-<kui-main-content [header]="'Transactions'">
-  <ng-template #totalCountTpl let-value="value">
-    <span *ngIf="value !== undefined"><span data-cy="transaction-count">{{ value }}</span> transactions found</span>
-  </ng-template>
+<kui-main-content header="Transactions" containerClass="container-fluid">
   <kui-spinner [spinning]="!columns || !datasource">
     <kui-datatable
       *ngIf="columns && datasource"
@@ -11,7 +8,7 @@
       [enableFileExport]="true"
       [enableColumnSelection]="true"
       [settingsKey]="settingsKey"
-      [totalCountTpl]="totalCountTpl"
+      [dataTypeName]="'transaction'"
     >
     </kui-datatable>
   </kui-spinner>

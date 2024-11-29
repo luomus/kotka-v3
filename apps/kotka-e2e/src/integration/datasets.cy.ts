@@ -28,7 +28,7 @@ describe('datasets', () => {
       cy.get('.ag-floating-filter[aria-colindex=3] input').first().type(personsResponsible);
 
       // remove the test tag if it already exists
-      cy.get('[data-cy=tag-count]').invoke('text').should('match', /^0|1$/).then(text => {
+      cy.get('[data-cy=total-count]').invoke('text').should('match', /^0|1$/).then(text => {
         if (text === '1') {
           cy.get('.edit-button').first().click();
           cy.get('[data-cy=form-delete]').click();

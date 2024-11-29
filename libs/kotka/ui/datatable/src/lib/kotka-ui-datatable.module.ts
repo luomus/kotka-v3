@@ -16,6 +16,7 @@ import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-mod
 import { TransactionCountRendererComponent } from './renderers/transaction-count-renderer.component';
 import { DueDaysRendererComponent } from './renderers/due-days-renderer.component';
 import { KotkaUiSpinnerModule } from '@kotka/ui/spinner';
+import { TotalCountComponent } from './total-count/total-count.component';
 
 ModuleRegistry.registerModules([CsvExportModule, InfiniteRowModelModule, ClientSideRowModelModule]);
 
@@ -38,7 +39,8 @@ ModuleRegistry.registerModules([CsvExportModule, InfiniteRowModelModule, ClientS
     DateCellRendererComponent,
     ColumnSettingsModalComponent,
     TransactionCountRendererComponent,
-    DueDaysRendererComponent
+    DueDaysRendererComponent,
+    TotalCountComponent
   ],
 })
 export class KotkaUiDatatableModule {}
