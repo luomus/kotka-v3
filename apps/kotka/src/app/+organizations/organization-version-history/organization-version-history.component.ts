@@ -11,13 +11,13 @@ import { globals } from '../../../environments/globals';
     <kotka-version-history-view
       [formId]="formId"
       [dataType]="dataType"
-      [dataTypeName]="'tag'"
+      [dataTypeName]="'organization'"
     ></kotka-version-history-view>
   `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrganizationVersionHistoryComponent {
-  formId = globals.datasetFormId;
-  dataType = KotkaDocumentObjectType.dataset;
+  formId = globals.organizationFormId;
+  dataType = KotkaDocumentObjectType.organization;
 }
