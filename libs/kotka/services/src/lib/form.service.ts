@@ -40,6 +40,7 @@ export class FormService {
         uiSchemaContext: {
           userName: this.userService.formatUserName(user?.fullName),
           userEmail: user?.emailAddress,
+          isAdmin: user?.role?.includes('MA.admin'),
           ...form.uiSchemaContext
         }
       })),
