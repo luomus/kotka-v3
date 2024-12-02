@@ -8,7 +8,6 @@ import {
   OnDestroy,
   Output,
   SimpleChanges,
-  TemplateRef,
 } from '@angular/core';
 import {
   ColDef,
