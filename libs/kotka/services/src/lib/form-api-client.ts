@@ -57,7 +57,7 @@ export class FormApiClient {
 
     switch (resourceType) {
       case ResourceType.autocompleteOrganizationResource:
-        path = apiBase + '/organization/autocomplete/old';
+        path = apiBase + '/organization/old/autocomplete';
         break;
       case ResourceType.autocompleteCollectionResource:
         path = apiBase + '/collection/autocomplete';
