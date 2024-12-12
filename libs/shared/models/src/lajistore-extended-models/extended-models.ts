@@ -16,6 +16,14 @@ export enum KotkaDocumentObjectType {
   sample = 'sample'
 }
 
+export enum KotkaDocumentObjectFullType {
+  dataset = 'GX.dataset',
+  transaction = 'HRX.specimenTransaction',
+  document = 'MY.document',
+  organization = 'MOS.organization',
+  sample = 'MF.sample'
+}
+
 export interface MultiLanguage {
   en?: string;
   fi?: string;

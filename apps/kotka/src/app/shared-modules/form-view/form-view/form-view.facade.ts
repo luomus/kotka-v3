@@ -13,7 +13,7 @@ import {
   throwError
 } from 'rxjs';
 import { distinctUntilChanged, map, take } from 'rxjs/operators';
-import { allowAccessByOrganization, allowAccessByTime } from '@kotka/utils';
+import { allowEditForUser, allowDeleteForUser } from '@kotka/utils';
 import { KotkaDocumentObject, KotkaDocumentObjectType } from '@kotka/shared/models';
 import { LajiForm, Person, Image } from '@kotka/shared/models';
 import { FormViewUtils } from './form-view-utils';
@@ -191,10 +191,9 @@ export class FormViewFacade implements OnDestroy {
   }
 
   private getInitialFormState(inputs: FormInputs, form: LajiForm.SchemaForm, formData: Partial<KotkaDocumentObject>, user: Person): FormState {
-    const isAdmin = this.userService.isICTAdmin(user);
     const isEditMode =  inputs.editMode;
-    const disabled = isEditMode && !isAdmin && !allowAccessByOrganization(formData, user);
-    const showDeleteButton = isEditMode && (isAdmin || (!disabled && allowAccessByTime(formData, {'d': 14})));
+    const disabled = isEditMode && !allowEditForUser(formData, user);
+    const showDeleteButton = isEditMode && (!disabled && allowDeleteForUser(<KotkaDocumentObject>formData, user));
     const showCopyButton = isEditMode && !!form.options?.allowTemplate;
 
     return {

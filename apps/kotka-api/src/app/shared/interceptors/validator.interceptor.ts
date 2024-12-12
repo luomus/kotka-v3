@@ -14,6 +14,7 @@ import { Reflector } from '@nestjs/core';
 import Ajv from 'ajv';
 import * as lajiValidate from '@luomus/laji-validate';
 import { ValidationService } from '../services/validation.service';
+import { KotkaDocumentObjectFullType } from '@kotka/shared/models';
 
 @Injectable()
 export class ValidatorInterceptor implements NestInterceptor {
@@ -38,7 +39,7 @@ export class ValidatorInterceptor implements NestInterceptor {
 
   async intercept(context: ExecutionContext, next: CallHandler): Promise<any> {
     const req = context.switchToHttp().getRequest();
-    const type: string = this.reflector.get('controllerType', context.getClass());
+    const type: KotkaDocumentObjectFullType = this.reflector.get('controllerType', context.getClass());
     const form = await this.formService.getForm(type);
 
     if (!req.body) {

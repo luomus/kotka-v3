@@ -1,8 +1,17 @@
-import { KotkaDocumentObject } from "@kotka/shared/models";
+import { KotkaDocumentObject, KotkaDocumentObjectFullType } from '@kotka/shared/models';
 import { Person } from '@kotka/shared/models';
 import moment from 'moment';
 
-export function allowAccessByOrganization(document: Partial<KotkaDocumentObject>, user: Person): boolean {
+const deleteAllowedForTypes = [
+  KotkaDocumentObjectFullType.dataset,
+  KotkaDocumentObjectFullType.transaction
+];
+
+export function allowEditForUser(document: Partial<KotkaDocumentObject>, user: Person): boolean {
+  if (user.role?.includes('MA.admin')) {
+    return true;
+  }
+
   if (!document.owner || !user.organisation) {
     return false;
   }
@@ -14,12 +23,26 @@ export function allowAccessByOrganization(document: Partial<KotkaDocumentObject>
   return false;
 }
 
-export function allowAccessByTime(document: Partial<KotkaDocumentObject>, time: {[key: string]: number}): boolean {
+export function allowDeleteForUser(document: KotkaDocumentObject, user: Person): boolean {
+  const type = document['@type'] as KotkaDocumentObjectFullType;
+
+  if (!type) {
+    return false;
+  }
+
+  if (!deleteAllowedForTypes.includes(type)) {
+    return false;
+  }
+
+  if (user.role?.includes('MA.admin')) {
+    return true;
+  }
+
   if (!document.dateCreated) {
     return false;
   }
 
-  if (moment(document.dateCreated).add(time).isBefore(moment())) {
+  if (moment(document.dateCreated).add({ d: 14 }).isBefore(moment())) {
     return false;
   }
 

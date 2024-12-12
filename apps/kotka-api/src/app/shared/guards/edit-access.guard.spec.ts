@@ -6,21 +6,21 @@ import { HttpModule } from '@nestjs/axios';
 import { Reflector } from '@nestjs/core';
 import { createMock } from '@golevelup/ts-jest';
 import { ExecutionContext, ForbiddenException } from '@nestjs/common';
-import { OrganizationGuard } from './organization.guard';
+import { EditAccessGuard } from './edit-access.guard.service';
 
-describe('InUseGuard', () => {
-  let organizationGuard: OrganizationGuard;
+describe('EditAccessGuard', () => {
+  let organizationGuard: EditAccessGuard;
   let lajiStoreService: LajiStoreService;
   let reflector: Reflector;
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [ApiServicesModule, HttpModule, MappersModule],
       controllers: [],
-      providers: [OrganizationGuard, Reflector],
+      providers: [EditAccessGuard, Reflector],
     }).compile();
 
     lajiStoreService = moduleRef.get<LajiStoreService>(LajiStoreService);
-    organizationGuard = moduleRef.get<OrganizationGuard>(OrganizationGuard);
+    organizationGuard = moduleRef.get<EditAccessGuard>(EditAccessGuard);
     reflector = moduleRef.get<Reflector>(Reflector);
 
     jest.useFakeTimers();

@@ -5,11 +5,14 @@ https://docs.nestjs.com/providers#services
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { LajiApiService } from './laji-api.service';
+import { KotkaDocumentObjectFullType } from '@kotka/shared/models';
 
-const types: {[ type: string]: string} = {
-  'GX.dataset': 'MHL.731',
-  'MOS.organization': 'MHL.1152',
-  'HRX.specimenTransaction': 'MHL.930'
+const types: {[ type in KotkaDocumentObjectFullType ]: string} = {
+  [KotkaDocumentObjectFullType.dataset]: 'MHL.731',
+  [KotkaDocumentObjectFullType.organization]: 'MHL.1152',
+  [KotkaDocumentObjectFullType.transaction]: 'MHL.930',
+  [KotkaDocumentObjectFullType.document]: '',
+  [KotkaDocumentObjectFullType.sample]: ''
 };
 
 @Injectable()
@@ -21,7 +24,7 @@ export class FormService {
     private readonly lajiApiService: LajiApiService
   ) {}
 
-  async getForm(type: string) {
+  async getForm(type: KotkaDocumentObjectFullType) {
     if (!this.forms[type]) {
       await this.initForm(type);
     }
@@ -29,7 +32,7 @@ export class FormService {
     return this.forms[type];
   }
 
-  async getValidators(type: string) {
+  async getValidators(type: KotkaDocumentObjectFullType) {
     if (!this.forms[type]) {
       await this.initForm(type);
     }
@@ -37,7 +40,7 @@ export class FormService {
     return this.forms[type]['validators'];
   }
 
-  async getSchema(type: string) {
+  async getSchema(type: KotkaDocumentObjectFullType) {
     if (!this.forms[type]) {
       await this.initForm(type);
     }
@@ -45,7 +48,7 @@ export class FormService {
     return this.forms[type]['schema'];
   }
 
-  async initForm(type: string) {
+  async initForm(type: KotkaDocumentObjectFullType) {
     if (!types[type]) {
       throw new InternalServerErrorException(`Could not find formId for document of type ${type}`);
     }

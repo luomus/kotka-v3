@@ -6,10 +6,11 @@ import { LajiStoreService } from '@kotka/api-services';
 import { Injectable, CanActivate, ExecutionContext, InternalServerErrorException, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { lastValueFrom } from 'rxjs';
-import { allowAccessByTime } from '@kotka/utils';
+import { allowDeleteForUser } from '@kotka/utils';
+import { KotkaDocumentObject } from '@kotka/shared/models';
 
 @Injectable()
-export class TimedDocumentAccessGuard implements CanActivate {
+export class DeleteAccessGuard implements CanActivate {
   constructor(
     private readonly lajiStoreService: LajiStoreService,
     private readonly reflector: Reflector,
@@ -19,22 +20,12 @@ export class TimedDocumentAccessGuard implements CanActivate {
     context: ExecutionContext
   ): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
-    const target = context.getHandler().name;
 
-    if (req.user.profile.role?.includes('MA.admin')) {
-      return true;
-    }
-
-    if (['getAll', 'post'].includes(target)) {
+    if (req.method !== 'DELETE') {
       return true;
     }
 
     const type = this.reflector.get('controllerType', context.getClass());
-    const timedAccessMetadata = this.reflector.get('timedAccessMetadata', context.getClass())?.[target];
-
-    if (!timedAccessMetadata) {
-      return true;
-    }
 
     if (!req.params.id) {
       throw new InternalServerErrorException('Missing expected id in url.');
@@ -42,8 +33,8 @@ export class TimedDocumentAccessGuard implements CanActivate {
 
     const res = await lastValueFrom(this.lajiStoreService.get(type, req.params.id));
 
-    if (!allowAccessByTime(res.data, timedAccessMetadata)) {
-      throw new ForbiddenException(`Time limit for ${type} ${req.method} has passed.`);
+    if (!allowDeleteForUser(<KotkaDocumentObject>res.data, req.user.profile)) {
+      throw new ForbiddenException(`Deletion is not allowed or time limit for ${type} ${req.method} has passed.`);
     }
 
     return true;

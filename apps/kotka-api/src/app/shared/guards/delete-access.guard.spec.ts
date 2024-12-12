@@ -6,21 +6,21 @@ import { HttpModule } from '@nestjs/axios';
 import { Reflector } from '@nestjs/core';
 import { createMock } from '@golevelup/ts-jest';
 import { ExecutionContext, ForbiddenException } from '@nestjs/common';
-import { TimedDocumentAccessGuard } from './timed-document-access.guard';
+import { DeleteAccessGuard } from './delete-access.guard.service';
 
-describe('InUseGuard', () => {
-  let timedDocumentAccessGuard: TimedDocumentAccessGuard;
+describe('DeleteAccessGuard', () => {
+  let timedDocumentAccessGuard: DeleteAccessGuard;
   let lajiStoreService: LajiStoreService;
   let reflector: Reflector;
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [ApiServicesModule, HttpModule, MappersModule],
       controllers: [],
-      providers: [TimedDocumentAccessGuard, Reflector],
+      providers: [DeleteAccessGuard, Reflector],
     }).compile();
 
     lajiStoreService = moduleRef.get<LajiStoreService>(LajiStoreService);
-    timedDocumentAccessGuard = moduleRef.get<TimedDocumentAccessGuard>(TimedDocumentAccessGuard);
+    timedDocumentAccessGuard = moduleRef.get<DeleteAccessGuard>(DeleteAccessGuard);
     reflector = moduleRef.get<Reflector>(Reflector);
 
     jest.useFakeTimers();

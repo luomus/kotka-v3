@@ -13,27 +13,22 @@ import { LajiStoreService, TriplestoreService } from '@kotka/api-services';
 import { TriplestoreMapperService } from '@kotka/mappers';
 import { LajiStoreController } from '../shared/controllers/laji-store.controller';
 import { ControllerType } from '../shared/decorators/controller-type.decorator';
-import { OrganizationGuard } from '../shared/guards/organization.guard';
-import { TimedAccessSet } from '../shared/decorators/timed-access-set.decorator';
-import { TimedDocumentAccessGuard } from '../shared/guards/timed-document-access.guard';
-// import { InUseGuard } from '../shared/guards/in-use.guard';
-// import { InUseTypesSet } from '../shared/decorators/in-use-types-set.decorator';
+import { EditAccessGuard } from '../shared/guards/edit-access.guard.service';
+import { DeleteAccessGuard } from '../shared/guards/delete-access.guard.service';
 import { Organization } from '@luomus/laji-schema';
 import { OldKotkaDataService } from '../shared/services/old-kotka-data.service';
 import { AutocompleteService } from '../shared/services/autocomplete.service';
 import { getOrganizationFullName } from '@kotka/utils';
-import { Person } from '@kotka/shared/models';
+import { KotkaDocumentObjectFullType, KotkaDocumentObjectType, Person } from '@kotka/shared/models';
 
-const type = 'MOS.organization';
+const type = KotkaDocumentObjectFullType.organization;
 
-@Controller('organization')
+@Controller(KotkaDocumentObjectType.organization)
 @ControllerType(type)
-@TimedAccessSet({ del: { 'd': 14 }})
-// @InUseTypesSet(['MY.document', 'MOS.organization']) TODO
 @UseGuards(
   AuthenticateCookieGuard,
-  OrganizationGuard,
-  TimedDocumentAccessGuard
+  EditAccessGuard,
+  DeleteAccessGuard
 )
 export class OrganizationController extends LajiStoreController<Organization> {
   constructor(
