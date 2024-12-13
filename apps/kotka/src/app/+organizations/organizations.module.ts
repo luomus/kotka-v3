@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { routing } from './organizations.routes';
-import { OrganizationTableComponent } from './dataset-table/organization-table.component';
+import { OrganizationTableComponent } from './organization-table/organization-table.component';
 import { KotkaUiMainContentModule } from '@kotka/ui/main-content';
 import { KotkaUiDatatableModule } from '@kotka/ui/datatable';
 import { OrganizationFormComponent } from './organization-form/organization-form.component';

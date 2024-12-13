@@ -1,6 +1,6 @@
 import { RouterModule, Routes } from '@angular/router';
 import { ModuleWithProviders } from '@angular/core';
-import { OrganizationTableComponent } from './dataset-table/organization-table.component';
+import { OrganizationTableComponent } from './organization-table/organization-table.component';
 import { OrganizationFormComponent } from './organization-form/organization-form.component';
 import { Utils } from '../shared/services/utils';
 import { ComponentCanDeactivateGuard } from '../shared/services/guards/component-can-deactivate.guard';
