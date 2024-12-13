@@ -13,8 +13,7 @@ import { LajiStoreService, TriplestoreService } from '@kotka/api-services';
 import { TriplestoreMapperService } from '@kotka/mappers';
 import { LajiStoreController } from '../shared/controllers/laji-store.controller';
 import { ControllerType } from '../shared/decorators/controller-type.decorator';
-import { EditAccessGuard } from '../shared/guards/edit-access.guard.service';
-import { DeleteAccessGuard } from '../shared/guards/delete-access.guard.service';
+import { ApiMethodAccessGuard } from '../shared/guards/api-method-access.guard';
 import { Organization } from '@luomus/laji-schema';
 import { OldKotkaDataService } from '../shared/services/old-kotka-data.service';
 import { AutocompleteService } from '../shared/services/autocomplete.service';
@@ -22,13 +21,13 @@ import { getOrganizationFullName } from '@kotka/utils';
 import { KotkaDocumentObjectFullType, KotkaDocumentObjectType, Person } from '@kotka/shared/models';
 
 const type = KotkaDocumentObjectFullType.organization;
+const useTriplestore = false;
 
 @Controller(KotkaDocumentObjectType.organization)
 @ControllerType(type)
 @UseGuards(
   AuthenticateCookieGuard,
-  EditAccessGuard,
-  DeleteAccessGuard
+  ApiMethodAccessGuard,
 )
 export class OrganizationController extends LajiStoreController<Organization> {
   constructor(
@@ -43,6 +42,7 @@ export class OrganizationController extends LajiStoreController<Organization> {
       triplestoreService,
       triplestoreMapperService,
       type,
+      useTriplestore
     );
   }
 

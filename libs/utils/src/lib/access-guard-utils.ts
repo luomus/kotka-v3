@@ -12,15 +12,17 @@ export function allowEditForUser(document: Partial<KotkaDocumentObject>, user: P
     return true;
   }
 
-  if (!document.owner || !user.organisation) {
-    return false;
+  if (document['@type'] !== KotkaDocumentObjectFullType.organization) {
+    if (!document.owner || !user.organisation) {
+      return false;
+    }
+
+    if (!user.organisation.includes(document.owner)) {
+      return false;
+    }
   }
 
-  if (user.organisation.includes(document.owner)) {
-    return true;
-  }
-
-  return false;
+  return true;
 }
 
 export function allowDeleteForUser(document: KotkaDocumentObject, user: Person): boolean {
