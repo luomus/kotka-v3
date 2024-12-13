@@ -12,8 +12,8 @@ export function allowEditForUser(document: Partial<KotkaDocumentObject>, user: P
     return true;
   }
 
-  if (document['@type'] !== KotkaDocumentObjectFullType.organization) {
-    if (!document.owner || !user.organisation) {
+  if (document.owner) {
+    if (!user.organisation) {
       return false;
     }
 
