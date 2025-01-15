@@ -1,4 +1,14 @@
 <kui-main-content header="Organizations" containerClass="container-fluid">
+  <div class="col-sm-6 mb-2">
+    <label for="nameFilter"><strong>Filter by name:</strong></label>
+    <input
+      id="nameFilter"
+      type="text"
+      class="form-control"
+      [(ngModel)]="nameFilterText"
+      (ngModelChange)="nameFilterChange()"
+    >
+  </div>
   <kui-datatable
     style="height: calc(100vh - 190px)"
     [columns]="columns"

@@ -10,18 +10,24 @@ import { FormViewModule } from '../shared-modules/form-view/form-view.module';
 import { SharedModule } from '../shared/shared.module';
 import { OrganizationVersionHistoryComponent } from './organization-version-history/organization-version-history.component';
 import { PipesModule } from '@kotka/pipes';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
-    imports: [
-        routing,
-        RouterModule,
-        CommonModule,
-        SharedModule,
-        KotkaUiMainContentModule,
-        KotkaUiDatatableModule,
-        FormViewModule,
-        PipesModule
-    ],
-  declarations: [OrganizationTableComponent, OrganizationFormComponent, OrganizationVersionHistoryComponent],
+  imports: [
+    routing,
+    RouterModule,
+    CommonModule,
+    SharedModule,
+    KotkaUiMainContentModule,
+    KotkaUiDatatableModule,
+    FormViewModule,
+    PipesModule,
+    FormsModule,
+  ],
+  declarations: [
+    OrganizationTableComponent,
+    OrganizationFormComponent,
+    OrganizationVersionHistoryComponent,
+  ],
 })
 export class OrganizationsModule {}

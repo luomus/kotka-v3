@@ -19,15 +19,32 @@ export class DatatableDataService {
     private dataService: DataService
   ) {}
 
-  getData(dataType: KotkaDocumentObjectType, columns: DatatableColumn[], startRow: number, endRow: number, sortModel: SortModel[], filterModel: FilterModel): Observable<ListResponse<KotkaDocumentObject>> {
+  getData(
+    dataType: KotkaDocumentObjectType,
+    columns: DatatableColumn[],
+    startRow: number,
+    endRow: number,
+    sortModel: SortModel[],
+    filterModel: FilterModel,
+    extraSearchQuery?: string
+  ): Observable<ListResponse<KotkaDocumentObject>> {
     const pageSize = endRow - startRow;
     const page = (startRow / pageSize) + 1;
 
     const colIdFieldMap = this.getColIdFieldMap(columns);
     const sort = this.sortModelToSortString(sortModel, colIdFieldMap);
-    const searchQuery = this.filterModelToSearchQuery(filterModel, colIdFieldMap);
+    const filterSearchQuery = this.filterModelToSearchQuery(filterModel, colIdFieldMap);
+    const searchQuery = [extraSearchQuery, filterSearchQuery].filter(query => !!query).map(query => `(${query})`).join(' AND ');
 
     return this.dataService.getData(dataType, page, pageSize, sort, searchQuery);
+  }
+
+  getSearchQueryForMultiColumnTextSearch(fields: string[], filterText: string): string {
+    if (!filterText) {
+      return '';
+    }
+    filterText = this.escapeFilterString(filterText);
+    return fields.map(field =>  `${field}:(*${filterText}*)`).join(' OR ');
   }
 
   private getColIdFieldMap(columns: DatatableColumn[]): Record<string, string> {

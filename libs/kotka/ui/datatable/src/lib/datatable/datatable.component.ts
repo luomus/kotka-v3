@@ -196,6 +196,10 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     });
   }
 
+  refresh() {
+    this.gridApi?.refreshInfiniteCache();
+  }
+
   private updateDatasource() {
     if (!this.gridApi || !this.datasource) {
       return;
