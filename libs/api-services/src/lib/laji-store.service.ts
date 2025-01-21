@@ -36,8 +36,8 @@ export class LajiStoreService {
     return this.httpService.delete(`${this.urlBase}${type}/${id}`, this.baseConfig);
   }
 
-  search<T>(type: string, body: Record<string, unknown>) {
-    return this.httpService.post<StoreQueryResult<T>>(`${this.urlBase}${type}/_search`, body, this.baseConfig);
+  search<T>(type: string, body: Record<string, unknown>, query: StoreGetQuery = {}) {
+    return this.httpService.post<StoreQueryResult<T>>(`${this.urlBase}${type}/_search`, body, Object.assign({ params: query }, this.baseConfig));
   }
 
   getVersionHistory(type: string, id: string, includeDiff = false) {

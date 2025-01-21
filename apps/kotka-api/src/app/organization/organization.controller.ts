@@ -5,6 +5,7 @@ https://docs.nestjs.com/controllers#controllers
 import {
   Controller, DefaultValuePipe,
   Get,
+  InternalServerErrorException,
   Param, ParseArrayPipe, ParseBoolPipe, ParseIntPipe, Query, Req,
   UseGuards
 } from '@nestjs/common';
@@ -19,6 +20,8 @@ import { OldKotkaDataService } from '../shared/services/old-kotka-data.service';
 import { AutocompleteService } from '../shared/services/autocomplete.service';
 import { getOrganizationFullName } from '@kotka/utils';
 import { KotkaDocumentObjectFullType, KotkaDocumentObjectType, Person } from '@kotka/shared/models';
+import { lastValueFrom } from 'rxjs';
+import { set } from 'lodash';
 
 const type = KotkaDocumentObjectFullType.organization;
 const useTriplestore = false;
@@ -44,6 +47,69 @@ export class OrganizationController extends LajiStoreController<Organization> {
       type,
       useTriplestore
     );
+  }
+
+  @Get('autocomplete')
+  async getAutocomplete(
+    @Req() req: any,
+    @Query('q') q = '',
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('onlyOwnOrganizations', new DefaultValuePipe(false),
+    ParseBoolPipe) onlyOwnOrganizations: boolean
+  ) {
+     try {
+      const user: Person|undefined = req.user?.profile;
+      const userRoles: string[] = user?.role || [];
+      const userOrganizations: string[] = user?.organisation || [];
+
+      const body = q ? {
+        query: {
+          bool: {
+            must: [
+              {
+                multi_match: {
+                  query: q,
+                  operator: 'and',
+                  fields: [
+                    "id^6",
+                    "abbreviation^5",
+                    "organizationLevel4.en.autocomplete^4",
+                    "organizationLevel3.en.autocomplete^3",
+                    "organizationLevel2.en.autocomplete^2",
+                    "organizationLevel1.en.autocomplete"
+                  ]
+                }
+              } as Record<string, any>
+            ]
+          }
+        }
+      } : {};
+
+      if (onlyOwnOrganizations && !userRoles.includes('MA.admin')) {
+        const terms = {
+          "terms": {
+            "owner": userOrganizations
+          }
+        };
+
+        if (!q) {
+          set(body, ['query', 'bool', 'must'], [terms]);
+        } else {
+          body.query.bool.must.push(terms);
+        }
+      }
+
+      const params = {sort: q ? '_score desc': 'abbreviation,organizationLevel4.en,organizationLevel3.en,organizationLevel2.en,organizationLevel1.en', limit, fields: 'id,abbreviation,organizationLevel1.en,organizationLevel2.en,organizationLevel3.en,organizationLevel4.en'};
+      const res = await lastValueFrom(this.lajiStoreService.search<Organization>(type, body, params));
+
+      return res.data.member.map(data => ({
+        key: data.id,
+        value: getOrganizationFullName(data)
+      }));
+    } catch (err) {
+      console.error(err);
+      throw new InternalServerErrorException(err.message);
+    }
   }
 
   @Get('old/autocomplete')
