@@ -7,7 +7,8 @@ import {
   Get,
   InternalServerErrorException,
   Param, ParseArrayPipe, ParseBoolPipe, ParseIntPipe, Query, Req,
-  UseGuards
+  UseGuards,
+  UseInterceptors
 } from '@nestjs/common';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
 import { LajiStoreService, TriplestoreService } from '@kotka/api-services';
@@ -22,6 +23,7 @@ import { getOrganizationFullName } from '@kotka/utils';
 import { KotkaDocumentObjectFullType, KotkaDocumentObjectType, Person } from '@kotka/shared/models';
 import { lastValueFrom } from 'rxjs';
 import { set } from 'lodash';
+import { OrganizationFullNameInterceptor } from './organization-fullname.interceptor';
 
 const type = KotkaDocumentObjectFullType.organization;
 const useTriplestore = false;
@@ -32,6 +34,7 @@ const useTriplestore = false;
   AuthenticateCookieGuard,
   ApiMethodAccessGuard,
 )
+@UseInterceptors(OrganizationFullNameInterceptor)
 export class OrganizationController extends LajiStoreController<Organization> {
   constructor(
     protected readonly lajiStoreService: LajiStoreService,
@@ -65,46 +68,43 @@ export class OrganizationController extends LajiStoreController<Organization> {
       const body = q ? {
         query: {
           bool: {
-            must: [
+            should: [
               {
-                multi_match: {
-                  query: q,
-                  operator: 'and',
-                  fields: [
-                    "id^6",
-                    "abbreviation^5",
-                    "organizationLevel4.en.autocomplete^4",
-                    "organizationLevel3.en.autocomplete^3",
-                    "organizationLevel2.en.autocomplete^2",
-                    "organizationLevel1.en.autocomplete"
-                  ]
+                term: {
+                  id: q
                 }
-              } as Record<string, any>
-            ]
+              },
+              {
+                term: {
+                  'fullName.en': q
+                }
+              },
+              {
+                wildcard: {
+                  'fullName.en': `*${q}*`
+                }
+              }
+            ],
           }
         }
       } : {};
 
       if (onlyOwnOrganizations && !userRoles.includes('MA.admin')) {
         const terms = {
-          "terms": {
-            "owner": userOrganizations
+          terms: {
+            owner: userOrganizations
           }
         };
 
-        if (!q) {
-          set(body, ['query', 'bool', 'must'], [terms]);
-        } else {
-          body.query.bool.must.push(terms);
-        }
+        set(body, ['query', 'bool', 'must'], [terms]);
       }
 
-      const params = {sort: q ? '_score desc': 'abbreviation,organizationLevel4.en,organizationLevel3.en,organizationLevel2.en,organizationLevel1.en', limit, fields: 'id,abbreviation,organizationLevel1.en,organizationLevel2.en,organizationLevel3.en,organizationLevel4.en'};
+      const params = {sort: q ? '_score desc': 'fullName.en', limit, fields: 'id,fullName.en'};
       const res = await lastValueFrom(this.lajiStoreService.search<Organization>(type, body, params));
 
       return res.data.member.map(data => ({
         key: data.id,
-        value: getOrganizationFullName(data)
+        value: data.fullName.en
       }));
     } catch (err) {
       console.error(err);

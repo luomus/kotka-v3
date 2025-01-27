@@ -159,7 +159,7 @@ export class ApiLabelService {
       );
     } else if (type === 'organization') {
       observable = this.apiCient.getOrganization(key).pipe(
-        map(organization => getOrganizationFullName(organization))
+        map(organization => getOrganizationFullName(organization)!.en!)
       );
     } else {
       observable = this.apiCient.getCollection(key).pipe(
@@ -179,7 +179,7 @@ export class ApiLabelService {
       observable = this.apiCient.getOrganizations(keys).pipe(
         map(organizations => (
           organizations.map((organization: Organization) => ({
-            key: organization.id!, value: getOrganizationFullName(organization)
+            key: organization.id!, value: getOrganizationFullName(organization)!.en!
           }))
         ))
       );

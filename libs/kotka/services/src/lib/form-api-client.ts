@@ -4,13 +4,12 @@ import { catchError, map } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ToastService } from './toast.service';
 import { apiBase, lajiApiBase } from './constants';
-import { getOrganizationFullName } from '@kotka/utils';
-import { Organization } from '@luomus/laji-schema';
 import { isMultiLanguageObject } from '@kotka/shared/models';
 import { DialogService } from './dialog.service';
 import { ErrorMessages } from '@kotka/api-interfaces';
 
 enum ResourceType {
+  autocompleteDatasetResource,
   autocompleteOrganizationResource,
   autocompleteCollectionResource,
   getOrganizationResource,
@@ -21,6 +20,7 @@ enum ResourceType {
 }
 
 const pathIs: Record<string, ResourceType> = {
+  '/autocomplete/dataset': ResourceType.autocompleteDatasetResource,
   '/autocomplete/organization': ResourceType.autocompleteOrganizationResource,
   '/autocomplete/collection': ResourceType.autocompleteCollectionResource,
   '/documents/validate': ResourceType.validateResource
@@ -56,8 +56,11 @@ export class FormApiClient {
     const resourceType = this.getResourceType(resource);
 
     switch (resourceType) {
+      case ResourceType.autocompleteDatasetResource:
+        path = apiBase + '/dataset/autocomplete';
+        break;
       case ResourceType.autocompleteOrganizationResource:
-        path = apiBase + '/organization/old/autocomplete';
+        path = apiBase + '/organization/autocomplete';
         break;
       case ResourceType.autocompleteCollectionResource:
         path = apiBase + '/collection/autocomplete';
@@ -119,9 +122,6 @@ export class FormApiClient {
   }
 
   private processResult(resourceType: ResourceType, result: any) {
-    if (resourceType === ResourceType.getOrganizationResource) {
-      result = { ...result, fullName: getOrganizationFullName(result as Organization) };
-    }
     if ([ResourceType.getOrganizationResource, ResourceType.getCollectionResource].includes(resourceType)) {
       result = this.processMultiLanguageObject(result);
     }

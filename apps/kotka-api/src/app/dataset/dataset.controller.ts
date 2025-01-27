@@ -2,7 +2,7 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { Controller, DefaultValuePipe, Get, InternalServerErrorException, ParseIntPipe, Query, Req, UseGuards } from '@nestjs/common';
+import { Controller, DefaultValuePipe, Get, InternalServerErrorException, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
 import { LajiStoreService, TriplestoreService } from '@kotka/api-services';
 import { TriplestoreMapperService } from '@kotka/mappers';
@@ -43,23 +43,34 @@ export class DatasetController extends LajiStoreController<Dataset> {
 
   @Get('autocomplete')
   async getAutocomplete(
-    @Req() req: any,
     @Query('q') q = '',
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number
   ) {
     try {
       const body = q ? {
         query: {
-          multi_match: {
-            query: q,
-            type: 'best_fields',
-            fields: [
-              'id^2',
-              'datasetName.en.autocomplete'
+          bool: {
+            should: [
+              {
+                term: {
+                  id: `${q}`
+                }
+              },
+              {
+                term: {
+                  'datasetName.en': q
+                }
+              },
+              {
+                wildcard: {
+                  'datasetName.en': `*${q}*`
+                }
+              }
             ]
           }
         }
       } : {};
+
       const params = {sort: q ? '_score desc': 'datasetName.en', page_size: limit, fields: 'id,datasetName.en'};
       const res = await lastValueFrom(this.lajiStoreService.search<Dataset>(type, body, params));
 
