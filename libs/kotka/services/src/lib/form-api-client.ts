@@ -12,6 +12,7 @@ enum ResourceType {
   autocompleteDatasetResource,
   autocompleteOrganizationResource,
   autocompleteCollectionResource,
+  getDatasetResource,
   getOrganizationResource,
   getCollectionResource,
   validateResource,
@@ -26,6 +27,7 @@ const pathIs: Record<string, ResourceType> = {
   '/documents/validate': ResourceType.validateResource
 };
 const pathStartsWith: Record<string, ResourceType> = {
+  '/dataset/by-id': ResourceType.getDatasetResource,
   '/organization/by-id': ResourceType.getOrganizationResource,
   '/collection/by-id': ResourceType.getCollectionResource,
   '/pdf': ResourceType.pdfResource
@@ -65,9 +67,8 @@ export class FormApiClient {
       case ResourceType.autocompleteCollectionResource:
         path = apiBase + '/collection/autocomplete';
         break;
+      case ResourceType.getDatasetResource:
       case ResourceType.getOrganizationResource:
-        path = apiBase + resource.replace('/by-id', '/old');
-        break;
       case ResourceType.getCollectionResource:
         path = apiBase + resource.replace('/by-id', '');
         break;
@@ -122,7 +123,11 @@ export class FormApiClient {
   }
 
   private processResult(resourceType: ResourceType, result: any) {
-    if ([ResourceType.getOrganizationResource, ResourceType.getCollectionResource].includes(resourceType)) {
+    if ([
+      ResourceType.getDatasetResource,
+      ResourceType.getOrganizationResource,
+      ResourceType.getCollectionResource
+    ].includes(resourceType)) {
       result = this.processMultiLanguageObject(result);
     }
 
