@@ -8,7 +8,7 @@ Start for localhost in docker-compose using `docker-compose up` in the root of t
 
 ## Testing
 
-Before running the tests, you should put CYPRESS_TEST_EMAIL and CYPRESS_TEST_PASSWORD to you environment variables or to the file .env.e2e if you are running the tests with docker. There are two ways to run e2e tests:
+Before running the tests, you should put CYPRESS_TEST_EMAIL and CYPRESS_TEST_PASSWORD to the .env file or .env.e2e file if you are running the tests with docker. There are two ways to run e2e tests:
 
 1. While the application is running, run
    ```
