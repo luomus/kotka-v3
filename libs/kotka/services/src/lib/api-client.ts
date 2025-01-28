@@ -11,7 +11,7 @@ import {
   Person,
   StoreVersion
 } from '@kotka/shared/models';
-import { Observable } from 'rxjs';
+import { Observable, of, switchMap } from 'rxjs';
 import { apiBase, lajiApiBase } from './constants';
 import {
   RangeResponse,
@@ -34,23 +34,23 @@ export class ApiClient {
     private httpClient: HttpClient
   ) {}
 
-  getDocumentById(type: KotkaDocumentObjectType, id: string): Observable<KotkaDocumentObject> {
-    return this.httpClient.get<KotkaDocumentObject>(path + type + '/' + id);
+  getDocumentById<T extends KotkaDocumentObject>(type: KotkaDocumentObjectType, id: string): Observable<T> {
+    return this.httpClient.get<T>(path + type + '/' + id);
   }
 
-  createDocument(type: KotkaDocumentObjectType, data: KotkaDocumentObject): Observable<KotkaDocumentObject> {
-    return this.httpClient.post<KotkaDocumentObject>(path + type, data);
+  createDocument<T extends KotkaDocumentObject>(type: KotkaDocumentObjectType, data: KotkaDocumentObject): Observable<T> {
+    return this.httpClient.post<T>(path + type, data);
   }
 
-  updateDocument(type: KotkaDocumentObjectType, id: string, data: KotkaDocumentObject): Observable<KotkaDocumentObject> {
-    return this.httpClient.put<KotkaDocumentObject>(path + type + '/' + id, data);
+  updateDocument<T extends KotkaDocumentObject>(type: KotkaDocumentObjectType, id: string, data: KotkaDocumentObject): Observable<T> {
+    return this.httpClient.put<T>(path + type + '/' + id, data);
   }
 
   deleteDocument(type: KotkaDocumentObjectType, id: string): Observable<null> {
     return this.httpClient.delete<null>(path + type + '/' + id);
   }
 
-  getDocumentList(type: KotkaDocumentObjectType, page=1, pageSize=100, sort?: string, searchQuery?: string): Observable<ListResponse<KotkaDocumentObject>> {
+  getDocumentList<T extends KotkaDocumentObject>(type: KotkaDocumentObjectType, page=1, pageSize=100, sort?: string, searchQuery?: string): Observable<ListResponse<T>> {
     let params = new HttpParams().set('page', page).set('page_size', pageSize);
     if (sort) {
       params = params.set('sort', sort);
@@ -58,7 +58,20 @@ export class ApiClient {
     if (searchQuery) {
       params = params.set('q', searchQuery);
     }
-    return this.httpClient.get<ListResponse<KotkaDocumentObject>>(path + type, {params});
+    return this.httpClient.get<ListResponse<T>>(path + type, {params});
+  }
+
+  getDocumentsById<T extends KotkaDocumentObject>(type: KotkaDocumentObjectType, ids: string[], page=1, pageSize=1000, results: T[]=[]): Observable<T[]> {
+    const searchQuery = ids.filter(id => !!id).map(id => `id:${id}`).join(' OR ');
+    return this.getDocumentList<T>(type, page, pageSize, undefined, searchQuery).pipe(
+      switchMap(result => {
+        results = results.concat(result.member);
+        if (result.currentPage < result.lastPage) {
+          return this.getDocumentsById(type, ids, page + 1, pageSize, results);
+        }
+        return of(results);
+      })
+    );
   }
 
   getDocumentVersionList(type: KotkaDocumentObjectType, id: string): Observable<StoreVersion[]> {
