@@ -6,7 +6,7 @@ import {
   Controller, DefaultValuePipe,
   Get,
   InternalServerErrorException,
-  Param, ParseArrayPipe, ParseBoolPipe, ParseIntPipe, Query, Req,
+  ParseBoolPipe, ParseIntPipe, Query, Req,
   UseGuards,
   UseInterceptors
 } from '@nestjs/common';
@@ -17,8 +17,6 @@ import { LajiStoreController } from '../shared/controllers/laji-store.controller
 import { ControllerType } from '../shared/decorators/controller-type.decorator';
 import { ApiMethodAccessGuard } from '../shared/guards/api-method-access.guard';
 import { Organization } from '@luomus/laji-schema';
-import { OldKotkaDataService } from '../shared/services/old-kotka-data.service';
-import { AutocompleteService } from '../shared/services/autocomplete.service';
 import { KotkaDocumentObjectFullType, KotkaDocumentObjectType, Person } from '@kotka/shared/models';
 import { lastValueFrom } from 'rxjs';
 import { set } from 'lodash';
@@ -38,9 +36,7 @@ export class OrganizationController extends LajiStoreController<Organization> {
   constructor(
     protected readonly lajiStoreService: LajiStoreService,
     protected readonly triplestoreService: TriplestoreService,
-    protected readonly triplestoreMapperService: TriplestoreMapperService,
-    private readonly oldKotkaDataService: OldKotkaDataService,
-    private readonly autocompleteService: AutocompleteService
+    protected readonly triplestoreMapperService: TriplestoreMapperService
   ) {
     super(
       lajiStoreService,
