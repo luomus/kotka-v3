@@ -11,7 +11,6 @@ import {
 import { map, share, tap } from 'rxjs/operators';
 import { UserService } from './user.service';
 import { ApiClient } from './api-client';
-import { getOrganizationFullName } from '@kotka/utils';
 import { Collection, Dataset, Organization } from '@luomus/laji-schema/models';
 import { KotkaDocumentObjectType } from '@kotka/shared/models';
 
@@ -169,8 +168,8 @@ export class ApiLabelService {
         })
       );
     } else if (type === 'organization') {
-      observable = this.apiCient.getOrganization(key).pipe(
-        map(organization => getOrganizationFullName(organization)!.en!)
+      observable = this.apiCient.getDocumentById<Organization>(KotkaDocumentObjectType.organization, key).pipe(
+        map(organization => organization.fullName?.en || key)
       );
     } else if (type === 'collection') {
       observable = this.apiCient.getCollection(key).pipe(
@@ -191,10 +190,10 @@ export class ApiLabelService {
     if (type === 'person') {
       throw new Error('The method is missing an implementation for persons!');
     } else if (type === 'organization') {
-      observable = this.apiCient.getOrganizations(keys).pipe(
+      observable = this.apiCient.getDocumentsById<Organization>(KotkaDocumentObjectType.organization, keys).pipe(
         map(organizations => (
           organizations.map((organization: Organization) => ({
-            key: organization.id!, value: getOrganizationFullName(organization)!.en!
+            key: organization.id!, value: organization.fullName?.en || organization.id!
           }))
         ))
       );

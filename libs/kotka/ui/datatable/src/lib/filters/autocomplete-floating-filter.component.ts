@@ -2,14 +2,18 @@ import { Component } from '@angular/core';
 import {
   IFloatingFilterParams,
   TextFilter,
-  TextFilterModel
+  TextFilterModel,
 } from '@ag-grid-community/core';
 import { IFloatingFilterAngularComp } from '@ag-grid-community/angular';
 import { ApiClient } from '@kotka/services';
-import { KotkaUiAutocompleteModule, FetchAutocompleteResultsFunc } from '@kotka/ui/autocomplete';
+import {
+  FetchAutocompleteResultsFunc,
+  KotkaUiAutocompleteModule,
+} from '@kotka/ui/autocomplete';
+import { KotkaDocumentObjectType } from '@kotka/shared/models';
 
 interface FilterExtraParams {
-  type: 'organization'|'collection'
+  type: 'organization' | 'collection';
 }
 
 @Component({
@@ -58,7 +62,7 @@ export class AutocompleteFloatingFilterComponent implements IFloatingFilterAngul
 
   private getAutocompleteResults(term: string) {
     if (this.params.type === 'organization') {
-      return this.apiClient.getOrganizationAutocomplete(term);
+      return this.apiClient.getAutocomplete(KotkaDocumentObjectType.organization, term);
     } else {
       return this.apiClient.getCollectionAutocomplete(term);
     }

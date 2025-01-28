@@ -10,7 +10,7 @@ import {
 import { Observable, combineLatest } from 'rxjs';
 import {
   TransactionPdfSheetsContextService
-} from '../+transactions/transaction-pdf-sheets/transaction-pdf-sheets-context-service';
+} from '../+transactions/transaction-pdf-sheets/services/transaction-pdf-sheets-context-service';
 
 enum TypeEnum {
   transactionDispatch = 'transactionDispatch',

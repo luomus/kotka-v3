@@ -18,7 +18,7 @@ import {
   LoginResponse,
   AutocompleteResult
 } from '@kotka/api-interfaces';
-import { Organization, Collection } from '@luomus/laji-schema';
+import { Collection } from '@luomus/laji-schema';
 import { map } from 'rxjs/operators';
 
 const path = apiBase + '/';
@@ -86,6 +86,11 @@ export class ApiClient {
     return this.httpClient.get<KotkaVersionDifference>(path + type + '/' + id + '/_ver/' + version1 + '/diff/' + version2);
   }
 
+  getAutocomplete(type: KotkaDocumentObjectType.dataset|KotkaDocumentObjectType.organization, query = ''): Observable<AutocompleteResult[]> {
+    const params = new HttpParams().set('q', query);
+    return this.httpClient.get<AutocompleteResult[]>(`${path}${type}/autocomplete`, { params });
+  }
+
   getForm(formId: string): Observable<LajiForm.SchemaForm> {
     return this.httpClient.get<LajiForm.SchemaForm>(`${lajiApiPath}forms/${formId}`);
   }
@@ -97,22 +102,6 @@ export class ApiClient {
 
   getSpecimenRange(range: string): Observable<RangeResponse> {
     return this.httpClient.get<RangeResponse>(`${path}specimen/range/${range}`);
-  }
-
-  getOrganization(id: string): Observable<Organization> {
-    return this.httpClient.get<Organization>(`${path}organization/old/${id}`);
-  }
-
-  getOrganizations(ids: string[]): Observable<Organization[]> {
-    const params = new HttpParams().set('ids', ids.join(','));
-    return this.httpClient.get<ListResponse<Organization>>(`${path}organization/old`, { params }).pipe(
-      map(result => result.member)
-    );
-  }
-
-  getOrganizationAutocomplete(query = ''): Observable<AutocompleteResult[]> {
-    const params = new HttpParams().set('q', query);
-    return this.httpClient.get<AutocompleteResult[]>(`${path}organization/old/autocomplete`, { params });
   }
 
   getCollection(id: string): Observable<Collection> {

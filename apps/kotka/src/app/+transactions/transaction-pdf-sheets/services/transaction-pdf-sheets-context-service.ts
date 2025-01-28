@@ -1,17 +1,16 @@
 import { Injectable } from '@angular/core';
-import { ApiClient } from '@kotka/services';
+import { ApiClient, FormService } from '@kotka/services';
 import { Organization, SpecimenTransaction } from '@luomus/laji-schema';
-import { LajiForm } from '@kotka/shared/models';
+import { KotkaDocumentObjectType, LajiForm } from '@kotka/shared/models';
 import { forkJoin, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { globals } from '../../../environments/globals';
-import { FormService } from '@kotka/services';
+import { globals } from '../../../../environments/globals';
 
 export interface TransactionSheetContext {
-  data: SpecimenTransaction,
-  ownerOrganization?: Organization,
-  correspondingOrganization?: Organization,
-  fieldData: Record<string, LajiForm.Field>
+  data: SpecimenTransaction;
+  ownerOrganization?: Organization;
+  correspondingOrganization?: Organization;
+  fieldData: Record<string, LajiForm.Field>;
 }
 
 export interface TransactionInsectShelfSlipContext {
@@ -62,6 +61,6 @@ export class TransactionPdfSheetsContextService {
   }
 
   private getOrganization(organizationId?: string): Observable<Organization|undefined> {
-    return organizationId ? this.apiClient.getOrganization(organizationId) : of(undefined);
+    return organizationId ? this.apiClient.getDocumentById<Organization>(KotkaDocumentObjectType.organization, organizationId) : of(undefined);
   }
 }

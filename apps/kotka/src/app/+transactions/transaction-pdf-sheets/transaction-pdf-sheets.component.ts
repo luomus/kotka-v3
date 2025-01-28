@@ -6,7 +6,7 @@ import {
 } from '@angular/core';
 import { TransactionDispatchSheetComponent } from './transaction-dispatch-sheet/transaction-dispatch-sheet';
 import { SpecimenTransaction } from '@luomus/laji-schema';
-import { TransactionPdfSheetsContextService } from './transaction-pdf-sheets-context-service';
+import { TransactionPdfSheetsContextService } from './services/transaction-pdf-sheets-context-service';
 import { PdfTemplateComponent, PdfService } from '@kotka/services';
 import { TransactionIncomingSheetComponent } from './transaction-incoming-sheet/transaction-incoming-sheet';
 import { TransactionInquirySheetComponent } from './transaction-inquiry-sheet/transaction-inquiry-sheet';
