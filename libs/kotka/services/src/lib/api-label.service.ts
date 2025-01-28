@@ -168,7 +168,7 @@ export class ApiLabelService {
         })
       );
     } else if (type === 'organization') {
-      observable = this.apiCient.getDocumentById<Organization>(KotkaDocumentObjectType.organization, key).pipe(
+      observable = this.apiCient.getDocumentById(KotkaDocumentObjectType.organization, key).pipe(
         map(organization => organization.fullName?.en || key)
       );
     } else if (type === 'collection') {
@@ -176,7 +176,7 @@ export class ApiLabelService {
         map(collection => collection.collectionName.en || key)
       );
     } else {
-      observable = this.apiCient.getDocumentById<Dataset>(KotkaDocumentObjectType.dataset, key).pipe(
+      observable = this.apiCient.getDocumentById(KotkaDocumentObjectType.dataset, key).pipe(
         map(dataset => dataset.datasetName.en || key)
       );
     }
@@ -190,7 +190,7 @@ export class ApiLabelService {
     if (type === 'person') {
       throw new Error('The method is missing an implementation for persons!');
     } else if (type === 'organization') {
-      observable = this.apiCient.getDocumentsById<Organization>(KotkaDocumentObjectType.organization, keys).pipe(
+      observable = this.apiCient.getDocumentsById(KotkaDocumentObjectType.organization, keys).pipe(
         map(organizations => (
           organizations.map((organization: Organization) => ({
             key: organization.id!, value: organization.fullName?.en || organization.id!
@@ -206,7 +206,7 @@ export class ApiLabelService {
         ))
       );
     } else {
-      observable = this.apiCient.getDocumentsById<Dataset>(KotkaDocumentObjectType.dataset, keys).pipe(
+      observable = this.apiCient.getDocumentsById(KotkaDocumentObjectType.dataset, keys).pipe(
         map(datasets => (
           datasets.map((dataset: Dataset) => ({
             key: dataset.id!, value: dataset.datasetName.en || dataset.id!

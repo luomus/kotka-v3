@@ -25,7 +25,7 @@ import {
 } from './form-view.facade';
 import { filter, take } from 'rxjs/operators';
 import { FormViewUtils } from './form-view-utils';
-import { DataService, IdService, ToastService, DialogService } from '@kotka/services';
+import { ApiClient, IdService, ToastService, DialogService } from '@kotka/services';
 import { Utils } from '../../../shared/services/utils';
 
 @Component({
@@ -66,7 +66,7 @@ export class FormViewComponent implements OnChanges, OnDestroy {
   constructor(
     private notifier: ToastService,
     private activeRoute: ActivatedRoute,
-    private dataService: DataService,
+    private apiClient: ApiClient,
     private dialogService: DialogService,
     private router: Router,
     private formViewFacade: FormViewFacade,
@@ -169,7 +169,7 @@ export class FormViewComponent implements OnChanges, OnDestroy {
     }
 
     this.lajiForm?.block();
-    this.dataService.delete(this.dataType, data.id).subscribe({
+    this.apiClient.deleteDocument(this.dataType, data.id).subscribe({
       'next': () => {
         this.formViewFacade.setFormHasChanges(false);
         this.lajiForm?.unBlock();
@@ -197,9 +197,9 @@ export class FormViewComponent implements OnChanges, OnDestroy {
 
     let save$: Observable<KotkaDocumentObject>;
     if (data.id) {
-      save$ = this.dataService.update(this.dataType, data.id, data);
+      save$ = this.apiClient.updateDocument(this.dataType, data.id, data);
     } else {
-      save$ = this.dataService.create(this.dataType, data);
+      save$ = this.apiClient.createDocument(this.dataType, data);
     }
 
     return save$;

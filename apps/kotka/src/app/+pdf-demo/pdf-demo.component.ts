@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ViewEncapsulation, } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { map, switchMap } from 'rxjs/operators';
-import { DataService } from '@kotka/services';
+import { ApiClient } from '@kotka/services';
 import { FormViewUtils } from '../shared-modules/form-view/form-view/form-view-utils';
 import {
   asSpecimenTransaction,
@@ -36,7 +36,7 @@ export class PdfDemoComponent {
 
   constructor(
     private route: ActivatedRoute,
-    private dataService: DataService,
+    private apiClient: ApiClient,
     private transactionPdfSheetsContextService: TransactionPdfSheetsContextService
   ) {
     const params$ = this.route.queryParams.pipe(
@@ -49,7 +49,7 @@ export class PdfDemoComponent {
     this.type$ = params$.pipe(map(params => params.type));
 
     const data$ = params$.pipe(switchMap(params => {
-      return this.dataService.getById(KotkaDocumentObjectType.transaction, params.id);
+      return this.apiClient.getDocumentById(KotkaDocumentObjectType.transaction, params.id);
     }));
 
     this.context$ = combineLatest([params$, data$]).pipe(

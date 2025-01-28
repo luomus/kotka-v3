@@ -7,8 +7,8 @@ import {
   DatatableColumn,
   FilterModel
 } from '@kotka/shared/models';
-import { DataService} from './data.service';
 import { Injectable } from '@angular/core';
+import { ApiClient } from './api-client';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +16,7 @@ import { Injectable } from '@angular/core';
 
 export class DatatableDataService {
   constructor(
-    private dataService: DataService
+    private apiClient: ApiClient
   ) {}
 
   getData(
@@ -36,7 +36,7 @@ export class DatatableDataService {
     const filterSearchQuery = this.filterModelToSearchQuery(filterModel, colIdFieldMap);
     const searchQuery = [extraSearchQuery, filterSearchQuery].filter(query => !!query).map(query => `(${query})`).join(' AND ');
 
-    return this.dataService.getData(dataType, page, pageSize, sort, searchQuery);
+    return this.apiClient.getDocumentList(dataType, page, pageSize, sort, searchQuery);
   }
 
   getSearchQueryForMultiColumnTextSearch(fields: string[], filterText: string): string {

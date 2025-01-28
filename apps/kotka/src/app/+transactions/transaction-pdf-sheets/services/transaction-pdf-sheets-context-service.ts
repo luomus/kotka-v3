@@ -61,6 +61,6 @@ export class TransactionPdfSheetsContextService {
   }
 
   private getOrganization(organizationId?: string): Observable<Organization|undefined> {
-    return organizationId ? this.apiClient.getDocumentById<Organization>(KotkaDocumentObjectType.organization, organizationId) : of(undefined);
+    return organizationId ? this.apiClient.getDocumentById(KotkaDocumentObjectType.organization, organizationId) : of(undefined);
   }
 }

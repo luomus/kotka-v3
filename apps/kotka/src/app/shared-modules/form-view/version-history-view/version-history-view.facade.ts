@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DataService, FormService } from '@kotka/services';
+import { ApiClient, FormService } from '@kotka/services';
 import {
   catchError,
   combineLatest,
@@ -76,7 +76,7 @@ export class VersionHistoryViewFacade {
 
   constructor(
     private formService: FormService,
-    private dataService: DataService
+    private apiClient: ApiClient
   ) {
     this.versionList$ = this.getVersionList$();
     this.form$ = this.getForm$();
@@ -165,7 +165,7 @@ export class VersionHistoryViewFacade {
     }
 
     const id = FormViewUtils.getIdFromDataURI(dataURI);
-    return this.dataService.getVersionList(dataType, id).pipe(
+    return this.apiClient.getDocumentVersionList(dataType, id).pipe(
       catchError(err => {
         err = err.status === 404 ? VersionHistoryErrorEnum.dataNotFound : err;
         return throwError(() => new Error(err));
@@ -179,7 +179,7 @@ export class VersionHistoryViewFacade {
     }
 
     const id = FormViewUtils.getIdFromDataURI(dataURI);
-    return this.dataService.getVersionData(dataType, id, version).pipe(
+    return this.apiClient.getDocumentVersionData(dataType, id, version).pipe(
       catchError(err => {
         err = err.status === 404 ? VersionHistoryErrorEnum.dataNotFound : err;
         return throwError(() => new Error(err));
@@ -193,6 +193,6 @@ export class VersionHistoryViewFacade {
     }
 
     const id = FormViewUtils.getIdFromDataURI(dataURI);
-    return this.dataService.getVersionDifference(dataType, id, versions[0], versions[1]);
+    return this.apiClient.getDocumentVersionDifference(dataType, id, versions[0], versions[1]);
   }
 }

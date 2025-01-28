@@ -3,7 +3,6 @@ export * from './lib/absch.service';
 export * from './lib/form-api-client';
 export * from './lib/toast.service';
 export * from './lib/component.service';
-export * from './lib/data.service';
 export * from './lib/datatable-data.service';
 export * from './lib/user.service';
 export * from './lib/api-label.service';

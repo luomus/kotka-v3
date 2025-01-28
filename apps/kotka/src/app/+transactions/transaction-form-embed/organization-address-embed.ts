@@ -43,7 +43,7 @@ export class OrganizationAddressEmbedComponent {
       return of(undefined);
     }
 
-    return this.apiClient.getDocumentById<Organization>(
+    return this.apiClient.getDocumentById(
       KotkaDocumentObjectType.organization, organizationId
     ).pipe(
       catchError((e) => {

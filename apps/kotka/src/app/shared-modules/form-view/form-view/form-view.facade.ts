@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { DataService, FormService, UserService } from '@kotka/services';
+import { ApiClient, FormService, UserService } from '@kotka/services';
 import {
   catchError,
   concat,
@@ -80,7 +80,7 @@ export class FormViewFacade implements OnDestroy {
   constructor(
     private userService: UserService,
     private formService: FormService,
-    private dataService: DataService
+    private apiClient: ApiClient
   ) {
     this.vm$ = this.getVm$();
     this.initialStateSub = this.getInitialStateSub();
@@ -160,7 +160,7 @@ export class FormViewFacade implements OnDestroy {
     }
 
     const id = FormViewUtils.getIdFromDataURI(dataURI);
-    return this.dataService.getById(dataType, id).pipe(
+    return this.apiClient.getDocumentById(dataType, id).pipe(
       catchError(err => {
         err = err.status === 404 ? FormErrorEnum.dataNotFound : err;
         return throwError(() => new Error(err));
