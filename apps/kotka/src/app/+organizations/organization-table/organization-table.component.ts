@@ -4,7 +4,7 @@ import {
   DateCellRendererComponent,
   LabelCellRendererComponent,
   URICellRendererComponent,
-  BooleanFilterComponent, BooleanFloatingFilterComponent
+  BooleanFilterComponent, BooleanFloatingFilterComponent, AutocompleteFloatingFilterComponent
 } from '@kotka/ui/datatable';
 import { DatatableDataService, DEFAULT_DOMAIN } from '@kotka/services';
 import {
@@ -64,7 +64,13 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
   }, {
     headerName: 'Tags',
     field: 'datasetID',
-    cellRenderer: LabelCellRendererComponent
+    cellRenderer: LabelCellRendererComponent,
+    floatingFilterComponent: AutocompleteFloatingFilterComponent,
+    floatingFilterComponentParams: {
+      type: 'dataset'
+    },
+    suppressFloatingFilterButton: true,
+    sortable: false
   }, {
     headerName: 'Orders Due',
     field: 'dateOrdersDue',

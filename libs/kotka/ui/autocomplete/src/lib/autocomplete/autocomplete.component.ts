@@ -7,7 +7,6 @@ import {
   Output,
   SimpleChanges
 } from '@angular/core';
-import { KeyCode } from '@ag-grid-community/core';
 import { AutocompleteResult } from '@kotka/api-interfaces';
 import { debounceTime, distinctUntilChanged, Observable, of, OperatorFunction, switchMap } from 'rxjs';
 import { NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
@@ -29,7 +28,7 @@ export type FetchAutocompleteResultsFunc = (term: string) => Observable<Autocomp
       [container]="'body'"
       (selectItem)="onSelectItem($event)"
       (blur)="onBlur()"
-      (keydown)="onKeyDown($event)"
+      (ngModelChange)="onChange()"
     />
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -85,11 +84,9 @@ export class AutocompleteComponent implements OnChanges {
     }
   };
 
-  onKeyDown(event: KeyboardEvent) {
-    if (event.key === KeyCode.ENTER) {
-      if (this.typeaheadValue === '' && this.value) {
-        this.clearValue();
-      }
+  onChange() {
+    if (this.typeaheadValue === '' && this.value) {
+      this.clearValue();
     }
   }
 

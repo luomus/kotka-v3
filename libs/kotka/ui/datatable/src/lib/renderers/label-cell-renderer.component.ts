@@ -7,7 +7,7 @@ import { DatatableColumn } from '@kotka/shared/models';
 @Component({
   selector: 'kui-label-cell-renderer',
   template: `
-    <span title="{{ params.value | label }}">{{ params.value | label:'Loading...' }}</span>
+    <span title="{{ params.value | label | join }}">{{ params.value | label:'Loading...' | join }}</span>
   `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush

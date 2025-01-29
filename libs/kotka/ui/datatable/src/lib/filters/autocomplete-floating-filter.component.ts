@@ -13,7 +13,7 @@ import {
 import { KotkaDocumentObjectType } from '@kotka/shared/models';
 
 interface FilterExtraParams {
-  type: 'organization' | 'collection';
+  type: KotkaDocumentObjectType.dataset | KotkaDocumentObjectType.organization | 'collection';
 }
 
 @Component({
@@ -61,10 +61,10 @@ export class AutocompleteFloatingFilterComponent implements IFloatingFilterAngul
   }
 
   private getAutocompleteResults(term: string) {
-    if (this.params.type === 'organization') {
-      return this.apiClient.getAutocomplete(KotkaDocumentObjectType.organization, term);
-    } else {
+    if (this.params.type === 'collection') {
       return this.apiClient.getCollectionAutocomplete(term);
+    } else {
+      return this.apiClient.getAutocomplete(this.params.type, term);
     }
   }
 }
