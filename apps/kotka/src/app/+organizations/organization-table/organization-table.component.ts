@@ -3,7 +3,8 @@ import {
   DatatableComponent,
   DateCellRendererComponent,
   LabelCellRendererComponent,
-  URICellRendererComponent
+  URICellRendererComponent,
+  BooleanFilterComponent, BooleanFloatingFilterComponent
 } from '@kotka/ui/datatable';
 import { DatatableDataService, DEFAULT_DOMAIN } from '@kotka/services';
 import {
@@ -55,7 +56,11 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
     field: 'postalCode'
   }, {
     headerName: 'Hidden',
-    field: 'hidden'
+    field: 'hidden',
+    cellRenderer: LabelCellRendererComponent,
+    filter: BooleanFilterComponent,
+    floatingFilterComponent: BooleanFloatingFilterComponent,
+    suppressFloatingFilterButton: true
   }, {
     headerName: 'Tags',
     field: 'datasetID',

@@ -70,18 +70,20 @@ export class DatatableDataService {
   }
 
   private filterModelEntryToSearchQuery(field: string, filterModel: FilterModel): string {
-    if (!['text', 'date'].includes(filterModel['filterType'])) {
+    if (!['text', 'date', 'boolean'].includes(filterModel['filterType'])) {
       throw new Error('Filter type ' + filterModel['filterType'] + ' is not supported!');
     }
 
     const type = filterModel['type'];
     if (type) {
       let filter: string, filter2: string;
-      if (filterModel['filterType'] === 'date') {
+      if (filterModel['filterType'] === 'text') {
+        filter = this.escapeFilterString(filterModel['filter']);
+      } else if (filterModel['filterType'] === 'date') {
         filter = this.getDateFilter(filterModel['dateFrom']);
         filter2 = this.getDateFilter(filterModel['dateTo']);
       } else {
-        filter = this.escapeFilterString(filterModel['filter']);
+        filter = filterModel['filter'];
       }
 
       switch(type) {
