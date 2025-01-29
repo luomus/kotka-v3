@@ -4,7 +4,8 @@ import moment from 'moment';
 
 const deleteAllowedForTypes = [
   KotkaDocumentObjectFullType.dataset,
-  KotkaDocumentObjectFullType.transaction
+  KotkaDocumentObjectFullType.transaction,
+  KotkaDocumentObjectFullType.organization
 ];
 
 export function allowEditForUser(document: Partial<KotkaDocumentObject>, user: Person): boolean {
