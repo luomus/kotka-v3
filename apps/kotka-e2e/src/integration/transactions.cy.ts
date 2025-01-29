@@ -57,7 +57,8 @@ describe('transactions', () => {
           .should('have.length.greaterThan', 1)
           .should('contain.text', 'Finnish Environment Institute');
 
-        cy.get('#root_geneticResourceAcquisitionCountry input').clear();
+        cy.get('#root_geneticResourceAcquisitionCountry').clear();
+        cy.get('#root_geneticResourceAcquisitionCountry').blur();
         cy.get('[data-cy=permits-info] ul').should('not.exist');
 
         cy.get('#root_geneticResourceAcquisitionCountry').type('Sweden{enter}');
@@ -66,7 +67,8 @@ describe('transactions', () => {
           .should('not.contain.text', 'Finnish Environment Institute')
           .should('contain.text', 'The Swedish Environmental Protection Agency');
 
-        cy.get('#root_type input').clear();
+        cy.get('#root_type').clear();
+        cy.get('#root_type').blur();
         cy.get('[data-cy=permits-info]').should('not.exist');
         cy.get('#root_type').type('Loan, incoming{enter}');
         cy.get('[data-cy=permits-info] ul').children()
