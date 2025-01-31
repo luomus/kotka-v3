@@ -60,29 +60,28 @@ export class OrganizationController extends LajiStoreController<Organization> {
       const userRoles: string[] = user?.role || [];
       const userOrganizations: string[] = user?.organisation || [];
 
-      const body = q ? {
-        query: {
-          bool: {
-            should: [
-              {
-                term: {
-                  id: q
-                }
-              },
-              {
-                term: {
-                  'fullName.en': q
-                }
-              },
-              {
-                wildcard: {
-                  'fullName.en': `*${q}*`
-                }
+      const body: Record<string, any> = {};
+      const should = q ? {
+        bool: {
+          should: [
+            {
+              term: {
+                id: q
               }
-            ],
-          }
+            },
+            {
+              term: {
+                'fullName.en': q
+              }
+            },
+            {
+              wildcard: {
+                'fullName.en': `*${q}*`
+              }
+            }
+          ],
         }
-      } : {};
+      } : undefined;
 
       if (onlyOwnOrganizations && !userRoles.includes('MA.admin')) {
         const terms = {
@@ -92,6 +91,9 @@ export class OrganizationController extends LajiStoreController<Organization> {
         };
 
         set(body, ['query', 'bool', 'must'], [terms]);
+        if (q) body.query.bool.must.push(should);
+      } else if (q) {
+        set(body, ['query'], should);
       }
 
       const params = {sort: q ? '_score desc': 'fullName.en', limit, fields: 'id,fullName.en'};
