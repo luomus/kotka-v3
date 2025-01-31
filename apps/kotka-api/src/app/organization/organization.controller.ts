@@ -92,7 +92,7 @@ export class OrganizationController extends LajiStoreController<Organization> {
       if (onlyOwnOrganizations && !userRoles.includes('MA.admin')) {
         const terms = {
           terms: {
-            owner: userOrganizations
+            id: userOrganizations
           }
         };
 
