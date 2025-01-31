@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { SpecimenTransaction } from '@luomus/laji-schema';
 import { CommonModule } from '@angular/common';
-import { TransactionSheetContext } from '../transaction-pdf-sheets-context-service';
+import { TransactionSheetContext } from '../services/transaction-pdf-sheets-context-service';
 import { PdfTemplateComponent } from '@kotka/services';
 import { PipesModule } from '@kotka/pipes';
 import { TransactionDispatchLabelPipe } from '../pipes/transaction-dispatch-label.pipe';

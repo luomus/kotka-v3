@@ -1,14 +1,13 @@
 import { HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { TriplestoreService } from '@kotka/api-services';
 import { TriplestoreMapperService } from '@kotka/mappers';
-import { Collection, Organization } from '@luomus/laji-schema';
+import { Collection } from '@luomus/laji-schema';
 import { lastValueFrom, map, switchMap } from 'rxjs';
 import { Cached } from '../decorators/cached.decorator';
 import { Cron, CronExpression, Timeout } from '@nestjs/schedule';
 import { CacheService } from './cache.service';
 
 const collectionType = 'MY.collection';
-const organizationType = 'MOS.organization';
 const cache_ttl = 12 * 60 * 60 * 1000; // 12 h
 @Injectable()
 export class OldKotkaDataService {
@@ -32,19 +31,6 @@ export class OldKotkaDataService {
     return this.getAllObjects<Collection>(collectionType);
   }
 
-  async getOrganization(id: string) {
-    return this.getObject<Organization>(organizationType, id);
-  }
-
-  async getOrganizations(ids: string[]) {
-    return this.getObjects<Organization>(organizationType, ids);
-  }
-
-  @Cached('allOrganizations', cache_ttl)
-  async getAllOrganizations() {
-    return this.getAllObjects<Organization>(organizationType);
-  }
-
   @Timeout(0)
   async initializeAll() {
     await this.updateAll();
@@ -53,17 +39,11 @@ export class OldKotkaDataService {
   @Cron(CronExpression.EVERY_10_MINUTES)
   async updateAll() {
     await this.updateCollections();
-    await this.updateOrganizations();
   }
 
   private async updateCollections() {
     const getDataFunc = async () => await this.getAllObjects<Collection>(collectionType);
     await this.cacheService.getValue('allCollections', cache_ttl, getDataFunc, true);
-  }
-
-  private async updateOrganizations() {
-    const getDataFunc = async () => await this.getAllObjects<Organization>(organizationType);
-    await this.cacheService.getValue('allOrganizations', cache_ttl, getDataFunc, true);
   }
 
   private async getObject<T>(type: string, id: string) {

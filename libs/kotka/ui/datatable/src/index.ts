@@ -9,3 +9,5 @@ export * from './lib/renderers/due-days-renderer.component';
 export * from './lib/filters/autocomplete-floating-filter.component';
 export * from './lib/filters/enum-floating-filter.component';
 export * from './lib/filters/year-floating-filter.component';
+export * from './lib/filters/boolean-filter.component';
+export * from './lib/filters/boolean-floating-filter.component';

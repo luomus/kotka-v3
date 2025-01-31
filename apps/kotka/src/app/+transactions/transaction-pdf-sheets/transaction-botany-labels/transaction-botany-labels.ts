@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { SpecimenTransaction } from '@luomus/laji-schema';
 import { CommonModule } from '@angular/common';
-import { TransactionBotanyShelfSlipContext } from '../transaction-pdf-sheets-context-service';
+import { TransactionBotanyShelfSlipContext } from '../services/transaction-pdf-sheets-context-service';
 import { PdfTemplateComponent } from '@kotka/services';
 import { PipesModule } from '@kotka/pipes';
 import { QRCodeModule } from 'angularx-qrcode';

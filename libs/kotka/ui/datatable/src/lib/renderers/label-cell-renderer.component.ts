@@ -7,7 +7,7 @@ import { DatatableColumn } from '@kotka/shared/models';
 @Component({
   selector: 'kui-label-cell-renderer',
   template: `
-    <span title="{{ params.value | label }}">{{ params.value | label:'Loading...' }}</span>
+    <span title="{{ params.value | label | join }}">{{ params.value | label:'Loading...' | join }}</span>
   `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -23,10 +23,17 @@ export class LabelCellRendererComponent extends CellRendererComponent {
   static override fetchDataNeededForExport(col: DatatableColumn, data: any[], injector: Injector): Observable<Record<string, string>> {
     const uniqueKeys: LabelKey[] = [];
     data.forEach(item => {
-      const value = item[col.field || ''];
-      if (value != null && !uniqueKeys.includes(value)) {
-        uniqueKeys.push(value);
+      const colValue = item[col.field || ''];
+      if (colValue == null) {
+        return;
       }
+
+      const values = Array.isArray(colValue) ? colValue : [colValue];
+      values.forEach(value => {
+        if (value != null && !uniqueKeys.includes(value)) {
+          uniqueKeys.push(value);
+        }
+      });
     });
 
     if (uniqueKeys.length === 0) {

@@ -1,10 +1,9 @@
-import {
-  Component
-} from '@angular/core';
+import { Component } from '@angular/core';
 import { catchError, Observable, of, ReplaySubject, switchMap } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { ApiClient } from '@kotka/services';
 import { Organization } from '@luomus/laji-schema';
+import { KotkaDocumentObjectType } from '@kotka/shared/models';
 
 @Component({
   selector: 'kotka-organization-address-embed',
@@ -24,7 +23,7 @@ import { Organization } from '@luomus/laji-schema';
 export class OrganizationAddressEmbedComponent {
   set organization(organization: string|null|undefined) {
     this.organizationSubject.next(organization);
-  };
+  }
 
   data$: Observable<Organization|undefined>;
 
@@ -44,8 +43,10 @@ export class OrganizationAddressEmbedComponent {
       return of(undefined);
     }
 
-    return this.apiClient.getOrganization(organizationId).pipe(
-      catchError(e => {
+    return this.apiClient.getDocumentById(
+      KotkaDocumentObjectType.organization, organizationId
+    ).pipe(
+      catchError((e) => {
         if (e?.status === 404) {
           return of(undefined);
         }

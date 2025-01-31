@@ -1,5 +1,11 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { DatatableComponent, DateCellRendererComponent, URICellRendererComponent } from '@kotka/ui/datatable';
+import {
+  DatatableComponent,
+  DateCellRendererComponent,
+  LabelCellRendererComponent,
+  URICellRendererComponent,
+  BooleanFilterComponent, BooleanFloatingFilterComponent, AutocompleteFloatingFilterComponent
+} from '@kotka/ui/datatable';
 import { DatatableDataService, DEFAULT_DOMAIN } from '@kotka/services';
 import {
   DatatableColumn,
@@ -50,10 +56,21 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
     field: 'postalCode'
   }, {
     headerName: 'Hidden',
-    field: 'hidden'
+    field: 'hidden',
+    cellRenderer: LabelCellRendererComponent,
+    filter: BooleanFilterComponent,
+    floatingFilterComponent: BooleanFloatingFilterComponent,
+    suppressFloatingFilterButton: true
   }, {
     headerName: 'Tags',
-    field: 'datasetID'
+    field: 'datasetID',
+    cellRenderer: LabelCellRendererComponent,
+    floatingFilterComponent: AutocompleteFloatingFilterComponent,
+    floatingFilterComponentParams: {
+      type: 'dataset'
+    },
+    suppressFloatingFilterButton: true,
+    sortable: false
   }, {
     headerName: 'Orders Due',
     field: 'dateOrdersDue',

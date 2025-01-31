@@ -5,21 +5,24 @@ import {
   KotkaDocumentObject,
   KotkaDocumentObjectType,
   KotkaVersionDifference,
+  KotkaVersionDifferenceObject,
   LajiForm,
   ListResponse,
   PagedResult,
   Person,
+  StorePatch,
   StoreVersion
 } from '@kotka/shared/models';
-import { Observable } from 'rxjs';
+import { Observable, of, switchMap } from 'rxjs';
 import { apiBase, lajiApiBase } from './constants';
 import {
   RangeResponse,
   LoginResponse,
   AutocompleteResult
 } from '@kotka/api-interfaces';
-import { Organization, Collection } from '@luomus/laji-schema';
+import { Dataset, SpecimenTransaction, Organization, Collection } from '@luomus/laji-schema';
 import { map } from 'rxjs/operators';
+import { get, set } from 'lodash';
 
 const path = apiBase + '/';
 const authPath = apiBase + '/auth/';
@@ -34,6 +37,10 @@ export class ApiClient {
     private httpClient: HttpClient
   ) {}
 
+  getDocumentById(type: KotkaDocumentObjectType.dataset, id: string): Observable<Dataset>;
+  getDocumentById(type: KotkaDocumentObjectType.transaction, id: string): Observable<SpecimenTransaction>;
+  getDocumentById(type: KotkaDocumentObjectType.organization, id: string): Observable<Organization>;
+  getDocumentById(type: KotkaDocumentObjectType, id: string): Observable<KotkaDocumentObject>;
   getDocumentById(type: KotkaDocumentObjectType, id: string): Observable<KotkaDocumentObject> {
     return this.httpClient.get<KotkaDocumentObject>(path + type + '/' + id);
   }
@@ -61,6 +68,23 @@ export class ApiClient {
     return this.httpClient.get<ListResponse<KotkaDocumentObject>>(path + type, {params});
   }
 
+  getDocumentsById(type: KotkaDocumentObjectType.dataset, ids: string[], page?: number, pageSize?: number, results?: Dataset[]): Observable<Dataset[]>;
+  getDocumentsById(type: KotkaDocumentObjectType.transaction, ids: string[], page?: number, pageSize?: number, results?: SpecimenTransaction[]): Observable<SpecimenTransaction[]>;
+  getDocumentsById(type: KotkaDocumentObjectType.organization, ids: string[], page?: number, pageSize?: number, results?: Organization[]): Observable<Organization[]>;
+  getDocumentsById(type: KotkaDocumentObjectType, ids: string[], page?: number, pageSize?: number, results?: KotkaDocumentObject[]): Observable<KotkaDocumentObject[]>;
+  getDocumentsById(type: KotkaDocumentObjectType, ids: string[], page=1, pageSize=1000, results: KotkaDocumentObject[]=[]): Observable<KotkaDocumentObject[]> {
+    const searchQuery = ids.filter(id => !!id).map(id => `id:${id}`).join(' OR ');
+    return this.getDocumentList(type, page, pageSize, undefined, searchQuery).pipe(
+      switchMap(result => {
+        results = results.concat(result.member);
+        if (result.currentPage < result.lastPage) {
+          return this.getDocumentsById(type, ids, page + 1, pageSize, results);
+        }
+        return of(results);
+      })
+    );
+  }
+
   getDocumentVersionList(type: KotkaDocumentObjectType, id: string): Observable<StoreVersion[]> {
     return this.httpClient.get<StoreVersion[]>(path + type + '/' + id + '/_ver');
   }
@@ -69,8 +93,15 @@ export class ApiClient {
     return this.httpClient.get<KotkaDocumentObject>(path + type + '/' + id + '/_ver/' + version);
   }
 
-  getDocumentVersionDifference(type: KotkaDocumentObjectType, id: string, version1: number, version2: number): Observable<KotkaVersionDifference> {
-    return this.httpClient.get<KotkaVersionDifference>(path + type + '/' + id + '/_ver/' + version1 + '/diff/' + version2);
+  getDocumentVersionDifference(type: KotkaDocumentObjectType, id: string, version1: number, version2: number): Observable<KotkaVersionDifferenceObject> {
+    return this.httpClient.get<KotkaVersionDifference>(path + type + '/' + id + '/_ver/' + version1 + '/diff/' + version2).pipe(
+      map(data => this.convertVersionDifferenceFormat(data))
+    );
+  }
+
+  getAutocomplete(type: KotkaDocumentObjectType.dataset|KotkaDocumentObjectType.organization, query = ''): Observable<AutocompleteResult[]> {
+    const params = new HttpParams().set('q', query);
+    return this.httpClient.get<AutocompleteResult[]>(`${path}${type}/autocomplete`, { params });
   }
 
   getForm(formId: string): Observable<LajiForm.SchemaForm> {
@@ -84,22 +115,6 @@ export class ApiClient {
 
   getSpecimenRange(range: string): Observable<RangeResponse> {
     return this.httpClient.get<RangeResponse>(`${path}specimen/range/${range}`);
-  }
-
-  getOrganization(id: string): Observable<Organization> {
-    return this.httpClient.get<Organization>(`${path}organization/old/${id}`);
-  }
-
-  getOrganizations(ids: string[]): Observable<Organization[]> {
-    const params = new HttpParams().set('ids', ids.join(','));
-    return this.httpClient.get<ListResponse<Organization>>(`${path}organization/old`, { params }).pipe(
-      map(result => result.member)
-    );
-  }
-
-  getOrganizationAutocomplete(query = ''): Observable<AutocompleteResult[]> {
-    const params = new HttpParams().set('q', query);
-    return this.httpClient.get<AutocompleteResult[]>(`${path}organization/old/autocomplete`, { params });
   }
 
   getCollection(id: string): Observable<Collection> {
@@ -141,5 +156,66 @@ export class ApiClient {
 
   htmlToPdf(html: string): Observable<Blob> {
     return this.httpClient.post(`${lajiApiPath}html-to-pdf`, html, { responseType: 'blob' });
+  }
+
+  private convertVersionDifferenceFormat(data: KotkaVersionDifference): KotkaVersionDifferenceObject {
+    const diff = {};
+    const isRemovedFromArray: Record<string, boolean[]> = {};
+
+    const getIdxBeforeArrayRemovals = (idx: number, arrayPath: string[], patch: StorePatch): number => {
+      const arrayPathString = arrayPath.join('/');
+
+      if (!isRemovedFromArray[arrayPathString]) {
+        isRemovedFromArray[arrayPathString] = [];
+      }
+
+      const isRemoved = isRemovedFromArray[arrayPathString];
+
+      for (let i = 0; i < isRemoved.length && i <= idx; i++) {
+        if (isRemoved[i]) {
+          idx++;
+        }
+      }
+
+      if (patch.op === "remove") {
+        isRemoved[idx] = true;
+      }
+
+      return idx;
+    };
+
+    const parsePatchPath = (patch: StorePatch): string[] => {
+      const path = patch.path.split('/').filter(value => !!value);
+
+      const parentPath = path.slice(0, -1);
+      const parentValue = get(data.original, parentPath);
+
+      let lastPathPart = path[path.length - 1];
+
+      if (lastPathPart === '-') {
+        const originalArray = parentValue || [];
+        const diffArray = get(diff, parentPath) || [];
+        lastPathPart = Math.max(originalArray.length, diffArray.length).toString();
+      } else if (Array.isArray(parentValue)) {
+        let arrayIdx = parseInt(lastPathPart, 10);
+        arrayIdx = getIdxBeforeArrayRemovals(arrayIdx, parentPath, patch);
+        lastPathPart = arrayIdx.toString();
+      }
+
+      path[path.length - 1] = lastPathPart;
+
+      return path;
+    };
+
+
+    data.patch.forEach(patch => {
+      const path = parsePatchPath(patch);
+      set(diff, path, { op: patch.op, value: patch.value });
+    });
+
+    return {
+      original: data.original,
+      diff
+    };
   }
 }

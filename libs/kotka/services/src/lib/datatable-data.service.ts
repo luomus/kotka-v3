@@ -7,8 +7,8 @@ import {
   DatatableColumn,
   FilterModel
 } from '@kotka/shared/models';
-import { DataService} from './data.service';
 import { Injectable } from '@angular/core';
+import { ApiClient } from './api-client';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +16,7 @@ import { Injectable } from '@angular/core';
 
 export class DatatableDataService {
   constructor(
-    private dataService: DataService
+    private apiClient: ApiClient
   ) {}
 
   getData(
@@ -36,7 +36,7 @@ export class DatatableDataService {
     const filterSearchQuery = this.filterModelToSearchQuery(filterModel, colIdFieldMap);
     const searchQuery = [extraSearchQuery, filterSearchQuery].filter(query => !!query).map(query => `(${query})`).join(' AND ');
 
-    return this.dataService.getData(dataType, page, pageSize, sort, searchQuery);
+    return this.apiClient.getDocumentList(dataType, page, pageSize, sort, searchQuery);
   }
 
   getSearchQueryForMultiColumnTextSearch(fields: string[], filterText: string): string {
@@ -70,18 +70,20 @@ export class DatatableDataService {
   }
 
   private filterModelEntryToSearchQuery(field: string, filterModel: FilterModel): string {
-    if (!['text', 'date'].includes(filterModel['filterType'])) {
+    if (!['text', 'date', 'boolean'].includes(filterModel['filterType'])) {
       throw new Error('Filter type ' + filterModel['filterType'] + ' is not supported!');
     }
 
     const type = filterModel['type'];
     if (type) {
       let filter: string, filter2: string;
-      if (filterModel['filterType'] === 'date') {
+      if (filterModel['filterType'] === 'text') {
+        filter = this.escapeFilterString(filterModel['filter']);
+      } else if (filterModel['filterType'] === 'date') {
         filter = this.getDateFilter(filterModel['dateFrom']);
         filter2 = this.getDateFilter(filterModel['dateTo']);
       } else {
-        filter = this.escapeFilterString(filterModel['filter']);
+        filter = filterModel['filter'];
       }
 
       switch(type) {

@@ -1,12 +1,20 @@
 import { Injectable } from '@angular/core';
-import { catchError, Observable, of, switchMap, isObservable, shareReplay, forkJoin } from 'rxjs';
-import { map, tap, share } from 'rxjs/operators';
+import {
+  catchError,
+  forkJoin,
+  isObservable,
+  Observable,
+  of,
+  shareReplay,
+  switchMap,
+} from 'rxjs';
+import { map, share, tap } from 'rxjs/operators';
 import { UserService } from './user.service';
 import { ApiClient } from './api-client';
-import { getOrganizationFullName } from '@kotka/utils';
-import { Organization, Collection } from '@luomus/laji-schema/models';
+import { Collection, Dataset, Organization } from '@luomus/laji-schema/models';
+import { KotkaDocumentObjectType } from '@kotka/shared/models';
 
-export type ApiLabelType = 'person' | 'organization' | 'collection';
+export type ApiLabelType = 'person' | 'organization' | 'collection' | 'dataset';
 
 @Injectable({
   providedIn: 'root'
@@ -38,6 +46,8 @@ export class ApiLabelService {
         return 'organization';
       } else if (key.startsWith('HR.')) {
         return 'collection';
+      } else if (key.startsWith('GX.')) {
+        return 'dataset';
       }
     }
 
@@ -68,7 +78,7 @@ export class ApiLabelService {
     return this.cache[key] as Observable<string>;
   }
 
-  getLabels(keys: string[], type: 'person' | 'organization' | 'collection'): Observable<Record<string, string>> {
+  getLabels(keys: string[], type: ApiLabelType): Observable<Record<string, string>> {
     const result: Record<string, string> = {};
 
     const validKeys = keys.filter(key => {
@@ -158,12 +168,16 @@ export class ApiLabelService {
         })
       );
     } else if (type === 'organization') {
-      observable = this.apiCient.getOrganization(key).pipe(
-        map(organization => getOrganizationFullName(organization)!.en!)
+      observable = this.apiCient.getDocumentById(KotkaDocumentObjectType.organization, key).pipe(
+        map(organization => organization.fullName?.en || key)
       );
-    } else {
+    } else if (type === 'collection') {
       observable = this.apiCient.getCollection(key).pipe(
         map(collection => collection.collectionName.en || key)
+      );
+    } else {
+      observable = this.apiCient.getDocumentById(KotkaDocumentObjectType.dataset, key).pipe(
+        map(dataset => dataset.datasetName.en || key)
       );
     }
 
@@ -176,18 +190,26 @@ export class ApiLabelService {
     if (type === 'person') {
       throw new Error('The method is missing an implementation for persons!');
     } else if (type === 'organization') {
-      observable = this.apiCient.getOrganizations(keys).pipe(
+      observable = this.apiCient.getDocumentsById(KotkaDocumentObjectType.organization, keys).pipe(
         map(organizations => (
           organizations.map((organization: Organization) => ({
-            key: organization.id!, value: getOrganizationFullName(organization)!.en!
+            key: organization.id!, value: organization.fullName?.en || organization.id!
           }))
         ))
       );
-    } else {
+    } else if (type === 'collection') {
       observable = this.apiCient.getCollections(keys).pipe(
         map(collections => (
           collections.map((collection: Collection) => ({
             key: collection.id!, value: collection.collectionName.en || collection.id!
+          }))
+        ))
+      );
+    } else {
+      observable = this.apiCient.getDocumentsById(KotkaDocumentObjectType.dataset, keys).pipe(
+        map(datasets => (
+          datasets.map((dataset: Dataset) => ({
+            key: dataset.id!, value: dataset.datasetName.en || dataset.id!
           }))
         ))
       );
