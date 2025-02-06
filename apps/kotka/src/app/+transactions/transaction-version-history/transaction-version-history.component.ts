@@ -2,7 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
 } from '@angular/core';
-import { asSpecimenTransaction, KotkaDocumentObjectType, SpecimenTransaction } from '@kotka/shared/models';
+import { KotkaDocumentObjectType, SpecimenTransaction } from '@kotka/shared/models';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { TransactionFormEmbedService } from '../transaction-form-embed/transaction-form-embed.service';
 import { globals } from '../../../environments/globals';
@@ -14,7 +14,7 @@ import { globals } from '../../../environments/globals';
       [formId]="formId"
       [dataType]="dataType"
       [dataTypeName]="'transaction'"
-      (formInit)="onFormInit($event.lajiForm, asSpecimenTransaction($event.formData))"
+      (formInit)="onFormInit($event.lajiForm, $event.formData)"
     ></kotka-version-history-view>
   `,
   styles: [],
@@ -22,9 +22,7 @@ import { globals } from '../../../environments/globals';
 })
 export class TransactionVersionHistoryComponent {
   formId = globals.transactionFormId;
-  dataType = KotkaDocumentObjectType.transaction;
-
-  asSpecimenTransaction = asSpecimenTransaction;
+  dataType: KotkaDocumentObjectType.transaction = KotkaDocumentObjectType.transaction;
 
   constructor(
     private transactionFormEmbedService: TransactionFormEmbedService

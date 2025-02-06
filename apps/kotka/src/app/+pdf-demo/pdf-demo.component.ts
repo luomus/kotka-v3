@@ -4,7 +4,6 @@ import { map, switchMap } from 'rxjs/operators';
 import { ApiClient } from '@kotka/services';
 import { FormViewUtils } from '../shared-modules/form-view/form-view/form-view-utils';
 import {
-  asSpecimenTransaction,
   KotkaDocumentObjectType,
 } from '@kotka/shared/models';
 import { Observable, combineLatest } from 'rxjs';
@@ -54,8 +53,6 @@ export class PdfDemoComponent {
 
     this.context$ = combineLatest([params$, data$]).pipe(
       switchMap(([ params, data ]) => {
-        data = asSpecimenTransaction(data);
-
         if (params.type === TypeEnum.transactionInsectLabels) {
           return this.transactionPdfSheetsContextService.getInsectShelfSlipContext(data);
         } else if (params.type === TypeEnum.transactionBotanyLabels) {

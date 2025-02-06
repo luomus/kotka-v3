@@ -6,7 +6,7 @@
   [editModeHeaderTpl]="editModeHeaderTpl"
   [extraSectionTpl]="extraSection"
   (formInit)="onFormInit($event)"
-  (formDataChange)="onFormDataChange(asPartialSpecimenTransaction($event))"
+  (formDataChange)="onFormDataChange($event)"
   (disabledChange)="setDisabled($event)"
 >
 </kotka-form-view>
@@ -14,13 +14,13 @@
 <ng-template #editModeHeaderTpl let-dataURI="dataURI" let-formData="formData">
   <h1 data-cy="main-header">
     Edit transaction {{ dataURI }}
-    <ng-container *ngIf="formData && asSpecimenTransaction(formData).legacyID as legacyID">({{ legacyID }})</ng-container>
+    <ng-container *ngIf="formData?.legacyID as legacyID">({{ legacyID }})</ng-container>
   </h1>
 </ng-template>
 
 <ng-template #extraSection>
   <kotka-transaction-pdf-sheets
     *ngIf="isSpecimenTransaction(formData)"
-    [data]="asSpecimenTransaction(formData)">
+    [data]="formData">
   </kotka-transaction-pdf-sheets>
 </ng-template>

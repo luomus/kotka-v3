@@ -19,5 +19,5 @@ import { globals } from '../../../environments/globals';
 })
 export class OrganizationVersionHistoryComponent {
   formId = globals.organizationFormId;
-  dataType = KotkaDocumentObjectType.organization;
+  dataType: KotkaDocumentObjectType.organization = KotkaDocumentObjectType.organization;
 }

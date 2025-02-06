@@ -11,5 +11,5 @@ import { FormViewContainerComponent } from '../../shared-modules/form-view/form-
 })
 export class OrganizationFormComponent extends FormViewContainerComponent {
   formId = globals.organizationFormId;
-  dataType = KotkaDocumentObjectType.organization;
+  dataType: KotkaDocumentObjectType.organization = KotkaDocumentObjectType.organization;
 }

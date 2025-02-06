@@ -5,12 +5,10 @@ import {
   ViewChild
 } from '@angular/core';
 import {
-  asPartialSpecimenTransaction,
   KotkaDocumentObjectType,
   LajiForm,
   SpecimenTransaction,
   isSpecimenTransaction,
-  asSpecimenTransaction
 } from '@kotka/shared/models';
 import { Observable, of, Subscription, switchMap } from 'rxjs';
 import { FormService, DialogService } from '@kotka/services';
@@ -32,16 +30,14 @@ import { FormViewContainerComponent } from '../../shared-modules/form-view/form-
 })
 export class TransactionFormComponent extends FormViewContainerComponent implements OnDestroy {
   formId = globals.transactionFormId;
-  dataType = KotkaDocumentObjectType.transaction;
+  dataType: KotkaDocumentObjectType.transaction = KotkaDocumentObjectType.transaction;
   augmentFormFunc = this.augmentForm.bind(this);
 
-  formData?: Partial<SpecimenTransaction>;
+  formData?: SpecimenTransaction|Partial<SpecimenTransaction>;
 
   isSpecimenTransaction = isSpecimenTransaction;
-  asSpecimenTransaction = asSpecimenTransaction;
-  asPartialSpecimenTransaction = asPartialSpecimenTransaction;
 
-  @ViewChild(FormViewComponent, { static: true }) formView!: FormViewComponent;
+  @ViewChild(FormViewComponent, { static: true }) formView!: FormViewComponent<KotkaDocumentObjectType.transaction>;
 
   private specimenRangeButtonClickSubscription?: Subscription;
 

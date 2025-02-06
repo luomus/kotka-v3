@@ -11,8 +11,8 @@ import {
   OnDestroy
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { KotkaDocumentObject, KotkaDocumentObjectType, LajiForm } from '@kotka/shared/models';
-import { EMPTY, from, Observable, Subscription, switchMap } from 'rxjs';
+import { KotkaDocumentObjectType, KotkaDocumentObjectMap, LajiForm } from '@kotka/shared/models';
+import { from, Observable, Subscription, switchMap } from 'rxjs';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ErrorMessages } from '@kotka/api-interfaces';
 import {
@@ -35,9 +35,9 @@ import { Utils } from '../../../shared/services/utils';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [FormViewFacade]
 })
-export class FormViewComponent implements OnChanges, OnDestroy {
-  @Input() formId?: string;
-  @Input() dataType?: KotkaDocumentObjectType;
+export class FormViewComponent<T extends KotkaDocumentObjectType = KotkaDocumentObjectType, S extends KotkaDocumentObjectMap[T] = KotkaDocumentObjectMap[T]> implements OnChanges, OnDestroy {
+  @Input({ required: true }) formId!: string;
+  @Input({ required: true }) dataType!: T;
   @Input() dataTypeName = '';
   @Input() augmentFormFunc?: (form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>;
 
@@ -47,20 +47,20 @@ export class FormViewComponent implements OnChanges, OnDestroy {
   editMode = false;
   dataURI?: string;
 
-  vm$: Observable<FormState | ErrorViewModel>;
+  vm$: Observable<FormState<S> | ErrorViewModel>;
 
   formErrorEnum = FormErrorEnum;
 
   isErrorViewModel = isErrorViewModel;
   isSuccessViewModel = isSuccessViewModel;
 
-  @Output() formDataChange = new EventEmitter<Partial<KotkaDocumentObject|undefined>>();
+  @Output() formDataChange = new EventEmitter<Partial<S|undefined>>();
   @Output() formInit = new EventEmitter<LajiFormComponent>();
   @Output() disabledChange = new EventEmitter<boolean|undefined>();
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
 
-  private state?: FormState;
+  private state?: FormState<S>;
   private subscription: Subscription = new Subscription();
 
   constructor(
@@ -69,7 +69,7 @@ export class FormViewComponent implements OnChanges, OnDestroy {
     private apiClient: ApiClient,
     private dialogService: DialogService,
     private router: Router,
-    private formViewFacade: FormViewFacade,
+    private formViewFacade: FormViewFacade<T, S>,
     private cdr: ChangeDetectorRef
   ) {
     this.setRouteParamsIfChanged();
@@ -92,7 +92,7 @@ export class FormViewComponent implements OnChanges, OnDestroy {
       this.formInit.emit(this.lajiForm);
     }
   }
-  onSubmit(data: KotkaDocumentObject) {
+  onSubmit(data: S) {
     this.lajiForm?.block();
 
     this.save$(data).subscribe({
@@ -113,7 +113,7 @@ export class FormViewComponent implements OnChanges, OnDestroy {
     });
   }
 
-  onDelete(data: KotkaDocumentObject) {
+  onDelete(data: S) {
     this.dialogService.confirm(`Are you sure you want to delete this ${this.dataTypeName}?`).subscribe(confirm => {
       if (confirm) {
         this.delete(data);
@@ -121,16 +121,16 @@ export class FormViewComponent implements OnChanges, OnDestroy {
     });
   }
 
-  onChange(data: Partial<KotkaDocumentObject>) {
+  onChange(data: Partial<S>) {
     this.formViewFacade.setFormData(data);
   }
 
-  onCopy(data: KotkaDocumentObject) {
+  onCopy(data: S) {
     const excludedFields = this.state?.disabled ? ['owner'] : [];
     this.copyAsNew(data, excludedFields);
   }
 
-  onSubmitAndCopy(data: KotkaDocumentObject) {
+  onSubmitAndCopy(data: S) {
     this.lajiForm?.block();
 
     this.save$(data).subscribe({
@@ -146,7 +146,7 @@ export class FormViewComponent implements OnChanges, OnDestroy {
     });
   }
 
-  setFormData(data: Partial<KotkaDocumentObject>) {
+  setFormData(data: Partial<S>) {
     this.formViewFacade.setFormData(data);
     this.formDataChange.emit(data);
   }
@@ -163,8 +163,8 @@ export class FormViewComponent implements OnChanges, OnDestroy {
     this.formViewFacade.setShowDeleteTargetInUseAlert(false);
   }
 
-  private delete(data: KotkaDocumentObject) {
-    if (!this.dataType || !data.id) {
+  private delete(data: S) {
+    if (!data.id) {
       return;
     }
 
@@ -190,12 +190,8 @@ export class FormViewComponent implements OnChanges, OnDestroy {
     });
   }
 
-  private save$(data: KotkaDocumentObject): Observable<KotkaDocumentObject> {
-    if (!this.dataType) {
-      return EMPTY;
-    }
-
-    let save$: Observable<KotkaDocumentObject>;
+  private save$(data: S): Observable<S> {
+    let save$: Observable<S>;
     if (data.id) {
       save$ = this.apiClient.updateDocument(this.dataType, data.id, data);
     } else {
@@ -205,11 +201,11 @@ export class FormViewComponent implements OnChanges, OnDestroy {
     return save$;
   }
 
-  private copyAsNew(data: KotkaDocumentObject, excludedFields: string[] = []) {
+  private copyAsNew(data: S, excludedFields: string[] = []) {
     this.lajiForm?.block();
 
     excludedFields = excludedFields.concat(this.state?.form?.excludeFromCopy || []);
-    const newData = FormViewUtils.removeMetaAndExcludedFields(data, excludedFields);
+    const newData = FormViewUtils.removeMetaAndExcludedFields<S>(data, excludedFields);
 
     return this.navigateToAdd().pipe(
       switchMap(() => this.formViewFacade.formData$), // wait that the initial form data has loaded
@@ -281,14 +277,12 @@ export class FormViewComponent implements OnChanges, OnDestroy {
   }
 
   private updateInputs() {
-    if (this.formId && this.dataType) {
-      this.formViewFacade.setInputs({
-        formId: this.formId,
-        dataType: this.dataType,
-        editMode: this.editMode,
-        dataURI: this.dataURI,
-        augmentFormFunc: this.augmentFormFunc
-      });
-    }
+    this.formViewFacade.setInputs({
+      formId: this.formId,
+      dataType: this.dataType,
+      editMode: this.editMode,
+      dataURI: this.dataURI,
+      augmentFormFunc: this.augmentFormFunc
+    });
   }
 }
