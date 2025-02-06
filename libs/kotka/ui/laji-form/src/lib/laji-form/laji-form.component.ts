@@ -19,16 +19,18 @@ import { DOCUMENT } from '@angular/common';
 import { MediaMetadata } from '@luomus/laji-form/lib/components/LajiForm';
 import { FormApiClient, ToastService } from '@kotka/services';
 
+type FormData = Record<string, any>;
+
 @Component({
   selector: 'kui-laji-form',
   templateUrl: './laji-form.component.html',
   styleUrls: ['./laji-form.component.scss'],
 })
-export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
+export class LajiFormComponent<T extends FormData = FormData> implements AfterViewInit, OnChanges, OnDestroy {
   static TOP_OFFSET = 0;
   static BOTTOM_OFFSET = 50;
   @Input() form: LajiFormModel.SchemaForm | null = null;
-  @Input() formData: any = {};
+  @Input() formData: Partial<T> = {};
   @Input() hasChanges? = false;
   @Input() disabled? = false;
   @Input() mediaMetadata?: MediaMetadata;
@@ -44,14 +46,14 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
   private isBlocked = false;
   private copyAfterSubmit = false;
 
-  @Output() formReady: EventEmitter<any> = new EventEmitter<void>();
+  @Output() formReady: EventEmitter<void> = new EventEmitter<void>();
   @Output() formDestroy: EventEmitter<void> = new EventEmitter<void>();
 
-  @Output() formChange: EventEmitter<any> = new EventEmitter<any>();
-  @Output() formSubmit: EventEmitter<any> = new EventEmitter<any>();
-  @Output() delete: EventEmitter<any> = new EventEmitter<any>();
-  @Output() formCopy: EventEmitter<any> = new EventEmitter<any>();
-  @Output() formSubmitAndCopy: EventEmitter<any> = new EventEmitter<any>();
+  @Output() formChange: EventEmitter<Partial<T>> = new EventEmitter<Partial<T>>();
+  @Output() formSubmit: EventEmitter<T> = new EventEmitter<T>();
+  @Output() delete: EventEmitter<Partial<T>> = new EventEmitter<Partial<T>>();
+  @Output() formCopy: EventEmitter<Partial<T>> = new EventEmitter<Partial<T>>();
+  @Output() formSubmitAndCopy: EventEmitter<T> = new EventEmitter<T>();
 
   @ViewChild('lajiForm', { static: true }) lajiFormRoot!: ElementRef;
 
@@ -209,7 +211,7 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
     this.formDestroy.emit();
   }
 
-  private onSubmit(data: any) {
+  private onSubmit(data: T) {
     this.ngZone.run(() => {
       this.hasOnlyWarnings = false;
 
@@ -223,7 +225,7 @@ export class LajiFormComponent implements AfterViewInit, OnChanges, OnDestroy {
     });
   }
 
-  private onChange(data: any) {
+  private onChange(data: Partial<T>) {
     this.ngZone.run(() => {
       this.hasOnlyWarnings = false;
       this.formData = data;

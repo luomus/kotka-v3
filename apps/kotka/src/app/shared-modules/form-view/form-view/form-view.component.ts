@@ -113,7 +113,7 @@ export class FormViewComponent<T extends KotkaDocumentObjectType = KotkaDocument
     });
   }
 
-  onDelete(data: S) {
+  onDelete(data: Partial<S>) {
     this.dialogService.confirm(`Are you sure you want to delete this ${this.dataTypeName}?`).subscribe(confirm => {
       if (confirm) {
         this.delete(data);
@@ -125,7 +125,7 @@ export class FormViewComponent<T extends KotkaDocumentObjectType = KotkaDocument
     this.formViewFacade.setFormData(data);
   }
 
-  onCopy(data: S) {
+  onCopy(data: Partial<S>) {
     const excludedFields = this.state?.disabled ? ['owner'] : [];
     this.copyAsNew(data, excludedFields);
   }
@@ -163,7 +163,7 @@ export class FormViewComponent<T extends KotkaDocumentObjectType = KotkaDocument
     this.formViewFacade.setShowDeleteTargetInUseAlert(false);
   }
 
-  private delete(data: S) {
+  private delete(data: Partial<S>) {
     if (!data.id) {
       return;
     }
@@ -201,7 +201,7 @@ export class FormViewComponent<T extends KotkaDocumentObjectType = KotkaDocument
     return save$;
   }
 
-  private copyAsNew(data: S, excludedFields: string[] = []) {
+  private copyAsNew(data: Partial<S>, excludedFields: string[] = []) {
     this.lajiForm?.block();
 
     excludedFields = excludedFields.concat(this.state?.form?.excludeFromCopy || []);
