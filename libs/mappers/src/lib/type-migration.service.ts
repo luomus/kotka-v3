@@ -10,13 +10,10 @@ export class TypeMigrationService {
     'HRA.transaction': {
       'transactionStatus': 'status',
       'transactionType': 'type',
-      'transactionRequestReceived': 'requestReceived',
       'externalTransactionID': 'externalID',
       'oldLoanID': 'legacyID',
       'sentType': 'transportMethod',
       'sentParcels': 'numberOfParcels',
-      'transactionSent': 'outgoingSent',
-      'transactionReturned': 'outgoingReturned',
       'localPerson': [ 'localPerson', 'localHandler' ],
       'away': 'awayIDs',
       'awayOther': 'awayCount',
@@ -30,6 +27,45 @@ export class TypeMigrationService {
       'damaged': 'damagedIDs',
       'damagedOther': 'damagedCount',
       'HRA.damaged': 'damagedCount'
+    }
+  };
+
+  private conditionalMapping = {
+    'HRA.transaction': {
+      'conditionalField': 'transactionType',
+      'conditions': {
+        'HRA.transactionTypeLoanIncoming': {
+          'incomingReceived': 'transactionRequestReceived',
+          'incomingReturned': 'transactionSent'
+        },
+        'HRA.transactionTypeLoanOutgoing': {
+          'requestReceived': 'transactionRequestReceived',
+          'outgoingSent': ['transactionSent', 'transactionRequestReceived'],
+          'outgoingReturned': 'transactionReturned'
+        },
+        'HRA.transactionTypeGiftIncoming': {
+          'incomingReceived': 'transactionRequestReceived',
+        },
+        'HRA.transactionTypeGiftOutgoing': {
+          'requestReceived': 'transactionRequestReceived',
+          'outgoingSent': ['transactionSent', 'transactionRequestReceived'],
+
+        },
+        'HRA.transactionTypeExchangeIncoming': {
+          'incomingReceived': 'transactionRequestReceived'
+        },
+        'HRA.transactionTypeExchangeOutgoing': {
+          'requestReceived': 'transactionRequestReceived',
+          'outgoingSent': ['transactionSent', 'transactionRequestReceived'],
+        },
+        'HRA.transactionTypeFieldCollection': {
+          'incomingReceived': 'transactionRequestReceived'
+        },
+        'HRA.transactionTypeVirtualLoanOutgoing': {
+          'requestReceived': 'transactionRequestReceived',
+          'outgoingSent': ['transactionSent', 'transactionRequestReceived'],
+        },
+      },
     }
   };
 
@@ -59,7 +95,10 @@ export class TypeMigrationService {
       'HRA.geneticResearchAllowed',
       'correspondenceHeaderOrganizationCode',
       'localDepartment',
-      'ids'
+      'ids',
+      'transactionRequestReceived',
+      'transactionSent',
+      'transactionReturned',
     ]
   };
 
@@ -105,15 +144,37 @@ export class TypeMigrationService {
 
   public migrateObjectType<F, T>(type: string, object: F | Array<F>): T | T[] {
     if (Array.isArray(object)) {
-      return object.map(data => this.migrate(type, data) as T);
+      return object.map(data => {
+        const mapped = this.migrate<T>(type, data);
+        this.specialMapping<F, T>(type, data, mapped);
+        return mapped;
+      });
     } else {
-      return this.migrate(type, object) as T;
+      const mapped = this.migrate<T>(type, object);
+      this.specialMapping<F, T>(type, object, mapped);
+      return mapped;
     }
   }
 
-  private migrate(type: string, object: Record<string, any>) {
-    const toReturn = {};
+  private specialMapping<F, T>(type: string, object: F, toReturn: T) {
+    const conditionalField = object[this.conditionalMapping[type]['conditionalField']];
+    const mappings = this.conditionalMapping[type]['conditions']?.[conditionalField];
 
+    if (!mappings) return;
+
+
+    Object.keys(mappings).forEach(key => {
+      if (!Array.isArray(mappings[key])) {
+        return this.mapProp(type, key, object[mappings[key]], toReturn);
+      }
+
+      const value = object[mappings[key][0]] ? object[mappings[key][0]] : object[mappings[key][1]];
+      this.mapProp(type, key, value, toReturn);
+    });
+  }
+
+  private migrate<T>(type: string, object: Record<string, any>) {
+    const toReturn = {};
     Object.keys(object).forEach(key => {
       const value = object[key];
       const newKey = this.typeMap[type][key] || key;
@@ -133,7 +194,7 @@ export class TypeMigrationService {
       }
     });
 
-    return toReturn;
+    return toReturn as T;
   }
   
   private mapProp (type: string, key: string, value: any, to: Record<string, any>) {
@@ -159,7 +220,6 @@ export class TypeMigrationService {
   private getValue (type, key, value) {
     if (key === '@type') return this.mapClasses[value] || value;
     if (this.ignoreValue[type].includes(key)) {
-
       return value;
     }
 

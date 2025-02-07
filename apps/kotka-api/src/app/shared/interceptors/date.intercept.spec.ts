@@ -15,7 +15,7 @@ describe('DateInterceptor', () => {
 
     dateInterceptor = moduleRef.get<DateInterceptor>(DateInterceptor);
 
-    jest.useFakeTimers();
+    jest.useFakeTimers().setSystemTime(new Date('2022-11-22T12:00:00.000Z'));
   });
 
   it('Date is set correctly when using POST', () => {

@@ -2,9 +2,10 @@ import { LajiStoreService, TriplestoreService } from "@kotka/api-services";
 import { TriplestoreMapperService, TypeMigrationService } from "@kotka/mappers";
 import { Command, Console } from "nestjs-console";
 import { lastValueFrom, map } from "rxjs";
-import { StoreObject } from '@kotka/shared/models';
+import { Organization, StoreObject } from '@kotka/shared/models';
 import { IdService } from "@kotka/util-services";
 import ora from 'ora';
+import { getOrganizationFullName } from "@kotka/utils";
 
 interface Options {
   limit: number,
@@ -165,6 +166,22 @@ export class MigrateCommand {
           }
         };
 
+        const migrateOrganizationFullName = (data) => {
+          if (data['fullName'] === undefined) {
+            data['fullName'] = getOrganizationFullName(data);
+          }
+        };
+
+        const migrateOrganizationDates = (data: Organization) => {
+          if (data['dateOrdersDue'] !== undefined && data['dateOrdersDue'].includes('.')) {
+            const dateParts = data['dateOrdersDue'].split('.');
+            data['dateOrdersDue'] = dateParts.reverse().join('-');
+          }
+
+            data['dateCreated'] = new Date(data['dateCreated']).toISOString();
+            data['dateEdited'] = new Date(data['dateEdited']).toISOString();
+        };
+
         if (type.includes('dataset')) {
           if (Array.isArray(jsonData)) {
             jsonData.forEach(data => {
@@ -180,6 +197,16 @@ export class MigrateCommand {
             });
           } else {
             migrateSpecimenTransactionPrivacy(jsonData);
+          }
+        } else if (type.includes('organization')) {
+          if (Array.isArray(jsonData)) {
+            jsonData.forEach(data => {
+              migrateOrganizationFullName(data);
+              migrateOrganizationDates(data as Organization);
+            });
+          } else {
+            migrateOrganizationFullName(jsonData);
+            migrateOrganizationDates(jsonData);
           }
         }
 
@@ -230,7 +257,6 @@ export class MigrateCommand {
   async convertData(type: string, id: string) {
     try {
       const triplestoreData = await lastValueFrom(this.triplestoreService.get(id, { resulttype: 'TREE' }));
-
       const jsonData = await this.triplestoreMapperService.triplestoreToJson(triplestoreData.data, type);
 
       console.log(JSON.stringify(jsonData, null, '  '));
@@ -246,7 +272,6 @@ export class MigrateCommand {
   async returnData(type: string, id: string) {
     try {
       const lajistoreData = await lastValueFrom(this.lajiStoreService.get(type, id).pipe(map(res => res.data)));
-
       const triplestoreData = await this.triplestoreMapperService.jsonToTriplestore(lajistoreData, type);
 
       await lastValueFrom(this.triplestoreService.put(id, triplestoreData));

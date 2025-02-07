@@ -105,7 +105,6 @@ export class MediaApiService {
       response.pipe(res);
     });
 
-    console.log(proxy.getHeaders());
     req.pipe(proxy);
   }
 

@@ -1,4 +1,4 @@
-import { ApiServicesModule, TriplestoreService } from '@kotka/api-services';
+import { ApiServicesModule, LajiStoreService, TriplestoreService } from '@kotka/api-services';
 import { MappersModule } from '@kotka/mappers';
 import { Test } from '@nestjs/testing';
 import { of } from 'rxjs';
@@ -7,9 +7,11 @@ import { InUseGuard } from './in-use.guard';
 import { Reflector } from '@nestjs/core';
 import { createMock } from '@golevelup/ts-jest';
 import { ExecutionContext, ForbiddenException } from '@nestjs/common';
+import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces';
 
 describe('InUseGuard', () => {
   let inUseGuard: InUseGuard;
+  let lajistoreService: LajiStoreService;
   let triplestoreService: TriplestoreService;
   let reflector: Reflector;
 
@@ -20,6 +22,7 @@ describe('InUseGuard', () => {
       providers: [InUseGuard, Reflector],
     }).compile();
 
+    lajistoreService = moduleRef.get<LajiStoreService>(LajiStoreService);
     triplestoreService = moduleRef.get<TriplestoreService>(TriplestoreService);
     inUseGuard = moduleRef.get<InUseGuard>(InUseGuard);
     reflector = moduleRef.get<Reflector>(Reflector);
@@ -60,7 +63,7 @@ describe('InUseGuard', () => {
     expect(mockReflectorGet.mock.calls[1][0]).toBe('inUseTypes');
   });
 
-  it('Request method of DELETE and found inUseTypes results in call to triplestore, found documents and organizations result into denied access with forbidden error', async () => {
+  it('Request method of DELETE and found inUseTypes results in call to triplestore for type stored there, found documents results into denied access with forbidden error', async () => {
     const mockContext = createMock<ExecutionContext>();
     mockContext.switchToHttp().getRequest.mockReturnValue({ method: 'DELETE', params: { id: 'GX.1' } });
     const mockReflectorGet = jest.spyOn(reflector, 'get').mockImplementation((key) => {
@@ -68,7 +71,6 @@ describe('InUseGuard', () => {
         return 'GX.dataset';
       } else if (key === 'inUseTypes') {
         return [
-          'MOS.organization',
           'MY.document'
         ];
       }
@@ -78,14 +80,13 @@ describe('InUseGuard', () => {
         'rdf:RDF': {
           'xmlns':	'http://tun.fi/',
           'MY.document': [],
-          'MOS.organization': {},
         }
       },
       status: 200,
       statusText: '',
       headers: {},
       config: {}
-    }));
+    } as AxiosResponse));
 
     await expect(inUseGuard.canActivate(mockContext)).rejects.toThrow(ForbiddenException);
     expect(mockReflectorGet).toBeCalledTimes(2);
@@ -93,7 +94,7 @@ describe('InUseGuard', () => {
     expect(mockTriplestoreServiceSearch.mock.calls[0][0]).toEqual({ object: 'GX.1' });
   });
 
-  it('Request method of DELETE and found inUseTypes results in call to triplestore, no found documents and organizations result into granted access', async () => {
+  it('Request method of DELETE and found inUseTypes results in call to lajistore for type stored there, found organizations results into denied access with forbidden error', async () => {
     const mockContext = createMock<ExecutionContext>();
     mockContext.switchToHttp().getRequest.mockReturnValue({ method: 'DELETE', params: { id: 'GX.1' } });
     const mockReflectorGet = jest.spyOn(reflector, 'get').mockImplementation((key) => {
@@ -102,10 +103,77 @@ describe('InUseGuard', () => {
       } else if (key === 'inUseTypes') {
         return [
           'MOS.organization',
-          'MY.document'
         ];
       }
     });
+    const mockLajistoreServiceSearch = jest.spyOn(lajistoreService, 'getAll').mockImplementation(() => of({
+      data: {
+        '@context': 'test',
+        '@type': 'test',
+        view: {
+          '@id': 'test',
+          '@type': 'test',
+          itemsPerPage: '10',
+          first: 'test',
+          last: 'test'
+        },
+        totalItems: 1,
+        pageSize: 10,
+        currentPage: 0,
+        lastPage: 0,
+        member: [{
+          '@type': 'something'
+        }]
+      },
+      status: 200,
+      statusText: '',
+      headers: {},
+      config: {}
+    } as AxiosResponse));
+
+    await expect(inUseGuard.canActivate(mockContext)).rejects.toThrow(ForbiddenException);
+    expect(mockReflectorGet).toBeCalledTimes(2);
+    expect(mockLajistoreServiceSearch).toBeCalled();
+    expect(mockLajistoreServiceSearch.mock.calls[0][0]).toEqual('MOS.organization');
+    expect(mockLajistoreServiceSearch.mock.calls[0][1]).toEqual('GX.1');
+  });
+
+  it('Request method of DELETE and found inUseTypes results in call to triplestore and lajistore, no found documents and organizations result into granted access', async () => {
+    const mockContext = createMock<ExecutionContext>();
+    mockContext.switchToHttp().getRequest.mockReturnValue({ method: 'DELETE', params: { id: 'GX.1' } });
+    const mockReflectorGet = jest.spyOn(reflector, 'get').mockImplementation((key) => {
+      if (key === 'controllerType') {
+        return 'GX.dataset';
+      } else if (key === 'inUseTypes') {
+        return [
+          'MOS.organization',
+          'MY.document',
+          'MY.sample'
+        ];
+      }
+    });
+    const mockLajistoreServiceSearch = jest.spyOn(lajistoreService, 'getAll').mockImplementation(() => of({
+      data: {
+        '@context': 'test',
+        '@type': 'test',
+        view: {
+          '@id': 'test',
+          '@type': 'test',
+          itemsPerPage: '10',
+          first: 'test',
+          last: 'test'
+        },
+        totalItems: 1,
+        pageSize: 10,
+        currentPage: 0,
+        lastPage: 0,
+        member: []
+      },
+      status: 200,
+      statusText: '',
+      headers: {},
+      config: {}
+    } as AxiosResponse));
     const mockTriplestoreServiceSearch = jest.spyOn(triplestoreService, 'search').mockImplementation(() => of({
       data: {
         'rdf:RDF': {
@@ -116,12 +184,16 @@ describe('InUseGuard', () => {
       statusText: '',
       headers: {},
       config: {}
-    }));
+    } as AxiosResponse));
 
     const canActivate = await inUseGuard.canActivate(mockContext);
     expect(canActivate).toBe(true);
     expect(mockReflectorGet).toBeCalledTimes(2);
-    expect(mockTriplestoreServiceSearch).toBeCalled();
+    expect(mockTriplestoreServiceSearch).toBeCalledTimes(1);
+    expect(mockLajistoreServiceSearch).toBeCalled();
     expect(mockTriplestoreServiceSearch.mock.calls[0][0]).toEqual({ object: 'GX.1' });
+    expect(mockLajistoreServiceSearch.mock.calls[0][0]).toEqual('MOS.organization');
+    expect(mockLajistoreServiceSearch.mock.calls[0][1]).toEqual('GX.1');
+
   });
 });

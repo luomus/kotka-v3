@@ -6,6 +6,7 @@ import { ApiServicesModule, FormService, LajiStoreService } from '@kotka/api-ser
 import { Reflector } from '@nestjs/core';
 import { ValidationService } from '../services/validation.service';
 import { of } from 'rxjs';
+import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces';
 
 const mockForm = {
   "schema": {
@@ -142,7 +143,7 @@ describe('ValidationInterceptor', () => {
 
     jest.spyOn(formService, 'getForm').mockImplementation(() => new Promise((resolve) => resolve(mockForm) ));
     jest.spyOn(reflector, 'get').mockImplementation(() => 'GX.dataset');
-    jest.spyOn(lajiStoreService, 'search').mockImplementation((type, body) => { console.log(type, body); return of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [] }});});
+    jest.spyOn(lajiStoreService, 'search').mockImplementation((type, body) => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [] }} as AxiosResponse));
   });
 
   it('Missing body in request results in error thrown in validator', async () => {
@@ -214,7 +215,7 @@ describe('ValidationInterceptor', () => {
      }
   });
 
-  it('Error in overriden remote validation for datasetName uniquenenss results in error being thrown', async () => {
+  it('Error in overriden remote validation for datasetName uniqueness results in error being thrown', async () => {
     const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
       getRequest: () => ({
         method: 'POST',
@@ -229,7 +230,7 @@ describe('ValidationInterceptor', () => {
      })});
 
      const mockNext = createMock<CallHandler>();
-     jest.spyOn(lajiStoreService, 'search').mockImplementation((type, body) => { console.log(type, body); return of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [{}] }});});
+     jest.spyOn(lajiStoreService, 'search').mockImplementation((type, body) => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [{id: 'GX.1'}] }} as AxiosResponse));
      expect.assertions(3);
 
      try {

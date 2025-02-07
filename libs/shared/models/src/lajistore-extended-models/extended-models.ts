@@ -24,6 +24,12 @@ export enum KotkaDocumentObjectFullType {
   sample = 'MF.sample'
 }
 
+export const STORE_OBJECTS = [
+  KotkaDocumentObjectFullType.dataset,
+  KotkaDocumentObjectFullType.organization,
+  KotkaDocumentObjectFullType.transaction
+];
+
 export interface MultiLanguage {
   en?: string;
   fi?: string;

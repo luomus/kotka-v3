@@ -134,14 +134,15 @@ describe('ApiMethodAccessGuard', () => {
     expect(mockLajistoreGet.mock.calls[0][1]).toBe('GX.1');
   });
 
-  it('PUT request with id pointing to document with no owner results in access denied with error and a call to lajiStore and correct params', async () => {
+  it('PUT request with id pointing to document with no owner results in access granted and a call to lajiStore and correct params', async () => {
     jest.spyOn(reflector, 'get').mockImplementation(() => 'GX.dataset');
     const mockContext = createMock<ExecutionContext>();
 
     mockContext.switchToHttp().getRequest.mockReturnValue({ params: { id: 'GX.1' }, method: 'PUT', user: { profile: { organisation: ['MOS.1'] }}, body: { '@type': 'GX.dataset' }});
     const mockLajistoreGet = jest.spyOn(lajiStoreService, 'get').mockImplementation(() => of({ data: { id: 'GX.1', '@type': 'GX.dataset' }, status: 200, statusText: '', headers: {}, config: {}} as AxiosResponse));
 
-    await expect(apiMethodAccessGuard.canActivate(mockContext)).rejects.toThrow(ForbiddenException);
+    const canActivate = await apiMethodAccessGuard.canActivate(mockContext);
+    expect(canActivate).toBe(true);
     expect(mockLajistoreGet).toBeCalledTimes(1);
     expect(mockLajistoreGet.mock.calls[0][0]).toBe('GX.dataset');
     expect(mockLajistoreGet.mock.calls[0][1]).toBe('GX.1');
@@ -193,7 +194,7 @@ describe('ApiMethodAccessGuard', () => {
     const mockContext = createMock<ExecutionContext>();
 
     mockContext.switchToHttp().getRequest.mockReturnValue({ params: { id: 'GX.1' }, method: 'DELETE',  user: { profile: { role: ['MA.admin'] }}, body: { owner: 'MOS.1' }});
-    const mockLajistoreGet = jest.spyOn(lajiStoreService, 'get').mockImplementation(() => of({ data: { '@type': 'MOS.organization', id: 'GX.1', owner: 'MOS.1' }, status: 200, statusText: '', headers: {}, config: {}} as AxiosResponse));
+    const mockLajistoreGet = jest.spyOn(lajiStoreService, 'get').mockImplementation(() => of({ data: { '@type': 'MY.document', id: 'GX.1', owner: 'MOS.1' }, status: 200, statusText: '', headers: {}, config: {}} as AxiosResponse));
 
     await expect(apiMethodAccessGuard.canActivate(mockContext)).rejects.toThrow(ForbiddenException);
     expect(mockLajistoreGet).toBeCalledTimes(1);

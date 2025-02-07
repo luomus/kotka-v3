@@ -45,7 +45,7 @@ export class ValidationService {
     const datasetName = get(data, datasetNameField);
     const members: Dataset[] = await lastValueFrom(this.lajiStoreService.search<Dataset>('GX.dataset', { query: { match: { [datasetNameField]: datasetName }}}).pipe(map(res => res.data?.member)));
 
-    if (members.length !== 0 && !(members.length === 1 && members[0].id === data.id)) {
+    if (members.length !== 0 && !(members.length === 1 && members[0].id && members[0].id === data.id)) {
       return this.getError(datasetNameField, "Dataset name must be unique.");
     }
 

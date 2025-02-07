@@ -7,6 +7,7 @@ import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@
 import { Reflector } from '@nestjs/core';
 import { lastValueFrom } from 'rxjs';
 import { ErrorMessages } from '@kotka/api-interfaces';
+import { KotkaDocumentObjectFullType, STORE_OBJECTS } from '@kotka/shared/models';
 
 @Injectable()
 export class InUseGuard implements CanActivate {
@@ -32,12 +33,29 @@ export class InUseGuard implements CanActivate {
       return true;
     }
 
-    const res = await lastValueFrom(this.triplestoreService.search({ object: req.params.id }, { format: 'JSON' }));
+    let triplestoreSearchResponse;
+    let found = false;
 
-    //const res = await lastValueFrom(this.lajistoreSevice.getAll(type, req.params.id));
-    const data = Object.keys(res.data['rdf:RDF']).filter(key => inUseTypes.includes(key));
+    for (const type of inUseTypes) {
+      if (STORE_OBJECTS.includes(type as KotkaDocumentObjectFullType)) {
+        const res = await lastValueFrom(this.lajistoreSevice.getAll(type, req.params.id));
+        if (res.data.member.length > 0) {
+          found = true;
+          break;
+        }
+      } else {
+        if (!triplestoreSearchResponse) triplestoreSearchResponse = await lastValueFrom(this.triplestoreService.search({ object: req.params.id }, { format: 'JSON' }));
 
-    if (data && data.length > 0) {
+        const data = Object.keys(triplestoreSearchResponse.data['rdf:RDF']).filter(key => inUseTypes.includes(key));
+
+        if (data && data.length > 0) {
+          found = true;
+          break;
+        }
+      }
+    }
+
+    if (found) {
       throw new ForbiddenException(ErrorMessages.deletionTargetInUse);
     }
 
