@@ -21,15 +21,25 @@ import { KotkaDocumentObjectFullType, KotkaDocumentObjectType, Person } from '@k
 import { lastValueFrom } from 'rxjs';
 import { set } from 'lodash';
 import { OrganizationFullNameInterceptor } from './organization-fullname.interceptor';
+import { InUseTypesSet } from '../shared/decorators/in-use-types-set.decorator';
+import { InUseGuard } from '../shared/guards/in-use.guard';
 
 const type = KotkaDocumentObjectFullType.organization;
 const useTriplestore = false;
 
 @Controller(KotkaDocumentObjectType.organization)
 @ControllerType(type)
+@InUseTypesSet([
+  KotkaDocumentObjectFullType.document,
+  KotkaDocumentObjectFullType.organization,
+  KotkaDocumentObjectFullType.dataset,
+  KotkaDocumentObjectFullType.document,
+  KotkaDocumentObjectFullType.sample
+])
 @UseGuards(
   AuthenticateCookieGuard,
   ApiMethodAccessGuard,
+  InUseGuard,
 )
 @UseInterceptors(OrganizationFullNameInterceptor)
 export class OrganizationController extends LajiStoreController<Organization> {
