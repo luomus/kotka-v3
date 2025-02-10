@@ -25,7 +25,6 @@ import { InUseTypesSet } from '../shared/decorators/in-use-types-set.decorator';
 import { InUseGuard } from '../shared/guards/in-use.guard';
 
 const type = KotkaDocumentObjectFullType.organization;
-const useTriplestore = false;
 
 @Controller(KotkaDocumentObjectType.organization)
 @ControllerType(type)
@@ -53,7 +52,6 @@ export class OrganizationController extends LajiStoreController<Organization> {
       triplestoreService,
       triplestoreMapperService,
       type,
-      useTriplestore
     );
   }
 

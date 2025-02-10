@@ -16,7 +16,6 @@ import { KotkaDocumentObjectFullType, KotkaDocumentObjectType } from '@kotka/sha
 import { lastValueFrom } from 'rxjs';
 
 const type = KotkaDocumentObjectFullType.dataset;
-const useTriplestore = false;
 
 @Controller(KotkaDocumentObjectType.dataset)
 @ControllerType(type)
@@ -37,7 +36,6 @@ export class DatasetController extends LajiStoreController<Dataset> {
         triplestoreService,
         triplestoreMapperService,
         type,
-        useTriplestore
       );
   }
 

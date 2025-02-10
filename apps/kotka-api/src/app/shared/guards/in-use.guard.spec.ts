@@ -122,7 +122,8 @@ describe('InUseGuard', () => {
         currentPage: 0,
         lastPage: 0,
         member: [{
-          '@type': 'something'
+          '@type': 'something',
+          'id': 'GX.2'
         }]
       },
       status: 200,
@@ -135,10 +136,10 @@ describe('InUseGuard', () => {
     expect(mockReflectorGet).toBeCalledTimes(2);
     expect(mockLajistoreServiceSearch).toBeCalled();
     expect(mockLajistoreServiceSearch.mock.calls[0][0]).toEqual('MOS.organization');
-    expect(mockLajistoreServiceSearch.mock.calls[0][1]).toEqual('GX.1');
+    expect(mockLajistoreServiceSearch.mock.calls[0][1]).toEqual({"fields": "id", "q": "GX.1"});
   });
 
-  it('Request method of DELETE and found inUseTypes results in call to triplestore and lajistore, no found documents and organizations result into granted access', async () => {
+  it('Request method of DELETE and found inUseTypes results in call to triplestore and lajistore, no found documents, tags and organizations (excluding itself) result into granted access', async () => {
     const mockContext = createMock<ExecutionContext>();
     mockContext.switchToHttp().getRequest.mockReturnValue({ method: 'DELETE', params: { id: 'GX.1' } });
     const mockReflectorGet = jest.spyOn(reflector, 'get').mockImplementation((key) => {
@@ -167,7 +168,12 @@ describe('InUseGuard', () => {
         pageSize: 10,
         currentPage: 0,
         lastPage: 0,
-        member: []
+        member: [
+          {
+            '@type': 'something',
+            'id': 'GX.1'
+          }
+        ]
       },
       status: 200,
       statusText: '',
@@ -193,7 +199,7 @@ describe('InUseGuard', () => {
     expect(mockLajistoreServiceSearch).toBeCalled();
     expect(mockTriplestoreServiceSearch.mock.calls[0][0]).toEqual({ object: 'GX.1' });
     expect(mockLajistoreServiceSearch.mock.calls[0][0]).toEqual('MOS.organization');
-    expect(mockLajistoreServiceSearch.mock.calls[0][1]).toEqual('GX.1');
+    expect(mockLajistoreServiceSearch.mock.calls[0][1]).toEqual({"fields": "id", "q": "GX.1"});
 
   });
 });
