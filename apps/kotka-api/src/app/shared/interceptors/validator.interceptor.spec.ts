@@ -143,7 +143,7 @@ describe('ValidationInterceptor', () => {
 
     jest.spyOn(formService, 'getForm').mockImplementation(() => new Promise((resolve) => resolve(mockForm) ));
     jest.spyOn(reflector, 'get').mockImplementation(() => 'GX.dataset');
-    jest.spyOn(lajiStoreService, 'search').mockImplementation((type, body) => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [] }} as AxiosResponse));
+    jest.spyOn(lajiStoreService, 'search').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [] }} as AxiosResponse));
   });
 
   it('Missing body in request results in error thrown in validator', async () => {
@@ -230,7 +230,7 @@ describe('ValidationInterceptor', () => {
      })});
 
      const mockNext = createMock<CallHandler>();
-     jest.spyOn(lajiStoreService, 'search').mockImplementation((type, body) => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [{id: 'GX.1'}] }} as AxiosResponse));
+     jest.spyOn(lajiStoreService, 'search').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [{id: 'GX.1'}] }} as AxiosResponse));
      expect.assertions(3);
 
      try {
