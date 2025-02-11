@@ -19,5 +19,5 @@ import { globals } from '../../../environments/globals';
 })
 export class DatasetVersionHistoryComponent {
   formId = globals.datasetFormId;
-  dataType = KotkaDocumentObjectType.dataset;
+  dataType: KotkaDocumentObjectType.dataset = KotkaDocumentObjectType.dataset;
 }

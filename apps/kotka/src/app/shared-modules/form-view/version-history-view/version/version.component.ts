@@ -14,19 +14,19 @@ import { LajiFormComponent } from '@kotka/ui/laji-form';
   styleUrls: ['./version.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class VersionComponent implements OnChanges {
+export class VersionComponent<S extends KotkaDocumentObject> implements OnChanges {
   @Input() visibleDataTypeName?: string;
 
   @Input() version?: number;
   @Input() versionList?: StoreVersion[];
 
   @Input() form?: LajiForm.SchemaForm;
-  @Input() data?: KotkaDocumentObject;
+  @Input() data?: S;
 
   previousVersion?: number;
   nextVersion?: number;
 
-  @Output() formInit = new EventEmitter<{ lajiForm: LajiFormComponent; formData: KotkaDocumentObject }>();
+  @Output() formInit = new EventEmitter<{ lajiForm: LajiFormComponent; formData: S }>();
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
 
@@ -39,7 +39,7 @@ export class VersionComponent implements OnChanges {
     }
   }
 
-  onFormReady(formData: KotkaDocumentObject) {
+  onFormReady(formData: S) {
     if (this.lajiForm) {
       this.formInit.emit({ lajiForm: this.lajiForm, formData });
     }

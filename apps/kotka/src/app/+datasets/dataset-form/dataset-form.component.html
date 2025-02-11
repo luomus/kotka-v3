@@ -10,7 +10,7 @@
   <h1 data-cy="main-header">Edit tag {{ dataURI }}</h1>
   <a
     *ngIf="isDataset(formData)"
-    [href]='("/specimens/search?q=dataset.raw:\"" + asDataset(formData).datasetName.en + "\"") | oldKotkaUrl'
+    [href]='("/specimens/search?q=dataset.raw:\"" + formData.datasetName.en + "\"") | oldKotkaUrl'
     target="_blank"
   >
     Specimens with this tag

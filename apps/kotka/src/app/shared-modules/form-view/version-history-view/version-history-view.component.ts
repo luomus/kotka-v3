@@ -19,7 +19,7 @@ import {
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
-import { KotkaDocumentObject, KotkaDocumentObjectType } from '@kotka/shared/models';
+import { KotkaDocumentObjectType, KotkaDocumentObjectMap } from '@kotka/shared/models';
 import { isEqual } from 'lodash';
 import { Utils } from '../../../shared/services/utils';
 
@@ -30,9 +30,9 @@ import { Utils } from '../../../shared/services/utils';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [VersionHistoryViewFacade]
 })
-export class VersionHistoryViewComponent implements OnChanges, OnDestroy {
+export class VersionHistoryViewComponent<T extends KotkaDocumentObjectType = KotkaDocumentObjectType, S extends KotkaDocumentObjectMap[T] = KotkaDocumentObjectMap[T]> implements OnChanges, OnDestroy {
   @Input() formId?: string;
-  @Input() dataType?: KotkaDocumentObjectType;
+  @Input() dataType?: T;
   @Input() dataTypeName = '';
 
   dataURI?: string;
@@ -40,7 +40,7 @@ export class VersionHistoryViewComponent implements OnChanges, OnDestroy {
   versions?: number[];
   view?: VersionHistoryViewEnum;
 
-  vm$: Observable<VersionHistoryState| ErrorViewModel>;
+  vm$: Observable<VersionHistoryState<S> | ErrorViewModel>;
 
   isErrorViewModel = isErrorViewModel;
   isSuccessViewModel = isSuccessViewModel;
@@ -48,12 +48,12 @@ export class VersionHistoryViewComponent implements OnChanges, OnDestroy {
   versionHistoryViewEnum = VersionHistoryViewEnum;
   versionHistoryErrorEnum = VersionHistoryErrorEnum;
 
-  @Output() formInit = new EventEmitter<{ lajiForm: LajiFormComponent; formData: KotkaDocumentObject }>();
+  @Output() formInit = new EventEmitter<{ lajiForm: LajiFormComponent; formData: S }>();
 
   private routeSub: Subscription;
 
   constructor(
-    private versionHistoryFacade: VersionHistoryViewFacade,
+    private versionHistoryFacade: VersionHistoryViewFacade<T, S>,
     private router: Router,
     private activeRoute: ActivatedRoute
   ) {

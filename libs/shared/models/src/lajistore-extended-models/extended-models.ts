@@ -16,6 +16,14 @@ export enum KotkaDocumentObjectType {
   sample = 'sample'
 }
 
+export interface KotkaDocumentObjectMap {
+  [KotkaDocumentObjectType.dataset]: Dataset;
+  [KotkaDocumentObjectType.document]: Document;
+  [KotkaDocumentObjectType.organization]: Organization;
+  [KotkaDocumentObjectType.sample]: Sample;
+  [KotkaDocumentObjectType.transaction]: SpecimenTransaction;
+}
+
 export enum KotkaDocumentObjectFullType {
   dataset = 'GX.dataset',
   transaction = 'HRX.specimenTransaction',
@@ -48,8 +56,8 @@ export interface StorePatch {
   value: any;
 }
 
-export interface KotkaVersionDifference {
-  original: KotkaDocumentObject;
+export interface KotkaVersionDifference<S extends KotkaDocumentObject = KotkaDocumentObject> {
+  original: S;
   patch: StorePatch[];
 }
 
@@ -59,8 +67,8 @@ export interface DifferenceObject {
 export type DifferenceObjectPatch = Omit<StorePatch, 'path'>;
 export type DifferenceObjectValue = DifferenceObject|DifferenceObject[]|DifferenceObjectPatch|DifferenceObjectPatch[];
 
-export interface KotkaVersionDifferenceObject {
-  original: KotkaDocumentObject;
+export interface KotkaVersionDifferenceObject<S extends KotkaDocumentObject = KotkaDocumentObject> {
+  original: S;
   diff: DifferenceObject;
 }
 

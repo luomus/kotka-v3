@@ -7,7 +7,7 @@ export class FormViewUtils {
     return dataURI.split('/').pop() as string;
   }
 
-  static removeMetaAndExcludedFields(data: Partial<KotkaDocumentObject>, excludedFields: string[] = []): Partial<KotkaDocumentObject> {
+  static removeMetaAndExcludedFields<S extends KotkaDocumentObject>(data: Partial<S>, excludedFields: string[] = []): Partial<S> {
     data = cloneDeep(data);
 
     let removedFields = ['$.id', '$.dateCreated', '$.dateEdited', '$.creator', '$.editor'];

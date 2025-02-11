@@ -43,7 +43,7 @@ export class BooleanFloatingFilterComponent implements IFloatingFilterAngularCom
   }
 
   onParentModelChanged(parentModel: BooleanFilterModel|null) {
-    if (!parentModel?.filter) {
+    if (!parentModel) {
       this.value = undefined;
     } else {
       this.value = parentModel.filter;

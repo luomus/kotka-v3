@@ -14,7 +14,7 @@ import {
 } from 'rxjs';
 import { distinctUntilChanged, map, take } from 'rxjs/operators';
 import { allowEditForUser, allowDeleteForUser } from '@kotka/utils';
-import { KotkaDocumentObject, KotkaDocumentObjectType } from '@kotka/shared/models';
+import { KotkaDocumentObject, KotkaDocumentObjectType, KotkaDocumentObjectMap } from '@kotka/shared/models';
 import { LajiForm, Person, Image } from '@kotka/shared/models';
 import { FormViewUtils } from './form-view-utils';
 import { MediaMetadata } from '@luomus/laji-form/lib/components/LajiForm';
@@ -24,17 +24,17 @@ export enum FormErrorEnum {
   genericError = 'genericError'
 }
 
-export interface FormInputs {
+export interface FormInputs<T extends KotkaDocumentObjectType> {
   formId: string;
-  dataType: KotkaDocumentObjectType;
+  dataType: T;
   editMode: boolean;
   dataURI?: string;
   augmentFormFunc?: (form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>;
 }
 
-export interface FormState {
+export interface FormState<S extends KotkaDocumentObject> {
   form?: LajiForm.SchemaForm;
-  formData?: Partial<KotkaDocumentObject>;
+  formData?: Partial<S>;
   disabled?: boolean;
   showDeleteButton?: boolean;
   showCopyButton?: boolean;
@@ -48,12 +48,12 @@ export interface ErrorViewModel {
   errorType: FormErrorEnum;
 }
 
-export type ViewModel = FormState | ErrorViewModel;
+export type ViewModel<S extends KotkaDocumentObject> = FormState<S> | ErrorViewModel;
 
-export function isSuccessViewModel(viewModel: ViewModel): viewModel is FormState {
+export function isSuccessViewModel<S extends KotkaDocumentObject>(viewModel: ViewModel<S>): viewModel is FormState<S> {
   return !isErrorViewModel(viewModel);
 }
-export function isErrorViewModel(viewModel: ViewModel): viewModel is ErrorViewModel {
+export function isErrorViewModel<S extends KotkaDocumentObject>(viewModel: ViewModel<S>): viewModel is ErrorViewModel {
   return 'errorType' in viewModel;
 }
 
@@ -62,20 +62,20 @@ interface KotkaMediaMetadata extends MediaMetadata {
 }
 
 @Injectable()
-export class FormViewFacade implements OnDestroy {
-  private store  = new ReplaySubject<FormState>(1);
+export class FormViewFacade<T extends KotkaDocumentObjectType, S extends KotkaDocumentObjectMap[T]> implements OnDestroy {
+  private store  = new ReplaySubject<FormState<S>>(1);
   state$ = this.store.asObservable();
 
   formData$ = this.state$.pipe(map(state => state.formData), distinctUntilChanged());
   disabled$ = this.state$.pipe(map(state => state.disabled), distinctUntilChanged());
 
-  vm$: Observable<ViewModel>;
+  vm$: Observable<ViewModel<S>>;
 
-  private inputs$ = new ReplaySubject<FormInputs>(1);
+  private inputs$ = new ReplaySubject<FormInputs<T>>(1);
 
   private initialStateSub: Subscription;
 
-  private _state: FormState = {};
+  private _state: FormState<S> = {};
 
   constructor(
     private userService: UserService,
@@ -90,16 +90,16 @@ export class FormViewFacade implements OnDestroy {
     this.initialStateSub.unsubscribe();
   }
 
-  setInputs(inputs: FormInputs) {
+  setInputs(inputs: FormInputs<T>) {
     this.inputs$.next(inputs);
   }
 
-  setFormData(formData: Partial<KotkaDocumentObject>, formHasChanges = true) {
+  setFormData(formData: Partial<S>, formHasChanges = true) {
     const mediaMetadata = this._state.mediaMetadata ? { ...this._state.mediaMetadata, intellectualOwner: formData.owner || ''} : undefined;
     this.setState({ ...this._state, formData, formHasChanges, mediaMetadata });
   }
 
-  setCopiedFormData(formData: Partial<KotkaDocumentObject>) {
+  setCopiedFormData(formData: Partial<S>) {
     this.getEmptyFormData$().pipe(take(1)).subscribe(emptyFormData => {
       formData = { ...emptyFormData, ...formData };
       this.setFormData(formData, false);
@@ -118,7 +118,7 @@ export class FormViewFacade implements OnDestroy {
     this.setState({ ...this._state, showDeleteTargetInUseAlert });
   }
 
-  private getVm$(): Observable<ViewModel> {
+  private getVm$(): Observable<ViewModel<S>> {
     return this.inputs$.pipe(
       switchMap(() => this.state$.pipe(
         catchError(err => {
@@ -130,13 +130,13 @@ export class FormViewFacade implements OnDestroy {
     );
   }
 
-  private getAugmentedForm$(inputs: FormInputs): Observable<LajiForm.SchemaForm> {
+  private getAugmentedForm$(inputs: FormInputs<T>): Observable<LajiForm.SchemaForm> {
     return this.formService.getFormWithUserContext(inputs.formId).pipe(
       switchMap(form => inputs.augmentFormFunc ? inputs.augmentFormFunc(form) : of(form))
     );
   }
 
-  private getInitialFormData$(inputs: FormInputs): Observable<Partial<KotkaDocumentObject>> {
+  private getInitialFormData$(inputs: FormInputs<T>): Observable<Partial<S>> {
     if (inputs.editMode) {
       return this.getFormData$(inputs.dataType, inputs.dataURI);
     } else {
@@ -144,9 +144,9 @@ export class FormViewFacade implements OnDestroy {
     }
   }
 
-  private getEmptyFormData$(): Observable<Partial<KotkaDocumentObject>> {
+  private getEmptyFormData$(): Observable<Partial<S>> {
     return this.userService.getCurrentLoggedInUser().pipe(map(user => {
-      const formData: Partial<KotkaDocumentObject> = {};
+      const formData: Partial<S> = {};
       if (user?.organisation && user.organisation.length === 1) {
         formData.owner = user.organisation[0];
       }
@@ -154,13 +154,13 @@ export class FormViewFacade implements OnDestroy {
     }));
   }
 
-  private getFormData$(dataType: KotkaDocumentObjectType, dataURI?: string): Observable<Partial<KotkaDocumentObject>> {
+  private getFormData$(dataType: T, dataURI?: string): Observable<Partial<S>> {
     if (!dataURI) {
       return throwError(() => new Error(FormErrorEnum.dataNotFound));
     }
 
     const id = FormViewUtils.getIdFromDataURI(dataURI);
-    return this.apiClient.getDocumentById(dataType, id).pipe(
+    return this.apiClient.getDocumentById<T, S>(dataType, id).pipe(
       catchError(err => {
         err = err.status === 404 ? FormErrorEnum.dataNotFound : err;
         return throwError(() => new Error(err));
@@ -183,17 +183,17 @@ export class FormViewFacade implements OnDestroy {
         )
       ))
     ).subscribe({
-      'next': (state: FormState) => {
+      'next': (state: FormState<S>) => {
         this.setState(state);
       },
       'error': err => this.store.error(err)
     });
   }
 
-  private getInitialFormState(inputs: FormInputs, form: LajiForm.SchemaForm, formData: Partial<KotkaDocumentObject>, user: Person): FormState {
+  private getInitialFormState(inputs: FormInputs<T>, form: LajiForm.SchemaForm, formData: Partial<S>, user: Person): FormState<S> {
     const isEditMode =  inputs.editMode;
     const disabled = isEditMode && !allowEditForUser(formData, user);
-    const showDeleteButton = isEditMode && (!disabled && allowDeleteForUser(<KotkaDocumentObject>formData, user));
+    const showDeleteButton = isEditMode && (!disabled && allowDeleteForUser(<S>formData, user));
     const showCopyButton = isEditMode && !!form.options?.allowTemplate;
 
     return {
@@ -209,7 +209,7 @@ export class FormViewFacade implements OnDestroy {
     };
   }
 
-  private getMediaMetadata(user: Person, formData: Partial<KotkaDocumentObject>): KotkaMediaMetadata {
+  private getMediaMetadata(user: Person, formData: Partial<S>): KotkaMediaMetadata {
     return {
       intellectualRights: 'MZ.intellectualRightsARR',
       intellectualOwner: formData.owner || '',
@@ -218,7 +218,7 @@ export class FormViewFacade implements OnDestroy {
     };
   }
 
-  private setState(state: FormState) {
+  private setState(state: FormState<S>) {
     this._state = state;
     this.store.next(this._state);
   }

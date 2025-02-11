@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CellRendererComponent } from './cell-renderer';
 import { ICellRendererParams } from '@ag-grid-community/core';
-import { asSpecimenTransaction } from '@kotka/shared/models';
 import { SpecimenTransaction } from '@luomus/laji-schema';
 
 type TransactionCountType = 'balance'|'total'|'returned';
@@ -29,7 +28,7 @@ export class TransactionCountRendererComponent extends CellRendererComponent<Ren
       return;
     }
 
-    const transaction = asSpecimenTransaction(this.params.data);
+    const transaction: SpecimenTransaction = this.params.data;
     this.result = TransactionCountRendererComponent.getTransactionCount(transaction, this.params.type);
   }
 

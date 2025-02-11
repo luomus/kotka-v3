@@ -4,6 +4,7 @@ import {
   Area,
   KotkaDocumentObject,
   KotkaDocumentObjectType,
+  KotkaDocumentObjectMap,
   KotkaVersionDifference,
   KotkaVersionDifferenceObject,
   LajiForm,
@@ -20,7 +21,7 @@ import {
   LoginResponse,
   AutocompleteResult
 } from '@kotka/api-interfaces';
-import { Dataset, SpecimenTransaction, Organization, Collection } from '@luomus/laji-schema';
+import { Collection } from '@luomus/laji-schema';
 import { map } from 'rxjs/operators';
 import { get, set } from 'lodash';
 
@@ -37,27 +38,25 @@ export class ApiClient {
     private httpClient: HttpClient
   ) {}
 
-  getDocumentById(type: KotkaDocumentObjectType.dataset, id: string): Observable<Dataset>;
-  getDocumentById(type: KotkaDocumentObjectType.transaction, id: string): Observable<SpecimenTransaction>;
-  getDocumentById(type: KotkaDocumentObjectType.organization, id: string): Observable<Organization>;
-  getDocumentById(type: KotkaDocumentObjectType, id: string): Observable<KotkaDocumentObject>;
-  getDocumentById(type: KotkaDocumentObjectType, id: string): Observable<KotkaDocumentObject> {
-    return this.httpClient.get<KotkaDocumentObject>(path + type + '/' + id);
+  getDocumentById<T extends KotkaDocumentObjectType, S extends KotkaDocumentObjectMap[T]>(type: T, id: string): Observable<S> {
+    return this.httpClient.get<S>(path + type + '/' + id);
   }
 
-  createDocument(type: KotkaDocumentObjectType, data: KotkaDocumentObject): Observable<KotkaDocumentObject> {
-    return this.httpClient.post<KotkaDocumentObject>(path + type, data);
+  createDocument<T extends KotkaDocumentObjectType, S extends KotkaDocumentObjectMap[T]>(type: T, data: S): Observable<S> {
+    return this.httpClient.post<S>(path + type, data);
   }
 
-  updateDocument(type: KotkaDocumentObjectType, id: string, data: KotkaDocumentObject): Observable<KotkaDocumentObject> {
-    return this.httpClient.put<KotkaDocumentObject>(path + type + '/' + id, data);
+  updateDocument<T extends KotkaDocumentObjectType, S extends KotkaDocumentObjectMap[T]>(type: T, id: string, data: S): Observable<S> {
+    return this.httpClient.put<S>(path + type + '/' + id, data);
   }
 
   deleteDocument(type: KotkaDocumentObjectType, id: string): Observable<null> {
     return this.httpClient.delete<null>(path + type + '/' + id);
   }
 
-  getDocumentList(type: KotkaDocumentObjectType, page=1, pageSize=100, sort?: string, searchQuery?: string): Observable<ListResponse<KotkaDocumentObject>> {
+  getDocumentList<T extends KotkaDocumentObjectType, S extends KotkaDocumentObjectMap[T]>(
+    type: T, page=1, pageSize=100, sort?: string, searchQuery?: string
+  ): Observable<ListResponse<S>> {
     let params = new HttpParams().set('page', page).set('page_size', pageSize);
     if (sort) {
       params = params.set('sort', sort);
@@ -65,16 +64,14 @@ export class ApiClient {
     if (searchQuery) {
       params = params.set('q', searchQuery);
     }
-    return this.httpClient.get<ListResponse<KotkaDocumentObject>>(path + type, {params});
+    return this.httpClient.get<ListResponse<S>>(path + type, {params});
   }
 
-  getDocumentsById(type: KotkaDocumentObjectType.dataset, ids: string[], page?: number, pageSize?: number, results?: Dataset[]): Observable<Dataset[]>;
-  getDocumentsById(type: KotkaDocumentObjectType.transaction, ids: string[], page?: number, pageSize?: number, results?: SpecimenTransaction[]): Observable<SpecimenTransaction[]>;
-  getDocumentsById(type: KotkaDocumentObjectType.organization, ids: string[], page?: number, pageSize?: number, results?: Organization[]): Observable<Organization[]>;
-  getDocumentsById(type: KotkaDocumentObjectType, ids: string[], page?: number, pageSize?: number, results?: KotkaDocumentObject[]): Observable<KotkaDocumentObject[]>;
-  getDocumentsById(type: KotkaDocumentObjectType, ids: string[], page=1, pageSize=1000, results: KotkaDocumentObject[]=[]): Observable<KotkaDocumentObject[]> {
+  getDocumentsById<T extends KotkaDocumentObjectType, S extends KotkaDocumentObjectMap[T]>(
+    type: T, ids: string[], page=1, pageSize=1000, results: S[]=[]
+  ): Observable<S[]> {
     const searchQuery = ids.filter(id => !!id).map(id => `id:${id}`).join(' OR ');
-    return this.getDocumentList(type, page, pageSize, undefined, searchQuery).pipe(
+    return this.getDocumentList<T, S>(type, page, pageSize, undefined, searchQuery).pipe(
       switchMap(result => {
         results = results.concat(result.member);
         if (result.currentPage < result.lastPage) {
@@ -89,12 +86,16 @@ export class ApiClient {
     return this.httpClient.get<StoreVersion[]>(path + type + '/' + id + '/_ver');
   }
 
-  getDocumentVersionData(type: KotkaDocumentObjectType, id: string, version: number): Observable<KotkaDocumentObject> {
-    return this.httpClient.get<KotkaDocumentObject>(path + type + '/' + id + '/_ver/' + version);
+  getDocumentVersionData<T extends KotkaDocumentObjectType, S extends KotkaDocumentObjectMap[T]>(
+    type: T, id: string, version: number
+  ): Observable<S> {
+    return this.httpClient.get<S>(path + type + '/' + id + '/_ver/' + version);
   }
 
-  getDocumentVersionDifference(type: KotkaDocumentObjectType, id: string, version1: number, version2: number): Observable<KotkaVersionDifferenceObject> {
-    return this.httpClient.get<KotkaVersionDifference>(path + type + '/' + id + '/_ver/' + version1 + '/diff/' + version2).pipe(
+  getDocumentVersionDifference<T extends KotkaDocumentObjectType, S extends KotkaDocumentObjectMap[T]>(
+    type: T, id: string, version1: number, version2: number
+  ): Observable<KotkaVersionDifferenceObject<S>> {
+    return this.httpClient.get<KotkaVersionDifference<S>>(path + type + '/' + id + '/_ver/' + version1 + '/diff/' + version2).pipe(
       map(data => this.convertVersionDifferenceFormat(data))
     );
   }
@@ -158,7 +159,7 @@ export class ApiClient {
     return this.httpClient.post(`${lajiApiPath}html-to-pdf`, html, { responseType: 'blob' });
   }
 
-  private convertVersionDifferenceFormat(data: KotkaVersionDifference): KotkaVersionDifferenceObject {
+  private convertVersionDifferenceFormat<S extends KotkaDocumentObject>(data: KotkaVersionDifference<S>): KotkaVersionDifferenceObject<S> {
     const diff = {};
     const isRemovedFromArray: Record<string, boolean[]> = {};
 
