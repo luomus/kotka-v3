@@ -31,6 +31,7 @@ const type = KotkaDocumentObjectFullType.organization;
 @InUseTypesSet([
   KotkaDocumentObjectFullType.document,
   KotkaDocumentObjectFullType.organization,
+  KotkaDocumentObjectFullType.transaction,
   KotkaDocumentObjectFullType.dataset,
   KotkaDocumentObjectFullType.document,
   KotkaDocumentObjectFullType.sample

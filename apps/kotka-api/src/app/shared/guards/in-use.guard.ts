@@ -3,7 +3,7 @@ https://docs.nestjs.com/guards#guards
 */
 
 import { LajiStoreService, TriplestoreService } from '@kotka/api-services';
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, ForbiddenException, InternalServerErrorException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { lastValueFrom } from 'rxjs';
 import { ErrorMessages } from '@kotka/api-interfaces';
@@ -26,8 +26,18 @@ export class InUseGuard implements CanActivate {
       return true;
     }
 
-    this.reflector.get('controllerType', context.getClass());
+    const controllerType: KotkaDocumentObjectFullType = this.reflector.get('controllerType', context.getClass());
     const inUseTypes: Array<string> = this.reflector.get('inUseTypes', context.getClass());
+    const storeInUseTargets = {
+      [KotkaDocumentObjectFullType.organization]: {
+        [KotkaDocumentObjectFullType.transaction]: ['correspondentOrganization', 'owner'],
+        [KotkaDocumentObjectFullType.organization]: ['owner'],
+        [KotkaDocumentObjectFullType.dataset]: ['owner'],
+      },
+      [KotkaDocumentObjectFullType.dataset]: {
+        [KotkaDocumentObjectFullType.organization]: ['datasetID']
+      }
+    };
 
     if (inUseTypes.length === 0 || !inUseTypes) {
       return true;
@@ -38,7 +48,13 @@ export class InUseGuard implements CanActivate {
 
     for (const type of inUseTypes) {
       if (STORE_OBJECTS.includes(type as KotkaDocumentObjectFullType)) {
-        const res = await lastValueFrom(this.lajistoreSevice.getAll<StoreObject>(type, { q: req.params.id, fields: 'id' }));
+        const targets = storeInUseTargets[controllerType]?.[type];
+
+        if (!targets) throw new InternalServerErrorException(`Unable to find store target fields for type ${type}`);
+
+        const query = targets.map(target => `(${target}: ${req.params.id})`).join(' OR ');
+
+        const res = await lastValueFrom(this.lajistoreSevice.getAll<StoreObject>(type, { q: query, fields: 'id' }));
         if (res.data.member.length > 0 && !(res.data.member.length === 1 && res.data.member[0].id === req.params.id)) {
           found = true;
           break;
