@@ -5,7 +5,7 @@ https://docs.nestjs.com/controllers#controllers
 import { LajiStoreService } from '@kotka/api-services';
 import { TypeMigrationService } from '@kotka/mappers';
 import { IdService } from '@kotka/util-services';
-import { Dataset, SpecimenTransaction } from '@luomus/laji-schema';
+import { Dataset, Organization, SpecimenTransaction } from '@luomus/laji-schema';
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import moment from 'moment';
 import { map } from 'rxjs';
@@ -22,7 +22,7 @@ export class OldKotkaController {
 
   @Get('tagsSelect')
   getTagsSelect() {
-    return this.lajiStoreService.getAll<Dataset>('dataset', { fields: "id,datasetName.en", sort: 'datasetName.en', page_size: 5000 }).pipe(
+    return this.lajiStoreService.getAll<Dataset>('dataset', { fields: 'id,datasetName.en', sort: 'datasetName.en', page_size: 5000 }).pipe(
       map(res => res.data),
       map(data => data.member),
       map(datasets => {
@@ -32,6 +32,35 @@ export class OldKotkaController {
         });
         return selectMap;
       })
+    );
+  }
+
+  @Get('organizationsSelect')
+  getOrganizationSelect() {
+    return this.lajiStoreService.getAll<Organization>('organization', { fields: 'id,abbreviation,fullName.en', sort: 'fullName.en', page_size: 10000 }).pipe(
+      map(res => res.data),
+      map(data => data.member),
+      map(organizations => {
+        const selectMap = {};
+        const abbreviated = [];
+        const unabbreviated = [];
+
+        organizations.forEach(organization => {
+          if (organization.abbreviation) {
+            abbreviated.push(organization);
+          } else {
+            unabbreviated.push(organization);
+          }
+        });
+
+        abbreviated.push(...unabbreviated);
+
+        abbreviated.forEach(organization => {
+          selectMap[organization.id] = organization.fullName.en;
+        });
+
+        return selectMap;
+      }),
     );
   }
 
