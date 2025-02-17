@@ -39,8 +39,9 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
   }, {
     headerName: 'Organization',
     field: 'organizationLevel1.en',
-    flex: 2,
-    sort: 'asc'
+    flex: 3,
+    sort: 'asc',
+    minWidth: 145
   }, {
     headerName: 'Suborganization',
     field: 'organizationLevel2.en',

@@ -32,7 +32,11 @@ interface FilterExtraParams {
     </div>
   `,
   styles: [`
+    .ag-select {
+      min-width: 0;
+    }
     .ag-picker-field-wrapper {
+      min-width: 0;
       height: var(--ag-list-item-height);
       border-radius: var(--ag-border-radius);
     }
