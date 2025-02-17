@@ -8,8 +8,6 @@ services:
     volumes:
       - redis:/data
   kotka-api:
-    env_file:
-      - .env
     build:
       context: ./
       dockerfile: ./tools/docker/kotka/dev/kotka-api/Dockerfile
