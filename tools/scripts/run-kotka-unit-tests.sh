@@ -5,7 +5,7 @@ SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 cd ${SCRIPT_PATH}/../../
 
 exit_code=0
-docker compose run --rm --no-deps --build --entrypoint="npm run test kotka-api" kotka-api \
+docker-compose run --rm --no-deps --build --entrypoint="npm run test kotka-api" kotka-api \
 || exit_code=$?
 
 if [[ $exit_code -eq 0 ]]; then
