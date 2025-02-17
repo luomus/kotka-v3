@@ -3,9 +3,11 @@ import {
   KotkaDocumentObject,
   ListResponse,
   KotkaDocumentObjectType,
-  SortModel,
   DatatableColumn,
-  FilterModel
+  FilterModel,
+  isBasicFilterModel,
+  isTextFilterModel,
+  isDateFilterModel, DatatableFilter, DatatableSort, BasicFilterModel, CombinedFilterModel
 } from '@kotka/shared/models';
 import { Injectable } from '@angular/core';
 import { ApiClient } from './api-client';
@@ -24,8 +26,8 @@ export class DatatableDataService {
     columns: DatatableColumn[],
     startRow: number,
     endRow: number,
-    sortModel: SortModel[],
-    filterModel: FilterModel,
+    sortModel: DatatableSort,
+    filterModel: DatatableFilter,
     extraSearchQuery?: string
   ): Observable<ListResponse<KotkaDocumentObject>> {
     const pageSize = endRow - startRow;
@@ -59,85 +61,94 @@ export class DatatableDataService {
     return result;
   }
 
-  private sortModelToSortString(sortModel: SortModel[], colIdFieldMap: Record<string, string>): string {
+  private sortModelToSortString(sortModel: DatatableSort, colIdFieldMap: Record<string, string>): string {
     return sortModel.map(sort => colIdFieldMap[sort.colId] + ' ' + sort.sort).join(',');
   }
 
-  private filterModelToSearchQuery(filterModel: FilterModel, colIdFieldMap: Record<string, string>): string {
+  private filterModelToSearchQuery(filterModel: DatatableFilter, colIdFieldMap: Record<string, string>): string {
     return Object.keys(filterModel).map(
       key => this.filterModelEntryToSearchQuery(colIdFieldMap[key], filterModel[key])
     ).join(' AND ');
   }
 
   private filterModelEntryToSearchQuery(field: string, filterModel: FilterModel): string {
-    if (!['text', 'date', 'boolean'].includes(filterModel['filterType'])) {
-      throw new Error('Filter type ' + filterModel['filterType'] + ' is not supported!');
+    if (!(filterModel.filterType && ['text', 'date', 'boolean'].includes(filterModel.filterType))) {
+      throw new Error('Filter model type ' + filterModel.filterType + ' is not supported!');
     }
 
-    const type = filterModel['type'];
-    if (type) {
-      let filter: string, filter2: string;
-      if (filterModel['filterType'] === 'text') {
-        filter = this.escapeFilterString(filterModel['filter']);
-      } else if (filterModel['filterType'] === 'date') {
-        filter = this.getDateFilter(filterModel['dateFrom']);
-        filter2 = this.getDateFilter(filterModel['dateTo']);
-      } else {
-        filter = filterModel['filter'];
-      }
-
-      switch(type) {
-        case 'contains': {
-          return `${field}:(*${filter}*)`;
-        }
-        case 'notContains': {
-          return `${field}:(NOT *${filter}*)`;
-        }
-        case 'equals': {
-          return `${field}:(${filter})`;
-        }
-        case 'notEqual': {
-          return `${field}:(NOT ${filter})`;
-        }
-        case 'startsWith': {
-          return `${field}:(${filter}*)`;
-        }
-        case 'endsWith': {
-          return `${field}:(*${filter})`;
-        }
-        case 'blank': {
-          return `_exists_:(NOT ${field})`;
-        }
-        case 'notBlank': {
-          return `_exists_:${field}`;
-        }
-        case 'lessThan': {
-          return `${field}:[* TO ${filter}]`;
-        }
-        case 'greaterThan': {
-          return `${field}:[${filter} TO *]`;
-        }
-        case 'inRange': {
-          return `${field}:[${filter} TO ${filter2!}]`;
-        }
-        default: {
-          break;
-        }
-      }
-    } else if (filterModel['operator']) {
-      const condition1 = this.filterModelEntryToSearchQuery(field, filterModel['condition1']);
-      const condition2 = this.filterModelEntryToSearchQuery(field, filterModel['condition2']);
-      return `${condition1} ${filterModel['operator']} ${condition2}`;
+    if (isBasicFilterModel(filterModel)) {
+      return this.basicFilterModelEntryToSearchQuery(field, filterModel);
+    } else {
+      return this.combinedFilterModelEntryToSearchQuery(field, filterModel);
     }
-
-    return '';
   }
 
-  private getDateFilter(searchQuery?: string): string {
+  private basicFilterModelEntryToSearchQuery(field: string, filterModel: BasicFilterModel): string {
+    let filter: string|boolean, filter2: string;
+    if (isTextFilterModel(filterModel)) {
+      filter = this.escapeFilterString(filterModel.filter);
+    } else if (isDateFilterModel(filterModel)) {
+      filter = this.getDateFilter(filterModel.dateFrom);
+      filter2 = this.getDateFilter(filterModel.dateTo);
+    } else {
+      filter = filterModel.filter;
+    }
+
+    switch(filterModel.type) {
+      case 'contains': {
+        return `${field}:(*${filter}*)`;
+      }
+      case 'notContains': {
+        return `${field}:(NOT *${filter}*)`;
+      }
+      case 'equals': {
+        return `${field}:(${filter})`;
+      }
+      case 'notEqual': {
+        return `${field}:(NOT ${filter})`;
+      }
+      case 'startsWith': {
+        return `${field}:(${filter}*)`;
+      }
+      case 'endsWith': {
+        return `${field}:(*${filter})`;
+      }
+      case 'blank': {
+        return `_exists_:(NOT ${field})`;
+      }
+      case 'notBlank': {
+        return `_exists_:${field}`;
+      }
+      case 'lessThan': {
+        return `${field}:[* TO ${filter}]`;
+      }
+      case 'greaterThan': {
+        return `${field}:[${filter} TO *]`;
+      }
+      case 'inRange': {
+        return `${field}:[${filter} TO ${filter2!}]`;
+      }
+      default: {
+        throw new Error('Filter type ' + filterModel.type + ' is not supported!');
+      }
+    }
+  }
+
+  private combinedFilterModelEntryToSearchQuery(field: string, filterModel: CombinedFilterModel): string {
+    if (!filterModel.conditions) {
+      throw new Error('Filter model has errors!');
+    }
+
+    return filterModel.conditions.map(condition => (
+      this.filterModelEntryToSearchQuery(field, condition)
+    )).join(` ${filterModel.operator} `);
+  }
+
+  private getDateFilter(searchQuery?: string|null): string {
     return searchQuery ? searchQuery.split(' ')[0] : '';
   }
 
-  private escapeFilterString(searchQuery?: string): string {
+  private escapeFilterString(searchQuery?: string|null): string {
     if (!searchQuery) {
       return '';
     }

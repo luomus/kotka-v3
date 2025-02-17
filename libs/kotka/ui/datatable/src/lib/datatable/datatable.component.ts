@@ -19,9 +19,9 @@ import {
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
 import {
   CustomColDef,
-  DatatableColumn,
-  DatatableSource, FilterModel,
-  GetRowsParams, SortModel, TupleUnion
+  DatatableColumn, DatatableFilter, DatatableSort,
+  DatatableSource,
+  GetRowsParams, TupleUnion
 } from '@kotka/shared/models';
 import { forkJoin, from, Observable, Subscription } from 'rxjs';
 import { ColumnSettingsModalComponent } from '../column-settings-modal/column-settings-modal.component';
@@ -58,7 +58,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
   @Input() dataTypeName = 'item';
   @Input() dataTypeNamePlural?: string;
 
-  @Input() defaultFilterModel: FilterModel = {};
+  @Input() defaultFilterModel: DatatableFilter = {};
 
   @Output() rowClicked = new EventEmitter();
 
@@ -98,8 +98,8 @@ export class DatatableComponent implements OnChanges, OnDestroy {
 
   private allColumns: DatatableColumn[] = [];
 
-  private sortModel: SortModel[] = [];
-  private filterModel: FilterModel = {};
+  private sortModel: DatatableSort = [];
+  private filterModel: DatatableFilter = {};
 
   private isDestroyed = false;
   private loadCellRendererDataToCacheSub: Subscription = new Subscription();
@@ -206,35 +206,42 @@ export class DatatableComponent implements OnChanges, OnDestroy {
       return;
     }
 
-    const originalSuccessCallback = params.successCallback;
+    this.beforeFetchRows(params);
 
-    const newSuccessCallback = (results: any[], totalItems: number) => {
+    const successCallback = (results: any[], totalItems: number) => {
       if (this.isDestroyed) {
         return;
       }
 
-      this.loadCellRendererDataToCache(results);
+      this.afterFetchRows(results, totalItems);
 
-      this.ngZone.run(() => {
-        this.totalCount = totalItems;
-        this.cdr.markForCheck();
-      });
-
-      this.updateLoading(false);
-      originalSuccessCallback(results, totalItems);
+      params.successCallback(results, totalItems);
     };
 
+    this.datasource?.getRows({ ...params, successCallback });
+  }
+
+  private beforeFetchRows(params: GetRowsParams) {
     this.sortModel = params.sortModel;
     this.filterModel = params.filterModel;
     this.datatableFilterStoreService.updateFilters(this.settingsKey, this.filterModel, this.allColumns);
 
+    this.updateTotalCount(undefined);
+    this.updateLoading(true);
+  }
+
+  private afterFetchRows(results: any[], totalItems: number) {
+    this.loadCellRendererDataToCache(results);
+
+    this.updateTotalCount(totalItems);
+    this.updateLoading(false);
+  }
+
+  private updateTotalCount(totalCount: number|undefined) {
     this.ngZone.run(() => {
-      this.totalCount = undefined;
+      this.totalCount = totalCount;
       this.cdr.markForCheck();
     });
-
-    this.updateLoading(true);
-    this.datasource?.getRows({ ...params, successCallback: newSuccessCallback });
   }
 
   private updateLoading(loading: boolean) {

@@ -5,8 +5,9 @@ import {
 import { IFloatingFilterAngularComp } from '@ag-grid-community/angular';
 import { NgForOf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { BooleanFilterComponent, BooleanFilterModel } from './boolean-filter.component';
+import { BooleanFilterComponent } from './boolean-filter.component';
 import { PipesModule } from '@kotka/pipes';
+import { BooleanFilterModel } from '@kotka/shared/models';
 
 @Component({
   standalone: true,

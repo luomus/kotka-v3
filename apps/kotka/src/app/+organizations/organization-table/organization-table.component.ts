@@ -9,8 +9,8 @@ import {
 import { DatatableDataService, DEFAULT_DOMAIN } from '@kotka/services';
 import {
   DatatableColumn,
+  DatatableFilter,
   DatatableSource,
-  FilterModel,
   GetRowsParams,
   KotkaDocumentObjectType
 } from '@kotka/shared/models';
@@ -111,7 +111,7 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
     }
   };
 
-  defaultFilterModel: FilterModel = {
+  defaultFilterModel: DatatableFilter = {
     hidden: {
       filterType: 'boolean',
       type: 'equals',
