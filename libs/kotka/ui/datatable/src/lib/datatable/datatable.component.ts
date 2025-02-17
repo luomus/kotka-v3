@@ -302,7 +302,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     const settings = this.datatableColumnSettingsService.getSettings(this.settingsKey);
     const selected = settings.selected ? settings.selected : this.getDefaultSelectedColumns();
 
-    columns = columns.filter(col => selected.includes(col.colId!));
+    columns = columns.map(col => ({ ...col, hide: !selected.includes(col.colId!) }));
     columns.sort((columnA, columnB) => (
       selected.indexOf(columnA.colId!) - selected.indexOf(columnB.colId!)
     ));

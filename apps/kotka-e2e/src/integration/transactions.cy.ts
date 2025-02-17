@@ -6,11 +6,27 @@ describe('transactions', () => {
 
   describe('transaction table', () => {
     it('should be able to add a column', () => {
-      cy.get('.ag-header-row-column .ag-header-cell').should('have.length', 5);
+      cy.get('.ag-header-row-column').eq(0).children().should('have.length', 5);
       cy.get('[data-cy=select-columns]').click();
       cy.get('.ag-selection-checkbox').eq(4).click();
       cy.get('[data-cy=confirm-ok]').click();
-      cy.get('.ag-header-row-column .ag-header-cell').should('have.length', 6);
+      cy.get('.ag-header-row-column').eq(0).children().should('have.length', 6);
+    });
+
+    it('should be able to add a column after removing columns', () => {
+      cy.get('.ag-header-row-column').eq(0).children().should('have.length', 5);
+
+      for (let i = 0; i < 3; i++) {
+        cy.get('.ag-header-cell-text').eq(2).trigger('mousedown', { button: 0 });
+        cy.get('.ag-header-cell-text').eq(2).trigger('mousemove', { clientX: 300, clientY: 100 });
+        cy.get('.ag-dnd-ghost-label').trigger('mouseup');
+      }
+      cy.get('.ag-header-row-column .ag-header-cell').should('have.length', 2);
+
+      cy.get('[data-cy=select-columns]').click();
+      cy.get('.ag-selection-checkbox').eq(3).click();
+      cy.get('[data-cy=confirm-ok]').click();
+      cy.get('.ag-header-row-column').eq(0).children().should('have.length', 3);
     });
 
     it('should remember owner selection', () => {
