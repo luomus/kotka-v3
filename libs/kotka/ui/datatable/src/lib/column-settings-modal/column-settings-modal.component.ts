@@ -177,7 +177,7 @@ export class ColumnSettingsModalComponent {
     }
 
     this.rowData = [...this.allColumns].sort(this.comparator.bind(this));
-    this.gridApi.setRowData(this.rowData);
+    this.gridApi.setGridOption('rowData', this.rowData);
     this.setInitialSelected();
   }
 

@@ -11,9 +11,9 @@ export class DatatableFilterStoreService {
     private storage: LocalStorageService
   ) {}
 
-  getFilters(settingsKey: string|undefined): FilterModel {
+  getFilters(settingsKey: string|undefined): FilterModel|null {
     if (!settingsKey) {
-      return {};
+      return null;
     }
 
     return this.storage.retrieve(settingsKey + '-filters');

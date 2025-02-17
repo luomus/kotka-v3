@@ -3,15 +3,14 @@ import {
   Component,
   EventEmitter,
   Injector,
-  Input,
+  Input, NgZone,
   OnChanges,
   OnDestroy,
   Output,
-  SimpleChanges,
+  SimpleChanges
 } from '@angular/core';
 import {
   ColDef,
-  ColumnApi,
   GridApi,
   GridOptions,
   Module,
@@ -19,9 +18,10 @@ import {
 } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
 import {
+  CustomColDef,
   DatatableColumn,
   DatatableSource, FilterModel,
-  GetRowsParams, SortModel
+  GetRowsParams, SortModel, TupleUnion
 } from '@kotka/shared/models';
 import { forkJoin, from, Observable, Subscription } from 'rxjs';
 import { ColumnSettingsModalComponent } from '../column-settings-modal/column-settings-modal.component';
@@ -32,12 +32,11 @@ import { CellRendererComponent } from '../renderers/cell-renderer';
 import { DatatableColumnSettingsService } from '../services/datatable-column-settings.service';
 import { DatatableFilterStoreService } from '../services/datatable-filter-store.service';
 
-type CustomColumnKey = keyof Pick<DatatableColumn, 'hideDefaultHeaderTooltip'|'defaultSelected'>;
+type CustomColumnKeyList = TupleUnion<keyof CustomColDef>;
 
 interface GridReadyEvent {
   type: string;
   api: GridApi;
-  columnApi: ColumnApi;
 }
 
 @Component({
@@ -58,6 +57,8 @@ export class DatatableComponent implements OnChanges, OnDestroy {
 
   @Input() dataTypeName = 'item';
   @Input() dataTypeNamePlural?: string;
+
+  @Input() defaultFilterModel: FilterModel = {};
 
   @Output() rowClicked = new EventEmitter();
 
@@ -87,14 +88,13 @@ export class DatatableComponent implements OnChanges, OnDestroy {
   maxConcurrentDatasourceRequests = 1;
   infiniteInitialRowCount = 1;
   maxBlocksInCache = 10;
-  rowData = [];
   gridOptions: GridOptions = {
     rowGroupPanelShow: 'always',
-    suppressFieldDotNotation: true,
+    suppressFieldDotNotation: true
   };
 
   private gridApi?: GridApi;
-  private gridColumnApi?: ColumnApi;
+  private gridDataSource?: DatatableSource;
 
   private allColumns: DatatableColumn[] = [];
 
@@ -110,21 +110,23 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     private datatableColumnSettingsService: DatatableColumnSettingsService,
     private datatableFilterStoreService: DatatableFilterStoreService,
     private injector: Injector,
+    private ngZone: NgZone,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['datasource']) {
-      this.updateDatasource();
-    }
-
     if (changes['columns'] || changes['enableColumnSelection'] || changes['settingsKey']) {
       this.updateColumns();
     }
 
-    if (changes['settingsKey']) {
-      this.filterModel = this.datatableFilterStoreService.getFilters(this.settingsKey);
+    if (changes['defaultFilterModel'] || changes['settingsKey']) {
+      this.filterModel = this.datatableFilterStoreService.getFilters(this.settingsKey) || this.defaultFilterModel;
       this.gridApi?.setFilterModel(this.filterModel);
+    }
+
+    if (changes['datasource']) {
+      this.gridDataSource = this.datasource ? { ...this.datasource, getRows: this.getRows.bind(this) } : undefined;
+      this.gridApi?.setGridOption('datasource', this.gridDataSource);
     }
   }
 
@@ -135,18 +137,17 @@ export class DatatableComponent implements OnChanges, OnDestroy {
 
   onGridReady(params: GridReadyEvent) {
     this.gridApi = params.api;
-    this.gridColumnApi = params.columnApi;
     this.gridApi.setFilterModel(this.filterModel);
-    this.updateDatasource();
+    this.gridApi.setGridOption('datasource', this.gridDataSource);
   }
 
   columnUpdated() {
-    if (!this.gridColumnApi) {
+    if (!this.gridApi) {
       return;
     }
 
     if (this.enableColumnSelection) {
-      const selected = this.gridColumnApi
+      const selected = this.gridApi
         .getAllDisplayedColumns()
         .map((c) => c.getColId());
 
@@ -200,14 +201,6 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     this.gridApi?.refreshInfiniteCache();
   }
 
-  private updateDatasource() {
-    if (!this.gridApi || !this.datasource) {
-      return;
-    }
-
-    this.gridApi.setDatasource({ ...this.datasource, getRows: this.getRows.bind(this) });
-  }
-
   private getRows(params: GetRowsParams) {
     if (this.isDestroyed) {
       return;
@@ -222,8 +215,10 @@ export class DatatableComponent implements OnChanges, OnDestroy {
 
       this.loadCellRendererDataToCache(results);
 
-      this.totalCount = totalItems;
-      this.cdr.markForCheck();
+      this.ngZone.run(() => {
+        this.totalCount = totalItems;
+        this.cdr.markForCheck();
+      });
 
       this.updateLoading(false);
       originalSuccessCallback(results, totalItems);
@@ -233,8 +228,13 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     this.filterModel = params.filterModel;
     this.datatableFilterStoreService.updateFilters(this.settingsKey, this.filterModel, this.allColumns);
 
+    this.ngZone.run(() => {
+      this.totalCount = undefined;
+      this.cdr.markForCheck();
+    });
+
     this.updateLoading(true);
-    this.datasource!.getRows({ ...params, successCallback: newSuccessCallback });
+    this.datasource?.getRows({ ...params, successCallback: newSuccessCallback });
   }
 
   private updateLoading(loading: boolean) {
@@ -314,7 +314,9 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     return columns.map(col => {
       col = {...col};
 
-      const customKeys: CustomColumnKey[] = ['hideDefaultHeaderTooltip', 'defaultSelected'];
+      const customKeys: CustomColumnKeyList = [
+        'hideDefaultHeaderTooltip', 'hideDefaultTooltip', 'defaultSelected', 'rememberFilters'
+      ];
       for (const key of customKeys) {
         delete col[key];
       }

@@ -16,7 +16,8 @@ export class DatasetTableComponent {
     cellRenderer: URICellRendererComponent,
     cellRendererParams: {
       domain: DEFAULT_DOMAIN
-    }
+    },
+    lockPosition: 'left'
   }, {
     headerName: 'Name',
     field: 'datasetName.en',

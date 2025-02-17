@@ -10,6 +10,7 @@ import { DatatableDataService, DEFAULT_DOMAIN } from '@kotka/services';
 import {
   DatatableColumn,
   DatatableSource,
+  FilterModel,
   GetRowsParams,
   KotkaDocumentObjectType
 } from '@kotka/shared/models';
@@ -31,11 +32,15 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
     cellRenderer: URICellRendererComponent,
     cellRendererParams: {
       domain: DEFAULT_DOMAIN
-    }
+    },
+    width: 145,
+    flex: 0,
+    lockPosition: 'left'
   }, {
     headerName: 'Organization',
     field: 'organizationLevel1.en',
-    flex: 2
+    flex: 2,
+    sort: 'asc'
   }, {
     headerName: 'Suborganization',
     field: 'organizationLevel2.en',
@@ -60,7 +65,10 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
     cellRenderer: LabelCellRendererComponent,
     filter: BooleanFilterComponent,
     floatingFilterComponent: BooleanFloatingFilterComponent,
-    suppressFloatingFilterButton: true
+    suppressFloatingFilterButton: true,
+    width: 100,
+    minWidth: 100,
+    flex: 0
   }, {
     headerName: 'Tags',
     field: 'datasetID',
@@ -99,6 +107,14 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
       ).subscribe(result => {
         params.successCallback(result.member, result.totalItems);
       });
+    }
+  };
+
+  defaultFilterModel: FilterModel = {
+    hidden: {
+      filterType: 'boolean',
+      type: 'equals',
+      filter: false
     }
   };
 

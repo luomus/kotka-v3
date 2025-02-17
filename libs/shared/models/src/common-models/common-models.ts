@@ -7,12 +7,14 @@ export interface SortModel {
 
 export type FilterModel = Record<string, any>;
 
-export interface DatatableColumn extends ColDef {
+export interface CustomColDef {
   hideDefaultHeaderTooltip?: boolean;
   hideDefaultTooltip?: boolean;
   defaultSelected?: boolean;
   rememberFilters?: boolean;
 }
+
+export type DatatableColumn = ColDef & CustomColDef;
 
 export interface GetRowsParams extends IGetRowsParams {
   sortModel: SortModel[];
@@ -27,3 +29,7 @@ export interface ColumnSettings {
   selected?: string[];
   order?: string[];
 }
+
+export type TupleUnion<U extends string, R extends any[] = []> = {
+  [S in U]: Exclude<U, S> extends never ? [...R, S] : TupleUnion<Exclude<U, S>, [...R, S]>;
+}[U];

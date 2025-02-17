@@ -8,19 +8,18 @@ describe('organizations', () => {
     it('should be able to filter by the hidden field', () => {
       const selectSelector = '.ag-header-row-column-filter select';
 
-      cy.get('[data-cy=total-count]').invoke('text').then(totalCountString => {
-        const totalCount = parseInt(totalCountString, 10);
+      cy.getCountFromText('[data-cy=total-count]').then(noCount => {
+        cy.get(selectSelector).first().select('');
 
-        cy.get(selectSelector).first().select('No');
+        cy.getChangedCountFromText('[data-cy=total-count]', noCount)
+          .should('be.gte', noCount)
+          .then(totalCount => {
+            cy.get(selectSelector).first().select('Yes');
 
-        cy.get('[data-cy=total-count]').invoke('text')
-          .should('not.eq', totalCountString)
-          .then(parseInt)
-          .should('be.a', 'number')
-          .should('be.gt', 0)
-          .should('be.lt', totalCount);
-        }
-      );
+            cy.getChangedCountFromText('[data-cy=total-count]', totalCount)
+              .should('eq', totalCount - noCount);
+          });
+      });
     });
   });
 
@@ -31,18 +30,19 @@ describe('organizations', () => {
       cy.setUserAsLoggedIn();
       cy.visit('/organizations');
 
-      // search for test organization
-      cy.get('.ag-floating-filter[aria-colindex=2] input').first().type(organizationName);
+      cy.getCountFromText('[data-cy=total-count]').then(totalCount => {
+        // search for test organization
+        cy.get('.ag-floating-filter[aria-colindex=2] input').first().type(organizationName);
 
-      // remove the test organization if it already exists
-      cy.get('[data-cy=total-count]').contains(/^[01]$/).invoke('text').then(text => {
-        cy.log(text);
-        if (text === '1') {
-          cy.get('.edit-button').first().click();
-          cy.get('[data-cy=form-delete]').click();
-          cy.get('[data-cy=confirm-ok]').click();
-          cy.url({ timeout: 10000 }).should('equal', Cypress.config('baseUrl') + '/organizations');
-        }
+        // remove the test organization if it already exists
+        cy.getChangedCountFromText('[data-cy=total-count]', totalCount).then(count => {
+          if (count > 0) {
+            cy.get('.edit-button').first().click();
+            cy.get('[data-cy=form-delete]').click();
+            cy.get('[data-cy=confirm-ok]').click();
+            cy.url({ timeout: 10000 }).should('equal', Cypress.config('baseUrl') + '/organizations');
+          }
+        });
       });
     });
 
