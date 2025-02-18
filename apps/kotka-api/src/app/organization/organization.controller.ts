@@ -80,7 +80,18 @@ export class OrganizationController extends LajiStoreController<Organization> {
             },
             {
               term: {
-                'fullName.en': q
+                'fullName.en': {
+                  value: q,
+                  boost: 4
+                }
+              }
+            },
+            {
+              wildcard: {
+                'fullName.en': {
+                  value: `${q}*`,
+                  boost: 2
+                }
               }
             },
             {

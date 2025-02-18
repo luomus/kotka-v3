@@ -56,7 +56,18 @@ export class DatasetController extends LajiStoreController<Dataset> {
               },
               {
                 term: {
-                  'datasetName.en': q
+                  'datasetName.en': {
+                    value: q,
+                    boost: 4
+                  }
+                }
+              },
+              {
+                wildcard: {
+                  'datasetName.en': {
+                    value: `${q}*`,
+                    boost: 2
+                  }
                 }
               },
               {
