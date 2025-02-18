@@ -2,8 +2,8 @@
 https://docs.nestjs.com/modules
 */
 
-import { ApiServicesModule } from '@kotka/api-services';
-import { MappersModule } from '@kotka/mappers';
+import { ApiServicesModule } from '@kotka/api/services';
+import { MappersModule } from '@kotka/api/mappers';
 import { UtilServicesModule } from '@kotka/util-services';
 import { Module } from '@nestjs/common';
 import { ConsoleModule } from 'nestjs-console';

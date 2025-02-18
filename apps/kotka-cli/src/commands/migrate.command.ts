@@ -1,11 +1,11 @@
-import { LajiStoreService, TriplestoreService } from "@kotka/api-services";
-import { TriplestoreMapperService, TypeMigrationService } from "@kotka/mappers";
+import { LajiStoreService, TriplestoreService } from "@kotka/api/services";
+import { TriplestoreMapperService, TypeMigrationService } from "@kotka/api/mappers";
 import { Command, Console } from "nestjs-console";
 import { lastValueFrom, map } from "rxjs";
 import { Organization, StoreObject } from '@kotka/shared/models';
 import { IdService } from "@kotka/util-services";
 import ora from 'ora';
-import { getOrganizationFullName } from "@kotka/utils";
+import { getOrganizationFullName } from "@kotka/shared/utils";
 
 interface Options {
   limit: number,
@@ -72,7 +72,7 @@ export class MigrateCommand {
     if (typeof option === 'number') {
       return option;
     }
-  
+
     const parsedVal = parseInt(option);
 
     if (isNaN(parsedVal)) {

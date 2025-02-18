@@ -4,8 +4,8 @@ https://docs.nestjs.com/modules
 */
 
 import { Module } from '@nestjs/common';
-import { ApiServicesModule } from '@kotka/api-services';
-import { MappersModule } from '@kotka/mappers';
+import { ApiServicesModule } from '@kotka/api/services';
+import { MappersModule } from '@kotka/api/mappers';
 import { SharedModule } from '../shared/shared.module';
 
 @Module({

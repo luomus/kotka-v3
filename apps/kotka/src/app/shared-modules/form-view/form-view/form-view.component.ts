@@ -14,7 +14,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { KotkaDocumentObjectType, KotkaDocumentObjectMap, LajiForm } from '@kotka/shared/models';
 import { from, Observable, Subscription, switchMap } from 'rxjs';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
-import { ErrorMessages } from '@kotka/api-interfaces';
+import { ErrorMessages } from '@kotka/shared/interfaces';
 import {
   FormErrorEnum,
   ErrorViewModel,

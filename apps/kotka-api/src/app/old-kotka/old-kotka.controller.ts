@@ -2,8 +2,8 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { LajiStoreService } from '@kotka/api-services';
-import { TypeMigrationService } from '@kotka/mappers';
+import { LajiStoreService } from '@kotka/api/services';
+import { TypeMigrationService } from '@kotka/api/mappers';
 import { IdService } from '@kotka/util-services';
 import { Dataset, Organization, SpecimenTransaction } from '@luomus/laji-schema';
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
@@ -78,7 +78,7 @@ export class OldKotkaController {
       map(res => res.data),
       map(data => data.member),
       map((transactions: SpecimenTransaction[]) => {
-        let id; 
+        let id;
         transactions.every(transaction => {
           if (transaction.type === 'HRX.typeLoanOutgoing') {
             id = transaction.id;

@@ -2,11 +2,11 @@
 https://docs.nestjs.com/guards#guards
 */
 
-import { LajiStoreService, TriplestoreService } from '@kotka/api-services';
+import { LajiStoreService, TriplestoreService } from '@kotka/api/services';
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException, InternalServerErrorException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { lastValueFrom } from 'rxjs';
-import { ErrorMessages } from '@kotka/api-interfaces';
+import { ErrorMessages } from '@kotka/shared/interfaces';
 import { KotkaDocumentObjectFullType, STORE_OBJECTS, StoreObject } from '@kotka/shared/models';
 
 @Injectable()

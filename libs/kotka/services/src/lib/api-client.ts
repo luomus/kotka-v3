@@ -20,7 +20,7 @@ import {
   RangeResponse,
   LoginResponse,
   AutocompleteResult
-} from '@kotka/api-interfaces';
+} from '@kotka/shared/interfaces';
 import { Collection } from '@luomus/laji-schema';
 import { map } from 'rxjs/operators';
 import { get, set } from 'lodash';

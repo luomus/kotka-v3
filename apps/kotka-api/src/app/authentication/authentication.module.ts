@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ApiServicesModule } from '@kotka/api-services';
+import { ApiServicesModule } from '@kotka/api/services';
 import { AuthenticateCookieGuard } from './authenticateCookie.guard';
 import { AuthenticatePersonTokenGuard } from './authenticatePersonToken.guard';
 import { AuthenticationController } from './authentication.controller';

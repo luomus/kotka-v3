@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { catchError, map, mergeMap, tap } from 'rxjs';
-import { LajiApiService } from '@kotka/api-services';
+import { LajiApiService } from '@kotka/api/services';
 
 const kotkaRoles = [
   'MA.admin',

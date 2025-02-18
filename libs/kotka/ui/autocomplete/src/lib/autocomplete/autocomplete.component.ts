@@ -7,7 +7,7 @@ import {
   Output,
   SimpleChanges
 } from '@angular/core';
-import { AutocompleteResult } from '@kotka/api-interfaces';
+import { AutocompleteResult } from '@kotka/shared/interfaces';
 import { debounceTime, distinctUntilChanged, Observable, of, OperatorFunction, switchMap } from 'rxjs';
 import { NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
 

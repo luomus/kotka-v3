@@ -2,7 +2,7 @@
 https://docs.nestjs.com/providers#services
 */
 
-import { LajiApiService, LajiStoreService, AbschService } from '@kotka/api-services';
+import { LajiApiService, LajiStoreService, AbschService } from '@kotka/api/services';
 import { Dataset } from '@luomus/laji-schema';
 import { Injectable } from '@nestjs/common';
 import { get } from 'lodash';

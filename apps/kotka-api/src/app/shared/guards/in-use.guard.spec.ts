@@ -1,5 +1,5 @@
-import { ApiServicesModule, LajiStoreService, TriplestoreService } from '@kotka/api-services';
-import { MappersModule } from '@kotka/mappers';
+import { ApiServicesModule, LajiStoreService, TriplestoreService } from '@kotka/api/services';
+import { MappersModule } from '@kotka/api/mappers';
 import { Test } from '@nestjs/testing';
 import { of } from 'rxjs';
 import { HttpModule } from '@nestjs/axios';

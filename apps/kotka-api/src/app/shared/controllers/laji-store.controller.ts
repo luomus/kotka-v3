@@ -2,10 +2,10 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { StoreGetQuery } from '@kotka/api-interfaces';
+import { StoreGetQuery } from '@kotka/shared/interfaces';
 import { lastValueFrom } from 'rxjs';
-import { LajiStoreService, TriplestoreService } from '@kotka/api-services';
-import { TriplestoreMapperService } from '@kotka/mappers';
+import { LajiStoreService, TriplestoreService } from '@kotka/api/services';
+import { TriplestoreMapperService } from '@kotka/api/mappers';
 import {
   Body,
   Delete,

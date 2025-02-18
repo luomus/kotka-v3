@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing';
 import { createMock } from '@golevelup/ts-jest';
 import { CallHandler, ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 import { ValidatorInterceptor } from './validator.interceptor';
-import { ApiServicesModule, FormService, LajiStoreService } from '@kotka/api-services';
+import { ApiServicesModule, FormService, LajiStoreService } from '@kotka/api/services';
 import { Reflector } from '@nestjs/core';
 import { ValidationService } from '../services/validation.service';
 import { of } from 'rxjs';

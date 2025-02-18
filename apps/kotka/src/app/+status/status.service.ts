@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { StatusResponse } from '@kotka/api-interfaces';
+import { StatusResponse } from '@kotka/shared/interfaces';
 
 const statusPath = '/api/status';
 

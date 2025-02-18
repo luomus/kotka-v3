@@ -13,7 +13,7 @@ import {
   throwError
 } from 'rxjs';
 import { distinctUntilChanged, map, take } from 'rxjs/operators';
-import { allowEditForUser, allowDeleteForUser } from '@kotka/utils';
+import { allowEditForUser, allowDeleteForUser } from '@kotka/shared/utils';
 import { KotkaDocumentObject, KotkaDocumentObjectType, KotkaDocumentObjectMap } from '@kotka/shared/models';
 import { LajiForm, Person, Image } from '@kotka/shared/models';
 import { FormViewUtils } from './form-view-utils';

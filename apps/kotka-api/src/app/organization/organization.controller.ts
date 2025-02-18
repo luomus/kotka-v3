@@ -11,8 +11,8 @@ import {
   UseInterceptors
 } from '@nestjs/common';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
-import { LajiStoreService, TriplestoreService } from '@kotka/api-services';
-import { TriplestoreMapperService } from '@kotka/mappers';
+import { LajiStoreService, TriplestoreService } from '@kotka/api/services';
+import { TriplestoreMapperService } from '@kotka/api/mappers';
 import { LajiStoreController } from '../shared/controllers/laji-store.controller';
 import { ControllerType } from '../shared/decorators/controller-type.decorator';
 import { ApiMethodAccessGuard } from '../shared/guards/api-method-access.guard';

@@ -2,9 +2,9 @@
 https://docs.nestjs.com/guards#guards
 */
 
-import { LajiStoreService } from '@kotka/api-services';
+import { LajiStoreService } from '@kotka/api/services';
 import { KotkaDocumentObject } from '@kotka/shared/models';
-import { allowEditForUser, allowDeleteForUser } from '@kotka/utils';
+import { allowEditForUser, allowDeleteForUser } from '@kotka/shared/utils';
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException, InternalServerErrorException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { lastValueFrom } from 'rxjs';
@@ -40,7 +40,7 @@ export class ApiMethodAccessGuard implements CanActivate {
       if (!req.params.id) {
         throw new InternalServerErrorException('Missing expected id in url.');
       }
-      
+
       const res = await lastValueFrom(this.lajiStoreService.get<KotkaDocumentObject>(type, req.params.id));
 
       if (!allowEditForUser(res.data, req.user.profile)) {
