@@ -3,9 +3,8 @@ import { TriplestoreMapperService, TypeMigrationService } from "@kotka/api/mappe
 import { Command, Console } from "nestjs-console";
 import { lastValueFrom, map } from "rxjs";
 import { Organization, StoreObject } from '@kotka/shared/models';
-import { IdService } from "@kotka/util-services";
 import ora from 'ora';
-import { getOrganizationFullName } from "@kotka/shared/utils";
+import { getId, getOrganizationFullName } from '@kotka/shared/utils';
 
 interface Options {
   limit: number,
@@ -20,7 +19,6 @@ export class MigrateCommand {
     private readonly lajiStoreService: LajiStoreService,
     private readonly triplestoreMapperService: TriplestoreMapperService,
     private readonly typeMigrationService: TypeMigrationService,
-    private readonly idService: IdService,
   ) {}
 
   private getType (typeQName) {
@@ -125,7 +123,7 @@ export class MigrateCommand {
           map(data => {
             const qnameList = [];
             data.data['rdf:RDF'][type]?.forEach(obj => {
-              qnameList.push(this.idService.getId(obj['rdf:about']));
+              qnameList.push(getId(obj['rdf:about']));
             });
             return qnameList;
           })

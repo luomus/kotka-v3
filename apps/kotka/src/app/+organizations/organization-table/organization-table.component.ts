@@ -6,7 +6,7 @@ import {
   URICellRendererComponent,
   BooleanFilterComponent, BooleanFloatingFilterComponent, AutocompleteFloatingFilterComponent
 } from '@kotka/ui/datatable';
-import { DatatableDataService, DEFAULT_DOMAIN } from '@kotka/services';
+import { DatatableDataService } from '@kotka/services';
 import {
   KotkaDocumentObjectType
 } from '@kotka/shared/models';
@@ -32,9 +32,6 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
     headerName: 'URI',
     field: 'id',
     cellRenderer: URICellRendererComponent,
-    cellRendererParams: {
-      domain: DEFAULT_DOMAIN
-    },
     width: 145,
     flex: 0,
     lockPosition: 'left'

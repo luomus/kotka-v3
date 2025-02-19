@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { IdService } from '@kotka/services';
+import { getUri } from '@kotka/shared/utils';
 
 @Pipe({
   name: 'toFullUri'
@@ -11,6 +11,6 @@ export class ToFullUriPipe implements PipeTransform {
     if (Array.isArray(value)) {
       return value.map(val => this.transform(val));
     }
-    return IdService.getUri(value);
+    return getUri(value);
   }
 }

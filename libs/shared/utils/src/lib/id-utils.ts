@@ -21,7 +21,7 @@ export function getId(value: string): string {
   return value;
 }
 
-export function getUri (value: string): string {
+export function getUri(value: string): string {
   if (typeof value !== 'string' || value === '' || value.indexOf('http') === 0) return value;
 
   if (value.includes(':')) {
@@ -35,7 +35,19 @@ export function getUri (value: string): string {
   return defaultDomain + value;
 }
 
-export function getIdWithoutPrefix (value: string): string {
+export function getDomainAndIdWithoutPrefix(value: string): string[] {
+  if (typeof value !== 'string' || value === '' || value.indexOf('http') === 0) return ['', value];
+
+  if (value.includes(':')) {
+    const [prefix, id] = value.split(':');
+    const domain = domainMap[prefix] || defaultDomain;
+    return [domain, id];
+  }
+
+  return [defaultDomain, value];
+}
+
+export function getIdWithoutPrefix(value: string): string {
   if (typeof value !== 'string' || value === '') return value;
 
   const idx = value.indexOf(':');

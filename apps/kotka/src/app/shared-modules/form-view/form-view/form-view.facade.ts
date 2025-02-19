@@ -13,10 +13,9 @@ import {
   throwError
 } from 'rxjs';
 import { distinctUntilChanged, map, take } from 'rxjs/operators';
-import { allowEditForUser, allowDeleteForUser } from '@kotka/shared/utils';
+import { allowEditForUser, allowDeleteForUser, getId } from '@kotka/shared/utils';
 import { KotkaDocumentObject, KotkaDocumentObjectType, KotkaDocumentObjectMap } from '@kotka/shared/models';
 import { LajiForm, Person, Image } from '@kotka/shared/models';
-import { FormViewUtils } from './form-view-utils';
 import { MediaMetadata } from '@luomus/laji-form/lib/components/LajiForm';
 
 export enum FormErrorEnum {
@@ -159,7 +158,7 @@ export class FormViewFacade<T extends KotkaDocumentObjectType, S extends KotkaDo
       return throwError(() => new Error(FormErrorEnum.dataNotFound));
     }
 
-    const id = FormViewUtils.getIdFromDataURI(dataURI);
+    const id = getId(dataURI);
     return this.apiClient.getDocumentById<T, S>(dataType, id).pipe(
       catchError(err => {
         err = err.status === 404 ? FormErrorEnum.dataNotFound : err;

@@ -5,7 +5,7 @@ import {
   TransactionCountRendererComponent, DueDaysRendererComponent, EnumFloatingFilterComponent, YearFloatingFilterComponent
 } from '@kotka/ui/datatable';
 import { URICellRendererComponent, EnumCellRendererComponent, AutocompleteFloatingFilterComponent } from '@kotka/ui/datatable';
-import { DatatableDataService, DEFAULT_DOMAIN, FormService, UserService } from '@kotka/services';
+import { DatatableDataService, FormService, UserService } from '@kotka/services';
 import {
   KotkaDocumentObjectType,
   LajiForm
@@ -54,9 +54,6 @@ export class TransactionTableComponent {
         headerName: 'URI',
         field: 'id',
         cellRenderer: URICellRendererComponent,
-        cellRendererParams: {
-          domain: DEFAULT_DOMAIN
-        },
         defaultSelected: true,
         lockPosition: 'left'
       },

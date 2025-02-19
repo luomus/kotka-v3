@@ -25,8 +25,9 @@ import {
 } from './form-view.facade';
 import { filter, take } from 'rxjs/operators';
 import { FormViewUtils } from './form-view-utils';
-import { ApiClient, IdService, ToastService, DialogService } from '@kotka/services';
+import { ApiClient, ToastService, DialogService } from '@kotka/services';
 import { Utils } from '../../../shared/services/utils';
+import { getUri } from '@kotka/shared/utils';
 
 @Component({
   selector: 'kotka-form-view',
@@ -228,7 +229,7 @@ export class FormViewComponent<T extends KotkaDocumentObjectType = KotkaDocument
   private navigateToEdit(id: string): Observable<boolean> {
     return from(this.router.navigate(['..', 'edit'], {
       relativeTo: this.activeRoute,
-      queryParams: { uri: IdService.getUri(id) }
+      queryParams: { uri: getUri(id) }
     }));
   }
 

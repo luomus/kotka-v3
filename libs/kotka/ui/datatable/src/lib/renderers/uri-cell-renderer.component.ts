@@ -1,24 +1,19 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { CellRendererComponent } from './cell-renderer';
-
-interface RendererExtraParams {
-  domain: string;
-}
-
-type RendererParams = ICellRendererParams & RendererExtraParams;
+import { getDomainAndIdWithoutPrefix, getUri } from '@kotka/shared/utils';
 
 @Component({
   selector: 'kui-uri-cell-renderer',
   template: `
-    <div *ngIf="params.value" class="uri-cell-layout">
+    <div *ngIf="id" class="uri-cell-layout">
       <a type="button" class="btn btn-info edit-button" [routerLink]="['edit']" [queryParams]="{
-        uri: params.domain + params.value
+        uri: domain + id
       }">
         <i class="fa fa-pen-to-square"></i>
       </a>
-      <small class="domain-value">{{ params.domain }}</small>
-      <span class="id-value" title="{{ params.value }}">{{ params.value }}</span>
+      <small class="domain-value">{{ domain }}</small>
+      <span class="id-value" title="{{ id }}">{{ id }}</span>
     </div>
   `,
   styles: [`
@@ -46,11 +41,26 @@ type RendererParams = ICellRendererParams & RendererExtraParams;
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class URICellRendererComponent extends CellRendererComponent<RendererParams> {
-  static override getExportValue(value: string, row: any, params: RendererExtraParams): string {
+export class URICellRendererComponent extends CellRendererComponent<ICellRendererParams> {
+  domain = '';
+  id = '';
+
+  override paramsChange() {
+    if (!this.params.value) {
+      this.domain = '';
+      this.id = '';
+      return;
+    }
+
+    const [domain, id] = getDomainAndIdWithoutPrefix(this.params.value);
+    this.domain = domain;
+    this.id = id;
+  }
+
+  static override getExportValue(value: string, row: any, params: undefined): string {
     if (!value) {
       return '';
     }
-    return params.domain + value;
+    return getUri(value);
   }
 }

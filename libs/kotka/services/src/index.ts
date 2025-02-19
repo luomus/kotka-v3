@@ -9,7 +9,6 @@ export * from './lib/api-label.service';
 export * from './lib/label.service';
 export * from './lib/dialog.service';
 export * from './lib/form.service';
-export * from './lib/id.service';
 export * from './lib/pdf.service';
 export * from './lib/title.service';
 export * from './lib/logger/logger.service';

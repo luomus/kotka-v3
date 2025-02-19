@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { URICellRendererComponent } from '@kotka/ui/datatable';
-import { DatatableDataService, DEFAULT_DOMAIN } from '@kotka/services';
+import { DatatableDataService } from '@kotka/services';
 import { KotkaDocumentObjectType } from '@kotka/shared/models';
 import { DatatableColumn, DatatableSource, GetRowsParams } from '@kotka/models';
 
@@ -15,9 +15,6 @@ export class DatasetTableComponent {
     headerName: 'URI',
     field: 'id',
     cellRenderer: URICellRendererComponent,
-    cellRendererParams: {
-      domain: DEFAULT_DOMAIN
-    },
     lockPosition: 'left'
   }, {
     headerName: 'Name',
