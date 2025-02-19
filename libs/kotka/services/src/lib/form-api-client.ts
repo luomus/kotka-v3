@@ -6,7 +6,7 @@ import { ToastService } from './toast.service';
 import { apiBase, lajiApiBase } from './constants';
 import { isMultiLanguageObject } from '@kotka/shared/models';
 import { DialogService } from './dialog.service';
-import { ErrorMessages } from '@kotka/shared/interfaces';
+import { ErrorMessages } from '@kotka/shared/models';
 
 enum ResourceType {
   autocompleteDatasetResource,

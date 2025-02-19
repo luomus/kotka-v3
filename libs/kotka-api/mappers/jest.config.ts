@@ -1,7 +1,7 @@
 /* eslint-disable */
 export default {
-  displayName: 'mappers',
-  preset: '../../jest.preset.js',
+  displayName: 'api-mappers',
+  preset: '../../../jest.preset.js',
   globals: {},
   testEnvironment: 'node',
   transform: {
@@ -13,5 +13,5 @@ export default {
     ],
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../../coverage/libs/mappers',
+  coverageDirectory: '../../../coverage/libs/kotka-api/mappers',
 };

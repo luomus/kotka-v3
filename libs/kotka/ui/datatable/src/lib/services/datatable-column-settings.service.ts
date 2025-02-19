@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { isEqual } from 'lodash';
-import { ColumnSettings, DatatableColumn } from '@kotka/shared/models';
+import { ColumnSettings, DatatableColumn } from '@kotka/models';
 import { LocalStorageService } from 'ngx-webstorage';
 
 @Injectable({

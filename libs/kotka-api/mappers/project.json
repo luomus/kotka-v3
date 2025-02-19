@@ -1,5 +1,5 @@
 {
-  "name": "mappers",
+  "name": "api-mappers",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/kotka-api/mappers/src",
   "projectType": "library",
@@ -10,7 +10,7 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/mappers"],
+      "outputs": ["{workspaceRoot}/coverage/libs/kotka-api/mappers"],
       "options": {
         "jestConfig": "libs/mappers/jest.config.ts"
       }

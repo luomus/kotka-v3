@@ -3,7 +3,7 @@ import { map } from 'rxjs/operators';
 import { CellRendererComponent } from '../renderers/cell-renderer';
 import { ExportService } from '@kotka/services';
 import { Injectable, Injector } from '@angular/core';
-import { DatatableColumn, DatatableSource, FilterModel, GetRowsParams, SortModel } from '@kotka/shared/models';
+import { DatatableColumn, DatatableSource, FilterModel, GetRowsParams, SortModel } from '@kotka/models';
 
 @Injectable({
   providedIn: 'root'

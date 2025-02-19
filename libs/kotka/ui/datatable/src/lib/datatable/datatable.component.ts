@@ -22,7 +22,7 @@ import {
   DatatableColumn, DatatableFilter, DatatableSort,
   DatatableSource,
   GetRowsParams, TupleUnion
-} from '@kotka/shared/models';
+} from '@kotka/models';
 import { forkJoin, from, Observable, Subscription } from 'rxjs';
 import { ColumnSettingsModalComponent } from '../column-settings-modal/column-settings-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';

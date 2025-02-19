@@ -1,6 +1,6 @@
 /* eslint-disable */
 export default {
-  displayName: 'shared-utils',
+  displayName: 'shared-models',
   preset: '../../../jest.preset.js',
   globals: {},
   testEnvironment: 'node',
@@ -13,5 +13,5 @@ export default {
     ],
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../../../coverage/libs/shared/utils',
+  coverageDirectory: '../../../coverage/libs/shared/models',
 };

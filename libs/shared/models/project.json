@@ -1,5 +1,5 @@
 {
-  "name": "shared-utils",
+  "name": "shared-models",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/shared/models/src",
   "projectType": "library",
@@ -10,9 +10,9 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/shared/utils"],
+      "outputs": ["{workspaceRoot}/coverage/libs/shared/models"],
       "options": {
-        "jestConfig": "libs/shared/utils/jest.config.ts"
+        "jestConfig": "libs/shared/models/jest.config.ts"
       }
     }
   },

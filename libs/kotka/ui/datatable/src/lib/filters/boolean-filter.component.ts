@@ -4,7 +4,7 @@ import { PipesModule } from '@kotka/pipes';
 import { IFilterAngularComp } from '@ag-grid-community/angular';
 import { IFilterParams } from '@ag-grid-community/core';
 import { NgForOf } from '@angular/common';
-import { BooleanFilterModel } from '@kotka/shared/models';
+import { BooleanFilterModel } from '@kotka/models';
 
 @Component({
   standalone: true,

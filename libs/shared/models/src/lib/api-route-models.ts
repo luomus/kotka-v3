@@ -33,12 +33,12 @@ export enum ErrorMessages {
   missingIntellectualOwner = 'Missing an intellectualOwner'
 }
 
-export interface LoginResponse {
+export interface LoginResult {
   profile: Person,
   next: string
 }
 
-export interface RangeResponse {
+export interface RangeResult {
   status: string;
   items?: string[];
 }
@@ -48,4 +48,4 @@ export type AutocompleteResult = {
   value: string;
 }
 
-export type StatusResponse = HealthCheckResult;
+export type StatusResult = HealthCheckResult;

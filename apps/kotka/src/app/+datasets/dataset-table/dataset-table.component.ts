@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { URICellRendererComponent } from '@kotka/ui/datatable';
 import { DatatableDataService, DEFAULT_DOMAIN } from '@kotka/services';
-import { DatatableColumn, DatatableSource, GetRowsParams, KotkaDocumentObjectType } from '@kotka/shared/models';
+import { KotkaDocumentObjectType } from '@kotka/shared/models';
+import { DatatableColumn, DatatableSource, GetRowsParams } from '@kotka/models';
 
 @Component({
   selector: 'kotka-dataset-table',

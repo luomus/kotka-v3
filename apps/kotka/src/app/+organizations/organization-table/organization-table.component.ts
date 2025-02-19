@@ -8,12 +8,14 @@ import {
 } from '@kotka/ui/datatable';
 import { DatatableDataService, DEFAULT_DOMAIN } from '@kotka/services';
 import {
+  KotkaDocumentObjectType
+} from '@kotka/shared/models';
+import {
   DatatableColumn,
   DatatableFilter,
   DatatableSource,
-  GetRowsParams,
-  KotkaDocumentObjectType
-} from '@kotka/shared/models';
+  GetRowsParams
+} from '@kotka/models';
 import { Organization } from '@luomus/laji-schema';
 import { debounceTime, Subject, Subscription } from 'rxjs';
 

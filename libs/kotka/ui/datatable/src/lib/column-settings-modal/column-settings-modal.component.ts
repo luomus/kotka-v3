@@ -8,7 +8,7 @@ import {
   RowSelectedEvent
 } from '@ag-grid-community/core';
 import { combineLatest, ReplaySubject, take } from 'rxjs';
-import { ColumnSettings, DatatableColumn } from '@kotka/shared/models';
+import { ColumnSettings, DatatableColumn } from '@kotka/models';
 
 @Component({
   selector: 'kui-column-settings-modal',

@@ -2,7 +2,7 @@
 https://docs.nestjs.com/providers#services
 */
 
-import { StoreGetQuery, StoreQueryResult } from '@kotka/shared/interfaces';
+import { StoreGetQuery, StoreQueryResult } from '@kotka/shared/models';
 import { StoreVersion } from '@kotka/shared/models';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';

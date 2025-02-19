@@ -17,10 +17,10 @@ import {
 import { Observable, of, switchMap } from 'rxjs';
 import { apiBase, lajiApiBase } from './constants';
 import {
-  RangeResponse,
-  LoginResponse,
+  RangeResult,
+  LoginResult,
   AutocompleteResult
-} from '@kotka/shared/interfaces';
+} from '@kotka/shared/models';
 import { Collection } from '@luomus/laji-schema';
 import { map } from 'rxjs/operators';
 import { get, set } from 'lodash';
@@ -114,8 +114,8 @@ export class ApiClient {
     return this.httpClient.get<LajiForm.JsonForm>(`${lajiApiPath}forms/${formId}`, { params });
   }
 
-  getSpecimenRange(range: string): Observable<RangeResponse> {
-    return this.httpClient.get<RangeResponse>(`${path}specimen/range/${range}`);
+  getSpecimenRange(range: string): Observable<RangeResult> {
+    return this.httpClient.get<RangeResult>(`${path}specimen/range/${range}`);
   }
 
   getCollection(id: string): Observable<Collection> {
@@ -147,8 +147,8 @@ export class ApiClient {
     return this.httpClient.get<Person>(authPath + 'user');
   }
 
-  login(): Observable<LoginResponse> {
-    return this.httpClient.get<LoginResponse>(authPath + 'postLogin');
+  login(): Observable<LoginResult> {
+    return this.httpClient.get<LoginResult>(authPath + 'postLogin');
   }
 
   logout(): Observable<void> {

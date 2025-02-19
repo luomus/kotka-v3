@@ -1,10 +1,10 @@
 /* eslint-disable */
 export default {
   displayName: 'api-services',
-  preset: '../../jest.preset.js',
+  preset: '../../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   globals: {},
-  coverageDirectory: '../../coverage/libs/api-services',
+  coverageDirectory: '../../../coverage/libs/kotka-api/services',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
       'jest-preset-angular',

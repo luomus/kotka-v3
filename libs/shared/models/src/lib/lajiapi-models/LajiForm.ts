@@ -1,8 +1,9 @@
 /**
  * Form interface
  */
-import { Annotation, Document } from '@kotka/shared/models';
+import { Annotation, Document } from '@luomus/laji-schema';
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace LajiForm {
   export enum PrintType {
     lineTransect = 'MHL.printTypeLineTransect',

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { LocalStorageService } from 'ngx-webstorage';
-import { DatatableColumn, DatatableFilter } from '@kotka/shared/models';
+import { DatatableColumn, DatatableFilter } from '@kotka/models';
 import { cloneDeep } from 'lodash';
 
 @Injectable({

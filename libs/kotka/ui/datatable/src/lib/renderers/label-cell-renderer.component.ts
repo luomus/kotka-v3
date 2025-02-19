@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Injector } from '@angular/core';
 import { CellRendererComponent } from './cell-renderer';
 import { Observable, of } from 'rxjs';
 import { LabelKey, LabelService } from '@kotka/services';
-import { DatatableColumn } from '@kotka/shared/models';
+import { DatatableColumn } from '@kotka/models';
 
 @Component({
   selector: 'kui-label-cell-renderer',

@@ -2,7 +2,7 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { StoreGetQuery } from '@kotka/shared/interfaces';
+import { StoreGetQuery } from '@kotka/shared/models';
 import { lastValueFrom } from 'rxjs';
 import { LajiStoreService, TriplestoreService } from '@kotka/api/services';
 import { TriplestoreMapperService } from '@kotka/api/mappers';

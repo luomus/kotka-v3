@@ -6,7 +6,7 @@ import { LajiStoreService, TriplestoreService } from '@kotka/api/services';
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException, InternalServerErrorException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { lastValueFrom } from 'rxjs';
-import { ErrorMessages } from '@kotka/shared/interfaces';
+import { ErrorMessages } from '@kotka/shared/models';
 import { KotkaDocumentObjectFullType, STORE_OBJECTS, StoreObject } from '@kotka/shared/models';
 
 @Injectable()

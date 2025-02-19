@@ -1,3 +1,3 @@
-export * from './lajiapi-models';
-export * from './lajistore-extended-models';
-export * from './common-models';
+export * from './lib/lajistore-extended-models';
+export * from './lib/lajiapi-models';
+export * from './lib/api-route-models';

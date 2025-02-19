@@ -1,7 +1,7 @@
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { Observable, of } from 'rxjs';
-import { DatatableColumn } from '@kotka/shared/models';
+import { DatatableColumn } from '@kotka/models';
 import { Injector } from '@angular/core';
 
 export class CellRendererComponent<T extends ICellRendererParams = ICellRendererParams> implements ICellRendererAngularComp {

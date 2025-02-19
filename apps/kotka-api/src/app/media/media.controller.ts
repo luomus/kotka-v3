@@ -8,7 +8,7 @@ import { MediaApiService, NewMediaFile } from '@kotka/api/services';
 import { map } from 'rxjs';
 import { Image } from '@luomus/laji-schema';
 import { MediaAccessInterceptor } from '../shared/interceptors/media-access.interceptor';
-import { ErrorMessages } from '@kotka/shared/interfaces';
+import { ErrorMessages } from '@kotka/shared/models';
 
 @Controller('media')
 @UseGuards(AuthenticateCookieGuard)

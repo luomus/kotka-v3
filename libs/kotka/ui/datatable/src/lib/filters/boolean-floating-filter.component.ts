@@ -7,7 +7,7 @@ import { NgForOf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BooleanFilterComponent } from './boolean-filter.component';
 import { PipesModule } from '@kotka/pipes';
-import { BooleanFilterModel } from '@kotka/shared/models';
+import { BooleanFilterModel } from '@kotka/models';
 
 @Component({
   standalone: true,

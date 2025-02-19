@@ -2,11 +2,11 @@ import { Dataset, Document, Organization, Sample, SpecimenTransaction } from '@l
 export * from '@luomus/laji-schema';
 
 export type KotkaDocumentObject =
-| Dataset
-| Document
-| Organization
-| Sample
-| SpecimenTransaction
+  | Dataset
+  | Document
+  | Organization
+  | Sample
+  | SpecimenTransaction
 
 export enum KotkaDocumentObjectType {
   dataset = 'dataset',

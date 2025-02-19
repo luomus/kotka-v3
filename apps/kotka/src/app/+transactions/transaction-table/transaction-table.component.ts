@@ -7,12 +7,14 @@ import {
 import { URICellRendererComponent, EnumCellRendererComponent, AutocompleteFloatingFilterComponent } from '@kotka/ui/datatable';
 import { DatatableDataService, DEFAULT_DOMAIN, FormService, UserService } from '@kotka/services';
 import {
-  DatatableColumn,
-  DatatableSource,
-  GetRowsParams,
   KotkaDocumentObjectType,
   LajiForm
 } from '@kotka/shared/models';
+import {
+  DatatableColumn,
+  DatatableSource,
+  GetRowsParams
+} from '@kotka/models';
 import { globals } from '../../../environments/globals';
 
 @Component({

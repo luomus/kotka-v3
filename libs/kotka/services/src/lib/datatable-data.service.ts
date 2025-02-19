@@ -2,13 +2,15 @@ import { Observable } from 'rxjs';
 import {
   KotkaDocumentObject,
   ListResponse,
-  KotkaDocumentObjectType,
+  KotkaDocumentObjectType
+} from '@kotka/shared/models';
+import {
   DatatableColumn,
   FilterModel,
   isBasicFilterModel,
   isTextFilterModel,
   isDateFilterModel, DatatableFilter, DatatableSort, BasicFilterModel, CombinedFilterModel
-} from '@kotka/shared/models';
+} from '@kotka/models';
 import { Injectable } from '@angular/core';
 import { ApiClient } from './api-client';
 
