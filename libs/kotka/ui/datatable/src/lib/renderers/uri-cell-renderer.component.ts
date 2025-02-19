@@ -57,7 +57,7 @@ export class URICellRendererComponent extends CellRendererComponent<ICellRendere
     this.id = id;
   }
 
-  static override getExportValue(value: string, row: any, params: undefined): string {
+  static override getExportValue(value: string): string {
     if (!value) {
       return '';
     }
