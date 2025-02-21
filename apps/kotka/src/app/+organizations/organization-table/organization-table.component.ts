@@ -81,7 +81,7 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
       suppressHeaderFilterButton: true,
       width: 100,
       minWidth: 100,
-      flex: 0,
+      flex: 0
     },
     {
       headerName: 'Tags',

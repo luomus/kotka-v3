@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { LocalStorageService } from 'ngx-webstorage';
-import { DatatableColumn, DatatableFilter } from '../models/models';
+import { DatatableColumnWithId, DatatableFilter } from '../models/models';
 import { cloneDeep } from 'lodash';
 
 @Injectable({
@@ -9,31 +9,32 @@ import { cloneDeep } from 'lodash';
 export class DatatableFilterStoreService {
   constructor(private storage: LocalStorageService) {}
 
-  getFilters(settingsKey: string | undefined): DatatableFilter | null {
+  getFilters(settingsKey: string | undefined): DatatableFilter {
     if (!settingsKey) {
-      return null;
+      return {};
     }
 
-    return this.storage.retrieve(settingsKey + '-filters');
+    return this.storage.retrieve(settingsKey + '-filters') || {};
   }
 
   updateFilters(
     settingsKey: string | undefined,
     filterModel: DatatableFilter,
-    allColumns: DatatableColumn[],
+    allColumns: DatatableColumnWithId[],
   ) {
     if (!settingsKey) {
       return;
     }
 
     const columnFilters: DatatableFilter = {};
-    Object.keys(filterModel).forEach((colId) => {
-      const col = allColumns.filter((col) => col.colId === colId)[0];
+    allColumns.forEach(col => {
       if (col?.rememberFilters) {
-        columnFilters[colId] = cloneDeep(filterModel[colId]);
+        columnFilters[col.colId] = cloneDeep(filterModel[col.colId] || null);
       }
     });
 
-    this.storage.store(settingsKey + '-filters', columnFilters);
+    if (Object.keys(columnFilters).length > 0) {
+      this.storage.store(settingsKey + '-filters', columnFilters);
+    }
   }
 }

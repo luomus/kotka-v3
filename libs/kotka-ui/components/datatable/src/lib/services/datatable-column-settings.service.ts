@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { isEqual } from 'lodash';
-import { ColumnSettings, DatatableColumn } from '../models/models';
+import { ColumnSettings, DatatableColumnWithId } from '../models/models';
 import { LocalStorageService } from 'ngx-webstorage';
 
 @Injectable({
@@ -31,10 +31,10 @@ export class DatatableColumnSettingsService {
 
   cleanSettings(
     settingsKey: string | undefined,
-    allColumns: DatatableColumn[],
+    allColumns: DatatableColumnWithId[],
   ) {
     const settings = this.getSettings(settingsKey);
-    const allColIds: string[] = allColumns.map((col) => col.colId!);
+    const allColIds: string[] = allColumns.map((col) => col.colId);
 
     let { selected, order } = settings;
 

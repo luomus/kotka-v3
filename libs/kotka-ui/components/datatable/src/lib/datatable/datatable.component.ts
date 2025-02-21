@@ -141,9 +141,10 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     }
 
     if (changes['defaultFilterModel'] || changes['settingsKey']) {
-      this.filterModel =
-        this.datatableFilterStoreService.getFilters(this.settingsKey) ||
-        this.defaultFilterModel;
+      this.filterModel = {
+        ...this.defaultFilterModel,
+        ...this.datatableFilterStoreService.getFilters(this.settingsKey)
+      };
       this.gridApi?.setFilterModel(this.filterModel);
     }
 
