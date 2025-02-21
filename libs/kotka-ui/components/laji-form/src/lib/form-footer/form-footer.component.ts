@@ -5,12 +5,14 @@ import {
   Output,
   EventEmitter,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'kui-form-footer',
   templateUrl: './form-footer.component.html',
   styleUrls: ['./form-footer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule]
 })
 export class FormFooterComponent {
   @Input() hasChanges? = false;

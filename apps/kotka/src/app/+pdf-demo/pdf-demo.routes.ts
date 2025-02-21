@@ -10,5 +10,3 @@ export const pdfDemoRoutes: Routes = [
     data: { title: 'Pdf demo' }
   }
 ];
-
-export const routing: ModuleWithProviders<RouterModule> = RouterModule.forChild(pdfDemoRoutes);

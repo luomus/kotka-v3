@@ -17,14 +17,17 @@ import {
 } from '@kotka/ui/datatable';
 import { Organization } from '@luomus/laji-schema';
 import { debounceTime, Subject, Subscription } from 'rxjs';
-import { DatatableDataService } from '@kotka/ui/document-datatable';
+import { DatatableDataService, DocumentDatatableComponent } from '@kotka/ui/document-datatable';
 import { KotkaDocumentObjectType } from '@kotka/shared/models';
+import { MainContentComponent } from '@kotka/ui/main-content';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'kotka-organization-table',
   templateUrl: './organization-table.component.html',
   styleUrls: ['./organization-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [MainContentComponent, FormsModule, DocumentDatatableComponent],
 })
 export class OrganizationTableComponent implements OnInit, OnDestroy {
   dataType = KotkaDocumentObjectType.organization;
@@ -105,8 +108,8 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
     hidden: {
       filterType: 'boolean',
       type: 'equals',
-      filter: false
-    }
+      filter: false,
+    },
   };
 
   extraSearchQuery?: string;
@@ -119,7 +122,7 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
 
   constructor(
     private dataService: DatatableDataService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     const multiLangNameFields: (keyof Organization)[] = [
       'organizationLevel1',
@@ -140,10 +143,11 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
     this.updateSearchQuerySub = this.nameFilterChangedSubject
       .pipe(debounceTime(500))
       .subscribe(() => {
-        this.extraSearchQuery = this.dataService.getSearchQueryForMultiColumnTextSearch(
-          this.allNameFields,
-          this.nameFilterText
-        );
+        this.extraSearchQuery =
+          this.dataService.getSearchQueryForMultiColumnTextSearch(
+            this.allNameFields,
+            this.nameFilterText,
+          );
         this.cdr.markForCheck();
       });
   }

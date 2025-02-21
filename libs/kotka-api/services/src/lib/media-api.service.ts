@@ -182,7 +182,7 @@ export class MediaApiService {
         return this.metaToPDF(media);
       default:
         return;
-    };
+    }
   }
 
   metaToPDF(media: Media) {

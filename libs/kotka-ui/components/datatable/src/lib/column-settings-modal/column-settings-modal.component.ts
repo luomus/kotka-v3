@@ -14,12 +14,14 @@ import {
 } from '@ag-grid-community/core';
 import { combineLatest, ReplaySubject, take } from 'rxjs';
 import { ColumnSettings, DatatableColumn } from '../models/models';
+import { AgGridAngular } from '@ag-grid-community/angular';
 
 @Component({
   selector: 'kui-column-settings-modal',
   templateUrl: './column-settings-modal.component.html',
   styleUrls: ['./column-settings-modal.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [AgGridAngular],
 })
 export class ColumnSettingsModalComponent {
   columnsSubject: ReplaySubject<DatatableColumn[]> = new ReplaySubject(1);

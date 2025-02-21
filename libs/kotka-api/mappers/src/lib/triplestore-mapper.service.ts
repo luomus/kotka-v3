@@ -128,7 +128,7 @@ export class TriplestoreMapperService implements OnModuleInit {
             });
 
             json.push(parsed);
-          };
+          }
         } else {
           json = await compact(jsonld, this.fromContext[type]);
 
@@ -266,7 +266,7 @@ export class TriplestoreMapperService implements OnModuleInit {
 
         ctx3['@context'][key]['@id'] = val;
       }
-    };
+    }
 
     this.fromContext[type] = ctx2;
     this.returnContext[type] = ctx3;

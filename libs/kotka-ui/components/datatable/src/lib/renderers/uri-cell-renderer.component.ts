@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { CellRendererComponent } from './cell-renderer';
 import { getDomainAndIdWithoutPrefix, getUri } from '@kotka/shared/utils';
+import { RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'kui-uri-cell-renderer',
@@ -12,7 +14,7 @@ import { getDomainAndIdWithoutPrefix, getUri } from '@kotka/shared/utils';
         class="btn btn-info edit-button"
         [routerLink]="['edit']"
         [queryParams]="{
-          uri: domain + id
+          uri: domain + id,
         }"
       >
         <i class="fa fa-pen-to-square"></i>
@@ -32,14 +34,17 @@ import { getDomainAndIdWithoutPrefix, getUri } from '@kotka/shared/utils';
           'button id';
         column-gap: 2px;
       }
+
       .uri-cell-layout .edit-button {
         grid-area: button;
       }
+
       .uri-cell-layout .domain-value {
         grid-area: domain;
         line-height: initial;
         font-size: 60%;
       }
+
       .uri-cell-layout .id-value {
         grid-area: id;
         line-height: initial;
@@ -47,6 +52,7 @@ import { getDomainAndIdWithoutPrefix, getUri } from '@kotka/shared/utils';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, RouterLink],
 })
 export class URICellRendererComponent extends CellRendererComponent<ICellRendererParams> {
   domain = '';

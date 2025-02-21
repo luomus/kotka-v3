@@ -12,7 +12,6 @@ import {
   DatatableColumn,
   DatatableComponent,
   DatatableFilter,
-  KotkaUiDatatableModule,
 } from '@kotka/ui/datatable';
 import { DatatableDataService } from '../datatable-data.service';
 import { KotkaDocumentObjectType } from '@kotka/shared/models';
@@ -21,10 +20,9 @@ import { Observable, map } from 'rxjs';
 
 @Component({
   selector: 'kui-document-datatable',
-  standalone: true,
-  imports: [CommonModule, KotkaUiDatatableModule],
   templateUrl: './document-datatable.component.html',
-  styleUrls: ['./document-datatable.component.scss']
+  styleUrls: ['./document-datatable.component.scss'],
+  imports: [CommonModule, DatatableComponent]
 })
 export class DocumentDatatableComponent implements OnChanges {
   @ViewChild(DatatableComponent, { static: true })

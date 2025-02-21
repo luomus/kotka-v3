@@ -6,7 +6,7 @@ import {
 } from '@ag-grid-community/core';
 import { IFloatingFilterAngularComp } from '@ag-grid-community/angular';
 import { LajiForm } from '@kotka/shared/models';
-import { KeyValuePipe, NgForOf } from '@angular/common';
+import { NgForOf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 interface FilterExtraParams {
@@ -14,8 +14,7 @@ interface FilterExtraParams {
 }
 
 @Component({
-  standalone: true,
-  imports: [KeyValuePipe, NgForOf, FormsModule],
+  imports: [NgForOf, FormsModule],
   template: `
     <div class="ag-floating-filter-input">
       <div class="ag-select ag-filter-select">

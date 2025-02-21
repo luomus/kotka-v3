@@ -21,6 +21,7 @@ export class CellRendererComponent<
     return true;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   paramsChange(): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

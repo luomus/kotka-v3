@@ -6,6 +6,9 @@ import { KotkaDocumentObjectType, SpecimenTransaction } from '@kotka/shared/mode
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { TransactionFormEmbedService } from '../transaction-form-embed/transaction-form-embed.service';
 import { globals } from '../../../environments/globals';
+import {
+  VersionHistoryViewComponent
+} from '../../shared-modules/form-view/version-history-view/version-history-view.component';
 
 @Component({
   selector: 'kotka-transaction-version-history',
@@ -19,13 +22,16 @@ import { globals } from '../../../environments/globals';
   `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [VersionHistoryViewComponent],
+  providers: [TransactionFormEmbedService]
 })
 export class TransactionVersionHistoryComponent {
   formId = globals.transactionFormId;
-  dataType: KotkaDocumentObjectType.transaction = KotkaDocumentObjectType.transaction;
+  dataType: KotkaDocumentObjectType.transaction =
+    KotkaDocumentObjectType.transaction;
 
   constructor(
-    private transactionFormEmbedService: TransactionFormEmbedService
+    private transactionFormEmbedService: TransactionFormEmbedService,
   ) {}
 
   onFormInit(lajiForm: LajiFormComponent, formData: SpecimenTransaction) {

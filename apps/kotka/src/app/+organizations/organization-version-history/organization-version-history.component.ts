@@ -4,6 +4,9 @@ import {
 } from '@angular/core';
 import { KotkaDocumentObjectType } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
+import {
+  VersionHistoryViewComponent
+} from '../../shared-modules/form-view/version-history-view/version-history-view.component';
 
 @Component({
   selector: 'kotka-organization-version-history',
@@ -16,8 +19,10 @@ import { globals } from '../../../environments/globals';
   `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [VersionHistoryViewComponent],
 })
 export class OrganizationVersionHistoryComponent {
   formId = globals.organizationFormId;
-  dataType: KotkaDocumentObjectType.organization = KotkaDocumentObjectType.organization;
+  dataType: KotkaDocumentObjectType.organization =
+    KotkaDocumentObjectType.organization;
 }

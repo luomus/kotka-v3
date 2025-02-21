@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { StatusService } from './status.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'kotka-status',
@@ -10,13 +11,14 @@ import { map } from 'rxjs/operators';
       Status: {{ status$ | async }}
     </div>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [AsyncPipe]
 })
 export class StatusComponent {
   status$: Observable<string>;
 
   constructor(
-    private statusService: StatusService
+    statusService: StatusService
   ) {
     this.status$ = statusService.getApiStatus().pipe(
       map(status => status.status)

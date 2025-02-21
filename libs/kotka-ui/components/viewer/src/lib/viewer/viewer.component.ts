@@ -9,6 +9,8 @@ import {
   KotkaDocumentObject,
   LajiForm,
 } from '@kotka/shared/models';
+import { ViewerFieldsetComponent } from './components/viewer-fieldset.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'kui-viewer',
@@ -16,6 +18,7 @@ import {
   styleUrls: ['./viewer.component.scss'],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, ViewerFieldsetComponent],
 })
 export class ViewerComponent {
   @Input() set form(form: LajiForm.JsonForm | undefined) {

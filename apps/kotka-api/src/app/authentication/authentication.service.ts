@@ -87,5 +87,5 @@ export class AuthenticationService {
     });
 
     request.session.cookie.maxAge = 0;
-  };
+  }
 }

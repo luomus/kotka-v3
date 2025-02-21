@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { TransactionTypeLabelPipe } from '../../pipes/transaction-type-label.pipe';
 
 @Component({
-  standalone: true,
   imports: [CommonModule, TransactionTypeLabelPipe],
   selector: 'kotka-transaction-sheet-signature',
   templateUrl: './transaction-sheet-signature.html'

@@ -1,1 +1,1 @@
-export * from './lib/kotka-ui-viewer.module';
+export * from './lib/viewer/viewer.component';

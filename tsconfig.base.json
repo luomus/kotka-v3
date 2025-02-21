@@ -23,6 +23,7 @@
       "@kotka/ui/autocomplete": [
         "libs/kotka-ui/components/autocomplete/src/index.ts"
       ],
+      "@kotka/ui/data-services": ["libs/kotka-ui/data-services/src/index.ts"],
       "@kotka/ui/datatable": [
         "libs/kotka-ui/components/datatable/src/index.ts"
       ],
@@ -38,8 +39,7 @@
       "@kotka/ui/pipes": ["libs/kotka-ui/pipes/src/index.ts"],
       "@kotka/ui/spinner": ["libs/kotka-ui/components/spinner/src/index.ts"],
       "@kotka/ui/util-services": ["libs/kotka-ui/util-services/src/index.ts"],
-      "@kotka/ui/viewer": ["libs/kotka-ui/components/viewer/src/index.ts"],
-      "@kotka/ui/data-services": ["libs/kotka-ui/data-services/src/index.ts"]
+      "@kotka/ui/viewer": ["libs/kotka-ui/components/viewer/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

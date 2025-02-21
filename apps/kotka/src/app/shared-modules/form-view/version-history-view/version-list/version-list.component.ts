@@ -7,12 +7,17 @@ import {
   Output,
 } from '@angular/core';
 import { StoreVersion } from '@kotka/shared/models';
+import { SpinnerComponent } from '@kotka/ui/spinner';
+import { RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { ReversePipe } from '@kotka/ui/pipes';
 
 @Component({
   selector: 'kotka-version-list',
   templateUrl: './version-list.component.html',
   styleUrls: ['./version-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, SpinnerComponent, RouterLink, ReversePipe],
 })
 export class VersionListComponent implements OnChanges {
   @Input() data?: StoreVersion[];
@@ -23,7 +28,7 @@ export class VersionListComponent implements OnChanges {
 
   ngOnChanges() {
     this.checkedVersions = {};
-    (this.data || []).forEach(version => {
+    (this.data || []).forEach((version) => {
       this.checkedVersions[version.version] = false;
     });
   }
@@ -45,6 +50,8 @@ export class VersionListComponent implements OnChanges {
   }
 
   private getSelectedVersions(): number[] {
-    return Object.keys(this.checkedVersions).filter(key => this.checkedVersions[key]).map(key => parseInt(key, 10));
+    return Object.keys(this.checkedVersions)
+      .filter((key) => this.checkedVersions[key])
+      .map((key) => parseInt(key, 10));
   }
 }

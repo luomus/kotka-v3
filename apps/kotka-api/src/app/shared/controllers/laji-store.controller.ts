@@ -35,7 +35,7 @@ export abstract class LajiStoreController<T extends StoreObject> {
     protected readonly triplestoreService: TriplestoreService,
     protected readonly triplestoreMapperService: TriplestoreMapperService,
     protected readonly type: string,
-    protected readonly useTriplestore: boolean = true
+    protected readonly useTriplestore = true
   ) {
   }
 

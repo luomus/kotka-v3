@@ -4,6 +4,10 @@ import {
   isDifferenceObjectPatch,
   LajiForm,
 } from '@kotka/shared/models';
+import { ViewerCollectionComponent } from './viewer-collection.component';
+import { ViewerMultilangComponent } from './viewer-multilang.component';
+import { ViewerFieldComponent } from './viewer-field.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'kui-viewer-fieldset-field',
@@ -39,6 +43,12 @@ import {
   `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    CommonModule,
+    ViewerCollectionComponent,
+    ViewerMultilangComponent,
+    ViewerFieldComponent,
+  ],
 })
 export class ViewerFieldsetFieldComponent {
   @Input() field?: LajiForm.Field;

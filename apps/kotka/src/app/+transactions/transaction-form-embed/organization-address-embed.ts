@@ -4,6 +4,7 @@ import { distinctUntilChanged } from 'rxjs/operators';
 import { ApiClient } from '@kotka/ui/data-services';
 import { Organization } from '@luomus/laji-schema';
 import { KotkaDocumentObjectType } from '@kotka/shared/models';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'kotka-organization-address-embed',
@@ -19,6 +20,7 @@ import { KotkaDocumentObjectType } from '@kotka/shared/models';
       </ng-container>
     </div>
   `,
+  imports: [CommonModule]
 })
 export class OrganizationAddressEmbedComponent {
   set organization(organization: string | null | undefined) {

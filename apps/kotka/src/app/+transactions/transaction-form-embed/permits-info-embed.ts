@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Observable, of, ReplaySubject, switchMap } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { AbschService, LinkData } from '@kotka/ui/data-services';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'kotka-permits-info-embed',
@@ -40,6 +41,7 @@ import { AbschService, LinkData } from '@kotka/ui/data-services';
       </div>
     </div>
   `,
+  imports: [CommonModule]
 })
 export class PermitsInfoEmbedComponent {
   set country(country: string | null | undefined) {

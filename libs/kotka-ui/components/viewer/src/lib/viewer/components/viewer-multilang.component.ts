@@ -5,6 +5,8 @@ import {
   isDifferenceObjectPatch,
   LajiForm,
 } from '@kotka/shared/models';
+import { ViewerFieldComponent } from './viewer-field.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'kui-viewer-multilang',
@@ -26,7 +28,7 @@ import {
               differenceDataPatch
                 ? {
                     op: differenceDataPatch.op,
-                    value: differenceDataPatch.value[lang]
+                    value: differenceDataPatch.value[lang],
                   }
                 : $any(differenceDataObject?.[lang])
             "
@@ -37,6 +39,7 @@ import {
   `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, ViewerFieldComponent],
 })
 export class ViewerMultilangComponent {
   @Input() field?: LajiForm.Field;

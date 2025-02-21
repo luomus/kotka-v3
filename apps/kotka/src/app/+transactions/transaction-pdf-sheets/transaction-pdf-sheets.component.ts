@@ -16,6 +16,8 @@ import { TransactionReturnSheetComponent } from './transaction-return-sheet/tran
 import { TransactionInsectLabelsComponent } from './transaction-insect-labels/transaction-insect-labels';
 import { Observable, switchMap } from 'rxjs';
 import { TransactionBotanyLabelsComponent } from './transaction-botany-labels/transaction-botany-labels';
+import { SpinnerComponent } from '@kotka/ui/spinner';
+import { OldKotkaUrlPipe } from '../../shared/pipes/old-kotka-url.pipe';
 
 @Component({
   selector: 'kotka-transaction-pdf-sheets',
@@ -88,6 +90,7 @@ import { TransactionBotanyLabelsComponent } from './transaction-botany-labels/tr
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [SpinnerComponent, OldKotkaUrlPipe],
 })
 export class TransactionPdfSheetsComponent implements OnChanges {
   @Input() data?: SpecimenTransaction;

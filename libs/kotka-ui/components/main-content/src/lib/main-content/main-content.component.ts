@@ -4,6 +4,7 @@ import {
   Input,
   TemplateRef,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'kui-main-content',
@@ -26,6 +27,7 @@ import {
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule]
 })
 export class MainContentComponent {
   @Input() header?: string;

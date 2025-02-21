@@ -33,5 +33,3 @@ export const organizationsRoutes: Routes = [
     }
   }
 ];
-
-export const routing: ModuleWithProviders<RouterModule> = RouterModule.forChild(organizationsRoutes);

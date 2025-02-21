@@ -17,7 +17,8 @@ import {
   OperatorFunction,
   switchMap,
 } from 'rxjs';
-import { NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
+import { NgbTypeahead, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
+import { FormsModule } from '@angular/forms';
 
 export type FetchAutocompleteResultsFunc = (
   term: string,
@@ -42,6 +43,7 @@ export type FetchAutocompleteResultsFunc = (
     />
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [FormsModule, NgbTypeahead],
 })
 export class AutocompleteComponent implements OnChanges {
   @Input() value?: string;

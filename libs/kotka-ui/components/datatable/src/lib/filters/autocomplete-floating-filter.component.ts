@@ -7,8 +7,8 @@ import {
 import { IFloatingFilterAngularComp } from '@ag-grid-community/angular';
 import { ApiClient } from '@kotka/ui/data-services';
 import {
-  FetchAutocompleteResultsFunc,
-  KotkaUiAutocompleteModule,
+  AutocompleteComponent,
+  FetchAutocompleteResultsFunc
 } from '@kotka/ui/autocomplete';
 import { KotkaDocumentObjectType } from '@kotka/shared/models';
 
@@ -20,8 +20,7 @@ interface FilterExtraParams {
 }
 
 @Component({
-  standalone: true,
-  imports: [KotkaUiAutocompleteModule],
+  imports: [AutocompleteComponent],
   template: `
     <div class="ag-floating-filter-input">
       <kui-autocomplete

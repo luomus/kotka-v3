@@ -7,12 +7,14 @@ import {
 import { Router } from '@angular/router';
 import { UserService } from '@kotka/ui/data-services';
 import { environment } from '../../../environments/environment';
+import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'kotka-logout',
   templateUrl: './logout.component.html',
   styleUrls: ['./logout.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [NgbAlert],
 })
 export class LogoutComponent implements OnInit {
   errorMsg?: string;

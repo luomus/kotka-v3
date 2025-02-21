@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Subject } from 'rxjs';
+import { FormsModule } from '@angular/forms';
 
 
 @Component({
@@ -16,7 +17,8 @@ import { Subject } from 'rxjs';
         </div>
       </div>
     </div>
-  `
+  `,
+  imports: [FormsModule]
 })
 export class SpecimenRangeSelectEmbedComponent{
   value = '';

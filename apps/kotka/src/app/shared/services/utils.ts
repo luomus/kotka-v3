@@ -11,7 +11,7 @@ export class Utils {
       };
     }
     return null;
-  };
+  }
 
   static navigationEnd$(router: Router): Observable<void> {
     return router.events.pipe(

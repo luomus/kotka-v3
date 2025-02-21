@@ -10,7 +10,6 @@ import { TransactionSheetSignatureAndMaterialComponent } from '../sheet-componen
 import { TransactionTypeLabelPipe } from '../pipes/transaction-type-label.pipe';
 
 @Component({
-  standalone: true,
   imports: [
     CommonModule,
     TransactionSheetHeaderComponent,

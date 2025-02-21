@@ -5,12 +5,17 @@ import {
   OnChanges
 } from '@angular/core';
 import { KotkaVersionDifferenceObject, LajiForm, StoreVersion } from '@kotka/shared/models';
+import { SpinnerComponent } from '@kotka/ui/spinner';
+import { ViewerComponent } from '@kotka/ui/viewer';
+import { RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'kotka-version-comparison',
   templateUrl: './version-comparison.component.html',
   styleUrls: ['./version-comparison.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, SpinnerComponent, ViewerComponent, RouterLink],
 })
 export class VersionComparisonComponent implements OnChanges {
   @Input() versions?: number[];
@@ -25,11 +30,19 @@ export class VersionComparisonComponent implements OnChanges {
 
   ngOnChanges() {
     if (this.versions && this.versionList) {
-      const idx1 = this.versionList.findIndex(val => val.version === this.versions?.[0]);
-      const idx2 = this.versionList.findIndex(val => val.version === this.versions?.[1]);
+      const idx1 = this.versionList.findIndex(
+        (val) => val.version === this.versions?.[0],
+      );
+      const idx2 = this.versionList.findIndex(
+        (val) => val.version === this.versions?.[1],
+      );
 
-      this.previousVersion = idx1 > 0 ? this.versionList[idx1 - 1].version : undefined;
-      this.nextVersion = idx2 !== this.versionList.length - 1 ? this.versionList[idx2 + 1].version : undefined;
+      this.previousVersion =
+        idx1 > 0 ? this.versionList[idx1 - 1].version : undefined;
+      this.nextVersion =
+        idx2 !== this.versionList.length - 1
+          ? this.versionList[idx2 + 1].version
+          : undefined;
 
       this.versionData = [this.versionList[idx1], this.versionList[idx2]];
     }

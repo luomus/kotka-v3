@@ -14,8 +14,8 @@ import {
   ColDef,
   GridApi,
   GridOptions,
-  Module,
-  RowModelType,
+  Module, ModuleRegistry,
+  RowModelType
 } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
 import {
@@ -35,6 +35,18 @@ import { CustomDatepickerComponent } from '../components/custom-datepicker.compo
 import { CellRendererComponent } from '../renderers/cell-renderer';
 import { DatatableColumnSettingsService } from '../services/datatable-column-settings.service';
 import { DatatableFilterStoreService } from '../services/datatable-filter-store.service';
+import { CsvExportModule } from '@ag-grid-community/csv-export';
+import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
+import { TotalCountComponent } from '../total-count/total-count.component';
+import { SpinnerComponent } from '@kotka/ui/spinner';
+import { AgGridAngular } from '@ag-grid-community/angular';
+import { CommonModule } from '@angular/common';
+
+ModuleRegistry.registerModules([
+  CsvExportModule,
+  InfiniteRowModelModule,
+  ClientSideRowModelModule,
+]);
 
 type CustomColumnKeyList = TupleUnion<keyof CustomColDef>;
 
@@ -47,6 +59,7 @@ interface GridReadyEvent {
   selector: 'kui-datatable',
   templateUrl: './datatable.component.html',
   styleUrls: ['./datatable.component.scss'],
+  imports: [CommonModule, TotalCountComponent, SpinnerComponent, AgGridAngular],
 })
 export class DatatableComponent implements OnChanges, OnDestroy {
   @Input() columns: DatatableColumn[] = [];

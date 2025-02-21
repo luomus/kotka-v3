@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { DifferenceObjectPatch, LajiForm } from '@kotka/shared/models';
+import { CommonModule } from '@angular/common';
+import { EnumPipe, LabelPipe } from '@kotka/ui/pipes';
 
 @Component({
   selector: 'kui-viewer-field-value',
@@ -47,6 +49,7 @@ import { DifferenceObjectPatch, LajiForm } from '@kotka/shared/models';
   `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, EnumPipe, LabelPipe]
 })
 export class ViewerFieldValueComponent {
   @Input() field?: LajiForm.Field;

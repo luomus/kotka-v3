@@ -14,7 +14,7 @@ export class ValidationService {
     private readonly lajiApiService: LajiApiService,
     private readonly lajiStoreService: LajiStoreService,
     private readonly abschService: AbschService
-  ) { };
+  ) { }
 
   async remoteValidate(query, options) {
     let error = {};

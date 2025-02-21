@@ -11,7 +11,6 @@ export type LabelKey = string | number | boolean;
 export class LabelService {
   constructor(
     private apiLabelService: ApiLabelService,
-    private datePipe: DatePipe,
   ) {}
 
   getLabel(key: LabelKey): Observable<string> {
@@ -52,11 +51,11 @@ export class LabelService {
     }
 
     if (/^\d{4}-\d{2}-\d{2}$/.test(key)) {
-      return this.datePipe.transform(key, 'dd.MM.YYYY') || key;
+      return new DatePipe('en').transform(key, 'dd.MM.YYYY') || key;
     }
 
     if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(key)) {
-      return this.datePipe.transform(key, 'dd.MM.YYYY HH:mm') || key;
+      return new DatePipe('en').transform(key, 'dd.MM.YYYY HH:mm') || key;
     }
 
     return key;

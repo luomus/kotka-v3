@@ -4,12 +4,11 @@ import { IFloatingFilterAngularComp } from '@ag-grid-community/angular';
 import { NgForOf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BooleanFilterComponent } from './boolean-filter.component';
-import { PipesModule } from '@kotka/ui/pipes';
+import { LabelPipe } from '@kotka/ui/pipes';
 import { BooleanFilterModel } from '../models/models';
 
 @Component({
-  standalone: true,
-  imports: [NgForOf, FormsModule, PipesModule],
+  imports: [NgForOf, FormsModule, LabelPipe],
   template: `
     <div class="ag-floating-filter-input">
       <div class="ag-select ag-filter-select">

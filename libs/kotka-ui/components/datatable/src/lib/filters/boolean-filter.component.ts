@@ -1,14 +1,13 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { PipesModule } from '@kotka/ui/pipes';
+import { LabelPipe } from '@kotka/ui/pipes';
 import { IFilterAngularComp } from '@ag-grid-community/angular';
 import { IFilterParams } from '@ag-grid-community/core';
 import { NgForOf } from '@angular/common';
 import { BooleanFilterModel } from '../models/models';
 
 @Component({
-  standalone: true,
-  imports: [FormsModule, NgForOf, PipesModule],
+  imports: [FormsModule, NgForOf, LabelPipe],
   template: `
     <div class="ag-filter-wrapper">
       <div class="ag-filter-body-wrapper ag-simple-filter-body-wrapper">

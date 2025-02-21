@@ -36,6 +36,12 @@ import {
 import { Utils } from '../../../shared/services/utils';
 import { getUri } from '@kotka/shared/utils';
 import { ApiClient } from '@kotka/ui/data-services';
+import { MainContentComponent } from '@kotka/ui/main-content';
+import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
+import { MetaFieldsComponent } from '../meta-fields/meta-fields.component';
+import { SpinnerComponent } from '@kotka/ui/spinner';
+import { CommonModule } from '@angular/common';
+import { LabelPipe } from '@kotka/ui/pipes';
 
 @Component({
   selector: 'kotka-form-view',
@@ -43,6 +49,15 @@ import { ApiClient } from '@kotka/ui/data-services';
   styleUrls: ['./form-view.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [FormViewFacade],
+  imports: [
+    CommonModule,
+    MainContentComponent,
+    NgbAlert,
+    MetaFieldsComponent,
+    LajiFormComponent,
+    SpinnerComponent,
+    LabelPipe
+  ],
 })
 export class FormViewComponent<
     T extends KotkaDocumentObjectType = KotkaDocumentObjectType,

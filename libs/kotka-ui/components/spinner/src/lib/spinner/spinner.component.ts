@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'kui-spinner',
@@ -20,6 +21,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
   `,
   styleUrls: ['./spinner.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule]
 })
 export class SpinnerComponent {
   @Input() spinning = true;

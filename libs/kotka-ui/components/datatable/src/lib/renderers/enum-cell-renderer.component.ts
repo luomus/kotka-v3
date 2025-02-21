@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { LajiForm } from '@kotka/shared/models';
 import { CellRendererComponent } from './cell-renderer';
+import { EnumPipe } from '@kotka/ui/pipes';
+import { CommonModule } from '@angular/common';
 
 interface RendererExtraParams {
   field: LajiForm.Field;
@@ -21,6 +23,7 @@ type RendererParams = ICellRendererParams & RendererExtraParams;
   `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, EnumPipe]
 })
 export class EnumCellRendererComponent extends CellRendererComponent<RendererParams> {
   static override getExportValue(

@@ -1,10 +1,13 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import {
   DifferenceObject,
   DifferenceObjectPatch,
   isDifferenceObjectPatch,
   LajiForm,
 } from '@kotka/shared/models';
+import { CommonModule } from '@angular/common';
+import { ViewerFieldsetComponent } from './viewer-fieldset.component';
+import { ArrayIndexRangePipe } from '../../pipes/array-index-range.pipe';
 
 @Component({
   selector: 'kui-viewer-collection',
@@ -20,7 +23,8 @@ import {
           [ngClass]="{
             'viewer-fieldset-removed':
               differenceDataPatchArray?.[i]?.op === 'remove',
-            'viewer-fieldset-added': differenceDataPatchArray?.[i]?.op === 'add'
+            'viewer-fieldset-added':
+              differenceDataPatchArray?.[i]?.op === 'add',
           }"
           *ngFor="let i of data | arrayIndexRange: differenceDataPatchArray"
         >
@@ -39,6 +43,7 @@ import {
   `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, forwardRef(() => ViewerFieldsetComponent), ArrayIndexRangePipe],
 })
 export class ViewerCollectionComponent {
   @Input() field?: LajiForm.Field;

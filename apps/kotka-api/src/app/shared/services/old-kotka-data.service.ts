@@ -16,7 +16,7 @@ export class OldKotkaDataService {
     private readonly triplestoreService: TriplestoreService,
     private readonly triplestoreMapperService: TriplestoreMapperService,
     private readonly cacheService: CacheService,
-  ) {};
+  ) {}
 
   async getCollection(id: string) {
     return this.getObject<Collection>(collectionType, id);

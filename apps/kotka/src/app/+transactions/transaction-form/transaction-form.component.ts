@@ -18,12 +18,16 @@ import { ApiClient, FormService } from '@kotka/ui/data-services';
 import { TransactionFormEmbedService } from '../transaction-form-embed/transaction-form-embed.service';
 import { globals } from '../../../environments/globals';
 import { FormViewContainerComponent } from '../../shared-modules/form-view/form-view/form-view-container';
+import { TransactionPdfSheetsComponent } from '../transaction-pdf-sheets/transaction-pdf-sheets.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'kotka-transaction-form',
   templateUrl: './transaction-form.component.html',
   styleUrls: ['./transaction-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, FormViewComponent, TransactionPdfSheetsComponent],
+  providers: [TransactionFormEmbedService]
 })
 export class TransactionFormComponent
   extends FormViewContainerComponent

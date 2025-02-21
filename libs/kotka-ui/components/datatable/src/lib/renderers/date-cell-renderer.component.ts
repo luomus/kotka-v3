@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CellRendererComponent } from './cell-renderer';
 import { ICellRendererParams } from '@ag-grid-community/core';
-import { formatDate } from '@angular/common';
+import { DatePipe, formatDate } from '@angular/common';
 
 interface RendererExtraParams {
   format?: string;
@@ -20,6 +20,7 @@ const DEFAULT_FORMAT = 'dd.MM.YYYY';
   `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [DatePipe]
 })
 export class DateCellRendererComponent extends CellRendererComponent<RendererParams> {
   defaultFormat = DEFAULT_FORMAT;

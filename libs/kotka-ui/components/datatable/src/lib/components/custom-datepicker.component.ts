@@ -64,7 +64,6 @@ export class CustomDateParserFormatter extends NgbDateParserFormatter {
 }
 
 @Component({
-  standalone: true,
   imports: [NgbInputDatepicker, FormsModule],
   template: `
     <div class="input-group">

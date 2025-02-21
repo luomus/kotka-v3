@@ -14,7 +14,6 @@ interface FilterExtraParams {
 }
 
 @Component({
-  standalone: true,
   imports: [KeyValuePipe, NgForOf, FormsModule],
   template: `
     <div class="ag-floating-filter-input">

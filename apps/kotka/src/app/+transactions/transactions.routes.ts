@@ -6,7 +6,7 @@ import { Utils } from '../shared/services/utils';
 import { ComponentCanDeactivateGuard } from '../shared/services/guards/component-can-deactivate.guard';
 import { TransactionVersionHistoryComponent } from './transaction-version-history/transaction-version-history.component';
 
-export const datasetsRoutes: Routes = [
+export const transactionsRoutes: Routes = [
   {
     path: '',
     pathMatch: 'full',
@@ -33,5 +33,3 @@ export const datasetsRoutes: Routes = [
     }
   }
 ];
-
-export const routing: ModuleWithProviders<RouterModule> = RouterModule.forChild(datasetsRoutes);

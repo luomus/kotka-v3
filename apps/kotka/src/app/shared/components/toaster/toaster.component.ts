@@ -5,12 +5,15 @@ import {
   HostBinding,
 } from '@angular/core';
 import { ToastService } from '@kotka/ui/util-services';
+import { NgbToast } from '@ng-bootstrap/ng-bootstrap';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'kotka-toaster',
   templateUrl: './toaster.component.html',
   styleUrls: ['./toaster.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, NgbToast],
 })
 export class ToasterComponent {
   @HostBinding('class') classes =

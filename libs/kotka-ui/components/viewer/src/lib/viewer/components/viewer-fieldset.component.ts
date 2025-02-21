@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { DifferenceObject, LajiForm } from '@kotka/shared/models';
+import { ViewerFieldsetFieldComponent } from './viewer-fieldset-field.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'kui-viewer-fieldset',
@@ -14,6 +16,7 @@ import { DifferenceObject, LajiForm } from '@kotka/shared/models';
   `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, ViewerFieldsetFieldComponent],
 })
 export class ViewerFieldsetComponent {
   @Input() fields: LajiForm.Field[] = [];

@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+import { NavComponent } from '../nav/nav.component';
+import { RouterOutlet } from '@angular/router';
+import { ToasterComponent } from '../toaster/toaster.component';
 
 @Component({
   selector: 'kotka-base',
@@ -7,10 +10,13 @@ import { Component } from '@angular/core';
     <router-outlet></router-outlet>
     <kotka-toaster></kotka-toaster>
   `,
-  styles: [`
-    :host {
-      display: block;
-    }
-  `]
+  imports: [NavComponent, RouterOutlet, ToasterComponent],
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
 })
 export class BaseComponent {}

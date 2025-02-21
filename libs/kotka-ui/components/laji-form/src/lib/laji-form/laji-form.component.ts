@@ -18,10 +18,11 @@ import { Theme as LajiFormTheme } from '@luomus/laji-form/lib/themes/theme';
 import { scrollIntoViewIfNeeded } from '@luomus/laji-form/lib/utils';
 import { LajiForm as LajiFormModel } from '@kotka/shared/models';
 import { combineLatest } from 'rxjs';
-import { DOCUMENT } from '@angular/common';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import { MediaMetadata } from '@luomus/laji-form/lib/components/LajiForm';
 import { ToastService } from '@kotka/ui/util-services';
 import { FormApiClient } from '@kotka/ui/data-services';
+import { FormFooterComponent } from '../form-footer/form-footer.component';
 
 type FormData = Record<string, any>;
 
@@ -29,6 +30,7 @@ type FormData = Record<string, any>;
   selector: 'kui-laji-form',
   templateUrl: './laji-form.component.html',
   styleUrls: ['./laji-form.component.scss'],
+  imports: [CommonModule, FormFooterComponent],
 })
 export class LajiFormComponent<T extends FormData = FormData>
   implements AfterViewInit, OnChanges, OnDestroy

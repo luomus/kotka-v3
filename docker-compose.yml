@@ -14,6 +14,7 @@ services:
     volumes:
       - .:/app
       - shared-volume:/app/node_modules
+      - shared-nx:/app/.nx
     ports:
       - 3333:3333
   kotka:
@@ -23,10 +24,12 @@ services:
     volumes:
       - .:/app
       - shared-volume:/app/node_modules
+      - shared-nx:/app/.nx
     ports:
       - 4200:4200
     links:
      - kotka-api
 volumes:
   shared-volume:
+  shared-nx:
   redis:

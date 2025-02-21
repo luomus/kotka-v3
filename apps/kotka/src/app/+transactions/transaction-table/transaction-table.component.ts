@@ -20,12 +20,17 @@ import {
 import { FormService } from '@kotka/ui/data-services';
 import { KotkaDocumentObjectType, LajiForm } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
+import { MainContentComponent } from '@kotka/ui/main-content';
+import { SpinnerComponent } from '@kotka/ui/spinner';
+import { DocumentDatatableComponent } from '@kotka/ui/document-datatable';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'kotka-transaction-table',
   templateUrl: './transaction-table.component.html',
   styleUrls: ['./transaction-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, MainContentComponent, SpinnerComponent, DocumentDatatableComponent],
 })
 export class TransactionTableComponent {
   dataType = KotkaDocumentObjectType.transaction;

@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'kui-total-count',
@@ -7,15 +8,12 @@ import { Component, Input } from '@angular/core';
       <span data-cy="total-count">{{ value }}</span>
       <span [ngPlural]="value || 0">
         <ng-template ngPluralCase="=1"> {{ dataTypeName }}</ng-template>
-        <ng-template ngPluralCase="other">
-          {{
-            dataTypeNamePlural ? dataTypeNamePlural : dataTypeName + 's'
-          }}</ng-template
-        >
+        <ng-template ngPluralCase="other"> {{ dataTypeNamePlural ? dataTypeNamePlural : dataTypeName + 's' }}</ng-template>
       </span>
       <span> found</span>
     </span>
   `,
+  imports: [CommonModule],
 })
 export class TotalCountComponent {
   @Input() value?: number;

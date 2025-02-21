@@ -3,7 +3,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  standalone: true,
   imports: [CommonModule],
   selector: 'kui-confirm-modal',
   template: `

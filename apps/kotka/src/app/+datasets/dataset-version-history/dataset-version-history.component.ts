@@ -4,6 +4,9 @@ import {
 } from '@angular/core';
 import { KotkaDocumentObjectType } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
+import {
+  VersionHistoryViewComponent
+} from '../../shared-modules/form-view/version-history-view/version-history-view.component';
 
 @Component({
   selector: 'kotka-transaction-version-history',
@@ -16,6 +19,7 @@ import { globals } from '../../../environments/globals';
   `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [VersionHistoryViewComponent],
 })
 export class DatasetVersionHistoryComponent {
   formId = globals.datasetFormId;

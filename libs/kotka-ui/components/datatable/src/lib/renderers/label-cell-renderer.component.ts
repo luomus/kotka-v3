@@ -3,6 +3,7 @@ import { CellRendererComponent } from './cell-renderer';
 import { Observable, of } from 'rxjs';
 import { LabelKey, LabelService } from '@kotka/ui/data-services';
 import { DatatableColumn } from '../models/models';
+import { JoinPipe, LabelPipe } from '@kotka/ui/pipes';
 
 @Component({
   selector: 'kui-label-cell-renderer',
@@ -13,6 +14,7 @@ import { DatatableColumn } from '../models/models';
   `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [LabelPipe, JoinPipe]
 })
 export class LabelCellRendererComponent extends CellRendererComponent {
   static override getExportValue(

@@ -1,1 +1,1 @@
-export * from './lib/kotka-ui-spinner.module';
+export * from './lib/spinner/spinner.component';

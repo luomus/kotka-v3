@@ -12,7 +12,7 @@ import { isEmpty } from 'lodash';
 export class ValidateController {
   constructor(
     private readonly validationService: ValidationService
-  ) {};
+  ) {}
 
   @Post()
   async validateRequest(@Req() req) {

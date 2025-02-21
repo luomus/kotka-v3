@@ -1,1 +1,1 @@
-export * from './lib/kotka-ui-main-content.module';
+export * from './lib/main-content/main-content.component';
