@@ -216,10 +216,9 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     }
 
     this.exportLoading = true;
-
     this.datatableExportService
       .exportData(
-        this.colDefs,
+        this.getVisibleColumns(),
         this.datasource,
         this.totalCount,
         this.sortModel,
@@ -402,5 +401,20 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     return this.allColumns
       .filter((col) => col.defaultSelected)
       .map((col) => col.colId!);
+  }
+
+  private getVisibleColumns(): DatatableColumn[] {
+    if (this.gridApi) {
+      const columnByIdMap = this.allColumns.reduce((res, col) => {
+        res[col.colId!] = col;
+        return res;
+      }, {} as Record<string, DatatableColumn>);
+
+      const selected = this.gridApi.getAllDisplayedColumns().map(c => c.getColId());
+
+      return selected.map(id => columnByIdMap[id]);
+    } else {
+      return this.allColumns.filter(col => !col.hide);
+    }
   }
 }
