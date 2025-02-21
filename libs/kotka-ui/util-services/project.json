@@ -2,7 +2,7 @@
   "name": "ui-util-services",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/kotka-ui/util-services/src",
-  "prefix": "lib",
+  "prefix": "kui",
   "tags": [],
   "projectType": "library",
   "targets": {

@@ -2,7 +2,7 @@
   "name": "ui-data-services",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/kotka-ui/data-services/src",
-  "prefix": "lib",
+  "prefix": "kui",
   "tags": [],
   "projectType": "library",
   "targets": {
