@@ -37,6 +37,10 @@ export interface CustomColDef {
 
 export type DatatableColumn = ColDef & CustomColDef;
 
+export interface DatatableColumnWithId extends DatatableColumn {
+  colId: string;
+}
+
 export interface GetRowsParams extends IGetRowsParams {
   sortModel: SortModel[];
 }

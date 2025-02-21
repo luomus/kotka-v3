@@ -20,12 +20,12 @@ import {
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
 import {
   CustomColDef,
-  DatatableColumn,
+  DatatableColumn, DatatableColumnWithId,
   DatatableFilter,
   DatatableSort,
   DatatableSource,
   GetRowsParams,
-  TupleUnion,
+  TupleUnion
 } from '../models/models';
 import { forkJoin, from, Observable, Subscription } from 'rxjs';
 import { ColumnSettingsModalComponent } from '../column-settings-modal/column-settings-modal.component';
@@ -113,7 +113,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
   private gridApi?: GridApi;
   private gridDataSource?: DatatableSource;
 
-  private allColumns: DatatableColumn[] = [];
+  private allColumns: DatatableColumnWithId[] = [];
 
   private sortModel: DatatableSort = [];
   private filterModel: DatatableFilter = {};
@@ -247,7 +247,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
 
     this.beforeFetchRows(params);
 
-    const successCallback = (results: any[], totalItems: number) => {
+    const successCallback = (results: unknown[], totalItems: number) => {
       if (this.isDestroyed) {
         return;
       }
@@ -273,7 +273,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     this.updateLoading(true);
   }
 
-  private afterFetchRows(results: any[], totalItems: number) {
+  private afterFetchRows(results: unknown[], totalItems: number) {
     this.loadCellRendererDataToCache(results);
 
     this.updateTotalCount(totalItems);
@@ -298,8 +298,8 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     }
   }
 
-  private loadCellRendererDataToCache(rowData: any[]) {
-    const observables: Observable<any>[] = [];
+  private loadCellRendererDataToCache(rowData: unknown[]) {
+    const observables: Observable<unknown>[] = [];
 
     this.colDefs.forEach((col) => {
       if (col.cellRenderer) {
@@ -335,12 +335,13 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     this.colDefs = this.removeCustomColumnKeys(columns);
   }
 
-  private processColumns(columns: DatatableColumn[]): DatatableColumn[] {
+  private processColumns(columns: DatatableColumn[]): DatatableColumnWithId[] {
     return columns.map((col) => {
-      const newCol: DatatableColumn = {
-        ...col,
-        colId: col.colId || col.field,
-      };
+      const colId = col.colId || col.field;
+      if (!colId) {
+        throw Error('Every column should either have colId or field');
+      }
+      const newCol: DatatableColumnWithId = { ...col, colId };
 
       if (!col.hideDefaultHeaderTooltip) {
         newCol.headerTooltip = col.headerName;
@@ -349,17 +350,11 @@ export class DatatableComponent implements OnChanges, OnDestroy {
         newCol.tooltipField = col.field;
       }
 
-      if (this.enableColumnSelection && !newCol.colId) {
-        throw Error(
-          'Every column should either have colId or field when the enableColumnSelection option is on',
-        );
-      }
-
       return newCol;
     });
   }
 
-  private filterAndSortColumns(columns: DatatableColumn[]): DatatableColumn[] {
+  private filterAndSortColumns(columns: DatatableColumnWithId[]): DatatableColumnWithId[] {
     const settings = this.datatableColumnSettingsService.getSettings(
       this.settingsKey,
     );
@@ -369,11 +364,11 @@ export class DatatableComponent implements OnChanges, OnDestroy {
 
     columns = columns.map((col) => ({
       ...col,
-      hide: !selected.includes(col.colId!),
+      hide: !selected.includes(col.colId),
     }));
     columns.sort(
       (columnA, columnB) =>
-        selected.indexOf(columnA.colId!) - selected.indexOf(columnB.colId!),
+        selected.indexOf(columnA.colId) - selected.indexOf(columnB.colId),
     );
 
     return columns;
@@ -400,15 +395,15 @@ export class DatatableComponent implements OnChanges, OnDestroy {
   private getDefaultSelectedColumns(): string[] {
     return this.allColumns
       .filter((col) => col.defaultSelected)
-      .map((col) => col.colId!);
+      .map((col) => col.colId);
   }
 
-  private getVisibleColumns(): DatatableColumn[] {
+  private getVisibleColumns(): DatatableColumnWithId[] {
     if (this.gridApi) {
       const columnByIdMap = this.allColumns.reduce((res, col) => {
-        res[col.colId!] = col;
+        res[col.colId] = col;
         return res;
-      }, {} as Record<string, DatatableColumn>);
+      }, {} as Record<string, DatatableColumnWithId>);
 
       const selected = this.gridApi.getAllDisplayedColumns().map(c => c.getColId());
 

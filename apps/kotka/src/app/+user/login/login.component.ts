@@ -7,13 +7,14 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '@kotka/ui/data-services';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'kotka-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgbAlert],
+  imports: [CommonModule, NgbAlert],
 })
 export class LoginComponent implements OnInit {
   errorMsg?: string;
