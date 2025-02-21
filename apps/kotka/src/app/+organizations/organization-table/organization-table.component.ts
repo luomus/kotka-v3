@@ -78,6 +78,7 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
       filter: BooleanFilterComponent,
       floatingFilterComponent: BooleanFloatingFilterComponent,
       suppressFloatingFilterButton: true,
+      suppressHeaderFilterButton: true,
       width: 100,
       minWidth: 100,
       flex: 0,
@@ -91,6 +92,7 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
         type: 'dataset',
       },
       suppressFloatingFilterButton: true,
+      suppressHeaderFilterButton: true,
       sortable: false,
     },
     {

@@ -69,6 +69,7 @@ export class TransactionTableComponent {
           type: 'organization',
         },
         suppressFloatingFilterButton: true,
+        suppressHeaderFilterButton: true,
         sortable: false,
         defaultSelected: true,
         rememberFilters: true,
@@ -86,6 +87,7 @@ export class TransactionTableComponent {
           field: fieldData['status'],
         },
         suppressFloatingFilterButton: true,
+        suppressHeaderFilterButton: true,
         defaultSelected: true,
       },
       {
@@ -100,6 +102,7 @@ export class TransactionTableComponent {
           field: fieldData['type'],
         },
         suppressFloatingFilterButton: true,
+        suppressHeaderFilterButton: true,
         defaultSelected: true,
       },
       {
@@ -122,6 +125,7 @@ export class TransactionTableComponent {
         filter: 'agDateColumnFilter',
         floatingFilterComponent: YearFloatingFilterComponent,
         suppressFloatingFilterButton: true,
+        suppressHeaderFilterButton: true,
       },
       {
         headerName: 'Incoming received',
@@ -143,6 +147,7 @@ export class TransactionTableComponent {
         filter: 'agDateColumnFilter',
         floatingFilterComponent: YearFloatingFilterComponent,
         suppressFloatingFilterButton: true,
+        suppressHeaderFilterButton: true,
       },
       {
         headerName: 'Counterparty organization',
@@ -153,6 +158,7 @@ export class TransactionTableComponent {
           type: 'organization',
         },
         suppressFloatingFilterButton: true,
+        suppressHeaderFilterButton: true,
         sortable: false,
         defaultSelected: true,
       },
@@ -165,6 +171,7 @@ export class TransactionTableComponent {
           type: 'collection',
         },
         suppressFloatingFilterButton: true,
+        suppressHeaderFilterButton: true,
         sortable: false,
       },
       {

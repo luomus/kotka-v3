@@ -15,7 +15,7 @@ import {
   GridApi,
   GridOptions,
   Module, ModuleRegistry,
-  RowModelType
+  RowModelType, RowSelectionOptions
 } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
 import {
@@ -98,7 +98,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     suppressHeaderMenuButton: true,
   };
   rowBuffer = 0;
-  rowSelection: 'single' | 'multiple' | undefined = 'multiple';
+  rowSelection?: RowSelectionOptions;
   rowModelType: RowModelType = 'infinite';
   paginationPageSize = 100;
   cacheOverflowSize = 2;
@@ -291,11 +291,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     if (!this.gridApi) {
       return;
     }
-    if (loading) {
-      this.gridApi.showLoadingOverlay();
-    } else {
-      this.gridApi.hideOverlay();
-    }
+    this.gridApi.setGridOption('loading', loading);
   }
 
   private loadCellRendererDataToCache(rowData: unknown[]) {
