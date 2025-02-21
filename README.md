@@ -1,10 +1,8 @@
-
-
 # KotkaV3
 
-This is the the new Angular and Nestjs-based version of kotka CMS.
+This is the new Angular and Nestjs-based version of Kotka CMS.
 
-Start for localhost in docker-compose using `docker-compose up` in the root of the projent, if permissions are denied comment out `USER node`-line in the Docerfiles under `tools/docker` for both kotka and api.
+Start the development server with docker-compose using `docker-compose up` in the root of the project.
 
 ## Testing
 
@@ -30,3 +28,10 @@ Before running the tests, you should put CYPRESS_TEST_EMAIL and CYPRESS_TEST_PAS
     ```
     docker-compose -f ./docker-compose.e2e.yml --env-file .env.e2e up 
     ```
+
+## Useful commands
+```
+npx nx g lib --directory <folder> --name <lib name> // create lib
+npx nx g rm <lib name> // remove lib
+npx nx g mv --projectName <lib name> --newProjectName <new name> --destination <folder> --importPath <ts import path> // move or rename lib
+```

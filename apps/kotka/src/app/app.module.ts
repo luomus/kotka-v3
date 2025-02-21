@@ -6,7 +6,12 @@ import { QuicklinkModule } from 'ngx-quicklink';
 import { AppRoutingModule } from './app-routing.module';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './shared/components/app/app.component';
-import { Logger, ILogger, HttpLogger, ConsoleLogger } from '@kotka/services';
+import {
+  Logger,
+  ILogger,
+  HttpLogger,
+  ConsoleLogger,
+} from '@kotka/ui/util-services';
 import { environment } from '../environments/environment';
 import { ErrorHandlerService } from './shared/services/error-handler/error-handler.service';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
@@ -27,7 +32,7 @@ export function createLoggerLoader(httpClient: HttpClient): ILogger {
     QuicklinkModule,
     AppRoutingModule,
     SharedModule.forRoot(),
-    NgxWebstorageModule.forRoot({prefix: 'kotka-', separator: ''}),
+    NgxWebstorageModule.forRoot({ prefix: 'kotka-', separator: '' }),
   ],
   providers: [
     { provide: ErrorHandler, useClass: ErrorHandlerService },
@@ -35,10 +40,10 @@ export function createLoggerLoader(httpClient: HttpClient): ILogger {
     {
       provide: Logger,
       deps: [HttpClient],
-      useFactory: createLoggerLoader
+      useFactory: createLoggerLoader,
     },
-    { provide: 'Window', useValue: window }
+    { provide: 'Window', useValue: window },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule {}

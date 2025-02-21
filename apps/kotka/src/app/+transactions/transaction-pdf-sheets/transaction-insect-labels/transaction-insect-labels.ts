@@ -2,8 +2,8 @@ import { Component, Input } from '@angular/core';
 import { SpecimenTransaction } from '@luomus/laji-schema';
 import { CommonModule } from '@angular/common';
 import { TransactionInsectShelfSlipContext } from '../services/transaction-pdf-sheets-context-service';
-import { PdfTemplateComponent } from '@kotka/services';
-import { PipesModule } from '@kotka/pipes';
+import { PdfTemplateComponent } from '@kotka/ui/data-services';
+import { PipesModule } from '@kotka/ui/pipes';
 import { TransactionTypeLabelPipe } from '../pipes/transaction-type-label.pipe';
 
 interface SpecimenWithinPage {
@@ -14,13 +14,9 @@ interface SpecimenWithinPage {
 
 @Component({
   standalone: true,
-  imports: [
-    CommonModule,
-    PipesModule,
-    TransactionTypeLabelPipe
-  ],
+  imports: [CommonModule, PipesModule, TransactionTypeLabelPipe],
   selector: 'kotka-transaction-insect-labels',
-  templateUrl: './transaction-insect-labels.html'
+  templateUrl: './transaction-insect-labels.html',
 })
 export class TransactionInsectLabelsComponent implements PdfTemplateComponent {
   @Input({ required: true }) context!: TransactionInsectShelfSlipContext;
@@ -42,7 +38,10 @@ export class TransactionInsectLabelsComponent implements PdfTemplateComponent {
     while (allSpecimens.length > 0) {
       const pageResult: SpecimenWithinPage[] = [];
       const specimensPerCol = this.specimensPerCol - (isFirstPage ? 1 : 0);
-      const pageSpecimens = allSpecimens.splice(0, this.specimensPerRow * specimensPerCol);
+      const pageSpecimens = allSpecimens.splice(
+        0,
+        this.specimensPerRow * specimensPerCol,
+      );
 
       let col = 0;
       while (pageSpecimens.length > 0) {
@@ -51,7 +50,7 @@ export class TransactionInsectLabelsComponent implements PdfTemplateComponent {
           pageResult.push({
             id: colSpecimens[row],
             row,
-            col
+            col,
           });
         }
         col++;
@@ -69,6 +68,8 @@ export class TransactionInsectLabelsComponent implements PdfTemplateComponent {
   }
 
   get allSpecimens(): string[] {
-    return (this.data.awayIDs || []).concat(this.data.returnedIDs || []).concat(this.data.missingIDs || []);
+    return (this.data.awayIDs || [])
+      .concat(this.data.returnedIDs || [])
+      .concat(this.data.missingIDs || []);
   }
 }

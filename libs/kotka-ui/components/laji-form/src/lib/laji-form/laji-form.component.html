@@ -1,0 +1,14 @@
+<div #lajiForm [ngClass]="{ 'form-with-footer': showFooter }"></div>
+<kui-form-footer
+  *ngIf="showFooter"
+  [hasChanges]="hasChanges"
+  [disabled]="disabled"
+  [hasOnlyWarnings]="hasOnlyWarnings"
+  [showDeleteButton]="showDeleteButton"
+  [showCopyButton]="showCopyButton"
+  (saveForm)="saveFormClicked()"
+  (highlightErrors)="highlightErrors()"
+  (delete)="delete.emit(formData)"
+  (copyForm)="formCopy.emit(formData)"
+  (saveAndCopyForm)="saveAndCopyFormClicked()"
+></kui-form-footer>

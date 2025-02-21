@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ApiClient, FormService } from '@kotka/services';
+import { ApiClient, FormService } from '@kotka/ui/data-services';
 import { Organization, SpecimenTransaction } from '@luomus/laji-schema';
 import { KotkaDocumentObjectType, LajiForm } from '@kotka/shared/models';
 import { forkJoin, Observable, of } from 'rxjs';
@@ -14,53 +14,77 @@ export interface TransactionSheetContext {
 }
 
 export interface TransactionInsectShelfSlipContext {
-  data: SpecimenTransaction
+  data: SpecimenTransaction;
 }
 
 export interface TransactionBotanyShelfSlipContext {
-  data: SpecimenTransaction,
-  correspondingOrganization?: Organization
+  data: SpecimenTransaction;
+  correspondingOrganization?: Organization;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TransactionPdfSheetsContextService {
   constructor(
     private apiClient: ApiClient,
-    private formService: FormService
+    private formService: FormService,
   ) {}
 
-  getSheetContext(data: SpecimenTransaction): Observable<TransactionSheetContext> {
-    type ForkJoinReturnType = [Organization|undefined, Organization|undefined, Record<string, LajiForm.Field>];
+  getSheetContext(
+    data: SpecimenTransaction,
+  ): Observable<TransactionSheetContext> {
+    type ForkJoinReturnType = [
+      Organization | undefined,
+      Organization | undefined,
+      Record<string, LajiForm.Field>,
+    ];
 
     return forkJoin([
       this.getOrganization(data.owner),
       this.getOrganization(data.correspondentOrganization),
-      this.formService.getFieldData(globals.transactionFormId)
+      this.formService.getFieldData(globals.transactionFormId),
     ]).pipe(
-      map(([ownerOrganization, correspondingOrganization, fieldData]: ForkJoinReturnType) => ({
-        data,
-        ownerOrganization,
-        correspondingOrganization,
-        fieldData
-    })));
-  }
-
-  getInsectShelfSlipContext(data: SpecimenTransaction): Observable<TransactionInsectShelfSlipContext> {
-    return of({ data });
-  }
-
-  getBotanyShelfSlipContext(data: SpecimenTransaction): Observable<TransactionBotanyShelfSlipContext> {
-    return this.getOrganization(data.correspondentOrganization).pipe(
-      map(correspondingOrganization => ({
-        data,
-        correspondingOrganization
-      }))
+      map(
+        ([
+          ownerOrganization,
+          correspondingOrganization,
+          fieldData,
+        ]: ForkJoinReturnType) => ({
+          data,
+          ownerOrganization,
+          correspondingOrganization,
+          fieldData,
+        }),
+      ),
     );
   }
 
-  private getOrganization(organizationId?: string): Observable<Organization|undefined> {
-    return organizationId ? this.apiClient.getDocumentById(KotkaDocumentObjectType.organization, organizationId) : of(undefined);
+  getInsectShelfSlipContext(
+    data: SpecimenTransaction,
+  ): Observable<TransactionInsectShelfSlipContext> {
+    return of({ data });
+  }
+
+  getBotanyShelfSlipContext(
+    data: SpecimenTransaction,
+  ): Observable<TransactionBotanyShelfSlipContext> {
+    return this.getOrganization(data.correspondentOrganization).pipe(
+      map((correspondingOrganization) => ({
+        data,
+        correspondingOrganization,
+      })),
+    );
+  }
+
+  private getOrganization(
+    organizationId?: string,
+  ): Observable<Organization | undefined> {
+    return organizationId
+      ? this.apiClient.getDocumentById(
+          KotkaDocumentObjectType.organization,
+          organizationId,
+        )
+      : of(undefined);
   }
 }

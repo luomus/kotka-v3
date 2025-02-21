@@ -1,14 +1,14 @@
-import { ChangeDetectionStrategy, Component, ViewEncapsulation, } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ViewEncapsulation,
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { map, switchMap } from 'rxjs/operators';
-import { ApiClient } from '@kotka/services';
-import {
-  KotkaDocumentObjectType,
-} from '@kotka/shared/models';
+import { ApiClient } from '@kotka/ui/data-services';
+import { KotkaDocumentObjectType } from '@kotka/shared/models';
 import { Observable, combineLatest } from 'rxjs';
-import {
-  TransactionPdfSheetsContextService
-} from '../+transactions/transaction-pdf-sheets/services/transaction-pdf-sheets-context-service';
+import { TransactionPdfSheetsContextService } from '../+transactions/transaction-pdf-sheets/services/transaction-pdf-sheets-context-service';
 import { getId } from '@kotka/shared/utils';
 
 enum TypeEnum {
@@ -17,7 +17,7 @@ enum TypeEnum {
   transactionInquiry = 'transactionInquiry',
   transactionReturn = 'transactionReturn',
   transactionInsectLabels = 'transactionInsectLabels',
-  transactionBotanyLabels = 'transactionBotanyLabels'
+  transactionBotanyLabels = 'transactionBotanyLabels',
 }
 
 @Component({
@@ -25,7 +25,7 @@ enum TypeEnum {
   templateUrl: './pdf-demo.component.html',
   styleUrls: ['./pdf-demo.component.scss', '../../assets/pdf-styles.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
 export class PdfDemoComponent {
   type$: Observable<TypeEnum>;
@@ -36,31 +36,40 @@ export class PdfDemoComponent {
   constructor(
     private route: ActivatedRoute,
     private apiClient: ApiClient,
-    private transactionPdfSheetsContextService: TransactionPdfSheetsContextService
+    private transactionPdfSheetsContextService: TransactionPdfSheetsContextService,
   ) {
     const params$ = this.route.queryParams.pipe(
       map(({ uri, type }) => ({
         id: getId(uri),
-        type: <TypeEnum> (<never> TypeEnum)[type] || TypeEnum.transactionDispatch
-      }))
+        type: <TypeEnum>(<never>TypeEnum)[type] || TypeEnum.transactionDispatch,
+      })),
     );
 
-    this.type$ = params$.pipe(map(params => params.type));
+    this.type$ = params$.pipe(map((params) => params.type));
 
-    const data$ = params$.pipe(switchMap(params => {
-      return this.apiClient.getDocumentById(KotkaDocumentObjectType.transaction, params.id);
-    }));
+    const data$ = params$.pipe(
+      switchMap((params) => {
+        return this.apiClient.getDocumentById(
+          KotkaDocumentObjectType.transaction,
+          params.id,
+        );
+      }),
+    );
 
     this.context$ = combineLatest([params$, data$]).pipe(
-      switchMap(([ params, data ]) => {
+      switchMap(([params, data]) => {
         if (params.type === TypeEnum.transactionInsectLabels) {
-          return this.transactionPdfSheetsContextService.getInsectShelfSlipContext(data);
+          return this.transactionPdfSheetsContextService.getInsectShelfSlipContext(
+            data,
+          );
         } else if (params.type === TypeEnum.transactionBotanyLabels) {
-          return this.transactionPdfSheetsContextService.getBotanyShelfSlipContext(data);
+          return this.transactionPdfSheetsContextService.getBotanyShelfSlipContext(
+            data,
+          );
         }
 
         return this.transactionPdfSheetsContextService.getSheetContext(data);
-      })
+      }),
     );
   }
 }

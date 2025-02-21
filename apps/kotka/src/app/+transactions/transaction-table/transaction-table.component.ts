@@ -1,61 +1,59 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+} from '@angular/core';
 import {
   LabelCellRendererComponent,
   DateCellRendererComponent,
-  TransactionCountRendererComponent, DueDaysRendererComponent, EnumFloatingFilterComponent, YearFloatingFilterComponent
-} from '@kotka/ui/datatable';
-import { URICellRendererComponent, EnumCellRendererComponent, AutocompleteFloatingFilterComponent } from '@kotka/ui/datatable';
-import { DatatableDataService, FormService, UserService } from '@kotka/services';
-import {
-  KotkaDocumentObjectType,
-  LajiForm
-} from '@kotka/shared/models';
-import {
+  TransactionCountRendererComponent,
+  DueDaysRendererComponent,
+  EnumFloatingFilterComponent,
+  YearFloatingFilterComponent,
   DatatableColumn,
-  DatatableSource,
-  GetRowsParams
-} from '@kotka/models';
+} from '@kotka/ui/datatable';
+import {
+  URICellRendererComponent,
+  EnumCellRendererComponent,
+  AutocompleteFloatingFilterComponent,
+} from '@kotka/ui/datatable';
+import { FormService } from '@kotka/ui/data-services';
+import { KotkaDocumentObjectType, LajiForm } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
 
 @Component({
   selector: 'kotka-transaction-table',
   templateUrl: './transaction-table.component.html',
   styleUrls: ['./transaction-table.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransactionTableComponent {
+  dataType = KotkaDocumentObjectType.transaction;
+
   columns?: DatatableColumn[];
 
-  datasource?: DatatableSource;
-
-  settingsKey?: string;
-
   constructor(
-    private dataService: DatatableDataService,
     private formService: FormService,
-    private userService: UserService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
-    this.formService.getFieldData(globals.transactionFormId).subscribe(fieldData => {
-      this.columns = this.getColumns(fieldData);
-      this.datasource = this.getDatasource(this.columns);
-      this.cdr.markForCheck();
-    });
-
-    this.userService.getCurrentLoggedInUser().subscribe(user => {
-      this.settingsKey = 'transaction-table-' + user.id;
-      this.cdr.markForCheck();
-    });
+    this.formService
+      .getFieldData(globals.transactionFormId)
+      .subscribe((fieldData) => {
+        this.columns = this.getColumns(fieldData);
+        this.cdr.markForCheck();
+      });
   }
 
-  private getColumns(fieldData: Record<string, LajiForm.Field>): DatatableColumn[] {
+  private getColumns(
+    fieldData: Record<string, LajiForm.Field>,
+  ): DatatableColumn[] {
     return [
       {
         headerName: 'URI',
         field: 'id',
         cellRenderer: URICellRendererComponent,
         defaultSelected: true,
-        lockPosition: 'left'
+        lockPosition: 'left',
       },
       {
         headerName: 'Owner',
@@ -63,41 +61,41 @@ export class TransactionTableComponent {
         cellRenderer: LabelCellRendererComponent,
         floatingFilterComponent: AutocompleteFloatingFilterComponent,
         floatingFilterComponentParams: {
-          type: 'organization'
+          type: 'organization',
         },
         suppressFloatingFilterButton: true,
         sortable: false,
         defaultSelected: true,
         rememberFilters: true,
-        lockPosition: 'left'
+        lockPosition: 'left',
       },
       {
         headerName: 'Transaction status',
         field: 'status',
         cellRenderer: EnumCellRendererComponent,
         cellRendererParams: {
-          field: fieldData['status']
+          field: fieldData['status'],
         },
         floatingFilterComponent: EnumFloatingFilterComponent,
         floatingFilterComponentParams: {
-          field: fieldData['status']
+          field: fieldData['status'],
         },
         suppressFloatingFilterButton: true,
-        defaultSelected: true
+        defaultSelected: true,
       },
       {
         headerName: 'Transaction type',
         field: 'type',
         cellRenderer: EnumCellRendererComponent,
         cellRendererParams: {
-          field: fieldData['type']
+          field: fieldData['type'],
         },
         floatingFilterComponent: EnumFloatingFilterComponent,
         floatingFilterComponentParams: {
-          field: fieldData['type']
+          field: fieldData['type'],
         },
         suppressFloatingFilterButton: true,
-        defaultSelected: true
+        defaultSelected: true,
       },
       {
         headerName: 'Outgoing sent',
@@ -105,8 +103,8 @@ export class TransactionTableComponent {
         cellRenderer: DateCellRendererComponent,
         filter: 'agDateColumnFilter',
         filterParams: {
-          inRangeFloatingFilterDateFormat: 'DD.MM.YYYY'
-        }
+          inRangeFloatingFilterDateFormat: 'DD.MM.YYYY',
+        },
       },
       {
         colId: 'outgoingSentYear',
@@ -114,11 +112,11 @@ export class TransactionTableComponent {
         field: 'outgoingSent',
         cellRenderer: DateCellRendererComponent,
         cellRendererParams: {
-          format: 'YYYY'
+          format: 'YYYY',
         },
         filter: 'agDateColumnFilter',
         floatingFilterComponent: YearFloatingFilterComponent,
-        suppressFloatingFilterButton: true
+        suppressFloatingFilterButton: true,
       },
       {
         headerName: 'Incoming received',
@@ -126,8 +124,8 @@ export class TransactionTableComponent {
         cellRenderer: DateCellRendererComponent,
         filter: 'agDateColumnFilter',
         filterParams: {
-          inRangeFloatingFilterDateFormat: 'DD.MM.YYYY'
-        }
+          inRangeFloatingFilterDateFormat: 'DD.MM.YYYY',
+        },
       },
       {
         colId: 'incomingReceivedYear',
@@ -135,11 +133,11 @@ export class TransactionTableComponent {
         field: 'incomingReceived',
         cellRenderer: DateCellRendererComponent,
         cellRendererParams: {
-          format: 'YYYY'
+          format: 'YYYY',
         },
         filter: 'agDateColumnFilter',
         floatingFilterComponent: YearFloatingFilterComponent,
-        suppressFloatingFilterButton: true
+        suppressFloatingFilterButton: true,
       },
       {
         headerName: 'Counterparty organization',
@@ -147,11 +145,11 @@ export class TransactionTableComponent {
         cellRenderer: LabelCellRendererComponent,
         floatingFilterComponent: AutocompleteFloatingFilterComponent,
         floatingFilterComponentParams: {
-          type: 'organization'
+          type: 'organization',
         },
         suppressFloatingFilterButton: true,
         sortable: false,
-        defaultSelected: true
+        defaultSelected: true,
       },
       {
         headerName: 'Collection',
@@ -159,93 +157,76 @@ export class TransactionTableComponent {
         cellRenderer: LabelCellRendererComponent,
         floatingFilterComponent: AutocompleteFloatingFilterComponent,
         floatingFilterComponentParams: {
-          type: 'collection'
+          type: 'collection',
         },
         suppressFloatingFilterButton: true,
-        sortable: false
+        sortable: false,
       },
       {
         headerName: 'Counterparty researcher',
-        field: 'correspondentResearcher'
+        field: 'correspondentResearcher',
       },
       {
         headerName: 'Counterparty person/contact info',
-        field: 'correspondentPerson'
+        field: 'correspondentPerson',
       },
       {
-        headerName: 'Sender\'s transaction ID',
-        field: 'externalID'
+        headerName: "Sender's transaction ID",
+        field: 'externalID',
       },
       {
         headerName: 'Local researcher',
-        field: 'localResearcher'
+        field: 'localResearcher',
       },
       {
         headerName: 'Local person',
-        field: 'localPerson'
+        field: 'localPerson',
       },
       {
         headerName: 'Material description',
-        field: 'material'
+        field: 'material',
       },
       {
         colId: 'balance',
         headerName: 'Balance',
         cellRenderer: TransactionCountRendererComponent,
         cellRendererParams: {
-          type: 'balance'
+          type: 'balance',
         },
         sortable: false,
-        filter: false
+        filter: false,
       },
       {
         colId: 'totalCount',
         headerName: 'Total count',
         cellRenderer: TransactionCountRendererComponent,
         cellRendererParams: {
-          type: 'total'
+          type: 'total',
         },
         sortable: false,
-        filter: false
+        filter: false,
       },
       {
         colId: 'returnedCount',
         headerName: 'Returned count',
         cellRenderer: TransactionCountRendererComponent,
         cellRendererParams: {
-          type: 'returned'
+          type: 'returned',
         },
         sortable: false,
-        filter: false
+        filter: false,
       },
       {
         colId: 'dueDays',
         headerName: 'Due days',
         field: 'dueDate',
         cellRenderer: DueDaysRendererComponent,
-        filter: false
+        filter: false,
       },
       {
         headerName: 'Old transaction number',
-        field: 'legacyID'
-      }
+        field: 'legacyID',
+      },
     ];
-  }
-
-  private getDatasource(columns: DatatableColumn[]): DatatableSource {
-    return {
-      getRows: (params: GetRowsParams) => {
-        this.dataService.getData(
-          KotkaDocumentObjectType.transaction,
-          columns,
-          params.startRow,
-          params.endRow,
-          params.sortModel,
-          params.filterModel
-        ).subscribe(result => {
-          params.successCallback(result.member, result.totalItems);
-        });
-      }
-    };
   }
 }

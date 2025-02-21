@@ -1,9 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "outDir": "../../../dist/libs/shared-models",
-    "types": []
-  },
-  "include": ["**/*.ts"],
-  "exclude": ["**/*.spec.ts"]
-}

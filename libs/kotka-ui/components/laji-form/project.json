@@ -1,0 +1,22 @@
+{
+  "name": "ui-laji-form",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/kotka-ui/components/laji-form/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": [
+        "{workspaceRoot}/coverage/libs/kotka-ui/components/laji-form"
+      ],
+      "options": {
+        "jestConfig": "libs/kotka-ui/components/laji-form/jest.config.ts"
+      }
+    }
+  },
+  "tags": []
+}

@@ -1,9 +1,9 @@
 <kui-main-content header="Tags" containerClass="container-fluid">
-  <kui-datatable
+  <kui-document-datatable
     style="height: calc(100vh - 190px)"
+    [dataType]="dataType"
     [columns]="columns"
-    [datasource]="datasource"
     [dataTypeName]="'tag'"
   >
-  </kui-datatable>
+  </kui-document-datatable>
 </kui-main-content>

@@ -3,16 +3,12 @@ import { SpecimenTransaction } from '@luomus/laji-schema';
 import { CommonModule } from '@angular/common';
 import { TransactionTypeLabelPipe } from '../pipes/transaction-type-label.pipe';
 import { TransactionSheetContext } from '../services/transaction-pdf-sheets-context-service';
-import { PdfTemplateComponent } from '@kotka/services';
-import { PipesModule } from '@kotka/pipes';
+import { PdfTemplateComponent } from '@kotka/ui/data-services';
+import { PipesModule } from '@kotka/ui/pipes';
 import { TransactionSheetHeaderComponent } from '../sheet-components/transaction-sheet-header/transaction-sheet-header';
 import { TransactionSheetRemarksComponent } from '../sheet-components/transaction-sheet-remarks/transaction-sheet-remarks';
-import {
-  TransactionSheetIncomingDetailsComponent
-} from '../sheet-components/transaction-sheet-incoming-details/transaction-sheet-incoming-details';
-import {
-  TransactionSheetSignatureAndMaterialComponent
-} from '../sheet-components/transaction-sheet-signature-and-material/transaction-sheet-signature-and-material';
+import { TransactionSheetIncomingDetailsComponent } from '../sheet-components/transaction-sheet-incoming-details/transaction-sheet-incoming-details';
+import { TransactionSheetSignatureAndMaterialComponent } from '../sheet-components/transaction-sheet-signature-and-material/transaction-sheet-signature-and-material';
 import { TransactionUtils } from '../services/transaction-utils';
 
 @Component({
@@ -24,10 +20,10 @@ import { TransactionUtils } from '../services/transaction-utils';
     TransactionSheetHeaderComponent,
     TransactionSheetRemarksComponent,
     TransactionSheetIncomingDetailsComponent,
-    TransactionSheetSignatureAndMaterialComponent
+    TransactionSheetSignatureAndMaterialComponent,
   ],
   selector: 'kotka-transaction-incoming-sheet',
-  templateUrl: './transaction-incoming-sheet.html'
+  templateUrl: './transaction-incoming-sheet.html',
 })
 export class TransactionIncomingSheetComponent implements PdfTemplateComponent {
   @Input({ required: true }) context!: TransactionSheetContext;

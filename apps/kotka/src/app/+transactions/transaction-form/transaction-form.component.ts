@@ -2,7 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnDestroy,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import {
   KotkaDocumentObjectType,
@@ -11,33 +11,35 @@ import {
   isSpecimenTransaction,
 } from '@kotka/shared/models';
 import { Observable, of, Subscription, switchMap } from 'rxjs';
-import { FormService, DialogService } from '@kotka/services';
+import { DialogService } from '@kotka/ui/util-services';
 import { FormViewComponent } from '../../shared-modules/form-view/form-view/form-view.component';
-import {
-  LajiFormComponent,
-} from '@kotka/ui/laji-form';
-import { ApiClient } from '@kotka/services';
+import { LajiFormComponent } from '@kotka/ui/laji-form';
+import { ApiClient, FormService } from '@kotka/ui/data-services';
 import { TransactionFormEmbedService } from '../transaction-form-embed/transaction-form-embed.service';
 import { globals } from '../../../environments/globals';
 import { FormViewContainerComponent } from '../../shared-modules/form-view/form-view/form-view-container';
-
 
 @Component({
   selector: 'kotka-transaction-form',
   templateUrl: './transaction-form.component.html',
   styleUrls: ['./transaction-form.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TransactionFormComponent extends FormViewContainerComponent implements OnDestroy {
+export class TransactionFormComponent
+  extends FormViewContainerComponent
+  implements OnDestroy
+{
   formId = globals.transactionFormId;
-  dataType: KotkaDocumentObjectType.transaction = KotkaDocumentObjectType.transaction;
+  dataType: KotkaDocumentObjectType.transaction =
+    KotkaDocumentObjectType.transaction;
   augmentFormFunc = this.augmentForm.bind(this);
 
-  formData?: SpecimenTransaction|Partial<SpecimenTransaction>;
+  formData?: SpecimenTransaction | Partial<SpecimenTransaction>;
 
   isSpecimenTransaction = isSpecimenTransaction;
 
-  @ViewChild(FormViewComponent, { static: true }) formView!: FormViewComponent<KotkaDocumentObjectType.transaction>;
+  @ViewChild(FormViewComponent, { static: true })
+  formView!: FormViewComponent<KotkaDocumentObjectType.transaction>;
 
   private specimenRangeButtonClickSubscription?: Subscription;
 
@@ -47,7 +49,7 @@ export class TransactionFormComponent extends FormViewContainerComponent impleme
     private apiClient: ApiClient,
     private formService: FormService,
     dialogService: DialogService,
-    private transactionFormEmbedService: TransactionFormEmbedService
+    private transactionFormEmbedService: TransactionFormEmbedService,
   ) {
     super(dialogService);
   }
@@ -57,10 +59,14 @@ export class TransactionFormComponent extends FormViewContainerComponent impleme
   }
 
   onFormInit(lajiForm: LajiFormComponent) {
-    this.transactionFormEmbedService.initEmbeddedComponents(lajiForm, this.formData || {});
-    this.specimenRangeButtonClickSubscription = this.transactionFormEmbedService.specimenRangeClick$?.subscribe(range => (
-      this.specimenRangeClick(range)
-    ));
+    this.transactionFormEmbedService.initEmbeddedComponents(
+      lajiForm,
+      this.formData || {},
+    );
+    this.specimenRangeButtonClickSubscription =
+      this.transactionFormEmbedService.specimenRangeClick$?.subscribe((range) =>
+        this.specimenRangeClick(range),
+      );
 
     if (this.disabled) {
       this.setDisabled(this.disabled);
@@ -79,11 +85,16 @@ export class TransactionFormComponent extends FormViewContainerComponent impleme
     }
   }
 
-  private augmentForm(form: LajiForm.SchemaForm): Observable<LajiForm.SchemaForm> {
-    return this.formService.getAllCountryOptions().pipe(switchMap(countries => {
-      form.schema.properties.geneticResourceAcquisitionCountry.oneOf = countries;
-      return of(form);
-    }));
+  private augmentForm(
+    form: LajiForm.SchemaForm,
+  ): Observable<LajiForm.SchemaForm> {
+    return this.formService.getAllCountryOptions().pipe(
+      switchMap((countries) => {
+        form.schema.properties.geneticResourceAcquisitionCountry.oneOf =
+          countries;
+        return of(form);
+      }),
+    );
   }
 
   specimenRangeClick(range: string) {
@@ -97,10 +108,13 @@ export class TransactionFormComponent extends FormViewContainerComponent impleme
 
     this.formView.lajiForm?.block();
     this.apiClient.getSpecimenRange(range).subscribe({
-      'next': result => {
+      next: (result) => {
         if (result.status === 'ok') {
-          const awayIDs = [...(this.formData?.awayIDs || []), ...(result.items || [])];
-          const formData = {...this.formData || {}, awayIDs};
+          const awayIDs = [
+            ...(this.formData?.awayIDs || []),
+            ...(result.items || []),
+          ];
+          const formData = { ...(this.formData || {}), awayIDs };
           this.formView.setFormData(formData);
 
           this.transactionFormEmbedService.clearSpecimenRangeSelect();
@@ -109,10 +123,10 @@ export class TransactionFormComponent extends FormViewContainerComponent impleme
         }
         this.formView.lajiForm?.unBlock();
       },
-      'error': () => {
+      error: () => {
         this.dialogService.alert('An unexpected error occurred.');
         this.formView.lajiForm?.unBlock();
-      }
+      },
     });
   }
 }

@@ -1,0 +1,22 @@
+{
+  "name": "ui-main-content",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/kotka-ui/components/main-content/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": [
+        "{workspaceRoot}/coverage/libs/kotka-ui/components/main-content"
+      ],
+      "options": {
+        "jestConfig": "libs/kotka-ui/components/main-content/jest.config.ts"
+      }
+    }
+  },
+  "tags": []
+}

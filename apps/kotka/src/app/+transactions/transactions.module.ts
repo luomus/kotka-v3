@@ -3,7 +3,6 @@ import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { routing } from './transactions.routes';
 import { KotkaUiMainContentModule } from '@kotka/ui/main-content';
-import { KotkaUiDatatableModule } from '@kotka/ui/datatable';
 import { TransactionFormComponent } from './transaction-form/transaction-form.component';
 import { FormViewModule } from '../shared-modules/form-view/form-view.module';
 import { SharedModule } from '../shared/shared.module';
@@ -16,10 +15,9 @@ import { TransactionVersionHistoryComponent } from './transaction-version-histor
 import { TransactionFormEmbedService } from './transaction-form-embed/transaction-form-embed.service';
 import { TransactionPdfSheetsComponent } from './transaction-pdf-sheets/transaction-pdf-sheets.component';
 import { FormsModule } from '@angular/forms';
-import {
-  TransactionDispatchSheetComponent
-} from './transaction-pdf-sheets/transaction-dispatch-sheet/transaction-dispatch-sheet';
-import { PipesModule } from '@kotka/pipes';
+import { TransactionDispatchSheetComponent } from './transaction-pdf-sheets/transaction-dispatch-sheet/transaction-dispatch-sheet';
+import { PipesModule } from '@kotka/ui/pipes';
+import { DocumentDatatableComponent } from '@kotka/ui/document-datatable';
 
 @NgModule({
   imports: [
@@ -28,12 +26,12 @@ import { PipesModule } from '@kotka/pipes';
     CommonModule,
     SharedModule,
     KotkaUiMainContentModule,
-    KotkaUiDatatableModule,
     FormViewModule,
     KotkaUiLajiFormModule,
     FormsModule,
     TransactionDispatchSheetComponent,
-    PipesModule
+    PipesModule,
+    DocumentDatatableComponent,
   ],
   declarations: [
     TransactionFormComponent,
@@ -42,10 +40,8 @@ import { PipesModule } from '@kotka/pipes';
     PermitsInfoEmbedComponent,
     SpecimenRangeSelectEmbedComponent,
     TransactionVersionHistoryComponent,
-    TransactionPdfSheetsComponent
+    TransactionPdfSheetsComponent,
   ],
-  providers: [
-    TransactionFormEmbedService
-  ]
+  providers: [TransactionFormEmbedService],
 })
 export class TransactionsModule {}
