@@ -12,7 +12,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/kotka-api/mappers"],
       "options": {
-        "jestConfig": "libs/mappers/jest.config.ts"
+        "jestConfig": "libs/kotka-api/mappers/jest.config.ts"
       }
     }
   },

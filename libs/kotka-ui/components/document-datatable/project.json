@@ -2,7 +2,7 @@
   "name": "ui-document-datatable",
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/kotka-ui/components/document-datatable/src",
-  "prefix": "lib",
+  "prefix": "kui",
   "tags": [],
   "projectType": "library",
   "targets": {

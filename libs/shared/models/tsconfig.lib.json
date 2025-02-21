@@ -1,9 +1,12 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../../dist/libs/shared-models",
-    "types": []
+    "outDir": "../../dist/out-tsc",
+    "declaration": true,
+    "types": [],
+    "target": "es6"
   },
   "include": ["**/*.ts"],
-  "exclude": ["**/*.spec.ts"]
+  "exclude": [
+    "jest.config.ts", "**/*.spec.ts", "**/*.test.ts"]
 }

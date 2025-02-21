@@ -57,7 +57,7 @@ export class AutocompleteComponent implements OnChanges {
   constructor(private cdr: ChangeDetectorRef) {}
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.value) {
+    if (changes['value']) {
       if (!this.value) {
         this.typeaheadValue = '';
       } else if (

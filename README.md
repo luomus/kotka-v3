@@ -8,7 +8,8 @@ Start the development server with docker-compose using `docker-compose up` in th
 
 ### Unit tests
 ```
-npm run test kotka-api
+npm run test:all // test all
+npm run test kotka-api // test single project
 ```
 
 ### End-to-end tests
