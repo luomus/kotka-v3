@@ -299,7 +299,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     const observables: Observable<unknown>[] = [];
 
     this.colDefs.forEach((col) => {
-      if (col.cellRenderer) {
+      if (!col.hide && col.cellRenderer) {
         observables.push(
           (col.cellRenderer as typeof CellRendererComponent).fetchDataToCache(
             col,
