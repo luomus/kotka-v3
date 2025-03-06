@@ -23,8 +23,12 @@ export class LabelCellRendererComponent extends CellRendererComponent {
     params: undefined,
     fetchData: Record<string, string>,
   ): string {
-    if (!value) {
+    if (value == null) {
       return '';
+    } else if (Array.isArray(value)) {
+      return value.map(
+        val => LabelCellRendererComponent.getExportValue(val, row, params, fetchData)
+      ).join(', ');
     }
     return fetchData[value];
   }

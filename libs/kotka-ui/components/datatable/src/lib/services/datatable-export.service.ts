@@ -10,6 +10,7 @@ import {
   GetRowsParams,
   SortModel,
 } from '../models/models';
+import { JSONPath } from 'jsonpath-plus';
 
 @Injectable({
   providedIn: 'root',
@@ -96,7 +97,8 @@ export class DatatableExportService {
       columns.forEach((col) => {
         let value: string;
 
-        const rawValue = item[col.field || ''];
+        const rawValue = JSONPath({ path: col.field || '', json: item, wrap: false });
+
         if (col.cellRenderer) {
           value = (
             col.cellRenderer as typeof CellRendererComponent
