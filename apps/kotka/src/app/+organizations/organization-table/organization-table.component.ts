@@ -40,6 +40,20 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
       width: 145,
       flex: 0,
       lockPosition: 'left',
+      defaultSelected: true
+    },
+    {
+      headerName: 'Owner',
+      field: 'owner',
+      flex: 2,
+      cellRenderer: LabelCellRendererComponent,
+      floatingFilterComponent: AutocompleteFloatingFilterComponent,
+      floatingFilterComponentParams: {
+        type: 'organization',
+      },
+      suppressFloatingFilterButton: true,
+      suppressHeaderFilterButton: true,
+      sortable: false
     },
     {
       headerName: 'Organization',
@@ -47,29 +61,42 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
       flex: 3,
       sort: 'asc',
       minWidth: 145,
+      defaultSelected: true
     },
     {
       headerName: 'Suborganization',
       field: 'organizationLevel2.en',
       flex: 2,
+      defaultSelected: true
     },
     {
       headerName: 'Department',
       field: 'organizationLevel3.en',
       flex: 2,
+      defaultSelected: true
     },
     {
       headerName: 'Section, team',
       field: 'organizationLevel4.en',
       flex: 2,
+      defaultSelected: true,
     },
     {
       headerName: 'Abbr',
       field: 'abbreviation',
+      defaultSelected: true,
     },
     {
       headerName: 'PC',
       field: 'postalCode',
+    },
+    {
+      headerName: 'City',
+      field: 'locality',
+    },
+    {
+      headerName: 'Country',
+      field: 'country',
     },
     {
       headerName: 'Hidden',
@@ -81,7 +108,8 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
       suppressHeaderFilterButton: true,
       width: 100,
       minWidth: 100,
-      flex: 0
+      flex: 0,
+      defaultSelected: true,
     },
     {
       headerName: 'Tags',
