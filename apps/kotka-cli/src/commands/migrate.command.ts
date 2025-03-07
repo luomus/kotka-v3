@@ -112,12 +112,26 @@ export class MigrateCommand {
   async migrateData(type: string, options: Options) {
     const limit = this.parseOptionToInt(options.limit);
     let offset = this.parseOptionToInt(options.offset);
-    let stop = false;
     let maxSeq = 0;
     let count = 0;
 
     const spin = ora();
     spin.start('Transfering items from Triplestore to laji-store');
+
+    const foundQnames = [];
+    const parseNestedOrganizationIds = (org: Record<string, any>, orgList: Array<string>) => {
+      if (org['MZ.owner'] && org['MZ.owner']['MOS.organization']) {
+        const owner = org['MZ.owner']['MOS.organization']['rdf:about'];
+
+        if (!foundQnames.includes(owner)) {
+          foundQnames.push(owner);
+
+          orgList.push(this.idService.getId(owner));
+        }
+
+        parseNestedOrganizationIds(org['MZ.owner']['MOS.organization'], orgList);
+      }
+    };
 
     do {
       try {
@@ -126,10 +140,21 @@ export class MigrateCommand {
             const qnameList = [];
             data.data['rdf:RDF'][type]?.forEach(obj => {
               qnameList.push(this.idService.getId(obj['rdf:about']));
+
+              if (type === 'MOS.organization') {
+                foundQnames.push(obj['rdf:about']);
+                parseNestedOrganizationIds(obj, qnameList);
+              }
             });
             return qnameList;
           })
         ));
+
+        if (triplestoreList.length === 0) {
+          break;
+        } else {
+          offset += limit;
+        }
 
         const jsonData: StoreObject[] = [];
 
@@ -145,12 +170,6 @@ export class MigrateCommand {
           } else {
             jsonData.push(parsedData);
           }
-        }
-
-        if ((Array.isArray(jsonData) && jsonData.length < limit) || !Array.isArray(jsonData)) {
-          stop = true;
-        } else {
-          offset += limit;
         }
 
         const migrateDatasetType = (data) => {
@@ -182,6 +201,12 @@ export class MigrateCommand {
             data['dateEdited'] = new Date(data['dateEdited']).toISOString();
         };
 
+        const migrateOrganizationHidden = (data: Organization) => {
+          if (data.hidden === undefined) {
+            data.hidden = false;
+          }
+        };
+
         if (type.includes('dataset')) {
           if (Array.isArray(jsonData)) {
             jsonData.forEach(data => {
@@ -201,12 +226,15 @@ export class MigrateCommand {
         } else if (type.includes('organization')) {
           if (Array.isArray(jsonData)) {
             jsonData.forEach(data => {
-              migrateOrganizationFullName(data);
+              migrateOrganizationFullName(data as Organization);
               migrateOrganizationDates(data as Organization);
+              migrateOrganizationHidden(data as Organization);
+
             });
           } else {
             migrateOrganizationFullName(jsonData);
             migrateOrganizationDates(jsonData);
+            migrateOrganizationHidden(jsonData);
           }
         }
 
@@ -241,7 +269,7 @@ export class MigrateCommand {
           }
         }
       }
-    } while (!stop);
+    } while (offset < 1000000);
 
     if (options.seq) {
       spin.succeed(`Transfer done, moved ${count} items, maximum sequence: ${maxSeq}`);
