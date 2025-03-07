@@ -31,6 +31,7 @@ export class DatatableColumnSettingsService {
   cleanSettings(
     settingsKey: string | undefined,
     allColumns: ColDefWithExtra[],
+    defaultSettings: Required<ColumnSettings>
   ) {
     const settings = this.getSettings(settingsKey);
     const allColIds: string[] = allColumns.map((col) => col.colId);
@@ -39,6 +40,8 @@ export class DatatableColumnSettingsService {
 
     if (selected) {
       selected = selected.filter((colId) => allColIds.includes(colId));
+    } else {
+      selected = defaultSettings.selected;
     }
 
     if (order) {
@@ -49,6 +52,8 @@ export class DatatableColumnSettingsService {
           order!.splice(idx, 0, colId);
         }
       });
+    } else {
+      order = defaultSettings.order;
     }
 
     this.setSettings(settingsKey, { selected, order });
@@ -61,6 +66,8 @@ export class DatatableColumnSettingsService {
 
     if (order) {
       order = this.getOrderAfterColumnMove(order, selected, colId);
+    } else {
+      console.warn('Column order can\'t be updated since the initial order is not set');
     }
 
     this.setSettings(settingsKey, { selected, order });

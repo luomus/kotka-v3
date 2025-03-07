@@ -28,7 +28,7 @@ import {
   DatatableSort,
   DatatableSource,
   GetRowsParams,
-  TupleUnion
+  TupleUnion, ColumnSettings
 } from '../models/models';
 import { forkJoin, from, Observable, Subscription } from 'rxjs';
 import { ColumnSettingsModalComponent } from '../column-settings-modal/column-settings-modal.component';
@@ -205,9 +205,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     modalRef.componentInstance.columns = this.allColumns;
     modalRef.componentInstance.settings =
       this.datatableColumnSettingsService.getSettings(this.settingsKey);
-    modalRef.componentInstance.defaultSettings = {
-      selected: this.getDefaultSelectedCols(),
-    };
+    modalRef.componentInstance.defaultSettings = this.getDefaultSettings();
 
     from(modalRef.result).subscribe({
       next: (settings) => {
@@ -356,6 +354,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
       this.datatableColumnSettingsService.cleanSettings(
         this.settingsKey,
         this.allColumns,
+        this.getDefaultSettings()
       );
       columns = this.filterAndSortColumns(columns);
     }
@@ -368,7 +367,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     );
     const selected = settings.selected
       ? settings.selected
-      : this.getDefaultSelectedCols();
+      : this.getDefaultSettings().selected;
 
     columns = columns.filter(col => (selected.includes(col.colId)));
     columns.sort(
@@ -397,10 +396,14 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     });
   }
 
-  private getDefaultSelectedCols(): string[] {
-    return this.allColumns
-      .filter((col) => col.defaultSelected)
-      .map((col) => col.colId);
+  private getDefaultSettings(): Required<ColumnSettings> {
+    const selected = this.allColumns
+      .filter(col => col.defaultSelected)
+      .map(col => col.colId);
+
+    const order = this.allColumns.map(col => col.colId);
+
+    return { selected, order };
   }
 
   private getVisibleCols(): string[] {
