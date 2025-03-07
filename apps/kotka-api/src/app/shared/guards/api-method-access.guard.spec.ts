@@ -1,5 +1,5 @@
-import { ApiServicesModule, LajiStoreService } from '@kotka/api-services';
-import { MappersModule } from '@kotka/mappers';
+import { ApiServicesModule, LajiStoreService } from '@kotka/api/services';
+import { MappersModule } from '@kotka/api/mappers';
 import { Test } from '@nestjs/testing';
 import { of } from 'rxjs';
 import { HttpModule } from '@nestjs/axios';
@@ -214,7 +214,7 @@ describe('ApiMethodAccessGuard', () => {
     expect(mockLajistoreGet.mock.calls[0][0]).toBe('GX.dataset');
     expect(mockLajistoreGet.mock.calls[0][1]).toBe('GX.1');
   });
-  
+
   it('DELETE request with id pointing to document with same organization as user and valid date results in access granted and a call to lajiStore and correct params', async () => {
     jest.spyOn(reflector, 'get').mockImplementation(() => 'GX.dataset');
     const mockContext = createMock<ExecutionContext>();

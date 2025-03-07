@@ -1,5 +1,5 @@
 import { ErrorHandler, Injectable, Injector } from '@angular/core';
-import { ToastService, Logger } from '@kotka/services';
+import { ToastService, Logger } from '@kotka/ui/util-services';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 
 let errorSent = false;
@@ -9,30 +9,41 @@ export class ErrorHandlerService extends ErrorHandler {
   private toastService?: ToastService;
   private logger?: Logger;
 
-  constructor(
-    private injector: Injector
-  ) {
+  constructor(private injector: Injector) {
     super();
   }
 
   override handleError(error: any) {
-    if (!error || (typeof error === 'object' && typeof error.message === 'string' && error.message.length === 0)) {
+    if (
+      !error ||
+      (typeof error === 'object' &&
+        typeof error.message === 'string' &&
+        error.message.length === 0)
+    ) {
       return super.handleError(error);
     }
 
     if (this.isScheduled()) {
-      this.getToastsService().showWarning("The service is temporarily unavailable.", {pause: true});
+      this.getToastsService().showWarning(
+        'The service is temporarily unavailable.',
+        { pause: true },
+      );
       return super.handleError(error);
     }
 
     if (!errorSent) {
       errorSent = true;
       const location = this.injector.get(LocationStrategy);
-      const url = location instanceof PathLocationStrategy ? location.path() : '';
-      this.getLogger().error('Unexpected error', {clientPath: url, error, errorMsg: error?.toString()});
+      const url =
+        location instanceof PathLocationStrategy ? location.path() : '';
+      this.getLogger().error('Unexpected error', {
+        clientPath: url,
+        error,
+        errorMsg: error?.toString(),
+      });
     }
 
-    this.getToastsService().showGenericError({pause: true});
+    this.getToastsService().showGenericError({ pause: true });
     return super.handleError(error);
   }
 

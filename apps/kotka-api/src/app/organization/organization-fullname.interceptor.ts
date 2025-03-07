@@ -2,7 +2,7 @@
 https://docs.nestjs.com/interceptors#interceptors
 */
 
-import { getOrganizationFullName } from '@kotka/utils';
+import { getOrganizationFullName } from '@kotka/shared/utils';
 import { Organization } from '@luomus/laji-schema/models';
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Observable } from 'rxjs';

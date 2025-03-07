@@ -1,17 +1,21 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { SpecimenTransaction } from '@luomus/laji-schema';
 import { CommonModule } from '@angular/common';
-import { PipesModule } from '@kotka/pipes';
 import { TransactionTypeLabelPipe } from '../../pipes/transaction-type-label.pipe';
 
-type SpecimenIdField = keyof Pick<SpecimenTransaction, 'awayIDs' | 'returnedIDs' | 'missingIDs'>;
-type SpecimenCountField = keyof Pick<SpecimenTransaction, 'awayCount' | 'returnedCount' | 'missingCount'>
+type SpecimenIdField = keyof Pick<
+  SpecimenTransaction,
+  'awayIDs' | 'returnedIDs' | 'missingIDs'
+>;
+type SpecimenCountField = keyof Pick<
+  SpecimenTransaction,
+  'awayCount' | 'returnedCount' | 'missingCount'
+>;
 
 @Component({
-  standalone: true,
-  imports: [CommonModule, PipesModule, TransactionTypeLabelPipe],
+  imports: [CommonModule, TransactionTypeLabelPipe],
   selector: 'kotka-transaction-sheet-material',
-  templateUrl: './transaction-sheet-material.html'
+  templateUrl: './transaction-sheet-material.html',
 })
 export class TransactionSheetMaterialComponent implements OnChanges {
   @Input({ required: true }) data!: SpecimenTransaction;
@@ -31,10 +35,18 @@ export class TransactionSheetMaterialComponent implements OnChanges {
     this.awayTotalCount = 0;
     this.allSpecimens = [];
 
-    const specimenIdFields: SpecimenIdField[] = ['awayIDs', 'returnedIDs', 'missingIDs'];
-    const specimenCountFields: SpecimenCountField[] = ['awayCount', 'returnedCount', 'missingCount'];
+    const specimenIdFields: SpecimenIdField[] = [
+      'awayIDs',
+      'returnedIDs',
+      'missingIDs',
+    ];
+    const specimenCountFields: SpecimenCountField[] = [
+      'awayCount',
+      'returnedCount',
+      'missingCount',
+    ];
 
-    specimenIdFields.forEach(field => {
+    specimenIdFields.forEach((field) => {
       const value = (this.data[field] || []).length;
       this.originalCountWithIds += value;
       this.originalTotalCount += value;
@@ -44,7 +56,7 @@ export class TransactionSheetMaterialComponent implements OnChanges {
       this.allSpecimens = this.allSpecimens.concat(this.data[field] || []);
     });
 
-    specimenCountFields.forEach(field => {
+    specimenCountFields.forEach((field) => {
       const value = this.data[field] || 0;
       this.originalCountWithoutIds += value;
       this.originalTotalCount += value;

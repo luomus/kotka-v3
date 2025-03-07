@@ -2,7 +2,7 @@
 https://docs.nestjs.com/providers#services
 */
 
-import { LajiApiService, LajiStoreService, AbschService } from '@kotka/api-services';
+import { LajiApiService, LajiStoreService, AbschService } from '@kotka/api/services';
 import { Dataset } from '@luomus/laji-schema';
 import { Injectable } from '@nestjs/common';
 import { get } from 'lodash';
@@ -14,7 +14,7 @@ export class ValidationService {
     private readonly lajiApiService: LajiApiService,
     private readonly lajiStoreService: LajiStoreService,
     private readonly abschService: AbschService
-  ) { };
+  ) { }
 
   async remoteValidate(query, options) {
     let error = {};

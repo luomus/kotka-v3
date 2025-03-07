@@ -23,18 +23,20 @@ describe('datasets', () => {
       cy.setUserAsLoggedIn();
       cy.visit('/tags');
 
-      // search for test tag
-      cy.get('.ag-floating-filter[aria-colindex=2] input').first().type(tagName);
-      cy.get('.ag-floating-filter[aria-colindex=3] input').first().type(personsResponsible);
+      cy.getCountFromText('[data-cy=total-count]').then(totalCount => {
+        // search for test tag
+        cy.get('.ag-floating-filter[aria-colindex=2] input').first().type(tagName);
+        cy.get('.ag-floating-filter[aria-colindex=3] input').first().type(personsResponsible);
 
-      // remove the test tag if it already exists
-      cy.get('[data-cy=total-count]').contains(/^[01]$/).invoke('text').then(text => {
-        if (text === '1') {
-          cy.get('.edit-button').first().click();
-          cy.get('[data-cy=form-delete]').click();
-          cy.get('[data-cy=confirm-ok]').click();
-          cy.url({ timeout: 10000 }).should('equal', Cypress.config('baseUrl') + '/tags');
-        }
+        // remove the test tag if it already exists
+        cy.getChangedCountFromText('[data-cy=total-count]', totalCount).then(count => {
+          if (count > 0) {
+            cy.get('.edit-button').first().click();
+            cy.get('[data-cy=form-delete]').click();
+            cy.get('[data-cy=confirm-ok]').click();
+            cy.url({ timeout: 10000 }).should('equal', Cypress.config('baseUrl') + '/tags');
+          }
+        });
       });
     });
 

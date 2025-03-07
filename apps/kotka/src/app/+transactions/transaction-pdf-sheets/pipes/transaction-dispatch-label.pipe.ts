@@ -3,7 +3,6 @@ import { SpecimenTransaction } from '@luomus/laji-schema';
 import { TransactionTypeLabelPipe } from './transaction-type-label.pipe';
 
 @Pipe({
-  standalone: true,
   name: 'transactionDispatchLabel',
   pure: true
 })

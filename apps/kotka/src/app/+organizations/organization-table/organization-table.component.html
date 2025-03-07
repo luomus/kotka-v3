@@ -9,11 +9,14 @@
       (ngModelChange)="nameFilterChange()"
     >
   </div>
-  <kui-datatable
-    style="height: calc(100vh - 190px)"
+  <kui-document-datatable
+    style="height: calc(100vh - 225px)"
+    [dataType]="dataType"
     [columns]="columns"
-    [datasource]="datasource"
     [dataTypeName]="'organization'"
+    [defaultFilterModel]="defaultFilterModel"
+    [extraSearchQuery]="extraSearchQuery"
+    [enableColumnSelection]="true"
   >
-  </kui-datatable>
+  </kui-document-datatable>
 </kui-main-content>

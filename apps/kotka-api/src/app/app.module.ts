@@ -1,11 +1,11 @@
 import { OrganizationModule } from './organization/organization.module';
 import { ValidateModule } from './validate/validate.module';
 import { SharedModule } from './shared/shared.module';
-import { MappersModule } from '@kotka/mappers';
+import { MappersModule } from '@kotka/api/mappers';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { Module } from '@nestjs/common';
 
-import { ApiServicesModule } from '@kotka/api-services';
+import { ApiServicesModule } from '@kotka/api/services';
 import { DatasetModule } from './dataset/dataset.module';
 import { StatusModule } from './status/status.module';
 import { RedisModule } from './shared-modules/redis/redis.module';

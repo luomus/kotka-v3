@@ -2,21 +2,15 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { SpecimenTransaction } from '@luomus/laji-schema';
 import { CommonModule } from '@angular/common';
 import { TransactionBotanyShelfSlipContext } from '../services/transaction-pdf-sheets-context-service';
-import { PdfTemplateComponent } from '@kotka/services';
-import { PipesModule } from '@kotka/pipes';
-import { QRCodeModule } from 'angularx-qrcode';
+import { PdfTemplateComponent } from '@kotka/ui/data-services';
 import { TransactionTypeLabelPipe } from '../pipes/transaction-type-label.pipe';
+import { QRCodeComponent } from 'angularx-qrcode';
+import { ToFullUriPipe } from '@kotka/ui/pipes';
 
 @Component({
-  standalone: true,
-  imports: [
-    CommonModule,
-    PipesModule,
-    QRCodeModule,
-    TransactionTypeLabelPipe
-  ],
+  imports: [CommonModule, TransactionTypeLabelPipe, QRCodeComponent, ToFullUriPipe],
   selector: 'kotka-transaction-botany-labels',
-  templateUrl: './transaction-botany-labels.html'
+  templateUrl: './transaction-botany-labels.html',
 })
 export class TransactionBotanyLabelsComponent implements PdfTemplateComponent {
   @Input({ required: true }) context!: TransactionBotanyShelfSlipContext;

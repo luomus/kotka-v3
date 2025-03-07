@@ -5,7 +5,7 @@ https://docs.nestjs.com/interceptors#interceptors
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, HttpException, HttpStatus } from '@nestjs/common';
 import { Observable, lastValueFrom, map } from 'rxjs';
 import { Pdf, Image, Person } from '@kotka/shared/models';
-import { MediaApiService } from '@kotka/api-services';
+import { MediaApiService } from '@kotka/api/services';
 
 @Injectable()
 export class MediaAccessInterceptor implements NestInterceptor {
@@ -33,7 +33,7 @@ export class MediaAccessInterceptor implements NestInterceptor {
       if (!id) {
         throw new HttpException('Missing id parameter', HttpStatus.BAD_REQUEST);
       }
-      
+
       const { meta } = await lastValueFrom(this.mediaApiService.getMedia(id,type));
 
       if (!(profile.role?.includes('MA.admin') || profile.organisation.includes(meta.rightsOwner))) {

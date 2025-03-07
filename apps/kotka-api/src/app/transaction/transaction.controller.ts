@@ -2,8 +2,8 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { LajiStoreService, TriplestoreService } from '@kotka/api-services';
-import { TriplestoreMapperService } from '@kotka/mappers';
+import { LajiStoreService, TriplestoreService } from '@kotka/api/services';
+import { TriplestoreMapperService } from '@kotka/api/mappers';
 import { Controller, UseGuards } from '@nestjs/common';
 import { LajiStoreController } from '../shared/controllers/laji-store.controller';
 import { ControllerType } from '../shared/decorators/controller-type.decorator';

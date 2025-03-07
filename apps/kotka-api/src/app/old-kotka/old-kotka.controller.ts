@@ -2,21 +2,20 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { LajiStoreService } from '@kotka/api-services';
-import { TypeMigrationService } from '@kotka/mappers';
-import { IdService } from '@kotka/util-services';
+import { LajiStoreService } from '@kotka/api/services';
+import { TypeMigrationService } from '@kotka/api/mappers';
 import { Dataset, Organization, SpecimenTransaction } from '@luomus/laji-schema';
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import moment from 'moment';
 import { map } from 'rxjs';
 import { OldKotkaGuard } from './old-kotka.guard';
+import { getId, getIdWithoutPrefix, getUri } from '@kotka/shared/utils';
 
 @Controller()
 @UseGuards(OldKotkaGuard)
 export class OldKotkaController {
   constructor(
     private readonly lajiStoreService: LajiStoreService,
-    private readonly idService: IdService,
     private readonly typeMigrationService: TypeMigrationService
   ) {}
 
@@ -66,9 +65,9 @@ export class OldKotkaController {
 
   @Get('transaction/isLoaned/:specimenId')
   getTransactionIsLoaned(@Param('specimenId') specimenId) {
-    const specimenIdQname = this.idService.getUri(specimenId);
-    const specimenIdPrefix = this.idService.getId(specimenIdQname);
-    specimenId = this.idService.getIdWithoutPrefix(specimenIdPrefix);
+    const specimenIdQname = getUri(specimenId);
+    const specimenIdPrefix = getId(specimenIdQname);
+    specimenId = getIdWithoutPrefix(specimenIdPrefix);
 
     return this.lajiStoreService.getAll('HRX.specimenTransaction', {
       q: `awayIDs:("${specimenIdQname}", "${specimenIdPrefix}", "${specimenId}")`,
@@ -78,7 +77,7 @@ export class OldKotkaController {
       map(res => res.data),
       map(data => data.member),
       map((transactions: SpecimenTransaction[]) => {
-        let id; 
+        let id;
         transactions.every(transaction => {
           if (transaction.type === 'HRX.typeLoanOutgoing') {
             id = transaction.id;
@@ -95,9 +94,9 @@ export class OldKotkaController {
 
   @Get('transaction/forSpecimen/:specimenId')
   getTransactionsForSpecimen(@Param('specimenId') specimenId) {
-    const specimenIdQname = this.idService.getUri(specimenId);
-    const specimenIdPrefix = this.idService.getId(specimenIdQname);
-    specimenId = this.idService.getIdWithoutPrefix(specimenIdPrefix);
+    const specimenIdQname = getUri(specimenId);
+    const specimenIdPrefix = getId(specimenIdQname);
+    specimenId = getIdWithoutPrefix(specimenIdPrefix);
 
     return this.lajiStoreService.getAll('HRX.specimenTransaction', {
       q: `awayIDs:("${specimenIdQname}", "${specimenIdPrefix}", "${specimenId}") OR returnedIDs:("${specimenIdQname}", "${specimenIdPrefix}", "${specimenId}")`,
@@ -116,7 +115,7 @@ export class OldKotkaController {
           }
 
           return {
-            uri: this.idService.getUri(transaction.id),
+            uri: getUri(transaction.id),
             type: type,
             'HRA.transactionType': this.typeMigrationService.reverseValueMap('HRA.transaction', 'type', transaction.type),
             'HRA.transactionStatus': this.typeMigrationService.reverseValueMap('HRA.transaction', 'status', transaction.status),

@@ -3,10 +3,6 @@ import { cloneDeep } from 'lodash';
 import { KotkaDocumentObject } from '@kotka/shared/models';
 
 export class FormViewUtils {
-  static getIdFromDataURI(dataURI: string): string {
-    return dataURI.split('/').pop() as string;
-  }
-
   static removeMetaAndExcludedFields<S extends KotkaDocumentObject>(data: Partial<S>, excludedFields: string[] = []): Partial<S> {
     data = cloneDeep(data);
 

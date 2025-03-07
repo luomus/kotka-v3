@@ -1,5 +1,5 @@
-import { ApiServicesModule, LajiStoreService, TriplestoreService } from '@kotka/api-services';
-import { MappersModule } from '@kotka/mappers';
+import { ApiServicesModule, LajiStoreService, TriplestoreService } from '@kotka/api/services';
+import { MappersModule } from '@kotka/api/mappers';
 import { Test } from '@nestjs/testing';
 import { of } from 'rxjs';
 import { HttpModule } from '@nestjs/axios';
@@ -136,7 +136,7 @@ describe('InUseGuard', () => {
     expect(mockReflectorGet).toBeCalledTimes(2);
     expect(mockLajistoreServiceSearch).toBeCalled();
     expect(mockLajistoreServiceSearch.mock.calls[0][0]).toEqual('MOS.organization');
-    expect(mockLajistoreServiceSearch.mock.calls[0][1]).toEqual({"fields": "id", "q": "GX.1"});
+    expect(mockLajistoreServiceSearch.mock.calls[0][1]).toEqual({"fields": "id", "q": "(datasetID: GX.1)"});
   });
 
   it('Request method of DELETE and found inUseTypes results in call to triplestore and lajistore, no found documents, tags and organizations (excluding itself) result into granted access', async () => {
@@ -199,7 +199,7 @@ describe('InUseGuard', () => {
     expect(mockLajistoreServiceSearch).toBeCalled();
     expect(mockTriplestoreServiceSearch.mock.calls[0][0]).toEqual({ object: 'GX.1' });
     expect(mockLajistoreServiceSearch.mock.calls[0][0]).toEqual('MOS.organization');
-    expect(mockLajistoreServiceSearch.mock.calls[0][1]).toEqual({"fields": "id", "q": "GX.1"});
+    expect(mockLajistoreServiceSearch.mock.calls[0][1]).toEqual({"fields": "id", "q": "(datasetID: GX.1)"});
 
   });
 });

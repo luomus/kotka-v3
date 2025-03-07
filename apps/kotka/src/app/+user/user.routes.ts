@@ -1,5 +1,4 @@
-import { RouterModule, Routes } from '@angular/router';
-import { ModuleWithProviders } from '@angular/core';
+import { Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { LogoutComponent } from './logout/logout.component';
 import { OnlyLoggedInGuard } from '../shared/services/guards/only-logged-in.guard';
@@ -19,5 +18,3 @@ export const userRoutes: Routes = [
   },
   { path: '', pathMatch: 'full', component: NotFoundComponent }
 ];
-
-export const routing: ModuleWithProviders<RouterModule> = RouterModule.forChild(userRoutes);

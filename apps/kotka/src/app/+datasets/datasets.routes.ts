@@ -33,5 +33,3 @@ export const datasetsRoutes: Routes = [
     }
   }
 ];
-
-export const routing: ModuleWithProviders<RouterModule> = RouterModule.forChild(datasetsRoutes);

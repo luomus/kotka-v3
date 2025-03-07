@@ -3,6 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/kotka-cli/src",
   "projectType": "application",
+  "tags": [],
   "targets": {
     "build": {
       "executor": "@nrwl/webpack:webpack",
@@ -41,8 +42,7 @@
       }
     },
     "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
+      "executor": "@nx/eslint:lint"
     },
     "test": {
       "executor": "@nx/jest:jest",
@@ -51,6 +51,5 @@
         "jestConfig": "apps/kotka-cli/jest.config.ts"
       }
     }
-  },
-  "tags": []
+  }
 }

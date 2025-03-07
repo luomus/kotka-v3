@@ -9,5 +9,3 @@ export const statusRoutes: Routes = [
     component: StatusComponent
   }
 ];
-
-export const routing: ModuleWithProviders<RouterModule> = RouterModule.forChild(statusRoutes);

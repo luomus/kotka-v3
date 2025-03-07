@@ -4,6 +4,7 @@
   "projectType": "application",
   "sourceRoot": "apps/kotka/src",
   "prefix": "kotka",
+  "tags": [],
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:browser",
@@ -111,6 +112,5 @@
         "jestConfig": "apps/kotka/jest.config.ts"
       }
     }
-  },
-  "tags": []
+  }
 }

@@ -2,7 +2,7 @@
 https://docs.nestjs.com/interceptors#interceptors
 */
 
-import { LajiStoreService, MediaApiService } from '@kotka/api-services';
+import { LajiStoreService, MediaApiService } from '@kotka/api/services';
 import { Concept, KeyOfUnion, StoreObject } from '@luomus/laji-schema/models';
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';

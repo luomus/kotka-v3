@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { StatusResponse } from '@kotka/api-interfaces';
+import { StatusResult } from '@kotka/shared/models';
 
 const statusPath = '/api/status';
 
@@ -14,7 +14,7 @@ export class StatusService {
     private httpClient: HttpClient
   ) {}
 
-  getApiStatus(): Observable<StatusResponse> {
-    return this.httpClient.get<StatusResponse>(statusPath);
+  getApiStatus(): Observable<StatusResult> {
+    return this.httpClient.get<StatusResult>(statusPath);
   }
 }

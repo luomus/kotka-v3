@@ -4,7 +4,6 @@ import { TransactionSheetMaterialComponent } from '../transaction-sheet-material
 import { TransactionSheetSignatureComponent } from '../transaction-sheet-signature/transaction-sheet-signature';
 
 @Component({
-  standalone: true,
   imports: [
     TransactionSheetMaterialComponent,
     TransactionSheetSignatureComponent

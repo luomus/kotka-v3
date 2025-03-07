@@ -2,7 +2,7 @@
 https://docs.nestjs.com/interceptors#interceptors
 */
 
-import { FormService } from '@kotka/api-services';
+import { FormService } from '@kotka/api/services';
 import {
   Injectable,
   NestInterceptor,

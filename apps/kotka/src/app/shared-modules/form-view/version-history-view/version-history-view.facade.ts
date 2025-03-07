@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ApiClient, FormService } from '@kotka/services';
+import { ApiClient, FormService } from '@kotka/ui/data-services';
 import {
   catchError,
   combineLatest,
@@ -8,28 +8,29 @@ import {
   ReplaySubject,
   shareReplay,
   switchMap,
-  throwError
+  throwError,
 } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import {
   KotkaDocumentObject,
-  KotkaDocumentObjectType, KotkaDocumentObjectMap,
+  KotkaDocumentObjectType,
+  KotkaDocumentObjectMap,
   KotkaVersionDifferenceObject,
   LajiForm,
-  StoreVersion
+  StoreVersion,
 } from '@kotka/shared/models';
-import { FormViewUtils } from '../form-view/form-view-utils';
 import { Utils } from '../../../shared/services/utils';
+import { getId } from '@kotka/shared/utils';
 
 export enum VersionHistoryErrorEnum {
   dataNotFound = 'dataNotFound',
-  genericError = 'genericError'
+  genericError = 'genericError',
 }
 
 export enum VersionHistoryViewEnum {
   versionList = 'versionList',
   version = 'version',
-  versionComparison = 'versionComparison'
+  versionComparison = 'versionComparison',
 }
 
 export interface VersionHistoryInputs<T extends KotkaDocumentObjectType> {
@@ -53,22 +54,31 @@ export interface ErrorViewModel {
   errorType: VersionHistoryErrorEnum;
 }
 
-export type ViewModel<S extends KotkaDocumentObject> = VersionHistoryState<S> | ErrorViewModel;
+export type ViewModel<S extends KotkaDocumentObject> =
+  | VersionHistoryState<S>
+  | ErrorViewModel;
 
-export function isSuccessViewModel<S extends KotkaDocumentObject>(viewModel: ViewModel<S>): viewModel is VersionHistoryState<S> {
+export function isSuccessViewModel<S extends KotkaDocumentObject>(
+  viewModel: ViewModel<S>,
+): viewModel is VersionHistoryState<S> {
   return !isErrorViewModel(viewModel);
 }
-export function isErrorViewModel<S extends KotkaDocumentObject>(viewModel: ViewModel<S>): viewModel is ErrorViewModel {
+export function isErrorViewModel<S extends KotkaDocumentObject>(
+  viewModel: ViewModel<S>,
+): viewModel is ErrorViewModel {
   return 'errorType' in viewModel;
 }
 
 @Injectable()
-export class VersionHistoryViewFacade<T extends KotkaDocumentObjectType, S extends KotkaDocumentObjectMap[T]> {
-  versionList$: Observable<StoreVersion[]|undefined>;
-  form$: Observable<LajiForm.SchemaForm|undefined>;
-  jsonForm$: Observable<LajiForm.JsonForm|undefined>;
-  data$: Observable<S|undefined>;
-  differenceData$: Observable<KotkaVersionDifferenceObject|undefined>;
+export class VersionHistoryViewFacade<
+  T extends KotkaDocumentObjectType,
+  S extends KotkaDocumentObjectMap[T],
+> {
+  versionList$: Observable<StoreVersion[] | undefined>;
+  form$: Observable<LajiForm.SchemaForm | undefined>;
+  jsonForm$: Observable<LajiForm.JsonForm | undefined>;
+  data$: Observable<S | undefined>;
+  differenceData$: Observable<KotkaVersionDifferenceObject | undefined>;
 
   vm$: Observable<ViewModel<S>>;
 
@@ -76,7 +86,7 @@ export class VersionHistoryViewFacade<T extends KotkaDocumentObjectType, S exten
 
   constructor(
     private formService: FormService,
-    private apiClient: ApiClient
+    private apiClient: ApiClient,
   ) {
     this.versionList$ = this.getVersionList$();
     this.form$ = this.getForm$();
@@ -97,102 +107,159 @@ export class VersionHistoryViewFacade<T extends KotkaDocumentObjectType, S exten
         let obs$: Observable<VersionHistoryState<S>>;
 
         if (inputs.view === VersionHistoryViewEnum.versionList) {
-          obs$ = this.versionList$.pipe(map(versionList => ({ versionList })));
+          obs$ = this.versionList$.pipe(
+            map((versionList) => ({ versionList })),
+          );
         } else if (inputs.view === VersionHistoryViewEnum.version) {
-          obs$ = combineLatest([this.versionList$, this.form$, this.data$]).pipe(map(([versionList, form, data]) => ({ versionList, form, data })));
+          obs$ = combineLatest([
+            this.versionList$,
+            this.form$,
+            this.data$,
+          ]).pipe(
+            map(([versionList, form, data]) => ({ versionList, form, data })),
+          );
         } else {
-          obs$ = combineLatest([this.versionList$, this.jsonForm$, this.differenceData$]).pipe(map(([versionList, jsonForm, differenceData]) => ({ versionList, jsonForm, differenceData })));
+          obs$ = combineLatest([
+            this.versionList$,
+            this.jsonForm$,
+            this.differenceData$,
+          ]).pipe(
+            map(([versionList, jsonForm, differenceData]) => ({
+              versionList,
+              jsonForm,
+              differenceData,
+            })),
+          );
         }
 
         return obs$.pipe(
-          catchError(err => {
-            const errorType = err.message === VersionHistoryErrorEnum.dataNotFound ? VersionHistoryErrorEnum.dataNotFound : VersionHistoryErrorEnum.genericError;
+          catchError((err) => {
+            const errorType =
+              err.message === VersionHistoryErrorEnum.dataNotFound
+                ? VersionHistoryErrorEnum.dataNotFound
+                : VersionHistoryErrorEnum.genericError;
             return of({ errorType });
-          })
+          }),
         );
       }),
-      shareReplay(1)
+      shareReplay(1),
     );
   }
 
-  private getVersionList$(): Observable<StoreVersion[]|undefined> {
+  private getVersionList$(): Observable<StoreVersion[] | undefined> {
     return this.inputs$.pipe(
-      distinctUntilChanged((inputs1, inputs2) => (
-        inputs1.dataURI === inputs2.dataURI && inputs1.dataType === inputs2.dataType
-      )),
-      switchMap(inputs => Utils.startWithUndefined(
-        this.getVersionListForDocument$(inputs.dataType, inputs.dataURI)
-      )),
-      shareReplay(1)
+      distinctUntilChanged(
+        (inputs1, inputs2) =>
+          inputs1.dataURI === inputs2.dataURI &&
+          inputs1.dataType === inputs2.dataType,
+      ),
+      switchMap((inputs) =>
+        Utils.startWithUndefined(
+          this.getVersionListForDocument$(inputs.dataType, inputs.dataURI),
+        ),
+      ),
+      shareReplay(1),
     );
   }
 
-  private getForm$(): Observable<LajiForm.SchemaForm|undefined> {
+  private getForm$(): Observable<LajiForm.SchemaForm | undefined> {
     return this.inputs$.pipe(
-      switchMap(inputs => Utils.startWithUndefined(
-        this.formService.getFormWithUserContext(inputs.formId)
-      ))
+      switchMap((inputs) =>
+        Utils.startWithUndefined(
+          this.formService.getFormWithUserContext(inputs.formId),
+        ),
+      ),
     );
   }
 
-  private getFormInJsonFormat$(): Observable<LajiForm.JsonForm|undefined> {
+  private getFormInJsonFormat$(): Observable<LajiForm.JsonForm | undefined> {
     return this.inputs$.pipe(
-      switchMap(inputs => Utils.startWithUndefined(
-        this.formService.getFormInJsonFormat(inputs.formId)
-      ))
+      switchMap((inputs) =>
+        Utils.startWithUndefined(
+          this.formService.getFormInJsonFormat(inputs.formId),
+        ),
+      ),
     );
   }
 
-  private getData$(): Observable<S|undefined> {
+  private getData$(): Observable<S | undefined> {
     return this.inputs$.pipe(
-      switchMap(inputs => Utils.startWithUndefined(
-        this.getVersionData$(inputs.dataType, inputs.dataURI, inputs.version)
-      ))
+      switchMap((inputs) =>
+        Utils.startWithUndefined(
+          this.getVersionData$(inputs.dataType, inputs.dataURI, inputs.version),
+        ),
+      ),
     );
   }
 
-  private getDifferenceData$(): Observable<KotkaVersionDifferenceObject<S>|undefined> {
+  private getDifferenceData$(): Observable<
+    KotkaVersionDifferenceObject<S> | undefined
+  > {
     return this.inputs$.pipe(
-      switchMap(inputs => Utils.startWithUndefined(
-        this.getVersionDifference$(inputs.dataType, inputs.dataURI, inputs.versions)
-      ))
+      switchMap((inputs) =>
+        Utils.startWithUndefined(
+          this.getVersionDifference$(
+            inputs.dataType,
+            inputs.dataURI,
+            inputs.versions,
+          ),
+        ),
+      ),
     );
   }
 
-  private getVersionListForDocument$(dataType: T, dataURI?: string): Observable<StoreVersion[]> {
+  private getVersionListForDocument$(
+    dataType: T,
+    dataURI?: string,
+  ): Observable<StoreVersion[]> {
     if (!dataURI) {
       return of([]);
     }
 
-    const id = FormViewUtils.getIdFromDataURI(dataURI);
+    const id = getId(dataURI);
     return this.apiClient.getDocumentVersionList(dataType, id).pipe(
-      catchError(err => {
+      catchError((err) => {
         err = err.status === 404 ? VersionHistoryErrorEnum.dataNotFound : err;
         return throwError(() => new Error(err));
-      })
+      }),
     );
   }
 
-  private getVersionData$(dataType: T, dataURI?: string, version?: number): Observable<S> {
+  private getVersionData$(
+    dataType: T,
+    dataURI?: string,
+    version?: number,
+  ): Observable<S> {
     if (!dataURI || version === undefined) {
       return throwError(() => new Error(VersionHistoryErrorEnum.dataNotFound));
     }
 
-    const id = FormViewUtils.getIdFromDataURI(dataURI);
-    return this.apiClient.getDocumentVersionData<T, S>(dataType, id, version).pipe(
-      catchError(err => {
-        err = err.status === 404 ? VersionHistoryErrorEnum.dataNotFound : err;
-        return throwError(() => new Error(err));
-      })
-    );
+    const id = getId(dataURI);
+    return this.apiClient
+      .getDocumentVersionData<T, S>(dataType, id, version)
+      .pipe(
+        catchError((err) => {
+          err = err.status === 404 ? VersionHistoryErrorEnum.dataNotFound : err;
+          return throwError(() => new Error(err));
+        }),
+      );
   }
 
-  private getVersionDifference$(dataType: T, dataURI?: string, versions?: number[]): Observable<KotkaVersionDifferenceObject<S>> {
+  private getVersionDifference$(
+    dataType: T,
+    dataURI?: string,
+    versions?: number[],
+  ): Observable<KotkaVersionDifferenceObject<S>> {
     if (!dataURI || !versions || versions.length !== 2) {
       return throwError(() => new Error(VersionHistoryErrorEnum.dataNotFound));
     }
 
-    const id = FormViewUtils.getIdFromDataURI(dataURI);
-    return this.apiClient.getDocumentVersionDifference(dataType, id, versions[0], versions[1]);
+    const id = getId(dataURI);
+    return this.apiClient.getDocumentVersionDifference(
+      dataType,
+      id,
+      versions[0],
+      versions[1],
+    );
   }
 }

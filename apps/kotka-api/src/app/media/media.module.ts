@@ -1,6 +1,6 @@
 import { HttpModule } from '@nestjs/axios';
 import { MediaController } from './media.controller';
-import { MediaApiService } from '@kotka/api-services';
+import { MediaApiService } from '@kotka/api/services';
 /*
 https://docs.nestjs.com/modules
 */

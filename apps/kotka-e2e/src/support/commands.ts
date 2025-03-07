@@ -16,6 +16,8 @@ declare namespace Cypress {
     login(email: string, password: string): void;
     logout(): void;
     disableSameSiteCookieRestrictions(): void;
+    getCountFromText(selector: string): Chainable<number>;
+    getChangedCountFromText(selector: string, prevCount: number): Chainable<number>;
   }
 }
 
@@ -70,6 +72,14 @@ Cypress.Commands.add('disableSameSiteCookieRestrictions', () => {
       }
     });
   });
+});
+
+Cypress.Commands.add('getCountFromText', (selector: string) => {
+  return cy.get(selector).contains(/^\d+$/).should('be.visible').invoke('text').then(parseInt);
+});
+
+Cypress.Commands.add('getChangedCountFromText', (selector: string, prevCount: number) => {
+  return cy.get(selector).contains(/^\d+$/).should('be.visible').should('not.include.text', prevCount).invoke('text').then(parseInt);
 });
 
 //

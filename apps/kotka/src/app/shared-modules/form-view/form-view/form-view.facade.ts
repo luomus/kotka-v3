@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { ApiClient, FormService, UserService } from '@kotka/services';
+import { ApiClient, FormService, UserService } from '@kotka/ui/data-services';
 import {
   catchError,
   concat,
@@ -10,18 +10,25 @@ import {
   shareReplay,
   Subscription,
   switchMap,
-  throwError
+  throwError,
 } from 'rxjs';
 import { distinctUntilChanged, map, take } from 'rxjs/operators';
-import { allowEditForUser, allowDeleteForUser } from '@kotka/utils';
-import { KotkaDocumentObject, KotkaDocumentObjectType, KotkaDocumentObjectMap } from '@kotka/shared/models';
+import {
+  allowEditForUser,
+  allowDeleteForUser,
+  getId,
+} from '@kotka/shared/utils';
+import {
+  KotkaDocumentObject,
+  KotkaDocumentObjectType,
+  KotkaDocumentObjectMap,
+} from '@kotka/shared/models';
 import { LajiForm, Person, Image } from '@kotka/shared/models';
-import { FormViewUtils } from './form-view-utils';
 import { MediaMetadata } from '@luomus/laji-form/lib/components/LajiForm';
 
 export enum FormErrorEnum {
   dataNotFound = 'dataNotFound',
-  genericError = 'genericError'
+  genericError = 'genericError',
 }
 
 export interface FormInputs<T extends KotkaDocumentObjectType> {
@@ -29,7 +36,9 @@ export interface FormInputs<T extends KotkaDocumentObjectType> {
   dataType: T;
   editMode: boolean;
   dataURI?: string;
-  augmentFormFunc?: (form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>;
+  augmentFormFunc?: (
+    form: LajiForm.SchemaForm,
+  ) => Observable<LajiForm.SchemaForm>;
 }
 
 export interface FormState<S extends KotkaDocumentObject> {
@@ -48,26 +57,42 @@ export interface ErrorViewModel {
   errorType: FormErrorEnum;
 }
 
-export type ViewModel<S extends KotkaDocumentObject> = FormState<S> | ErrorViewModel;
+export type ViewModel<S extends KotkaDocumentObject> =
+  | FormState<S>
+  | ErrorViewModel;
 
-export function isSuccessViewModel<S extends KotkaDocumentObject>(viewModel: ViewModel<S>): viewModel is FormState<S> {
+export function isSuccessViewModel<S extends KotkaDocumentObject>(
+  viewModel: ViewModel<S>,
+): viewModel is FormState<S> {
   return !isErrorViewModel(viewModel);
 }
-export function isErrorViewModel<S extends KotkaDocumentObject>(viewModel: ViewModel<S>): viewModel is ErrorViewModel {
+export function isErrorViewModel<S extends KotkaDocumentObject>(
+  viewModel: ViewModel<S>,
+): viewModel is ErrorViewModel {
   return 'errorType' in viewModel;
 }
 
 interface KotkaMediaMetadata extends MediaMetadata {
-  publicityRestrictions?: Image['publicityRestrictions']
+  publicityRestrictions?: Image['publicityRestrictions'];
 }
 
 @Injectable()
-export class FormViewFacade<T extends KotkaDocumentObjectType, S extends KotkaDocumentObjectMap[T]> implements OnDestroy {
-  private store  = new ReplaySubject<FormState<S>>(1);
+export class FormViewFacade<
+  T extends KotkaDocumentObjectType,
+  S extends KotkaDocumentObjectMap[T],
+> implements OnDestroy
+{
+  private store = new ReplaySubject<FormState<S>>(1);
   state$ = this.store.asObservable();
 
-  formData$ = this.state$.pipe(map(state => state.formData), distinctUntilChanged());
-  disabled$ = this.state$.pipe(map(state => state.disabled), distinctUntilChanged());
+  formData$ = this.state$.pipe(
+    map((state) => state.formData),
+    distinctUntilChanged(),
+  );
+  disabled$ = this.state$.pipe(
+    map((state) => state.disabled),
+    distinctUntilChanged(),
+  );
 
   vm$: Observable<ViewModel<S>>;
 
@@ -80,7 +105,7 @@ export class FormViewFacade<T extends KotkaDocumentObjectType, S extends KotkaDo
   constructor(
     private userService: UserService,
     private formService: FormService,
-    private apiClient: ApiClient
+    private apiClient: ApiClient,
   ) {
     this.vm$ = this.getVm$();
     this.initialStateSub = this.getInitialStateSub();
@@ -95,15 +120,22 @@ export class FormViewFacade<T extends KotkaDocumentObjectType, S extends KotkaDo
   }
 
   setFormData(formData: Partial<S>, formHasChanges = true) {
-    const mediaMetadata = this._state.mediaMetadata ? { ...this._state.mediaMetadata, intellectualOwner: formData.owner || ''} : undefined;
+    const mediaMetadata = this._state.mediaMetadata
+      ? {
+          ...this._state.mediaMetadata,
+          intellectualOwner: formData.owner || '',
+        }
+      : undefined;
     this.setState({ ...this._state, formData, formHasChanges, mediaMetadata });
   }
 
   setCopiedFormData(formData: Partial<S>) {
-    this.getEmptyFormData$().pipe(take(1)).subscribe(emptyFormData => {
-      formData = { ...emptyFormData, ...formData };
-      this.setFormData(formData, false);
-    });
+    this.getEmptyFormData$()
+      .pipe(take(1))
+      .subscribe((emptyFormData) => {
+        formData = { ...emptyFormData, ...formData };
+        this.setFormData(formData, false);
+      });
   }
 
   setFormHasChanges(formHasChanges: boolean) {
@@ -120,20 +152,31 @@ export class FormViewFacade<T extends KotkaDocumentObjectType, S extends KotkaDo
 
   private getVm$(): Observable<ViewModel<S>> {
     return this.inputs$.pipe(
-      switchMap(() => this.state$.pipe(
-        catchError(err => {
-          const errorType = err.message === FormErrorEnum.dataNotFound ? FormErrorEnum.dataNotFound : FormErrorEnum.genericError;
-          return of({ errorType });
-        }))
+      switchMap(() =>
+        this.state$.pipe(
+          catchError((err) => {
+            const errorType =
+              err.message === FormErrorEnum.dataNotFound
+                ? FormErrorEnum.dataNotFound
+                : FormErrorEnum.genericError;
+            return of({ errorType });
+          }),
+        ),
       ),
-      shareReplay(1)
+      shareReplay(1),
     );
   }
 
-  private getAugmentedForm$(inputs: FormInputs<T>): Observable<LajiForm.SchemaForm> {
-    return this.formService.getFormWithUserContext(inputs.formId).pipe(
-      switchMap(form => inputs.augmentFormFunc ? inputs.augmentFormFunc(form) : of(form))
-    );
+  private getAugmentedForm$(
+    inputs: FormInputs<T>,
+  ): Observable<LajiForm.SchemaForm> {
+    return this.formService
+      .getFormWithUserContext(inputs.formId)
+      .pipe(
+        switchMap((form) =>
+          inputs.augmentFormFunc ? inputs.augmentFormFunc(form) : of(form),
+        ),
+      );
   }
 
   private getInitialFormData$(inputs: FormInputs<T>): Observable<Partial<S>> {
@@ -145,13 +188,15 @@ export class FormViewFacade<T extends KotkaDocumentObjectType, S extends KotkaDo
   }
 
   private getEmptyFormData$(): Observable<Partial<S>> {
-    return this.userService.getCurrentLoggedInUser().pipe(map(user => {
-      const formData: Partial<S> = {};
-      if (user?.organisation && user.organisation.length === 1) {
-        formData.owner = user.organisation[0];
-      }
-      return formData;
-    }));
+    return this.userService.getCurrentLoggedInUser().pipe(
+      map((user) => {
+        const formData: Partial<S> = {};
+        if (user?.organisation && user.organisation.length === 1) {
+          formData.owner = user.organisation[0];
+        }
+        return formData;
+      }),
+    );
   }
 
   private getFormData$(dataType: T, dataURI?: string): Observable<Partial<S>> {
@@ -159,41 +204,51 @@ export class FormViewFacade<T extends KotkaDocumentObjectType, S extends KotkaDo
       return throwError(() => new Error(FormErrorEnum.dataNotFound));
     }
 
-    const id = FormViewUtils.getIdFromDataURI(dataURI);
+    const id = getId(dataURI);
     return this.apiClient.getDocumentById<T, S>(dataType, id).pipe(
-      catchError(err => {
+      catchError((err) => {
         err = err.status === 404 ? FormErrorEnum.dataNotFound : err;
         return throwError(() => new Error(err));
-      })
+      }),
     );
   }
 
   private getInitialStateSub(): Subscription {
-    return this.inputs$.pipe(
-      switchMap(inputs => concat(
-        of({}), // set the state first as empty object before the values load
-        forkJoin([
-          this.getAugmentedForm$(inputs),
-          this.getInitialFormData$(inputs),
-          this.userService.getCurrentLoggedInUser()
-        ]).pipe(
-          map(([form, formData, user]) => (
-            this.getInitialFormState(inputs, form, formData, user)
-          ))
-        )
-      ))
-    ).subscribe({
-      'next': (state: FormState<S>) => {
-        this.setState(state);
-      },
-      'error': err => this.store.error(err)
-    });
+    return this.inputs$
+      .pipe(
+        switchMap((inputs) =>
+          concat(
+            of({}), // set the state first as empty object before the values load
+            forkJoin([
+              this.getAugmentedForm$(inputs),
+              this.getInitialFormData$(inputs),
+              this.userService.getCurrentLoggedInUser(),
+            ]).pipe(
+              map(([form, formData, user]) =>
+                this.getInitialFormState(inputs, form, formData, user),
+              ),
+            ),
+          ),
+        ),
+      )
+      .subscribe({
+        next: (state: FormState<S>) => {
+          this.setState(state);
+        },
+        error: (err) => this.store.error(err),
+      });
   }
 
-  private getInitialFormState(inputs: FormInputs<T>, form: LajiForm.SchemaForm, formData: Partial<S>, user: Person): FormState<S> {
-    const isEditMode =  inputs.editMode;
+  private getInitialFormState(
+    inputs: FormInputs<T>,
+    form: LajiForm.SchemaForm,
+    formData: Partial<S>,
+    user: Person,
+  ): FormState<S> {
+    const isEditMode = inputs.editMode;
     const disabled = isEditMode && !allowEditForUser(formData, user);
-    const showDeleteButton = isEditMode && (!disabled && allowDeleteForUser(<S>formData, user));
+    const showDeleteButton =
+      isEditMode && !disabled && allowDeleteForUser(<S>formData, user);
     const showCopyButton = isEditMode && !!form.options?.allowTemplate;
 
     return {
@@ -205,16 +260,19 @@ export class FormViewFacade<T extends KotkaDocumentObjectType, S extends KotkaDo
       mediaMetadata: this.getMediaMetadata(user, formData),
       formHasChanges: false,
       disabledAlertDismissed: false,
-      showDeleteTargetInUseAlert: false
+      showDeleteTargetInUseAlert: false,
     };
   }
 
-  private getMediaMetadata(user: Person, formData: Partial<S>): KotkaMediaMetadata {
+  private getMediaMetadata(
+    user: Person,
+    formData: Partial<S>,
+  ): KotkaMediaMetadata {
     return {
       intellectualRights: 'MZ.intellectualRightsARR',
       intellectualOwner: formData.owner || '',
       capturerVerbatim: user.fullName,
-      publicityRestrictions: 'MZ.publicityRestrictionsPrivate'
+      publicityRestrictions: 'MZ.publicityRestrictionsPrivate',
     };
   }
 

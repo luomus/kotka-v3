@@ -3,10 +3,10 @@ import { NestFactory } from '@nestjs/core';
 import session from 'express-session';
 import passport from 'passport';
 import { Request } from 'express';
-import { createProxyMiddleware } from 'http-proxy-middleware';
+import { legacyCreateProxyMiddleware } from 'http-proxy-middleware';
 import { AppModule } from './app/app.module';
 import Redis from 'ioredis';
-import RedisStore from 'connect-redis';
+import { RedisStore } from 'connect-redis';
 import { AuthenticationService } from './app/authentication/authentication.service';
 import { Person } from '@kotka/shared/models';
 import { REDIS } from './app/shared-modules/redis/redis.constants';
@@ -86,7 +86,7 @@ async function bootstrap() {
     return false;
   };
 
-  const externalProxyServer = createProxyMiddleware(externalProxyFilter, {
+  const externalProxyServer = legacyCreateProxyMiddleware(externalProxyFilter, {
     target: process.env['LAJI_API_URL'],
     changeOrigin: true,
     pathRewrite: (path: string, req: UserRequest) => {

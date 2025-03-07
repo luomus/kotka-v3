@@ -1,11 +1,10 @@
-import { LajiStoreService, TriplestoreService } from "@kotka/api-services";
-import { TriplestoreMapperService, TypeMigrationService } from "@kotka/mappers";
+import { LajiStoreService, TriplestoreService } from "@kotka/api/services";
+import { TriplestoreMapperService, TypeMigrationService } from "@kotka/api/mappers";
 import { Command, Console } from "nestjs-console";
 import { lastValueFrom, map } from "rxjs";
 import { Organization, StoreObject } from '@kotka/shared/models';
-import { IdService } from "@kotka/util-services";
 import ora from 'ora';
-import { getOrganizationFullName } from "@kotka/utils";
+import { getId, getOrganizationFullName } from '@kotka/shared/utils';
 
 interface Options {
   limit: number,
@@ -20,7 +19,6 @@ export class MigrateCommand {
     private readonly lajiStoreService: LajiStoreService,
     private readonly triplestoreMapperService: TriplestoreMapperService,
     private readonly typeMigrationService: TypeMigrationService,
-    private readonly idService: IdService,
   ) {}
 
   private getType (typeQName) {
@@ -72,7 +70,7 @@ export class MigrateCommand {
     if (typeof option === 'number') {
       return option;
     }
-  
+
     const parsedVal = parseInt(option);
 
     if (isNaN(parsedVal)) {
@@ -126,7 +124,7 @@ export class MigrateCommand {
         if (!foundQnames.includes(owner)) {
           foundQnames.push(owner);
 
-          orgList.push(this.idService.getId(owner));
+          orgList.push(getId(owner));
         }
 
         parseNestedOrganizationIds(org['MZ.owner']['MOS.organization'], orgList);
@@ -139,7 +137,7 @@ export class MigrateCommand {
           map(data => {
             const qnameList = [];
             data.data['rdf:RDF'][type]?.forEach(obj => {
-              qnameList.push(this.idService.getId(obj['rdf:about']));
+              qnameList.push(getId(obj['rdf:about']));
 
               if (type === 'MOS.organization') {
                 foundQnames.push(obj['rdf:about']);

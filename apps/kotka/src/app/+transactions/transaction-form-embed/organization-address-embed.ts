@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import { catchError, Observable, of, ReplaySubject, switchMap } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
-import { ApiClient } from '@kotka/services';
+import { ApiClient } from '@kotka/ui/data-services';
 import { Organization } from '@luomus/laji-schema';
 import { KotkaDocumentObjectType } from '@kotka/shared/models';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'kotka-organization-address-embed',
@@ -18,40 +19,43 @@ import { KotkaDocumentObjectType } from '@kotka/shared/models';
         <div *ngIf="data.country">{{ data.country | uppercase }}</div>
       </ng-container>
     </div>
-  `
+  `,
+  imports: [CommonModule]
 })
 export class OrganizationAddressEmbedComponent {
-  set organization(organization: string|null|undefined) {
+  set organization(organization: string | null | undefined) {
     this.organizationSubject.next(organization);
   }
 
-  data$: Observable<Organization|undefined>;
+  data$: Observable<Organization | undefined>;
 
-  private organizationSubject = new ReplaySubject<string|null|undefined>(1);
-  private organization$ = this.organizationSubject.asObservable().pipe(distinctUntilChanged());
+  private organizationSubject = new ReplaySubject<string | null | undefined>(1);
+  private organization$ = this.organizationSubject
+    .asObservable()
+    .pipe(distinctUntilChanged());
 
-  constructor(
-    private apiClient: ApiClient
-  ) {
+  constructor(private apiClient: ApiClient) {
     this.data$ = this.organization$.pipe(
-      switchMap(organizationId => this.getOrganization(organizationId))
+      switchMap((organizationId) => this.getOrganization(organizationId)),
     );
   }
 
-  private getOrganization(organizationId?: string|null): Observable<Organization|undefined> {
+  private getOrganization(
+    organizationId?: string | null,
+  ): Observable<Organization | undefined> {
     if (!organizationId) {
       return of(undefined);
     }
 
-    return this.apiClient.getDocumentById(
-      KotkaDocumentObjectType.organization, organizationId
-    ).pipe(
-      catchError((e) => {
-        if (e?.status === 404) {
-          return of(undefined);
-        }
-        throw e;
-      })
-    );
+    return this.apiClient
+      .getDocumentById(KotkaDocumentObjectType.organization, organizationId)
+      .pipe(
+        catchError((e) => {
+          if (e?.status === 404) {
+            return of(undefined);
+          }
+          throw e;
+        }),
+      );
   }
 }

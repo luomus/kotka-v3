@@ -1,20 +1,15 @@
-import {
-  Directive,
-  HostListener,
-  ViewChild
-} from '@angular/core';
+import { Directive, HostListener, ViewChild } from '@angular/core';
 import { ComponentCanDeactivate } from '../../../shared/services/guards/component-can-deactivate.guard';
 import { Observable, of } from 'rxjs';
-import { DialogService } from '@kotka/services';
+import { DialogService } from '@kotka/ui/util-services';
 import { FormViewComponent } from './form-view.component';
 
 @Directive()
 export class FormViewContainerComponent implements ComponentCanDeactivate {
-  @ViewChild(FormViewComponent, { static: true }) formViewComponent?: FormViewComponent;
+  @ViewChild(FormViewComponent, { static: true })
+  formViewComponent?: FormViewComponent;
 
-  constructor(
-    protected dialogService: DialogService
-  ) {}
+  constructor(protected dialogService: DialogService) {}
 
   @HostListener('window:beforeunload', ['$event'])
   preventLeave($event: BeforeUnloadEvent) {
@@ -28,6 +23,8 @@ export class FormViewContainerComponent implements ComponentCanDeactivate {
       return of(true);
     }
 
-    return this.dialogService.confirm('Are you sure you want to leave and discard unsaved changes?');
+    return this.dialogService.confirm(
+      'Are you sure you want to leave and discard unsaved changes?',
+    );
   }
 }

@@ -2,10 +2,10 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { StoreGetQuery } from '@kotka/api-interfaces';
+import { StoreGetQuery } from '@kotka/shared/models';
 import { lastValueFrom } from 'rxjs';
-import { LajiStoreService, TriplestoreService } from '@kotka/api-services';
-import { TriplestoreMapperService } from '@kotka/mappers';
+import { LajiStoreService, TriplestoreService } from '@kotka/api/services';
+import { TriplestoreMapperService } from '@kotka/api/mappers';
 import {
   Body,
   Delete,
@@ -35,7 +35,7 @@ export abstract class LajiStoreController<T extends StoreObject> {
     protected readonly triplestoreService: TriplestoreService,
     protected readonly triplestoreMapperService: TriplestoreMapperService,
     protected readonly type: string,
-    protected readonly useTriplestore: boolean = true
+    protected readonly useTriplestore = true
   ) {
   }
 
