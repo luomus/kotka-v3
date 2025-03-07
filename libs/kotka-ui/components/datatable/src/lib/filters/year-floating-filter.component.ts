@@ -60,7 +60,7 @@ export class YearFloatingFilterComponent
     this.params = params;
   }
 
-  onParentModelChanged(parentModel: DateFilterModel | null) {
+  onParentModelChanged(parentModel?: DateFilterModel | null) {
     if (!parentModel?.dateFrom) {
       this.currentFilter = undefined;
     } else {

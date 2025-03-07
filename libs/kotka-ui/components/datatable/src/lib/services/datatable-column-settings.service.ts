@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { isEqual } from 'lodash';
-import { ColumnSettings, DatatableColumnWithId } from '../models/models';
+import { ColumnSettings, ColDefWithExtra } from '../models/models';
 import { LocalStorageService } from 'ngx-webstorage';
 
 @Injectable({
@@ -31,7 +30,7 @@ export class DatatableColumnSettingsService {
 
   cleanSettings(
     settingsKey: string | undefined,
-    allColumns: DatatableColumnWithId[],
+    allColumns: ColDefWithExtra[],
   ) {
     const settings = this.getSettings(settingsKey);
     const allColIds: string[] = allColumns.map((col) => col.colId);
@@ -55,29 +54,37 @@ export class DatatableColumnSettingsService {
     this.setSettings(settingsKey, { selected, order });
   }
 
-  updateSelected(settingsKey: string | undefined, selected: string[]) {
+  updateSelectedAfterColumnMove(settingsKey: string | undefined, selected: string[], colId: string) {
     const settings = this.getSettings(settingsKey);
 
-    if (isEqual(selected, settings.selected)) {
-      return;
-    }
-
-    const order = settings.order;
+    let order = settings.order;
 
     if (order) {
-      const getSortIndex = (value: string): number => {
-        let index = selected.indexOf(value);
-        if (index === -1) {
-          index = selected.length;
-        }
-        return index;
-      };
-
-      order.sort(
-        (valueA, valueB) => getSortIndex(valueA) - getSortIndex(valueB),
-      );
+      order = this.getOrderAfterColumnMove(order, selected, colId);
     }
 
     this.setSettings(settingsKey, { selected, order });
+  }
+
+  private getOrderAfterColumnMove(order: string[], selected: string[], colId: string): string[] {
+    order = [...order];
+
+    const oldSelectedIdx = order.filter(colId => selected.includes(colId)).indexOf(colId);
+    const newSelectedIdx = selected.indexOf(colId);
+
+    const oldOrderIdx = order.indexOf(colId);
+    let newOrderIndex = oldOrderIdx;
+
+    if (newSelectedIdx < oldSelectedIdx) {
+      newOrderIndex = order.indexOf(selected[newSelectedIdx + 1]);
+    } else if (newSelectedIdx > oldSelectedIdx) {
+      newOrderIndex = order.indexOf(selected[newSelectedIdx - 1]);
+    }
+
+    if (newOrderIndex !== oldOrderIdx) {
+      order.splice(newOrderIndex, 0, order.splice(oldOrderIdx, 1)[0]);
+    }
+
+    return order;
   }
 }

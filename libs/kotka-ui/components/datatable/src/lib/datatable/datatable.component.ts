@@ -11,16 +11,19 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import {
-  ColDef,
+  ColDef as AgGridColDef,
+  DragStoppedEvent,
   GridApi,
   GridOptions,
   Module, ModuleRegistry,
-  RowModelType, RowSelectionOptions
+  RowModelType,
+  RowSelectionOptions
 } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
 import {
-  CustomColDef,
-  DatatableColumn, DatatableColumnWithId,
+  ColDef,
+  ExtraColDef,
+  DatatableColumn, ColDefWithExtra,
   DatatableFilter,
   DatatableSort,
   DatatableSource,
@@ -41,6 +44,7 @@ import { TotalCountComponent } from '../total-count/total-count.component';
 import { SpinnerComponent } from '@kotka/ui/spinner';
 import { AgGridAngular } from '@ag-grid-community/angular';
 import { CommonModule } from '@angular/common';
+import { isEqual } from 'lodash';
 
 ModuleRegistry.registerModules([
   CsvExportModule,
@@ -48,7 +52,7 @@ ModuleRegistry.registerModules([
   ClientSideRowModelModule,
 ]);
 
-type CustomColumnKeyList = TupleUnion<keyof CustomColDef>;
+type CustomColumnKeyList = TupleUnion<keyof ExtraColDef>;
 
 interface GridReadyEvent {
   type: string;
@@ -62,7 +66,10 @@ interface GridReadyEvent {
   imports: [CommonModule, TotalCountComponent, SpinnerComponent, AgGridAngular],
 })
 export class DatatableComponent implements OnChanges, OnDestroy {
-  @Input() columns: DatatableColumn[] = [];
+  @Input() set columns(columns: DatatableColumn[]) {
+    this.allColumns = this.getProcessedColumns(columns);
+    this.updateColDefs();
+  }
 
   @Input() datasource?: DatatableSource;
 
@@ -88,7 +95,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     agDateInput: CustomDatepickerComponent,
   };
   colDefs: ColDef[] = [];
-  defaultColDef: ColDef = {
+  defaultColDef: AgGridColDef = {
     flex: 1,
     resizable: true,
     minWidth: 120,
@@ -113,7 +120,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
   private gridApi?: GridApi;
   private gridDataSource?: DatatableSource;
 
-  private allColumns: DatatableColumnWithId[] = [];
+  private allColumns: ColDefWithExtra[] = [];
 
   private sortModel: DatatableSort = [];
   private filterModel: DatatableFilter = {};
@@ -132,12 +139,9 @@ export class DatatableComponent implements OnChanges, OnDestroy {
   ) {}
 
   ngOnChanges(changes: SimpleChanges) {
-    if (
-      changes['columns'] ||
-      changes['enableColumnSelection'] ||
-      changes['settingsKey']
-    ) {
-      this.updateColumns();
+    if (changes['enableColumnSelection'] || changes['settingsKey']) {
+      this.defaultColDef.lockVisible = !this.enableColumnSelection;
+      this.updateColDefs();
     }
 
     if (changes['defaultFilterModel'] || changes['settingsKey']) {
@@ -167,20 +171,27 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     this.gridApi.setGridOption('datasource', this.gridDataSource);
   }
 
-  columnUpdated() {
+  dragStopped(e: DragStoppedEvent) {
     if (!this.gridApi) {
       return;
     }
 
-    if (this.enableColumnSelection) {
-      const selected = this.gridApi
-        .getAllDisplayedColumns()
-        .map((c) => c.getColId());
+    const colId = e.target.attributes.getNamedItem('col-id')?.value;
+    if (!colId) {
+      return;
+    }
 
-      this.datatableColumnSettingsService.updateSelected(
-        this.settingsKey,
-        selected,
-      );
+    if (this.enableColumnSelection) {
+      const prevSelected = this.colDefs.map((col: ColDef) => (col.colId));
+      const currentSelected = this.getVisibleCols();
+
+      if (!isEqual(prevSelected, currentSelected)) {
+        this.datatableColumnSettingsService.updateSelectedAfterColumnMove(this.settingsKey, currentSelected, colId);
+
+        if (!isEqual(prevSelected.sort(), currentSelected.sort())) {
+          this.updateColDefs();
+        }
+      }
     }
   }
 
@@ -195,7 +206,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     modalRef.componentInstance.settings =
       this.datatableColumnSettingsService.getSettings(this.settingsKey);
     modalRef.componentInstance.defaultSettings = {
-      selected: this.getDefaultSelectedColumns(),
+      selected: this.getDefaultSelectedCols(),
     };
 
     from(modalRef.result).subscribe({
@@ -204,7 +215,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
           this.settingsKey,
           settings,
         );
-        this.updateColumns();
+        this.updateColDefs();
         this.cdr.markForCheck();
       },
       error: () => undefined,
@@ -219,7 +230,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     this.exportLoading = true;
     this.datatableExportService
       .exportData(
-        this.getVisibleColumns(),
+        this.colDefs,
         this.datasource,
         this.totalCount,
         this.sortModel,
@@ -299,7 +310,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     const observables: Observable<unknown>[] = [];
 
     this.colDefs.forEach((col) => {
-      if (!col.hide && col.cellRenderer) {
+      if (col.cellRenderer) {
         observables.push(
           (col.cellRenderer as typeof CellRendererComponent).fetchDataToCache(
             col,
@@ -317,28 +328,13 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     }
   }
 
-  private updateColumns() {
-    this.allColumns = this.processColumns(this.columns);
-
-    let columns = this.allColumns;
-    if (this.enableColumnSelection) {
-      this.datatableColumnSettingsService.cleanSettings(
-        this.settingsKey,
-        this.allColumns,
-      );
-      columns = this.filterAndSortColumns(columns);
-    }
-
-    this.colDefs = this.removeCustomColumnKeys(columns);
-  }
-
-  private processColumns(columns: DatatableColumn[]): DatatableColumnWithId[] {
+  private getProcessedColumns(columns: DatatableColumn[]): ColDefWithExtra[] {
     return columns.map((col) => {
       const colId = col.colId || col.field;
       if (!colId) {
         throw Error('Every column should either have colId or field');
       }
-      const newCol: DatatableColumnWithId = { ...col, colId };
+      const newCol: ColDefWithExtra = { ...col, colId };
 
       if (!col.hideDefaultHeaderTooltip) {
         newCol.headerTooltip = col.headerName;
@@ -351,18 +347,30 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     });
   }
 
-  private filterAndSortColumns(columns: DatatableColumnWithId[]): DatatableColumnWithId[] {
+  private updateColDefs() {
+    this.colDefs = this.getColDefsFromColumns(this.allColumns);
+  }
+
+  private getColDefsFromColumns(columns: ColDefWithExtra[]): ColDef[] {
+    if (this.enableColumnSelection) {
+      this.datatableColumnSettingsService.cleanSettings(
+        this.settingsKey,
+        this.allColumns,
+      );
+      columns = this.filterAndSortColumns(columns);
+    }
+    return this.removeCustomColumnKeys(columns);
+  }
+
+  private filterAndSortColumns(columns: ColDefWithExtra[]): ColDefWithExtra[] {
     const settings = this.datatableColumnSettingsService.getSettings(
       this.settingsKey,
     );
     const selected = settings.selected
       ? settings.selected
-      : this.getDefaultSelectedColumns();
+      : this.getDefaultSelectedCols();
 
-    columns = columns.map((col) => ({
-      ...col,
-      hide: !selected.includes(col.colId),
-    }));
+    columns = columns.filter(col => (selected.includes(col.colId)));
     columns.sort(
       (columnA, columnB) =>
         selected.indexOf(columnA.colId) - selected.indexOf(columnB.colId),
@@ -371,7 +379,7 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     return columns;
   }
 
-  private removeCustomColumnKeys(columns: DatatableColumn[]): ColDef[] {
+  private removeCustomColumnKeys(columns: ColDefWithExtra[]): ColDef[] {
     return columns.map((col) => {
       col = { ...col };
 
@@ -389,24 +397,18 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     });
   }
 
-  private getDefaultSelectedColumns(): string[] {
+  private getDefaultSelectedCols(): string[] {
     return this.allColumns
       .filter((col) => col.defaultSelected)
       .map((col) => col.colId);
   }
 
-  private getVisibleColumns(): DatatableColumnWithId[] {
-    if (this.gridApi) {
-      const columnByIdMap = this.allColumns.reduce((res, col) => {
-        res[col.colId] = col;
-        return res;
-      }, {} as Record<string, DatatableColumnWithId>);
-
-      const selected = this.gridApi.getAllDisplayedColumns().map(c => c.getColId());
-
-      return selected.map(id => columnByIdMap[id]);
-    } else {
-      return this.allColumns.filter(col => !col.hide);
+  private getVisibleCols(): string[] {
+    if (!this.gridApi) {
+      return [];
     }
+    return this.gridApi
+      .getAllDisplayedColumns()
+      .map((c) => c.getColId());
   }
 }

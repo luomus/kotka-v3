@@ -4,11 +4,11 @@ import { CellRendererComponent } from '../renderers/cell-renderer';
 import { ExportService } from '@kotka/ui/util-services';
 import { Injectable, Injector } from '@angular/core';
 import {
-  DatatableColumn,
+  ColDef,
   DatatableSource,
   FilterModel,
   GetRowsParams,
-  SortModel,
+  SortModel
 } from '../models/models';
 import { JSONPath } from 'jsonpath-plus';
 
@@ -22,7 +22,7 @@ export class DatatableExportService {
   ) {}
 
   exportData(
-    columns: DatatableColumn[],
+    columns: ColDef[],
     datasource: DatatableSource,
     totalCount: number,
     sortModel: SortModel[],
@@ -40,7 +40,7 @@ export class DatatableExportService {
   }
 
   private getProcessedData(
-    columns: DatatableColumn[],
+    columns: ColDef[],
     data: any[],
   ): Observable<string[][]> {
     return this.fetchExtraData(columns, data).pipe(
@@ -49,7 +49,7 @@ export class DatatableExportService {
   }
 
   private fetchExtraData(
-    columns: DatatableColumn[],
+    columns: ColDef[],
     data: any[],
   ): Observable<Record<string, any>> {
     const result: Record<string, any> = {};
@@ -63,9 +63,7 @@ export class DatatableExportService {
             .fetchDataNeededForExport(col, data, this.injector)
             .pipe(
               tap((data) => {
-                if (col.colId) {
-                  result[col.colId] = data;
-                }
+                result[col.colId] = data;
               }),
             ),
         );
@@ -84,7 +82,7 @@ export class DatatableExportService {
   }
 
   private getExportData(
-    columns: DatatableColumn[],
+    columns: ColDef[],
     data: any[],
     extraData: Record<string, any>,
   ): string[][] {
@@ -106,7 +104,7 @@ export class DatatableExportService {
             rawValue,
             item,
             col.cellRendererParams,
-            extraData[col.colId || ''],
+            extraData[col.colId],
           );
         } else {
           value = CellRendererComponent.getExportValue(rawValue, item);

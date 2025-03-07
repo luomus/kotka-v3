@@ -48,7 +48,7 @@ export class AutocompleteFloatingFilterComponent
     this.params = params;
   }
 
-  onParentModelChanged(parentModel: TextFilterModel | null) {
+  onParentModelChanged(parentModel?: TextFilterModel | null) {
     if (!parentModel?.filter) {
       this.currentFilter = undefined;
     } else {

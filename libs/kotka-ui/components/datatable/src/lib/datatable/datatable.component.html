@@ -45,8 +45,7 @@
   [suppressFieldDotNotation]="false"
   [enableBrowserTooltips]="true"
   [enableCellTextSelection]="true"
-  (displayedColumnsChanged)="columnUpdated()"
-  (columnMoved)="columnUpdated()"
+  (dragStopped)="dragStopped($event)"
   (rowClicked)="rowClicked.emit($event)"
   (gridReady)="onGridReady($event)"
 ></ag-grid-angular>

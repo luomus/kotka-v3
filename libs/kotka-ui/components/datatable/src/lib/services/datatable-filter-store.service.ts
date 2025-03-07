@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { LocalStorageService } from 'ngx-webstorage';
-import { DatatableColumnWithId, DatatableFilter } from '../models/models';
+import { ColDefWithExtra, DatatableFilter } from '../models/models';
 import { cloneDeep } from 'lodash';
 
 @Injectable({
@@ -20,7 +20,7 @@ export class DatatableFilterStoreService {
   updateFilters(
     settingsKey: string | undefined,
     filterModel: DatatableFilter,
-    allColumns: DatatableColumnWithId[],
+    allColumns: ColDefWithExtra[],
   ) {
     if (!settingsKey) {
       return;
