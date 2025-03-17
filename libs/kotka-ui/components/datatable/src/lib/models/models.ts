@@ -62,8 +62,8 @@ export interface DatatableSource {
 }
 
 export interface ColumnSettings {
-  selected?: string[];
-  order?: string[];
+  selected: string[];
+  order: string[];
 }
 
 export function isBasicFilterModel(

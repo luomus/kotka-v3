@@ -1,58 +1,58 @@
 import {
-  ChangeDetectorRef,
   Component,
-  EventEmitter,
   Injector,
-  Input,
-  NgZone,
-  OnChanges,
   OnDestroy,
-  Output,
-  SimpleChanges,
+  input,
+  computed,
+  signal,
+  Signal,
+  effect,
+  WritableSignal
 } from '@angular/core';
 import {
   ColDef as AgGridColDef,
   DragStoppedEvent,
   GridApi,
   GridOptions,
-  Module, ModuleRegistry,
-  RowModelType,
-  RowSelectionOptions
+  Module,
+  ModuleRegistry,
 } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
 import {
   ColDef,
-  ExtraColDef,
-  DatatableColumn, ColDefWithExtra,
+  DatatableColumn,
   DatatableFilter,
   DatatableSort,
   DatatableSource,
   GetRowsParams,
-  TupleUnion, ColumnSettings
+  ColumnSettings,
+  ColDefWithExtra
 } from '../models/models';
-import { forkJoin, from, Observable, Subscription } from 'rxjs';
+import { forkJoin, from, Observable, Subject, takeUntil } from 'rxjs';
 import { ColumnSettingsModalComponent } from '../column-settings-modal/column-settings-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DatatableExportService } from '../services/datatable-export.service';
 import { CustomDatepickerComponent } from '../components/custom-datepicker.component';
 import { CellRendererComponent } from '../renderers/cell-renderer';
-import { DatatableColumnSettingsService } from '../services/datatable-column-settings.service';
-import { DatatableFilterStoreService } from '../services/datatable-filter-store.service';
 import { CsvExportModule } from '@ag-grid-community/csv-export';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { TotalCountComponent } from '../total-count/total-count.component';
 import { SpinnerComponent } from '@kotka/ui/spinner';
 import { AgGridAngular } from '@ag-grid-community/angular';
-import { CommonModule } from '@angular/common';
 import { isEqual } from 'lodash';
+import {
+  getVisibleColDefs,
+  getDefaultColumnSettings,
+  getProcessedColumns,
+  getColumnSettingsAfterColumnMove
+} from '../services/datatable-column-utils';
+import { DatatableSettingsStoreService } from '../services/datatable-settings-store.service';
 
 ModuleRegistry.registerModules([
   CsvExportModule,
   InfiniteRowModelModule,
   ClientSideRowModelModule,
 ]);
-
-type CustomColumnKeyList = TupleUnion<keyof ExtraColDef>;
 
 interface GridReadyEvent {
   type: string;
@@ -63,112 +63,105 @@ interface GridReadyEvent {
   selector: 'kui-datatable',
   templateUrl: './datatable.component.html',
   styleUrls: ['./datatable.component.scss'],
-  imports: [CommonModule, TotalCountComponent, SpinnerComponent, AgGridAngular],
+  imports: [TotalCountComponent, SpinnerComponent, AgGridAngular]
 })
-export class DatatableComponent implements OnChanges, OnDestroy {
-  @Input() set columns(columns: DatatableColumn[]) {
-    this.allColumns = this.getProcessedColumns(columns);
-    this.updateColDefs();
-  }
+export class DatatableComponent implements OnDestroy {
+  columns = input<DatatableColumn[]>([]);
+  datasource = input<DatatableSource>();
 
-  @Input() datasource?: DatatableSource;
+  enableFileExport = input<boolean|undefined>(false);
+  enableColumnSelection = input<boolean|undefined>(false);
 
-  @Input() enableFileExport? = false;
+  settingsKey = input<string>();
 
-  @Input() enableColumnSelection? = false;
+  dataTypeName = input('item');
+  dataTypeNamePlural = input<string>();
 
-  @Input() settingsKey?: string;
+  defaultFilterModel = input<DatatableFilter>({});
 
-  @Input() dataTypeName = 'item';
-  @Input() dataTypeNamePlural?: string;
+  colDefs: Signal<ColDef[]>;
+  defaultColDef: Signal<AgGridColDef>;
 
-  @Input() defaultFilterModel: DatatableFilter = {};
+  totalCount = signal<number|undefined>(undefined);
+  exportLoading = signal(false);
 
-  @Output() rowClicked = new EventEmitter();
-
-  totalCount?: number;
-
-  exportLoading = false;
-
+  gridOptions: GridOptions = {
+    rowGroupPanelShow: 'always',
+    enableBrowserTooltips: true,
+    enableCellTextSelection: true,
+    rowBuffer: 0,
+    rowModelType: 'infinite',
+    cacheOverflowSize: 2,
+    maxConcurrentDatasourceRequests: 1,
+    infiniteInitialRowCount: 1,
+    maxBlocksInCache: 10
+  };
   modules: Module[] = [InfiniteRowModelModule];
   components: Record<string, any> = {
     agDateInput: CustomDatepickerComponent,
   };
-  colDefs: ColDef[] = [];
-  defaultColDef: AgGridColDef = {
-    flex: 1,
-    resizable: true,
-    minWidth: 120,
-    sortable: true,
-    filter: true,
-    floatingFilter: true,
-    suppressHeaderMenuButton: true,
-  };
-  rowBuffer = 0;
-  rowSelection?: RowSelectionOptions;
-  rowModelType: RowModelType = 'infinite';
-  paginationPageSize = 100;
-  cacheOverflowSize = 2;
-  maxConcurrentDatasourceRequests = 1;
-  infiniteInitialRowCount = 1;
-  maxBlocksInCache = 10;
-  gridOptions: GridOptions = {
-    rowGroupPanelShow: 'always',
-    suppressFieldDotNotation: true,
-  };
+
+  private allColumns: Signal<ColDefWithExtra[]>;
+  private defaultColumnSettings: Signal<ColumnSettings>;
+  private columnSettings: WritableSignal<ColumnSettings> = signal({ selected: [], order: []}, {equal: isEqual});
+
+  private gridDataSource: Signal<DatatableSource|undefined>;
+
+  private sortModel: WritableSignal<DatatableSort> = signal([], {equal: isEqual});
+  private filterModel: WritableSignal<DatatableFilter> = signal({}, {equal: isEqual});
 
   private gridApi?: GridApi;
-  private gridDataSource?: DatatableSource;
-
-  private allColumns: ColDefWithExtra[] = [];
-
-  private sortModel: DatatableSort = [];
-  private filterModel: DatatableFilter = {};
-
   private isDestroyed = false;
-  private loadCellRendererDataToCacheSub: Subscription = new Subscription();
+  private unsubscribe$ = new Subject<void>();
 
   constructor(
     private modalService: NgbModal,
     private datatableExportService: DatatableExportService,
-    private datatableColumnSettingsService: DatatableColumnSettingsService,
-    private datatableFilterStoreService: DatatableFilterStoreService,
-    private injector: Injector,
-    private ngZone: NgZone,
-    private cdr: ChangeDetectorRef,
-  ) {}
+    private settingsStoreService: DatatableSettingsStoreService,
+    private injector: Injector
+  ) {
+    this.colDefs = computed(() => (
+      getVisibleColDefs(this.allColumns(), this.columnSettings()))
+    );
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['enableColumnSelection'] || changes['settingsKey']) {
-      this.defaultColDef.lockVisible = !this.enableColumnSelection;
-      this.updateColDefs();
-    }
+    this.defaultColDef = computed(() => ({
+      flex: 1,
+      resizable: true,
+      minWidth: 120,
+      sortable: true,
+      filter: true,
+      floatingFilter: true,
+      suppressHeaderMenuButton: true,
+      lockVisible: !this.enableColumnSelection()
+    }));
 
-    if (changes['defaultFilterModel'] || changes['settingsKey']) {
-      this.filterModel = {
-        ...this.defaultFilterModel,
-        ...this.datatableFilterStoreService.getFilters(this.settingsKey)
-      };
-      this.gridApi?.setFilterModel(this.filterModel);
-    }
+    this.allColumns = computed(() => (
+      getProcessedColumns(this.columns()))
+    );
 
-    if (changes['datasource']) {
-      this.gridDataSource = this.datasource
-        ? { ...this.datasource, getRows: this.getRows.bind(this) }
-        : undefined;
-      this.gridApi?.setGridOption('datasource', this.gridDataSource);
-    }
+    this.defaultColumnSettings = computed(() => (
+      getDefaultColumnSettings(this.allColumns(), this.enableColumnSelection()))
+    );
+
+    this.gridDataSource = computed(() => (
+      this.datasource()
+        ? { ...this.datasource(), getRows: this.getRows.bind(this) }
+        : undefined
+    ));
+
+    this.initEffects();
   }
 
   ngOnDestroy() {
     this.isDestroyed = true;
-    this.loadCellRendererDataToCacheSub.unsubscribe();
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
   onGridReady(params: GridReadyEvent) {
     this.gridApi = params.api;
-    this.gridApi.setFilterModel(this.filterModel);
-    this.gridApi.setGridOption('datasource', this.gridDataSource);
+    this.gridApi.setFilterModel(this.filterModel());
+    this.gridApi.setGridOption('datasource', this.gridDataSource());
   }
 
   dragStopped(e: DragStoppedEvent) {
@@ -181,18 +174,11 @@ export class DatatableComponent implements OnChanges, OnDestroy {
       return;
     }
 
-    if (this.enableColumnSelection) {
-      const prevSelected = this.colDefs.map((col: ColDef) => (col.colId));
-      const currentSelected = this.getVisibleCols();
+    const currentVisible = this.getVisibleCols();
 
-      if (!isEqual(prevSelected, currentSelected)) {
-        this.datatableColumnSettingsService.updateSelectedAfterColumnMove(this.settingsKey, currentSelected, colId);
-
-        if (!isEqual(prevSelected.sort(), currentSelected.sort())) {
-          this.updateColDefs();
-        }
-      }
-    }
+    this.columnSettings.set(
+      getColumnSettingsAfterColumnMove(this.columnSettings(), currentVisible, colId)
+    );
   }
 
   openColumnSettingsModal() {
@@ -202,52 +188,92 @@ export class DatatableComponent implements OnChanges, OnDestroy {
       modalDialogClass: 'column-settings-modal',
     });
 
-    modalRef.componentInstance.columns = this.allColumns;
-    modalRef.componentInstance.settings =
-      this.datatableColumnSettingsService.getSettings(this.settingsKey);
-    modalRef.componentInstance.defaultSettings = this.getDefaultSettings();
+    modalRef.componentInstance.columns = this.allColumns();
+    modalRef.componentInstance.settings = this.columnSettings();
+    modalRef.componentInstance.defaultSettings = this.defaultColumnSettings();
 
     from(modalRef.result).subscribe({
       next: (settings) => {
-        this.datatableColumnSettingsService.setSettings(
-          this.settingsKey,
-          settings,
-        );
-        this.updateColDefs();
-        this.cdr.markForCheck();
+        this.columnSettings.set(settings);
       },
       error: () => undefined,
     });
   }
 
   exportData() {
-    if (!this.datasource || !this.totalCount) {
+    const datasource = this.datasource();
+    const totalCount = this.totalCount();
+
+    if (!datasource || totalCount === undefined) {
       return;
     }
 
-    this.exportLoading = true;
+    this.exportLoading.set(true);
     this.datatableExportService
       .exportData(
-        this.colDefs,
-        this.datasource,
-        this.totalCount,
-        this.sortModel,
-        this.filterModel,
+        this.colDefs(),
+        datasource,
+        totalCount,
+        this.sortModel(),
+        this.filterModel(),
       )
       .subscribe({
         next: () => {
-          this.exportLoading = false;
-          this.cdr.markForCheck();
+          this.exportLoading.set(false);
         },
         error: () => {
-          this.exportLoading = false;
-          this.cdr.markForCheck();
+          this.exportLoading.set(false);
         },
       });
   }
 
   refresh() {
     this.gridApi?.refreshInfiniteCache();
+  }
+
+  private initEffects() {
+    effect(() => {
+      const defaultSettings = this.defaultColumnSettings();
+
+      let storedSettings: ColumnSettings|undefined;
+      if (this.enableColumnSelection()) {
+        storedSettings = this.settingsStoreService.getStoredColumnSettings(
+          this.settingsKey(),
+          defaultSettings
+        );
+      }
+
+      this.columnSettings.set(storedSettings || defaultSettings);
+    });
+
+    effect(() => {
+      if (this.enableColumnSelection()) {
+        this.settingsStoreService.storeColumnSettings(
+          this.settingsKey(),
+          this.columnSettings()
+        );
+      }
+    });
+
+    effect(() => {
+      this.filterModel.set({
+        ...this.defaultFilterModel(),
+        ...this.settingsStoreService.getStoredFilters(this.settingsKey())
+      });
+      this.gridApi?.setFilterModel(this.filterModel);
+    });
+
+    effect(() => {
+      this.settingsStoreService.storeFilters(
+        this.settingsKey(),
+        this.filterModel(),
+        this.allColumns(),
+      );
+    });
+
+    effect(() => {
+      this.gridApi?.setGridOption('datasource', this.gridDataSource());
+    });
   }
 
   private getRows(params: GetRowsParams) {
@@ -267,47 +293,32 @@ export class DatatableComponent implements OnChanges, OnDestroy {
       params.successCallback(results, totalItems);
     };
 
-    this.datasource?.getRows({ ...params, successCallback });
+    this.datasource()?.getRows({ ...params, successCallback });
   }
 
   private beforeFetchRows(params: GetRowsParams) {
-    this.sortModel = params.sortModel;
-    this.filterModel = params.filterModel;
-    this.datatableFilterStoreService.updateFilters(
-      this.settingsKey,
-      this.filterModel,
-      this.allColumns,
-    );
+    this.sortModel.set(params.sortModel);
+    this.filterModel.set(params.filterModel);
 
-    this.updateTotalCount(undefined);
+    this.totalCount.set(undefined);
     this.updateLoading(true);
   }
 
   private afterFetchRows(results: unknown[], totalItems: number) {
     this.loadCellRendererDataToCache(results);
 
-    this.updateTotalCount(totalItems);
+    this.totalCount.set(totalItems);
     this.updateLoading(false);
   }
 
-  private updateTotalCount(totalCount: number | undefined) {
-    this.ngZone.run(() => {
-      this.totalCount = totalCount;
-      this.cdr.markForCheck();
-    });
-  }
-
   private updateLoading(loading: boolean) {
-    if (!this.gridApi) {
-      return;
-    }
-    this.gridApi.setGridOption('loading', loading);
+    this.gridApi?.setGridOption('loading', loading);
   }
 
   private loadCellRendererDataToCache(rowData: unknown[]) {
     const observables: Observable<unknown>[] = [];
 
-    this.colDefs.forEach((col) => {
+    this.colDefs().forEach((col) => {
       if (col.cellRenderer) {
         observables.push(
           (col.cellRenderer as typeof CellRendererComponent).fetchDataToCache(
@@ -320,90 +331,8 @@ export class DatatableComponent implements OnChanges, OnDestroy {
     });
 
     if (observables.length > 0) {
-      this.loadCellRendererDataToCacheSub.add(
-        forkJoin(observables).subscribe(),
-      );
+      forkJoin(observables).pipe(takeUntil(this.unsubscribe$)).subscribe();
     }
-  }
-
-  private getProcessedColumns(columns: DatatableColumn[]): ColDefWithExtra[] {
-    return columns.map((col) => {
-      const colId = col.colId || col.field;
-      if (!colId) {
-        throw Error('Every column should either have colId or field');
-      }
-      const newCol: ColDefWithExtra = { ...col, colId };
-
-      if (!col.hideDefaultHeaderTooltip) {
-        newCol.headerTooltip = col.headerName;
-      }
-      if (!col.cellRenderer) {
-        newCol.tooltipField = col.field;
-      }
-
-      return newCol;
-    });
-  }
-
-  private updateColDefs() {
-    this.colDefs = this.getColDefsFromColumns(this.allColumns);
-  }
-
-  private getColDefsFromColumns(columns: ColDefWithExtra[]): ColDef[] {
-    if (this.enableColumnSelection) {
-      this.datatableColumnSettingsService.cleanSettings(
-        this.settingsKey,
-        this.allColumns,
-        this.getDefaultSettings()
-      );
-      columns = this.filterAndSortColumns(columns);
-    }
-    return this.removeCustomColumnKeys(columns);
-  }
-
-  private filterAndSortColumns(columns: ColDefWithExtra[]): ColDefWithExtra[] {
-    const settings = this.datatableColumnSettingsService.getSettings(
-      this.settingsKey,
-    );
-    const selected = settings.selected
-      ? settings.selected
-      : this.getDefaultSettings().selected;
-
-    columns = columns.filter(col => (selected.includes(col.colId)));
-    columns.sort(
-      (columnA, columnB) =>
-        selected.indexOf(columnA.colId) - selected.indexOf(columnB.colId),
-    );
-
-    return columns;
-  }
-
-  private removeCustomColumnKeys(columns: ColDefWithExtra[]): ColDef[] {
-    return columns.map((col) => {
-      col = { ...col };
-
-      const customKeys: CustomColumnKeyList = [
-        'hideDefaultHeaderTooltip',
-        'hideDefaultTooltip',
-        'defaultSelected',
-        'rememberFilters',
-      ];
-      for (const key of customKeys) {
-        delete col[key];
-      }
-
-      return col;
-    });
-  }
-
-  private getDefaultSettings(): Required<ColumnSettings> {
-    const selected = this.allColumns
-      .filter(col => col.defaultSelected)
-      .map(col => col.colId);
-
-    const order = this.allColumns.map(col => col.colId);
-
-    return { selected, order };
   }
 
   private getVisibleCols(): string[] {
