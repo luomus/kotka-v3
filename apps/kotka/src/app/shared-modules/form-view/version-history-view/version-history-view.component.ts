@@ -21,7 +21,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { KotkaDocumentObjectType, KotkaDocumentObjectMap } from '@kotka/shared/models';
 import { isEqual } from 'lodash';
-import { Utils } from '../../../shared/services/utils';
+import { navigationEnd$ } from '../../../shared/services/utils';
 import { MainContentComponent } from '@kotka/ui/main-content';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 import { VersionListComponent } from './version-list/version-list.component';
@@ -83,7 +83,7 @@ export class VersionHistoryViewComponent<
   ) {
     this.setRouteParamsIfChanged();
 
-    this.routeSub = Utils.navigationEnd$(this.router).subscribe(() => {
+    this.routeSub = navigationEnd$(this.router).subscribe(() => {
       if (this.setRouteParamsIfChanged()) {
         this.updateInputs();
       }

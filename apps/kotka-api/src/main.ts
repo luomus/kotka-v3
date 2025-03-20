@@ -8,7 +8,7 @@ import { AppModule } from './app/app.module';
 import Redis from 'ioredis';
 import { RedisStore } from 'connect-redis';
 import { AuthenticationService } from './app/authentication/authentication.service';
-import { Person } from '@kotka/shared/models';
+import { ErrorMessages, Person } from '@kotka/shared/models';
 import { REDIS } from './app/shared-modules/redis/redis.constants';
 
 interface UserRequest extends Request {
@@ -89,6 +89,7 @@ async function bootstrap() {
   const externalProxyServer = legacyCreateProxyMiddleware(externalProxyFilter, {
     target: process.env['LAJI_API_URL'],
     changeOrigin: true,
+    selfHandleResponse: true,
     pathRewrite: (path: string, req: UserRequest) => {
       let newPath = path.replace(lajiApiBase, '');
 
@@ -97,16 +98,28 @@ async function bootstrap() {
 
       return newPath;
     },
-    onProxyRes: (proxyRes, req: UserRequest) => {
+    onProxyRes: (proxyRes, req: UserRequest, res) => {
       const data = [];
       proxyRes.on('data', (chunk) => {
         data.push(chunk);
       });
 
       proxyRes.on('end', async () => {
+        const body = Buffer.concat(data);
+
         if (proxyRes.statusCode === 401 || (proxyRes.statusCode === 400 && Buffer.concat(data).toString().includes('INVALID TOKEN'))) {
           authService.invalidateSession(req);
+          res.status(401).json({ message: ErrorMessages.loginRequired, error: 'Unauthorized', statusCode: 401 });
+        } else {
+          // forward source headers
+          Object.keys(proxyRes.headers).forEach((key) => {
+            res.append(key, proxyRes.headers[key]);
+          });
+
+          res.status(proxyRes.statusCode).send(body);
         }
+
+        res.end();
       });
     },
   });

@@ -10,7 +10,7 @@ import {
   shareReplay,
   Subscription,
   switchMap,
-  throwError,
+  throwError
 } from 'rxjs';
 import { distinctUntilChanged, map, take } from 'rxjs/operators';
 import {
@@ -25,6 +25,7 @@ import {
 } from '@kotka/shared/models';
 import { LajiForm, Person, Image } from '@kotka/shared/models';
 import { MediaMetadata } from '@luomus/laji-form/lib/components/LajiForm';
+import { isAuthenticationError } from '../../../shared/services/utils';
 
 export enum FormErrorEnum {
   dataNotFound = 'dataNotFound',
@@ -155,6 +156,9 @@ export class FormViewFacade<
       switchMap(() =>
         this.state$.pipe(
           catchError((err) => {
+            if (isAuthenticationError(err)) {
+              throw err;
+            }
             const errorType =
               err.message === FormErrorEnum.dataNotFound
                 ? FormErrorEnum.dataNotFound
@@ -207,8 +211,8 @@ export class FormViewFacade<
     const id = getId(dataURI);
     return this.apiClient.getDocumentById<T, S>(dataType, id).pipe(
       catchError((err) => {
-        err = err.status === 404 ? FormErrorEnum.dataNotFound : err;
-        return throwError(() => new Error(err));
+        err = err.status === 404 ? new Error(FormErrorEnum.dataNotFound) : err;
+        return throwError(() => err);
       }),
     );
   }

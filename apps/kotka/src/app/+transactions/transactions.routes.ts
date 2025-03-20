@@ -1,8 +1,7 @@
-import { RouterModule, Routes } from '@angular/router';
-import { ModuleWithProviders } from '@angular/core';
+import { Routes } from '@angular/router';
 import { TransactionFormComponent } from './transaction-form/transaction-form.component';
 import { TransactionTableComponent } from './transaction-table/transaction-table.component';
-import { Utils } from '../shared/services/utils';
+import { formMatcher } from '../shared/services/utils';
 import { ComponentCanDeactivateGuard } from '../shared/services/guards/component-can-deactivate.guard';
 import { TransactionVersionHistoryComponent } from './transaction-version-history/transaction-version-history.component';
 
@@ -14,7 +13,7 @@ export const transactionsRoutes: Routes = [
     data: { title: 'Transactions' }
   },
   {
-    matcher: Utils.formMatcher,
+    matcher: formMatcher,
     component: TransactionFormComponent,
     data: {
       add: { title: 'Add transaction' },

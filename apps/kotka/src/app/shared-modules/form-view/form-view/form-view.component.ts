@@ -16,7 +16,7 @@ import {
   KotkaDocumentObjectMap,
   LajiForm,
 } from '@kotka/shared/models';
-import { from, Observable, Subscription, switchMap } from 'rxjs';
+import { catchError, EMPTY, from, Observable, Subscription, switchMap } from 'rxjs';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ErrorMessages } from '@kotka/shared/models';
 import {
@@ -33,7 +33,7 @@ import {
   ToastService,
   DialogService,
 } from '@kotka/ui/util-services';
-import { Utils } from '../../../shared/services/utils';
+import { navigationEnd$ } from '../../../shared/services/utils';
 import { getUri } from '@kotka/shared/utils';
 import { ApiClient } from '@kotka/ui/data-services';
 import { MainContentComponent } from '@kotka/ui/main-content';
@@ -278,7 +278,7 @@ export class FormViewComponent<
 
   private initSubscriptions() {
     this.subscription.add(
-      Utils.navigationEnd$(this.router).subscribe(() => {
+      navigationEnd$(this.router).subscribe(() => {
         if (this.setRouteParamsIfChanged()) {
           this.updateInputs();
         }
@@ -286,21 +286,21 @@ export class FormViewComponent<
     );
 
     this.subscription.add(
-      this.formViewFacade.state$.subscribe((state) => {
+      this.formViewFacade.state$.pipe(catchError(() => EMPTY)).subscribe((state) => {
         this.state = state;
         this.cdr.markForCheck();
       }),
     );
 
     this.subscription.add(
-      this.formViewFacade.disabled$.subscribe((disabled) => {
+      this.formViewFacade.disabled$.pipe(catchError(() => EMPTY)).subscribe((disabled) => {
         this.disabledChange.emit(disabled);
         this.cdr.markForCheck();
       }),
     );
 
     this.subscription.add(
-      this.formViewFacade.formData$.subscribe((formData) => {
+      this.formViewFacade.formData$.pipe(catchError(() => EMPTY)).subscribe((formData) => {
         this.formDataChange.emit(formData);
         this.cdr.markForCheck();
       }),

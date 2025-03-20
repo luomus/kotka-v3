@@ -30,7 +30,8 @@ export interface StoreQueryResult<T> {
 
 export enum ErrorMessages {
   deletionTargetInUse = 'Deletion target is in use.',
-  missingIntellectualOwner = 'Missing an intellectualOwner'
+  missingIntellectualOwner = 'Missing an intellectualOwner',
+  loginRequired = 'Login is required'
 }
 
 export interface LoginResult {

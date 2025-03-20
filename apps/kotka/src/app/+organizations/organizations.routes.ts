@@ -1,8 +1,7 @@
-import { RouterModule, Routes } from '@angular/router';
-import { ModuleWithProviders } from '@angular/core';
+import { Routes } from '@angular/router';
 import { OrganizationTableComponent } from './organization-table/organization-table.component';
 import { OrganizationFormComponent } from './organization-form/organization-form.component';
-import { Utils } from '../shared/services/utils';
+import { formMatcher } from '../shared/services/utils';
 import { ComponentCanDeactivateGuard } from '../shared/services/guards/component-can-deactivate.guard';
 import { OrganizationVersionHistoryComponent } from './organization-version-history/organization-version-history.component';
 
@@ -14,7 +13,7 @@ export const organizationsRoutes: Routes = [
     data: { title: 'Organizations' }
   },
   {
-    matcher: Utils.formMatcher,
+    matcher: formMatcher,
     component: OrganizationFormComponent,
     data: {
       add: { title: 'Add organization' },

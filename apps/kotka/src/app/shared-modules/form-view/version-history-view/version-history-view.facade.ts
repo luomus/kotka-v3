@@ -19,7 +19,7 @@ import {
   LajiForm,
   StoreVersion,
 } from '@kotka/shared/models';
-import { Utils } from '../../../shared/services/utils';
+import { isAuthenticationError, startWithUndefined } from '../../../shared/services/utils';
 import { getId } from '@kotka/shared/utils';
 
 export enum VersionHistoryErrorEnum {
@@ -134,6 +134,9 @@ export class VersionHistoryViewFacade<
 
         return obs$.pipe(
           catchError((err) => {
+            if (isAuthenticationError(err)) {
+              throw err;
+            }
             const errorType =
               err.message === VersionHistoryErrorEnum.dataNotFound
                 ? VersionHistoryErrorEnum.dataNotFound
@@ -154,7 +157,7 @@ export class VersionHistoryViewFacade<
           inputs1.dataType === inputs2.dataType,
       ),
       switchMap((inputs) =>
-        Utils.startWithUndefined(
+        startWithUndefined(
           this.getVersionListForDocument$(inputs.dataType, inputs.dataURI),
         ),
       ),
@@ -165,7 +168,7 @@ export class VersionHistoryViewFacade<
   private getForm$(): Observable<LajiForm.SchemaForm | undefined> {
     return this.inputs$.pipe(
       switchMap((inputs) =>
-        Utils.startWithUndefined(
+        startWithUndefined(
           this.formService.getFormWithUserContext(inputs.formId),
         ),
       ),
@@ -175,7 +178,7 @@ export class VersionHistoryViewFacade<
   private getFormInJsonFormat$(): Observable<LajiForm.JsonForm | undefined> {
     return this.inputs$.pipe(
       switchMap((inputs) =>
-        Utils.startWithUndefined(
+        startWithUndefined(
           this.formService.getFormInJsonFormat(inputs.formId),
         ),
       ),
@@ -185,7 +188,7 @@ export class VersionHistoryViewFacade<
   private getData$(): Observable<S | undefined> {
     return this.inputs$.pipe(
       switchMap((inputs) =>
-        Utils.startWithUndefined(
+        startWithUndefined(
           this.getVersionData$(inputs.dataType, inputs.dataURI, inputs.version),
         ),
       ),
@@ -197,7 +200,7 @@ export class VersionHistoryViewFacade<
   > {
     return this.inputs$.pipe(
       switchMap((inputs) =>
-        Utils.startWithUndefined(
+        startWithUndefined(
           this.getVersionDifference$(
             inputs.dataType,
             inputs.dataURI,
@@ -219,8 +222,8 @@ export class VersionHistoryViewFacade<
     const id = getId(dataURI);
     return this.apiClient.getDocumentVersionList(dataType, id).pipe(
       catchError((err) => {
-        err = err.status === 404 ? VersionHistoryErrorEnum.dataNotFound : err;
-        return throwError(() => new Error(err));
+        err = err.status === 404 ? new Error(VersionHistoryErrorEnum.dataNotFound) : err;
+        return throwError(() => err);
       }),
     );
   }
@@ -239,8 +242,8 @@ export class VersionHistoryViewFacade<
       .getDocumentVersionData<T, S>(dataType, id, version)
       .pipe(
         catchError((err) => {
-          err = err.status === 404 ? VersionHistoryErrorEnum.dataNotFound : err;
-          return throwError(() => new Error(err));
+          err = err.status === 404 ? new Error(VersionHistoryErrorEnum.dataNotFound) : err;
+          return throwError(() => err);
         }),
       );
   }

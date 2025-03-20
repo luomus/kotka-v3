@@ -28,8 +28,8 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
     this.route.queryParams.subscribe((params) => {
-      const error = params['error'];
-      const next = params['next'];
+      const error: string = params['error'];
+      const next: string = params['next'];
 
       if (next) {
         this.userService.login().subscribe({
@@ -37,30 +37,26 @@ export class LoginComponent implements OnInit {
             this.router.navigateByUrl(next);
           },
           error: (err) => {
-            this.errorMsg =
-              err.status === 401
-                ? 'Missing access rights to application'
-                : 'Unexpected error occurred';
-            this.cdr.markForCheck();
-            this.router.navigate([], {
-              relativeTo: this.route,
-              queryParams: {},
-            });
+            this.onError(err.status);
           },
         });
       } else if (error) {
-        this.errorMsg =
-          error === 401
-            ? 'Missing access rights to application'
-            : 'Unexpected error occurred';
-        this.cdr.markForCheck();
-        this.router.navigate([], {
-          relativeTo: this.route,
-          queryParams: {},
-        });
+        this.onError(parseInt(error, 10));
       } else if (!this.errorMsg) {
         this.router.navigate(['/']);
       }
+    });
+  }
+
+  private onError(errorStatus: number) {
+    this.errorMsg =
+      errorStatus === 401
+        ? 'Missing access rights to application'
+        : 'Unexpected error occurred';
+    this.cdr.markForCheck();
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {},
     });
   }
 }
