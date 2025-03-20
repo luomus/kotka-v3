@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import session from 'express-session';
 import passport from 'passport';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { legacyCreateProxyMiddleware } from 'http-proxy-middleware';
 import { AppModule } from './app/app.module';
 import Redis from 'ioredis';
@@ -98,7 +98,7 @@ async function bootstrap() {
 
       return newPath;
     },
-    onProxyRes: (proxyRes, req: UserRequest, res) => {
+    onProxyRes: (proxyRes, req: UserRequest, res: Response) => {
       const data = [];
       proxyRes.on('data', (chunk) => {
         data.push(chunk);
