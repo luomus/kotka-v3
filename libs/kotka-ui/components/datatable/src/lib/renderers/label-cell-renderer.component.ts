@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Injector } from '@angular/core';
 import { CellRendererComponent } from './cell-renderer';
 import { Observable, of } from 'rxjs';
 import { LabelKey, LabelService } from '@kotka/ui/data-services';
-import { DatatableColumn } from '../models/models';
+import { ColDef } from '../models/models';
 import { JoinPipe, LabelPipe } from '@kotka/ui/pipes';
 
 @Component({
@@ -34,7 +34,7 @@ export class LabelCellRendererComponent extends CellRendererComponent {
   }
 
   static override fetchDataNeededForExport(
-    col: DatatableColumn,
+    col: ColDef,
     data: any[],
     injector: Injector,
   ): Observable<Record<string, string>> {
@@ -62,7 +62,7 @@ export class LabelCellRendererComponent extends CellRendererComponent {
   }
 
   static override fetchDataToCache(
-    col: DatatableColumn,
+    col: ColDef,
     data: any[],
     injector: Injector,
   ): Observable<Record<string, string>> {

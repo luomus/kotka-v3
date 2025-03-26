@@ -13,7 +13,7 @@ import {
   RowSelectedEvent,
 } from '@ag-grid-community/core';
 import { combineLatest, ReplaySubject, take } from 'rxjs';
-import { ColumnSettings, DatatableColumn } from '../models/models';
+import { ColDefWithExtra, ColumnSettings } from '../models/models';
 import { AgGridAngular } from '@ag-grid-community/angular';
 
 @Component({
@@ -24,8 +24,8 @@ import { AgGridAngular } from '@ag-grid-community/angular';
   imports: [AgGridAngular],
 })
 export class ColumnSettingsModalComponent {
-  columnsSubject: ReplaySubject<DatatableColumn[]> = new ReplaySubject(1);
-  @Input() set columns(columns: DatatableColumn[]) {
+  columnsSubject: ReplaySubject<ColDefWithExtra[]> = new ReplaySubject(1);
+  @Input() set columns(columns: ColDefWithExtra[]) {
     this.columnsSubject.next(columns);
   }
 
@@ -40,14 +40,14 @@ export class ColumnSettingsModalComponent {
   }
 
   colDefs: ColDef[] = [];
-  rowData: DatatableColumn[] = [];
+  rowData: ColDefWithExtra[] = [];
 
   gridOptions: GridOptions = {
     rowDragManaged: true,
     animateRows: true,
   };
 
-  private allColumns: DatatableColumn[] = [];
+  private allColumns: ColDefWithExtra[] = [];
   private initialSettings?: ColumnSettings;
   private _defaultSettings?: ColumnSettings;
   private rowIsDragged = false;
@@ -65,7 +65,7 @@ export class ColumnSettingsModalComponent {
       .pipe(take(1))
       .subscribe(
         ([columns, settings, defaultSettings]: [
-          DatatableColumn[],
+          ColDefWithExtra[],
           ColumnSettings,
           ColumnSettings,
         ]) => {
@@ -201,8 +201,8 @@ export class ColumnSettingsModalComponent {
   }
 
   private comparator(
-    columnA: DatatableColumn,
-    columnB: DatatableColumn,
+    columnA: ColDefWithExtra,
+    columnB: ColDefWithExtra,
   ): number {
     if (!this.initialSettings?.order) {
       return 0;
@@ -210,10 +210,7 @@ export class ColumnSettingsModalComponent {
 
     const order = this.initialSettings.order;
 
-    const colIdA = columnA.colId!;
-    const colIdB = columnB.colId!;
-
-    return order.indexOf(colIdA) - order.indexOf(colIdB);
+    return order.indexOf(columnA.colId) - order.indexOf(columnB.colId);
   }
 
   private setInitialSelected() {
@@ -224,7 +221,7 @@ export class ColumnSettingsModalComponent {
     const selected = this.initialSettings.selected;
 
     this.gridApi.forEachNode((node) => {
-      if (selected.includes(node.data.colId!)) {
+      if (selected.includes(node.data.colId)) {
         node.setSelected(true);
       }
     });

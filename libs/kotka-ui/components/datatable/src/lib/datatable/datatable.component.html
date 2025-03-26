@@ -1,52 +1,41 @@
 <kui-total-count
-  [value]="totalCount"
-  [dataTypeName]="dataTypeName"
-  [dataTypeNamePlural]="dataTypeNamePlural"
+  [value]="totalCount()"
+  [dataTypeName]="dataTypeName()"
+  [dataTypeNamePlural]="dataTypeNamePlural()"
 ></kui-total-count>
 <div class="clearfix mb-1">
   <div class="float-sm-end">
-    <button
-      *ngIf="enableFileExport"
-      class="btn btn-secondary position-relative"
-      (click)="exportData()"
-      [disabled]="exportLoading"
-      data-cy="export-data"
-    >
-      <kui-spinner [overlay]="true" [spinning]="exportLoading">
-        Export data
-      </kui-spinner>
-    </button>
-    <button
-      *ngIf="enableColumnSelection"
-      class="btn btn-secondary"
-      (click)="openColumnSettingsModal()"
-      data-cy="select-columns"
-    >
-      <i class="fa-solid fa-gear"></i> Select columns
-    </button>
+    @if (enableFileExport()) {
+      <button
+        class="btn btn-secondary position-relative"
+        (click)="exportData()"
+        [disabled]="exportLoading()"
+        data-cy="export-data"
+      >
+        <kui-spinner [overlay]="true" [spinning]="exportLoading()">
+          Export data
+        </kui-spinner>
+      </button>
+    }
+    @if (enableColumnSelection()) {
+      <button
+        class="btn btn-secondary"
+        (click)="openColumnSettingsModal()"
+        data-cy="select-columns"
+      >
+        <i class="fa-solid fa-gear"></i> Select columns
+      </button>
+    }
   </div>
 </div>
 <ag-grid-angular
   style="width: 100%; height: 100%"
   class="ag-theme-alpine grid"
-  [gridOptions]="gridOptions"
   [modules]="modules"
   [components]="components"
-  [columnDefs]="colDefs"
-  [defaultColDef]="defaultColDef"
-  [rowBuffer]="rowBuffer"
-  [rowSelection]="rowSelection"
-  [rowModelType]="rowModelType"
-  [paginationPageSize]="paginationPageSize"
-  [cacheOverflowSize]="cacheOverflowSize"
-  [maxConcurrentDatasourceRequests]="maxConcurrentDatasourceRequests"
-  [infiniteInitialRowCount]="infiniteInitialRowCount"
-  [maxBlocksInCache]="maxBlocksInCache"
-  [suppressFieldDotNotation]="false"
-  [enableBrowserTooltips]="true"
-  [enableCellTextSelection]="true"
-  (displayedColumnsChanged)="columnUpdated()"
-  (columnMoved)="columnUpdated()"
-  (rowClicked)="rowClicked.emit($event)"
+  [gridOptions]="gridOptions"
+  [columnDefs]="colDefs()"
+  [defaultColDef]="defaultColDef()"
+  (dragStopped)="dragStopped($event)"
   (gridReady)="onGridReady($event)"
 ></ag-grid-angular>

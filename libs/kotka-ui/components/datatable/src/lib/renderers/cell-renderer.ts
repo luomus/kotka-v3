@@ -1,7 +1,7 @@
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { Observable, of } from 'rxjs';
-import { DatatableColumn } from '../models/models';
+import { ColDef } from '../models/models';
 import { Injector } from '@angular/core';
 
 export class CellRendererComponent<
@@ -33,12 +33,12 @@ export class CellRendererComponent<
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  static fetchDataNeededForExport(col: DatatableColumn, data: any[], injector: Injector): Observable<any> {
+  static fetchDataNeededForExport(col: ColDef, data: any[], injector: Injector): Observable<any> {
     return of(undefined);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  static fetchDataToCache(col: DatatableColumn, data: any[], injector: Injector): Observable<any> {
+  static fetchDataToCache(col: ColDef, data: any[], injector: Injector): Observable<any> {
     return of(undefined);
   }
 }

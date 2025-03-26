@@ -47,7 +47,7 @@ export class BooleanFloatingFilterComponent
     this.params = params;
   }
 
-  onParentModelChanged(parentModel: BooleanFilterModel | null) {
+  onParentModelChanged(parentModel?: BooleanFilterModel | null) {
     if (!parentModel) {
       this.value = undefined;
     } else {

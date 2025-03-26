@@ -57,8 +57,8 @@ export class BooleanFilterComponent implements IFilterAngularComp {
     };
   }
 
-  setModel(model: BooleanFilterModel | null) {
-    this.value = model === null ? undefined : model.filter;
+  setModel(model?: BooleanFilterModel | null) {
+    this.value = model ? model.filter : undefined;
   }
 
   updateFilter() {

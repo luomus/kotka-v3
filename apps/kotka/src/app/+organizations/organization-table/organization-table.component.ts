@@ -99,19 +99,6 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
       field: 'country',
     },
     {
-      headerName: 'Hidden',
-      field: 'hidden',
-      cellRenderer: LabelCellRendererComponent,
-      filter: BooleanFilterComponent,
-      floatingFilterComponent: BooleanFloatingFilterComponent,
-      suppressFloatingFilterButton: true,
-      suppressHeaderFilterButton: true,
-      width: 100,
-      minWidth: 100,
-      flex: 0,
-      defaultSelected: true,
-    },
-    {
       headerName: 'Tags',
       field: 'datasetID',
       cellRenderer: LabelCellRendererComponent,
@@ -132,6 +119,19 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
         inRangeFloatingFilterDateFormat: 'DD.MM.YYYY',
       },
     },
+    {
+      headerName: 'Hidden',
+      field: 'hidden',
+      cellRenderer: LabelCellRendererComponent,
+      filter: BooleanFilterComponent,
+      floatingFilterComponent: BooleanFloatingFilterComponent,
+      suppressFloatingFilterButton: true,
+      suppressHeaderFilterButton: true,
+      width: 100,
+      minWidth: 100,
+      flex: 0,
+      defaultSelected: true,
+    }
   ];
 
   defaultFilterModel: DatatableFilter = {

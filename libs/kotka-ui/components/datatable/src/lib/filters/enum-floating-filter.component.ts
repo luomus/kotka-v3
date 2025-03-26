@@ -60,7 +60,7 @@ export class EnumFloatingFilterComponent
     this.valueOptions = { ...params.field.options?.value_options, '': '' };
   }
 
-  onParentModelChanged(parentModel: TextFilterModel | null) {
+  onParentModelChanged(parentModel?: TextFilterModel | null) {
     if (!parentModel?.filter) {
       this.currentFilter = undefined;
     } else {
