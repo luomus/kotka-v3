@@ -100,7 +100,7 @@ export class MigrateCommand {
         required: false
       },
       {
-        flags: '-dr, --dry-run',
+        flags: '--dr, --dry-run',
         description: 'Selecting if converted data is only shown, or sent to laji-store.',
         required: false
       }
@@ -195,8 +195,8 @@ export class MigrateCommand {
             data['dateOrdersDue'] = dateParts.reverse().join('-');
           }
 
-            data['dateCreated'] = new Date(data['dateCreated']).toISOString();
-            data['dateEdited'] = new Date(data['dateEdited']).toISOString();
+          data['dateCreated'] = data['dateCreated'] ? new Date(data['dateCreated']).toISOString() : (data['dateEdited'] ? new Date(data['dateEdited']).toISOString() : undefined);
+          data['dateEdited'] = data['dateEdited'] ? new Date(data['dateEdited']).toISOString() : (data['dateCreated'] ? new Date(data['dateCreated']).toISOString() : undefined);
         };
 
         const migrateOrganizationHidden = (data: Organization) => {

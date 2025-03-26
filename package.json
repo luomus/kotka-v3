@@ -63,7 +63,7 @@
     "nestjs-console": "^10.0.0",
     "ngx-quicklink": "^0.4.7",
     "ngx-webstorage": "^19.0.1",
-    "ora": "^8.2.0",
+    "ora": "^5.4.1",
     "passport": "^0.7.0",
     "passport-custom": "^1.1.1",
     "rdflib": "^2.2.37",
