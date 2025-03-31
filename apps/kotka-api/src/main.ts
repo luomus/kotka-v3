@@ -98,30 +98,47 @@ async function bootstrap() {
 
       return newPath;
     },
-    onProxyRes: (proxyRes, req: UserRequest, res: Response) => {
-      const data = [];
-      proxyRes.on('data', (chunk) => {
-        data.push(chunk);
-      });
-
-      proxyRes.on('end', async () => {
-        const body = Buffer.concat(data);
-
-        if (proxyRes.statusCode === 401 || (proxyRes.statusCode === 400 && Buffer.concat(data).toString().includes('INVALID TOKEN'))) {
-          authService.invalidateSession(req);
-          res.status(401).json({ message: ErrorMessages.loginRequired, error: 'Unauthorized', statusCode: 401 });
-        } else {
-          // forward source headers
+    on: {
+      proxyRes: (proxyRes, req: UserRequest, res: Response) => {
+        const forwardAllHeaders = () => {
           Object.keys(proxyRes.headers).forEach((key) => {
             res.append(key, proxyRes.headers[key]);
           });
+        };
 
-          res.status(proxyRes.statusCode).send(body);
+        if (req.path === '/html-to-pdf') {
+          forwardAllHeaders();
+          res.status(proxyRes.statusCode);
+
+          proxyRes.on('data', (chunk) => {
+            res.write(chunk);
+          });
+
+          proxyRes.on('end', async () => {
+            res.end();
+          });
+        } else {
+          const data = [];
+          proxyRes.on('data', (chunk) => {
+            data.push(chunk);
+          });
+
+          proxyRes.on('end', async () => {
+            const body = Buffer.concat(data);
+
+            if (proxyRes.statusCode === 401 || (proxyRes.statusCode === 400 && Buffer.concat(data).toString().includes('INVALID TOKEN'))) {
+              authService.invalidateSession(req);
+              res.status(401).json({ message: ErrorMessages.loginRequired, error: 'Unauthorized', statusCode: 401 });
+            } else {
+              forwardAllHeaders();
+              res.status(proxyRes.statusCode).send(body);
+            }
+
+            res.end();
+          });
         }
-
-        res.end();
-      });
-    },
+      }
+    }
   });
 
   app.use(lajiApiBase, externalProxyServer);
