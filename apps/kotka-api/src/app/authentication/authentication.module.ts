@@ -24,7 +24,8 @@ import { LoginExceptionsFilter } from './loginExceptions.filter';
       LoginExceptionsFilter
     ],
     exports: [
-      AuthenticatePersonTokenGuard
+      AuthenticatePersonTokenGuard,
+      AuthenticationService
     ]
 })
 export class AuthenticationModule {}

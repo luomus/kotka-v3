@@ -19,6 +19,7 @@ import { redisInsStore } from 'cache-manager-ioredis-yet';
 import { REDIS } from './shared-modules/redis/redis.constants';
 import Redis from 'ioredis';
 import { ScheduleModule } from '@nestjs/schedule';
+import { LajiApiModule } from './laji-api/laji-api.module';
 
 @Module({
   imports: [
@@ -46,7 +47,8 @@ import { ScheduleModule } from '@nestjs/schedule';
     MediaModule,
     OldKotkaModule,
     OrganizationModule,
-    CollectionModule
+    CollectionModule,
+    LajiApiModule
   ],
   controllers: [],
   providers: []
