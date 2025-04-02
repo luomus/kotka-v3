@@ -16,6 +16,8 @@ import { JSONPath } from 'jsonpath-plus';
   providedIn: 'root',
 })
 export class DatatableExportService {
+  private maxFetchRowCount = 1000;
+
   constructor(
     private exportService: ExportService,
     private injector: Injector,
@@ -124,11 +126,18 @@ export class DatatableExportService {
     totalCount: number,
     sortModel: SortModel[],
     filterModel: FilterModel,
+    startRow = 0,
+    endRow = this.maxFetchRowCount,
+    results: any[] = []
   ): Observable<any[]> {
-    return new Observable((observer) => {
+    if (totalCount === 0) {
+      return of(results);
+    }
+
+    return new Observable<any[]>((observer) => {
       const params: GetRowsParams = {
-        startRow: 0,
-        endRow: totalCount,
+        startRow: startRow,
+        endRow: endRow,
         sortModel,
         successCallback: (data: any[]) => {
           observer.next(data);
@@ -141,6 +150,22 @@ export class DatatableExportService {
       };
 
       datasource.getRows(params);
-    });
+    }).pipe(
+      switchMap((result: any[]) => {
+        if (result.length === 0) {
+          throw new Error('Fetching data failed!');
+        }
+
+        results = results.concat(result);
+
+        if (results.length < totalCount) {
+          return this.fetchRawData(
+            datasource, totalCount, sortModel, filterModel, endRow, endRow + this.maxFetchRowCount, results
+          );
+        }
+
+        return of(results);
+      })
+    );
   }
 }
