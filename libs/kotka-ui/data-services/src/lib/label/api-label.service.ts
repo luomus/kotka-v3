@@ -11,8 +11,12 @@ import {
 import { map, share, tap } from 'rxjs/operators';
 import { UserService } from '../user.service';
 import { ApiClient } from '../api-client';
-import { Collection, Dataset, Organization } from '@luomus/laji-schema/models';
-import { KotkaDocumentObjectType } from '@kotka/shared/models';
+import { Collection } from '@luomus/laji-schema/models';
+import {
+  KotkaDocumentObject,
+  KotkaDocumentObjectType,
+} from '@kotka/shared/models';
+import { JSONPath } from 'jsonpath-plus';
 
 export type ApiLabelType = 'person' | 'organization' | 'collection' | 'dataset';
 
@@ -198,23 +202,16 @@ export class ApiLabelService {
     keys: string[],
     type: ApiLabelType,
   ): Observable<{ key: string; value: string }[]> {
-    let observable: Observable<{ key: string; value: string }[]>;
-
     if (type === 'person') {
       throw new Error('The method is missing an implementation for persons!');
     } else if (type === 'organization') {
-      observable = this.apiCient
-        .getDocumentsById(KotkaDocumentObjectType.organization, keys)
-        .pipe(
-          map((organizations) =>
-            organizations.map((organization: Organization) => ({
-              key: organization.id!,
-              value: organization.fullName?.en || organization.id!,
-            })),
-          ),
-        );
+      return this.fetchKotkaDocumentLabels(
+        KotkaDocumentObjectType.organization,
+        keys,
+        'fullName.en',
+      );
     } else if (type === 'collection') {
-      observable = this.apiCient.getCollections(keys).pipe(
+      return this.apiCient.getCollections(keys).pipe(
         map((collections) =>
           collections.map((collection: Collection) => ({
             key: collection.id!,
@@ -223,18 +220,27 @@ export class ApiLabelService {
         ),
       );
     } else {
-      observable = this.apiCient
-        .getDocumentsById(KotkaDocumentObjectType.dataset, keys)
-        .pipe(
-          map((datasets) =>
-            datasets.map((dataset: Dataset) => ({
-              key: dataset.id!,
-              value: dataset.datasetName.en || dataset.id!,
-            })),
-          ),
-        );
+      return this.fetchKotkaDocumentLabels(
+        KotkaDocumentObjectType.dataset,
+        keys,
+        'datasetName.en'
+      );
     }
+  }
 
-    return observable;
+  private fetchKotkaDocumentLabels(
+    type: KotkaDocumentObjectType,
+    keys: string[],
+    labelField: string,
+  ): Observable<{ key: string; value: string }[]> {
+    return this.apiCient.getDocumentsById(type, keys, ['id', labelField]).pipe(
+      map((docs) =>
+        docs.map((doc: Partial<KotkaDocumentObject>) => ({
+          key: doc.id!,
+          value:
+            JSONPath({ path: labelField, json: doc, wrap: false }) || doc.id!,
+        })),
+      ),
+    );
   }
 }

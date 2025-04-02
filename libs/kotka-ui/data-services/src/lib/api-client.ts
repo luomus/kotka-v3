@@ -63,13 +63,16 @@ export class ApiClient {
   getDocumentList<
     T extends KotkaDocumentObjectType,
     S extends KotkaDocumentObjectMap[T],
+    X extends string[]|undefined = undefined,
+    Y extends X extends string[] ? Partial<S> : S = S
   >(
     type: T,
     page = 1,
     pageSize = 100,
     sort?: string,
     searchQuery?: string,
-  ): Observable<ListResponse<S>> {
+    fields?: X
+  ): Observable<ListResponse<Y>> {
     let params = new HttpParams().set('page', page).set('page_size', pageSize);
     if (sort) {
       params = params.set('sort', sort);
@@ -77,34 +80,41 @@ export class ApiClient {
     if (searchQuery) {
       params = params.set('q', searchQuery);
     }
-    return this.httpClient.get<ListResponse<S>>(path + type, { params });
+    if (fields) {
+      params = params.set('fields', fields.join(','));
+    }
+    return this.httpClient.get<ListResponse<Y>>(path + type, { params });
   }
 
   getDocumentsById<
     T extends KotkaDocumentObjectType,
     S extends KotkaDocumentObjectMap[T],
+    X extends string[]|undefined = undefined,
+    Y extends X extends string[] ? Partial<S> : S = S
   >(
     type: T,
     ids: string[],
+    fields?: X,
     page = 1,
     pageSize = 1000,
-    results: S[] = [],
-  ): Observable<S[]> {
+    results: Y[] = [],
+  ): Observable<Y[]> {
     const searchQuery = ids
       .filter((id) => !!id)
       .map((id) => `id:${id}`)
       .join(' OR ');
-    return this.getDocumentList<T, S>(
+    return this.getDocumentList<T, S, X, Y>(
       type,
       page,
       pageSize,
       undefined,
       searchQuery,
+      fields
     ).pipe(
       switchMap((result) => {
         results = results.concat(result.member);
         if (result.currentPage < result.lastPage) {
-          return this.getDocumentsById(type, ids, page + 1, pageSize, results);
+          return this.getDocumentsById(type, ids, fields, page + 1, pageSize, results);
         }
         return of(results);
       }),
