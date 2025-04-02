@@ -9,8 +9,14 @@ import { provideNgxWebstorage, withLocalStorage, withNgxWebstorageConfig } from 
 import { ErrorHandlerService } from './app/shared/services/error-handler/error-handler.service';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { ConsoleLogger, HttpLogger, ILogger, Logger } from '@kotka/ui/util-services';
-import { HttpClient, provideHttpClient } from '@angular/common/http';
+import {
+  HTTP_INTERCEPTORS,
+  HttpClient,
+  provideHttpClient,
+  withInterceptorsFromDi
+} from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { HttpErrorInterceptor } from './app/shared/services/interceptors/http-error.interceptor';
 
 if (environment.production) {
   enableProdMode();
@@ -26,7 +32,7 @@ function createLoggerLoader(httpClient: HttpClient): ILogger {
 bootstrapApplication(AppComponent, {
   providers: [
     provideRouter(routes, withPreloading(QuicklinkStrategy), withEnabledBlockingInitialNavigation()),
-    provideHttpClient(),
+    provideHttpClient(withInterceptorsFromDi()),
     provideAnimations(),
     provideNgxWebstorage(
       withNgxWebstorageConfig({ prefix: 'kotka-', separator: '' }),
@@ -38,6 +44,11 @@ bootstrapApplication(AppComponent, {
       provide: Logger,
       deps: [HttpClient],
       useFactory: createLoggerLoader,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpErrorInterceptor,
+      multi: true
     },
     { provide: 'Window', useValue: window }
   ]

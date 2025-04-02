@@ -24,7 +24,3 @@ export function navigationEnd$(router: Router): Observable<void> {
 export function startWithUndefined<T>(observable: Observable<T>): Observable<T|undefined> {
   return concat(of(undefined), observable);
 }
-
-export function isAuthenticationError(error: any): boolean {
-  return error.status === 401 && error.error?.message === ErrorMessages.loginRequired;
-}

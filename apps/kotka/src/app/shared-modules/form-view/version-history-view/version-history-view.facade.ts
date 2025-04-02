@@ -19,7 +19,7 @@ import {
   LajiForm,
   StoreVersion,
 } from '@kotka/shared/models';
-import { isAuthenticationError, startWithUndefined } from '../../../shared/services/utils';
+import { startWithUndefined } from '../../../shared/services/utils';
 import { getId } from '@kotka/shared/utils';
 
 export enum VersionHistoryErrorEnum {
@@ -134,9 +134,6 @@ export class VersionHistoryViewFacade<
 
         return obs$.pipe(
           catchError((err) => {
-            if (isAuthenticationError(err)) {
-              throw err;
-            }
             const errorType =
               err.message === VersionHistoryErrorEnum.dataNotFound
                 ? VersionHistoryErrorEnum.dataNotFound

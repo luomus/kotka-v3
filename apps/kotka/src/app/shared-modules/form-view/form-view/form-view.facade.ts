@@ -25,7 +25,6 @@ import {
 } from '@kotka/shared/models';
 import { LajiForm, Person, Image } from '@kotka/shared/models';
 import { MediaMetadata } from '@luomus/laji-form/lib/components/LajiForm';
-import { isAuthenticationError } from '../../../shared/services/utils';
 
 export enum FormErrorEnum {
   dataNotFound = 'dataNotFound',
@@ -156,9 +155,6 @@ export class FormViewFacade<
       switchMap(() =>
         this.state$.pipe(
           catchError((err) => {
-            if (isAuthenticationError(err)) {
-              throw err;
-            }
             const errorType =
               err.message === FormErrorEnum.dataNotFound
                 ? FormErrorEnum.dataNotFound

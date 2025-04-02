@@ -3,7 +3,6 @@ import { ToastService, Logger } from '@kotka/ui/util-services';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { UserService } from '@kotka/ui/data-services';
 import { Router } from '@angular/router';
-import { isAuthenticationError } from '../utils';
 
 let errorSent = false;
 
@@ -23,13 +22,6 @@ export class ErrorHandlerService extends ErrorHandler {
         typeof error.message === 'string' &&
         error.message.length === 0)
     ) {
-      return super.handleError(error);
-    }
-
-    if (isAuthenticationError(error)) {
-      const router = this.injector.get(Router);
-      const userService = this.injector.get(UserService);
-      userService.redirectToLogin(router.url);
       return super.handleError(error);
     }
 
