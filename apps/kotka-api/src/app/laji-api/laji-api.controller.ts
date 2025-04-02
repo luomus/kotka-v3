@@ -24,7 +24,7 @@ export class LajiApiController {
     this.lajiApiProxy = this.getLajiApiProxy();
   }
 
-  @Get(['autocomplete{*all}', 'forms{*all}', 'organization{*all}', 'person{*all}', 'areas{*all}'])
+  @Get(['forms{*all}', 'person{*all}', 'areas{*all}'])
   proxyGetRequest(@Req() req: Request, @Res() res: Response) {
     void this.lajiApiProxy(req, res);
   }
