@@ -29,7 +29,7 @@ async function bootstrap() {
       cookie: {
         sameSite: true,
         secure: process.env['SECURE_COOKIE'] === 'true',
-        maxAge: 14 * 24 * 3600 * 1000
+        maxAge: 60 * 1000
       }
     })
   );
