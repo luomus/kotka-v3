@@ -100,7 +100,7 @@ export class MigrateCommand {
         required: false
       },
       {
-        flags: '-dr, --dry-run',
+        flags: '--dr, --dry-run',
         description: 'Selecting if converted data is only shown, or sent to laji-store.',
         required: false
       }
@@ -110,12 +110,26 @@ export class MigrateCommand {
   async migrateData(type: string, options: Options) {
     const limit = this.parseOptionToInt(options.limit);
     let offset = this.parseOptionToInt(options.offset);
-    let stop = false;
     let maxSeq = 0;
     let count = 0;
 
     const spin = ora();
     spin.start('Transfering items from Triplestore to laji-store');
+
+    const foundQnames = [];
+    const parseNestedOrganizationIds = (org: Record<string, any>, orgList: Array<string>) => {
+      if (org['MZ.owner'] && org['MZ.owner']['MOS.organization']) {
+        const owner = org['MZ.owner']['MOS.organization']['rdf:about'];
+
+        if (!foundQnames.includes(owner)) {
+          foundQnames.push(owner);
+
+          orgList.push(getId(owner));
+        }
+
+        parseNestedOrganizationIds(org['MZ.owner']['MOS.organization'], orgList);
+      }
+    };
 
     do {
       try {
@@ -124,10 +138,21 @@ export class MigrateCommand {
             const qnameList = [];
             data.data['rdf:RDF'][type]?.forEach(obj => {
               qnameList.push(getId(obj['rdf:about']));
+
+              if (type === 'MOS.organization') {
+                foundQnames.push(obj['rdf:about']);
+                parseNestedOrganizationIds(obj, qnameList);
+              }
             });
             return qnameList;
           })
         ));
+
+        if (triplestoreList.length === 0) {
+          break;
+        } else {
+          offset += limit;
+        }
 
         const jsonData: StoreObject[] = [];
 
@@ -143,12 +168,6 @@ export class MigrateCommand {
           } else {
             jsonData.push(parsedData);
           }
-        }
-
-        if ((Array.isArray(jsonData) && jsonData.length < limit) || !Array.isArray(jsonData)) {
-          stop = true;
-        } else {
-          offset += limit;
         }
 
         const migrateDatasetType = (data) => {
@@ -176,8 +195,14 @@ export class MigrateCommand {
             data['dateOrdersDue'] = dateParts.reverse().join('-');
           }
 
-            data['dateCreated'] = new Date(data['dateCreated']).toISOString();
-            data['dateEdited'] = new Date(data['dateEdited']).toISOString();
+          data['dateCreated'] = data['dateCreated'] ? new Date(data['dateCreated']).toISOString() : (data['dateEdited'] ? new Date(data['dateEdited']).toISOString() : undefined);
+          data['dateEdited'] = data['dateEdited'] ? new Date(data['dateEdited']).toISOString() : (data['dateCreated'] ? new Date(data['dateCreated']).toISOString() : undefined);
+        };
+
+        const migrateOrganizationHidden = (data: Organization) => {
+          if (data.hidden === undefined) {
+            data.hidden = false;
+          }
         };
 
         if (type.includes('dataset')) {
@@ -199,12 +224,15 @@ export class MigrateCommand {
         } else if (type.includes('organization')) {
           if (Array.isArray(jsonData)) {
             jsonData.forEach(data => {
-              migrateOrganizationFullName(data);
+              migrateOrganizationFullName(data as Organization);
               migrateOrganizationDates(data as Organization);
+              migrateOrganizationHidden(data as Organization);
+
             });
           } else {
             migrateOrganizationFullName(jsonData);
             migrateOrganizationDates(jsonData);
+            migrateOrganizationHidden(jsonData);
           }
         }
 
@@ -239,7 +267,7 @@ export class MigrateCommand {
           }
         }
       }
-    } while (!stop);
+    } while (offset < 1000000);
 
     if (options.seq) {
       spin.succeed(`Transfer done, moved ${count} items, maximum sequence: ${maxSeq}`);
