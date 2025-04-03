@@ -233,6 +233,8 @@ export class ApiLabelService {
     keys: string[],
     labelField: string,
   ): Observable<{ key: string; value: string }[]> {
+    keys = keys.filter(key => !!key);
+
     return this.apiCient.getDocumentsById(type, keys, ['id', labelField]).pipe(
       map((docs) =>
         docs.map((doc: Partial<KotkaDocumentObject>) => ({

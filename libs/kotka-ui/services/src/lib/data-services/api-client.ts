@@ -24,7 +24,8 @@ import {
 import { Collection } from '@luomus/laji-schema';
 import { map } from 'rxjs/operators';
 import { get, set } from 'lodash';
-import { LOGIN_REDIRECT_ENABLED } from '../interceptors/http-error.interceptor';
+import { LOGIN_REDIRECT_ENABLED } from '../interceptors';
+import { ElasticsearchQuery } from '@kotka/shared/models';
 
 const path = apiBase + '/';
 const authPath = apiBase + '/auth/';
@@ -71,20 +72,25 @@ export class ApiClient {
     page = 1,
     pageSize = 100,
     sort?: string,
-    searchQuery?: string,
+    searchQueryString?: string,
     fields?: X,
+    searchQueryObject?: ElasticsearchQuery,
   ): Observable<ListResponse<Y>> {
     let params = new HttpParams().set('page', page).set('page_size', pageSize);
     if (sort) {
       params = params.set('sort', sort);
     }
-    if (searchQuery) {
-      params = params.set('q', searchQuery);
+    if (searchQueryString) {
+      params = params.set('q', searchQueryString);
     }
     if (fields) {
       params = params.set('fields', fields.join(','));
     }
-    return this.httpClient.get<ListResponse<Y>>(path + type, { params });
+    if (searchQueryObject) {
+      return this.httpClient.post<ListResponse<Y>>(path + type + '/_search', searchQueryObject, { params });
+    } else {
+      return this.httpClient.get<ListResponse<Y>>(path + type, { params });
+    }
   }
 
   getDocumentsById<
@@ -100,21 +106,30 @@ export class ApiClient {
     pageSize = 1000,
     results: Y[] = [],
   ): Observable<Y[]> {
-    const searchQuery = ids
-      .filter((id) => !!id)
-      .map((id) => `id:${id}`)
-      .join(' OR ');
+    const startIdx = (page - 1) * pageSize;
+    const endIdx = startIdx + pageSize;
+    const idsPart = ids.slice(startIdx, endIdx);
+
+    const searchQueryObject: ElasticsearchQuery = {
+      "query": {
+        "terms": {
+          "id": idsPart
+        }
+      }
+    };
+
     return this.getDocumentList<T, S, X, Y>(
       type,
-      page,
-      pageSize,
+      1,
+      idsPart.length,
       undefined,
-      searchQuery,
+      undefined,
       fields,
+      searchQueryObject,
     ).pipe(
       switchMap((result) => {
         results = results.concat(result.member);
-        if (result.currentPage < result.lastPage) {
+        if (endIdx < ids.length) {
           return this.getDocumentsById(
             type,
             ids,
