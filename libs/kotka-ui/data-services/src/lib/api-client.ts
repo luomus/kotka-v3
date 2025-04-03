@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
   Area,
@@ -15,7 +15,7 @@ import {
   StoreVersion,
 } from '@kotka/shared/models';
 import { Observable, of, switchMap } from 'rxjs';
-import { apiBase, lajiApiBase } from './constants';
+import { apiBase, lajiApiBase, LOGIN_REDIRECT_ENABLED } from './constants';
 import {
   RangeResult,
   LoginResult,
@@ -219,7 +219,9 @@ export class ApiClient {
   }
 
   getSessionProfile(): Observable<Person | null> {
-    return this.httpClient.get<Person>(authPath + 'user');
+    return this.httpClient.get<Person>(authPath + 'user', {
+      context: new HttpContext().set(LOGIN_REDIRECT_ENABLED, false)
+    });
   }
 
   login(): Observable<LoginResult> {
