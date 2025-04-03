@@ -1,10 +1,9 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { isDataset, KotkaDocumentObjectType } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
-import { FormViewContainerComponent } from '../../shared-modules/form-view/form-view/form-view-container';
-import { FormViewComponent } from '../../shared-modules/form-view/form-view/form-view.component';
+import { FormViewContainerComponent, FormViewComponent } from '@kotka/ui/form-view';
 import { CommonModule } from '@angular/common';
-import { OldKotkaUrlPipe } from '../../shared/pipes/old-kotka-url.pipe';
+import { OldKotkaUrlPipe } from '@kotka/ui/pipes';
 
 @Component({
   selector: 'kotka-organization-form',

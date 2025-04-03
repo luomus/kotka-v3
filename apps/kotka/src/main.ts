@@ -1,14 +1,13 @@
 import { enableProdMode, ErrorHandler } from '@angular/core';
 import { environment } from './environments/environment';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { AppComponent } from './app/shared/components/app/app.component';
+import { AppComponent } from '@kotka/ui/base';
 import { provideRouter, withEnabledBlockingInitialNavigation, withPreloading } from '@angular/router';
 import { routes } from './app/app.routes';
 import { QuicklinkStrategy } from 'ngx-quicklink';
 import { provideNgxWebstorage, withLocalStorage, withNgxWebstorageConfig } from 'ngx-webstorage';
-import { ErrorHandlerService } from './app/shared/services/error-handler/error-handler.service';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
-import { ConsoleLogger, HttpLogger, ILogger, Logger } from '@kotka/ui/util-services';
+import { ErrorHandlerService, ConsoleLogger, HttpLogger, ILogger, Logger, HttpErrorInterceptor } from '@kotka/ui/services';
 import {
   HTTP_INTERCEPTORS,
   HttpClient,
@@ -16,7 +15,6 @@ import {
   withInterceptorsFromDi
 } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { HttpErrorInterceptor } from './app/shared/services/interceptors/http-error.interceptor';
 
 if (environment.production) {
   enableProdMode();
@@ -50,6 +48,7 @@ bootstrapApplication(AppComponent, {
       useClass: HttpErrorInterceptor,
       multi: true
     },
-    { provide: 'Window', useValue: window }
+    { provide: 'Window', useValue: window },
+    { provide: 'oldKotkaUrl', useValue: environment.oldKotkaUrl }
   ]
 }).catch(err => console.error(err));

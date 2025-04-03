@@ -5,10 +5,10 @@ import {
   TextFilterModel,
 } from '@ag-grid-community/core';
 import { IFloatingFilterAngularComp } from '@ag-grid-community/angular';
-import { ApiClient } from '@kotka/ui/data-services';
+import { ApiClient } from '@kotka/ui/services';
 import {
   AutocompleteComponent,
-  FetchAutocompleteResultsFunc
+  FetchAutocompleteResultsFunc,
 } from '@kotka/ui/autocomplete';
 import { KotkaDocumentObjectType } from '@kotka/shared/models';
 

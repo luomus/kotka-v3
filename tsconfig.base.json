@@ -23,12 +23,15 @@
       "@kotka/ui/autocomplete": [
         "libs/kotka-ui/components/autocomplete/src/index.ts"
       ],
-      "@kotka/ui/data-services": ["libs/kotka-ui/data-services/src/index.ts"],
+      "@kotka/ui/base": ["libs/kotka-ui/base/src/index.ts"],
       "@kotka/ui/datatable": [
         "libs/kotka-ui/components/datatable/src/index.ts"
       ],
       "@kotka/ui/document-datatable": [
         "libs/kotka-ui/components/document-datatable/src/index.ts"
+      ],
+      "@kotka/ui/form-view": [
+        "libs/kotka-ui/form-view/src/index.ts"
       ],
       "@kotka/ui/laji-form": [
         "libs/kotka-ui/components/laji-form/src/index.ts"
@@ -37,8 +40,8 @@
         "libs/kotka-ui/components/main-content/src/index.ts"
       ],
       "@kotka/ui/pipes": ["libs/kotka-ui/pipes/src/index.ts"],
+      "@kotka/ui/services": ["libs/kotka-ui/services/src/index.ts"],
       "@kotka/ui/spinner": ["libs/kotka-ui/components/spinner/src/index.ts"],
-      "@kotka/ui/util-services": ["libs/kotka-ui/util-services/src/index.ts"],
       "@kotka/ui/viewer": ["libs/kotka-ui/components/viewer/src/index.ts"]
     }
   },

@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { SpecimenTransaction } from '@luomus/laji-schema';
 import { CommonModule } from '@angular/common';
 import { TransactionSheetContext } from '../services/transaction-pdf-sheets-context-service';
-import { PdfTemplateComponent } from '@kotka/ui/data-services';
+import { PdfTemplateComponent } from '@kotka/ui/services';
 import { TransactionDispatchLabelPipe } from '../pipes/transaction-dispatch-label.pipe';
 import { TransactionSheetHeaderComponent } from '../sheet-components/transaction-sheet-header/transaction-sheet-header';
 import { TransactionSheetRemarksComponent } from '../sheet-components/transaction-sheet-remarks/transaction-sheet-remarks';
@@ -22,7 +22,7 @@ import { CapitalizeFirstLetterPipe, ToFullUriPipe } from '@kotka/ui/pipes';
     TransactionSheetSignatureAndMaterialComponent,
     TransactionTypeLabelPipe,
     ToFullUriPipe,
-    CapitalizeFirstLetterPipe
+    CapitalizeFirstLetterPipe,
   ],
   selector: 'kotka-transaction-dispatch-sheet',
   templateUrl: './transaction-dispatch-sheet.html',

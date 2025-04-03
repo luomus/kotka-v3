@@ -1,7 +1,7 @@
 import { concatAll, from, Observable, of, switchMap, tap, toArray } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CellRendererComponent } from '../renderers/cell-renderer';
-import { ExportService } from '@kotka/ui/util-services';
+import { ExportService } from '@kotka/ui/services';
 import { Injectable, Injector } from '@angular/core';
 import {
   ColDef,

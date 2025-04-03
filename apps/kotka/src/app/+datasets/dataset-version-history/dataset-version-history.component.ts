@@ -6,7 +6,7 @@ import { KotkaDocumentObjectType } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
 import {
   VersionHistoryViewComponent
-} from '../../shared-modules/form-view/version-history-view/version-history-view.component';
+} from '@kotka/ui/form-view';
 
 @Component({
   selector: 'kotka-transaction-version-history',

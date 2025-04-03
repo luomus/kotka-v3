@@ -15,14 +15,14 @@ import {
 } from '@kotka/ui/datatable';
 import { DatatableDataService } from '../datatable-data.service';
 import { KotkaDocumentObjectType } from '@kotka/shared/models';
-import { UserService } from '@kotka/ui/data-services';
+import { UserService } from '@kotka/ui/services';
 import { Observable, map } from 'rxjs';
 
 @Component({
   selector: 'kui-document-datatable',
   templateUrl: './document-datatable.component.html',
   styleUrls: ['./document-datatable.component.scss'],
-  imports: [CommonModule, DatatableComponent]
+  imports: [CommonModule, DatatableComponent],
 })
 export class DocumentDatatableComponent implements OnChanges {
   @ViewChild(DatatableComponent, { static: true })

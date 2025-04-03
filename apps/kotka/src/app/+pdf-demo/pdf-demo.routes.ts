@@ -1,5 +1,4 @@
-import { RouterModule, Routes } from '@angular/router';
-import { ModuleWithProviders } from '@angular/core';
+import { Routes } from '@angular/router';
 import { PdfDemoComponent } from './pdf-demo.component';
 
 export const pdfDemoRoutes: Routes = [
