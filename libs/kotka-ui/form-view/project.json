@@ -2,7 +2,7 @@
   "name": "ui-form-view",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/kotka-ui/form-view/src",
-  "prefix": "lib",
+  "prefix": "kotka",
   "projectType": "library",
   "tags": [],
   "targets": {

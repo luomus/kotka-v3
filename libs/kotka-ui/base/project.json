@@ -2,7 +2,7 @@
   "name": "ui-base",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/kotka-ui/base/src",
-  "prefix": "lib",
+  "prefix": "kotka",
   "projectType": "library",
   "tags": [],
   "targets": {
