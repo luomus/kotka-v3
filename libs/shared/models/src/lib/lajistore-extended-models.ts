@@ -13,7 +13,8 @@ export enum KotkaDocumentObjectType {
   transaction = 'transaction',
   document = 'document',
   organization = 'organization',
-  sample = 'sample'
+  sample = 'sample',
+  specimen = 'specimen',
 }
 
 export interface KotkaDocumentObjectMap {
