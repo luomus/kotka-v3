@@ -75,6 +75,19 @@ export abstract class LajiStoreController<T extends StoreObject> {
     }
   }
 
+  @Post('_search')
+  @HttpCode(200)
+  async search(@Req() req, @Query() query: StoreGetQuery, @Body() body: any) {
+    try {
+      const res = await lastValueFrom(this.lajiStoreService.search<T>(this.type, body, query));
+
+      return res.data;
+    } catch (err) {
+      console.error(err);
+      throw new InternalServerErrorException(err.message);
+    }
+  }
+
   @Get(':id')
   async get(@Param('id') id: string) {
     try {
