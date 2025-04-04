@@ -11,7 +11,7 @@ import {
   isSpecimenTransaction,
 } from '@kotka/shared/models';
 import { Observable, of, Subscription, switchMap } from 'rxjs';
-import { DialogService } from '@kotka/ui/services';
+import { DialogService, Logger } from '@kotka/ui/services';
 import { FormViewComponent } from '@kotka/ui/form-view';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ApiClient, FormService } from '@kotka/ui/services';
@@ -53,6 +53,7 @@ export class TransactionFormComponent
     private apiClient: ApiClient,
     private formService: FormService,
     dialogService: DialogService,
+    private logger: Logger,
     private transactionFormEmbedService: TransactionFormEmbedService,
   ) {
     super(dialogService);
@@ -127,7 +128,8 @@ export class TransactionFormComponent
         }
         this.formView.lajiForm?.unBlock();
       },
-      error: () => {
+      error: (e) => {
+        this.logger.error('Failed to fetch a specimen range', { 'error': e, 'range': range });
         this.dialogService.alert('An unexpected error occurred.');
         this.formView.lajiForm?.unBlock();
       },

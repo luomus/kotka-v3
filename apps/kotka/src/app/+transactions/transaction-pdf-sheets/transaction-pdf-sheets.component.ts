@@ -9,7 +9,7 @@ import {
 import { TransactionDispatchSheetComponent } from './transaction-dispatch-sheet/transaction-dispatch-sheet';
 import { SpecimenTransaction } from '@luomus/laji-schema';
 import { TransactionPdfSheetsContextService } from './services/transaction-pdf-sheets-context-service';
-import { PdfTemplateComponent, PdfService } from '@kotka/ui/services';
+import { PdfTemplateComponent, PdfService, DialogService, Logger } from '@kotka/ui/services';
 import { TransactionIncomingSheetComponent } from './transaction-incoming-sheet/transaction-incoming-sheet';
 import { TransactionInquirySheetComponent } from './transaction-inquiry-sheet/transaction-inquiry-sheet';
 import { TransactionReturnSheetComponent } from './transaction-return-sheet/transaction-return-sheet';
@@ -102,6 +102,8 @@ export class TransactionPdfSheetsComponent implements OnChanges {
   constructor(
     private transactionPdfSheetsContext: TransactionPdfSheetsContextService,
     private pdfService: PdfService,
+    private dialogService: DialogService,
+    private logger: Logger,
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -176,7 +178,9 @@ export class TransactionPdfSheetsComponent implements OnChanges {
           this.loading = false;
           this.cdr.markForCheck();
         },
-        error: () => {
+        error: (e) => {
+          this.logger.error('Transaction pdf sheet download failed', e);
+          this.dialogService.alert('An unexpected error occurred.');
           this.loading = false;
           this.cdr.markForCheck();
         },
