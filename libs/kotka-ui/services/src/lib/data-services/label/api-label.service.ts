@@ -5,7 +5,6 @@ import {
   isObservable,
   Observable,
   of,
-  shareReplay,
   switchMap,
 } from 'rxjs';
 import { map, share, tap } from 'rxjs/operators';
@@ -144,22 +143,27 @@ export class ApiLabelService {
     type: ApiLabelType,
   ): Observable<Record<string, string>> {
     const labels$ = this.fetchLabels(keys, type).pipe(
-      map((labels) => {
+      map(labels => {
         const result: Record<string, string> = {};
         labels.forEach((data) => {
           result[data.key] = data.value;
         });
         return result;
       }),
-      shareReplay(1),
+      tap({
+        next: (labels) => {
+          keys.forEach(key => this.cache[key] = labels[key] || key);
+        },
+        error: () => {
+          keys.forEach(key => delete this.cache[key]);
+        },
+      }),
+      share(),
     );
 
-    keys.forEach((key) => {
+    keys.forEach(key => {
       this.cache[key] = labels$.pipe(
-        map((labels) => labels[key] || key),
-        tap((result) => {
-          this.cache[key] = result;
-        }),
+        map(labels => labels[key] || key)
       );
     });
 
