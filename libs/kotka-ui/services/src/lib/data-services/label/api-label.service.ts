@@ -5,9 +5,11 @@ import {
   isObservable,
   Observable,
   of,
-  switchMap,
+  map,
+  tap,
+  shareReplay,
+  switchMap
 } from 'rxjs';
-import { map, share, tap } from 'rxjs/operators';
 import { UserService } from '../user.service';
 import { ApiClient } from '../api-client';
 import { Collection } from '@luomus/laji-schema/models';
@@ -74,7 +76,7 @@ export class ApiLabelService {
         next: (label) => (this.cache[key] = label),
         error: () => delete this.cache[key],
       }),
-      share(),
+      shareReplay(1),
     );
 
     return this.cache[key] as Observable<string>;
@@ -158,7 +160,7 @@ export class ApiLabelService {
           keys.forEach(key => delete this.cache[key]);
         },
       }),
-      share(),
+      shareReplay(1),
     );
 
     keys.forEach(key => {
