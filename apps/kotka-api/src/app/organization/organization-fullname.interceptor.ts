@@ -11,9 +11,8 @@ import { Observable } from 'rxjs';
 export class OrganizationFullNameInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = context.switchToHttp().getRequest();
-    const handler = context.getHandler().name;
 
-    if ((req.method === 'POST' && handler === 'post' ) || req.method === 'PUT') {
+    if ((req.method === 'POST' && !req.path?.endsWith('_search') ) || req.method === 'PUT') {
       const fullName = getOrganizationFullName(req.body as Organization);
       req.body.fullName = fullName;
     }
