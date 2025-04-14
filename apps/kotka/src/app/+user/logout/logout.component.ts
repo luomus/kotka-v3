@@ -5,7 +5,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { UserService } from '@kotka/ui/data-services';
+import { UserService } from '@kotka/ui/services';
 import { environment } from '../../../environments/environment';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, Injector } from '@angular/core';
 import { CellRendererComponent } from './cell-renderer';
 import { Observable, of } from 'rxjs';
-import { LabelKey, LabelService } from '@kotka/ui/data-services';
+import { LabelKey, LabelService } from '@kotka/ui/services';
 import { ColDef } from '../models/models';
 import { JoinPipe, LabelPipe } from '@kotka/ui/pipes';
 
@@ -14,7 +14,7 @@ import { JoinPipe, LabelPipe } from '@kotka/ui/pipes';
   `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [LabelPipe, JoinPipe]
+  imports: [LabelPipe, JoinPipe],
 })
 export class LabelCellRendererComponent extends CellRendererComponent {
   static override getExportValue(
@@ -26,9 +26,16 @@ export class LabelCellRendererComponent extends CellRendererComponent {
     if (value == null) {
       return '';
     } else if (Array.isArray(value)) {
-      return value.map(
-        val => LabelCellRendererComponent.getExportValue(val, row, params, fetchData)
-      ).join(', ');
+      return value
+        .map((val) =>
+          LabelCellRendererComponent.getExportValue(
+            val,
+            row,
+            params,
+            fetchData,
+          ),
+        )
+        .join(', ');
     }
     return fetchData[value];
   }

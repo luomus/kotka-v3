@@ -20,8 +20,8 @@ import { LajiForm as LajiFormModel } from '@kotka/shared/models';
 import { combineLatest } from 'rxjs';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { MediaMetadata } from '@luomus/laji-form/lib/components/LajiForm';
-import { ToastService } from '@kotka/ui/util-services';
-import { FormApiClient } from '@kotka/ui/data-services';
+import { ToastService } from '@kotka/ui/services';
+import { FormApiClient } from '@kotka/ui/services';
 import { FormFooterComponent } from '../form-footer/form-footer.component';
 
 type FormData = Record<string, any>;

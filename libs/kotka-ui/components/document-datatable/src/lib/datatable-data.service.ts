@@ -16,7 +16,7 @@ import {
   CombinedFilterModel,
 } from '@kotka/ui/datatable';
 import { Injectable } from '@angular/core';
-import { ApiClient } from '@kotka/ui/data-services';
+import { ApiClient } from '@kotka/ui/services';
 
 @Injectable({
   providedIn: 'root',

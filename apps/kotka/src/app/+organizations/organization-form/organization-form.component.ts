@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { KotkaDocumentObjectType } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
-import { FormViewContainerComponent } from '../../shared-modules/form-view/form-view/form-view-container';
-import { FormViewComponent } from '../../shared-modules/form-view/form-view/form-view.component';
+import { FormViewContainerComponent } from '@kotka/ui/form-view';
+import { FormViewComponent } from '@kotka/ui/form-view';
 
 @Component({
   selector: 'kotka-organization-form',

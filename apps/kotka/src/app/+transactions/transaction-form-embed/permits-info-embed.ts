@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Observable, of, ReplaySubject, switchMap } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
-import { AbschService, LinkData } from '@kotka/ui/data-services';
+import { AbschService, LinkData } from '@kotka/ui/services';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -41,7 +41,7 @@ import { CommonModule } from '@angular/common';
       </div>
     </div>
   `,
-  imports: [CommonModule]
+  imports: [CommonModule],
 })
 export class PermitsInfoEmbedComponent {
   set country(country: string | null | undefined) {

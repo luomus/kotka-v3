@@ -47,6 +47,7 @@ import {
   getColumnSettingsAfterColumnMove
 } from '../services/datatable-column-utils';
 import { DatatableSettingsStoreService } from '../services/datatable-settings-store.service';
+import { DialogService, Logger } from '@kotka/ui/services';
 
 ModuleRegistry.registerModules([
   CsvExportModule,
@@ -118,7 +119,9 @@ export class DatatableComponent implements OnDestroy {
     private modalService: NgbModal,
     private datatableExportService: DatatableExportService,
     private settingsStoreService: DatatableSettingsStoreService,
-    private injector: Injector
+    private injector: Injector,
+    private logger: Logger,
+    private dialogService: DialogService,
   ) {
     this.colDefs = computed(() => (
       getVisibleColDefs(this.allColumns(), this.columnSettings()))
@@ -221,7 +224,9 @@ export class DatatableComponent implements OnDestroy {
         next: () => {
           this.exportLoading.set(false);
         },
-        error: () => {
+        error: (e) => {
+          this.logger.error('Datatable export failed', e);
+          this.dialogService.alert('An unexpected error occurred.');
           this.exportLoading.set(false);
         },
       });

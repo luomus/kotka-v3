@@ -17,7 +17,7 @@ import {
   EnumCellRendererComponent,
   AutocompleteFloatingFilterComponent,
 } from '@kotka/ui/datatable';
-import { FormService } from '@kotka/ui/data-services';
+import { FormService } from '@kotka/ui/services';
 import { KotkaDocumentObjectType, LajiForm } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
 import { MainContentComponent } from '@kotka/ui/main-content';
@@ -30,7 +30,12 @@ import { CommonModule } from '@angular/common';
   templateUrl: './transaction-table.component.html',
   styleUrls: ['./transaction-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, MainContentComponent, SpinnerComponent, DocumentDatatableComponent],
+  imports: [
+    CommonModule,
+    MainContentComponent,
+    SpinnerComponent,
+    DocumentDatatableComponent,
+  ],
 })
 export class TransactionTableComponent {
   dataType = KotkaDocumentObjectType.transaction;

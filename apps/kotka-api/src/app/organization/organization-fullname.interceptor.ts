@@ -12,7 +12,7 @@ export class OrganizationFullNameInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = context.switchToHttp().getRequest();
 
-    if (req.method === 'POST' || req.method === 'PUT') {
+    if ((req.method === 'POST' && !req.path?.endsWith('_search') ) || req.method === 'PUT') {
       const fullName = getOrganizationFullName(req.body as Organization);
       req.body.fullName = fullName;
     }

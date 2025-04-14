@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
-import { NotFoundComponent } from './shared/components/not-found/not-found.component';
-import { OnlyLoggedInGuard} from './shared/services/guards/only-logged-in.guard';
-import { BaseComponent } from './shared/components/base/base.component';
+import { NotFoundComponent } from '@kotka/ui/base';
+import { OnlyLoggedInGuard} from '@kotka/ui/services';
+import { BaseComponent } from '@kotka/ui/base';
 import { environment } from '../environments/environment';
 
 const baseRoutes: Routes = [

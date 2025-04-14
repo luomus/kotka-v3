@@ -1,5 +1,4 @@
-import { RouterModule, Routes } from '@angular/router';
-import { ModuleWithProviders } from '@angular/core';
+import { Routes } from '@angular/router';
 import { StatusComponent } from './status.component';
 
 export const statusRoutes: Routes = [

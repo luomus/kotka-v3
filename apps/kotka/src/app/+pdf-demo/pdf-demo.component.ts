@@ -5,29 +5,17 @@ import {
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { map, switchMap } from 'rxjs/operators';
-import { ApiClient } from '@kotka/ui/data-services';
+import { ApiClient } from '@kotka/ui/services';
 import { KotkaDocumentObjectType } from '@kotka/shared/models';
 import { Observable, combineLatest } from 'rxjs';
 import { TransactionPdfSheetsContextService } from '../+transactions/transaction-pdf-sheets/services/transaction-pdf-sheets-context-service';
 import { getId } from '@kotka/shared/utils';
-import {
-  TransactionDispatchSheetComponent
-} from '../+transactions/transaction-pdf-sheets/transaction-dispatch-sheet/transaction-dispatch-sheet';
-import {
-  TransactionIncomingSheetComponent
-} from '../+transactions/transaction-pdf-sheets/transaction-incoming-sheet/transaction-incoming-sheet';
-import {
-  TransactionInquirySheetComponent
-} from '../+transactions/transaction-pdf-sheets/transaction-inquiry-sheet/transaction-inquiry-sheet';
-import {
-  TransactionReturnSheetComponent
-} from '../+transactions/transaction-pdf-sheets/transaction-return-sheet/transaction-return-sheet';
-import {
-  TransactionInsectLabelsComponent
-} from '../+transactions/transaction-pdf-sheets/transaction-insect-labels/transaction-insect-labels';
-import {
-  TransactionBotanyLabelsComponent
-} from '../+transactions/transaction-pdf-sheets/transaction-botany-labels/transaction-botany-labels';
+import { TransactionDispatchSheetComponent } from '../+transactions/transaction-pdf-sheets/transaction-dispatch-sheet/transaction-dispatch-sheet';
+import { TransactionIncomingSheetComponent } from '../+transactions/transaction-pdf-sheets/transaction-incoming-sheet/transaction-incoming-sheet';
+import { TransactionInquirySheetComponent } from '../+transactions/transaction-pdf-sheets/transaction-inquiry-sheet/transaction-inquiry-sheet';
+import { TransactionReturnSheetComponent } from '../+transactions/transaction-pdf-sheets/transaction-return-sheet/transaction-return-sheet';
+import { TransactionInsectLabelsComponent } from '../+transactions/transaction-pdf-sheets/transaction-insect-labels/transaction-insect-labels';
+import { TransactionBotanyLabelsComponent } from '../+transactions/transaction-pdf-sheets/transaction-botany-labels/transaction-botany-labels';
 import { CommonModule } from '@angular/common';
 
 enum TypeEnum {

@@ -2,13 +2,18 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { SpecimenTransaction } from '@luomus/laji-schema';
 import { CommonModule } from '@angular/common';
 import { TransactionBotanyShelfSlipContext } from '../services/transaction-pdf-sheets-context-service';
-import { PdfTemplateComponent } from '@kotka/ui/data-services';
+import { PdfTemplateComponent } from '@kotka/ui/services';
 import { TransactionTypeLabelPipe } from '../pipes/transaction-type-label.pipe';
 import { QRCodeComponent } from 'angularx-qrcode';
 import { ToFullUriPipe } from '@kotka/ui/pipes';
 
 @Component({
-  imports: [CommonModule, TransactionTypeLabelPipe, QRCodeComponent, ToFullUriPipe],
+  imports: [
+    CommonModule,
+    TransactionTypeLabelPipe,
+    QRCodeComponent,
+    ToFullUriPipe,
+  ],
   selector: 'kotka-transaction-botany-labels',
   templateUrl: './transaction-botany-labels.html',
 })

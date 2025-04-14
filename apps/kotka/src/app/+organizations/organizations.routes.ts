@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
 import { OrganizationTableComponent } from './organization-table/organization-table.component';
 import { OrganizationFormComponent } from './organization-form/organization-form.component';
-import { formMatcher } from '../shared/services/utils';
-import { ComponentCanDeactivateGuard } from '../shared/services/guards/component-can-deactivate.guard';
+import { formMatcher } from '@kotka/ui/services';
+import { ComponentCanDeactivateGuard } from '@kotka/ui/services';
 import { OrganizationVersionHistoryComponent } from './organization-version-history/organization-version-history.component';
 
 export const organizationsRoutes: Routes = [

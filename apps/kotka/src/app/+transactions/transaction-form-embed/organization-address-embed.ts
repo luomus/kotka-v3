@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { catchError, Observable, of, ReplaySubject, switchMap } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
-import { ApiClient } from '@kotka/ui/data-services';
+import { ApiClient } from '@kotka/ui/services';
 import { Organization } from '@luomus/laji-schema';
 import { KotkaDocumentObjectType } from '@kotka/shared/models';
 import { CommonModule } from '@angular/common';
@@ -20,7 +20,7 @@ import { CommonModule } from '@angular/common';
       </ng-container>
     </div>
   `,
-  imports: [CommonModule]
+  imports: [CommonModule],
 })
 export class OrganizationAddressEmbedComponent {
   set organization(organization: string | null | undefined) {

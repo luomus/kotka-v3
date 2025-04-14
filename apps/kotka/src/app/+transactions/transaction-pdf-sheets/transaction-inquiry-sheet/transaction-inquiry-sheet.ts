@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { SpecimenTransaction } from '@luomus/laji-schema';
 import { CommonModule } from '@angular/common';
 import { TransactionSheetContext } from '../services/transaction-pdf-sheets-context-service';
-import { PdfTemplateComponent } from '@kotka/ui/data-services';
+import { PdfTemplateComponent } from '@kotka/ui/services';
 import { TransactionSheetHeaderComponent } from '../sheet-components/transaction-sheet-header/transaction-sheet-header';
 import { TransactionSheetMaterialComponent } from '../sheet-components/transaction-sheet-material/transaction-sheet-material';
 import { TransactionSheetRemarksComponent } from '../sheet-components/transaction-sheet-remarks/transaction-sheet-remarks';
@@ -18,7 +18,7 @@ import { ToFullUriPipe } from '@kotka/ui/pipes';
     TransactionSheetRemarksComponent,
     TransactionSheetOutgoingDetailsComponent,
     TransactionTypeLabelPipe,
-    ToFullUriPipe
+    ToFullUriPipe,
   ],
   selector: 'kotka-transaction-inquiry-sheet',
   templateUrl: './transaction-inquiry-sheet.html',

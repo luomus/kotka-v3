@@ -5,8 +5,7 @@ import {
   PipeTransform,
 } from '@angular/core';
 import { forkJoin, Observable, Subscription } from 'rxjs';
-import { LabelKey, LabelService } from '@kotka/ui/data-services';
-
+import { LabelKey, LabelService } from '@kotka/ui/services';
 
 @Pipe({
   name: 'label',

@@ -22,7 +22,7 @@ export class ApiMethodAccessGuard implements CanActivate {
     const req = context.switchToHttp().getRequest();
     const type: string = this.reflector.get('controllerType', context.getClass());
 
-    if (req.method === 'POST') {
+    if (req.method === 'POST' && !req.path?.endsWith('_search')) {
       const doc = req.body;
 
       if (!allowEditForUser(doc, req.user.profile)) {
