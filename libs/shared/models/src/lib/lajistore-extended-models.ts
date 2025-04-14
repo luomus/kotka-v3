@@ -11,7 +11,6 @@ export type KotkaDocumentObject =
 export enum KotkaDocumentObjectType {
   dataset = 'dataset',
   transaction = 'transaction',
-  document = 'document',
   organization = 'organization',
   sample = 'sample',
   specimen = 'specimen',
@@ -19,7 +18,7 @@ export enum KotkaDocumentObjectType {
 
 export interface KotkaDocumentObjectMap {
   [KotkaDocumentObjectType.dataset]: Dataset;
-  [KotkaDocumentObjectType.document]: Document;
+  [KotkaDocumentObjectType.specimen]: Document;
   [KotkaDocumentObjectType.organization]: Organization;
   [KotkaDocumentObjectType.sample]: Sample;
   [KotkaDocumentObjectType.transaction]: SpecimenTransaction;
