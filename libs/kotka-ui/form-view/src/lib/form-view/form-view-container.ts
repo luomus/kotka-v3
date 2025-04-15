@@ -5,8 +5,7 @@ import { FormViewComponent } from './form-view.component';
 
 @Directive()
 export class FormViewContainerComponent implements ComponentCanDeactivate {
-  @ViewChild(FormViewComponent, { static: true })
-  formViewComponent?: FormViewComponent;
+  @ViewChild(FormViewComponent, { static: true }) formViewComponent?: FormViewComponent;
 
   constructor(protected dialogService: DialogService) {}
 

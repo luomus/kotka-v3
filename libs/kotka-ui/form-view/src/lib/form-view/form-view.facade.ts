@@ -33,7 +33,7 @@ export enum FormErrorEnum {
   genericError = 'genericError',
 }
 
-export interface FormInputs<T extends KotkaDocumentObjectType> {
+export interface FormInputs<T extends KotkaDocumentObjectType, S extends KotkaDocumentObjectMap[T]> {
   formId: string;
   dataType: T;
   editMode: boolean;
@@ -41,6 +41,7 @@ export interface FormInputs<T extends KotkaDocumentObjectType> {
   augmentFormFunc?: (
     form: LajiForm.SchemaForm,
   ) => Observable<LajiForm.SchemaForm>;
+  prefilledFormData?: Partial<S>;
 }
 
 export interface FormState<S extends KotkaDocumentObject> {
@@ -98,7 +99,7 @@ export class FormViewFacade<
 
   vm$: Observable<ViewModel<S>>;
 
-  private inputs$ = new ReplaySubject<FormInputs<T>>(1);
+  private inputs$ = new ReplaySubject<FormInputs<T, S>>(1);
 
   private initialStateSub: Subscription;
 
@@ -117,7 +118,7 @@ export class FormViewFacade<
     this.initialStateSub.unsubscribe();
   }
 
-  setInputs(inputs: FormInputs<T>) {
+  setInputs(inputs: FormInputs<T, S>) {
     this.inputs$.next(inputs);
   }
 
@@ -132,10 +133,9 @@ export class FormViewFacade<
   }
 
   setCopiedFormData(formData: Partial<S>) {
-    this.getEmptyFormData$()
+    this.getEmptyFormData$(formData)
       .pipe(take(1))
-      .subscribe((emptyFormData) => {
-        formData = { ...emptyFormData, ...formData };
+      .subscribe((formData) => {
         this.setFormData(formData, false);
       });
   }
@@ -170,7 +170,7 @@ export class FormViewFacade<
   }
 
   private getAugmentedForm$(
-    inputs: FormInputs<T>,
+    inputs: FormInputs<T, S>,
   ): Observable<LajiForm.SchemaForm> {
     return this.formService
       .getFormWithUserContext(inputs.formId)
@@ -181,22 +181,22 @@ export class FormViewFacade<
       );
   }
 
-  private getInitialFormData$(inputs: FormInputs<T>): Observable<Partial<S>> {
+  private getInitialFormData$(inputs: FormInputs<T, S>): Observable<Partial<S>> {
     if (inputs.editMode) {
       return this.getFormData$(inputs.dataType, inputs.dataURI);
     } else {
-      return this.getEmptyFormData$();
+      return this.getEmptyFormData$(inputs.prefilledFormData);
     }
   }
 
-  private getEmptyFormData$(): Observable<Partial<S>> {
+  private getEmptyFormData$(prefilledFormData?: Partial<S>): Observable<Partial<S>> {
     return this.userService.getCurrentLoggedInUser().pipe(
       map((user) => {
         const formData: Partial<S> = {};
         if (user?.organisation && user.organisation.length === 1) {
           formData.owner = user.organisation[0];
         }
-        return formData;
+        return { ...formData, ...prefilledFormData };
       }),
     );
   }
@@ -242,7 +242,7 @@ export class FormViewFacade<
   }
 
   private getInitialFormState(
-    inputs: FormInputs<T>,
+    inputs: FormInputs<T, S>,
     form: LajiForm.SchemaForm,
     formData: Partial<S>,
     user: Person,

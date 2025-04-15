@@ -69,6 +69,7 @@ export class FormViewComponent<
   @Input() augmentFormFunc?: (
     form: LajiForm.SchemaForm,
   ) => Observable<LajiForm.SchemaForm>;
+  @Input() prefilledFormData?: Partial<S>;
 
   @Input() editModeHeaderTpl?: TemplateRef<unknown>;
   @Input() extraSectionTpl?: TemplateRef<unknown>;
@@ -331,6 +332,7 @@ export class FormViewComponent<
       editMode: this.editMode,
       dataURI: this.dataURI,
       augmentFormFunc: this.augmentFormFunc,
+      prefilledFormData: this.prefilledFormData
     });
   }
 }
