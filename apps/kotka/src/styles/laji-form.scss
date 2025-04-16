@@ -17,4 +17,10 @@
   .date-widget > .date-picker {
     flex: 0 0 auto;
   }
+
+  .verbatim-field {
+    input, textarea {
+      background: url("/assets/paper-bgr.jpg") top left repeat;
+    }
+  }
 }
