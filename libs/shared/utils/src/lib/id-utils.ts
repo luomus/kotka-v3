@@ -40,7 +40,7 @@ export function getDomainAndIdWithoutPrefix(value: string): string[] {
 
   if (value.includes(':')) {
     const [prefix, id] = value.split(':');
-    const domain = domainMap[prefix] || defaultDomain;
+    const domain = domainMap[prefix + ':'] || defaultDomain;
     return [domain, id];
   }
 

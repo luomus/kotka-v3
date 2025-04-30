@@ -5,6 +5,12 @@ import { getDomainAndIdWithoutPrefix, getUri } from '@kotka/shared/utils';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
+interface RendererExtraParams {
+  routerLink?: string[];
+}
+
+type RendererParams = ICellRendererParams & RendererExtraParams;
+
 @Component({
   selector: 'kui-uri-cell-renderer',
   template: `
@@ -12,7 +18,7 @@ import { CommonModule } from '@angular/common';
       <a
         type="button"
         class="btn btn-info edit-button"
-        [routerLink]="['edit']"
+        [routerLink]="routerLink"
         [queryParams]="{
           uri: domain + id,
         }"
@@ -54,11 +60,14 @@ import { CommonModule } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterLink],
 })
-export class URICellRendererComponent extends CellRendererComponent<ICellRendererParams> {
+export class URICellRendererComponent extends CellRendererComponent<RendererParams> {
   domain = '';
   id = '';
+  routerLink = ['edit'];
 
   override paramsChange() {
+    this.routerLink = this.params.routerLink || ['edit'];
+
     if (!this.params.value) {
       this.domain = '';
       this.id = '';

@@ -15,7 +15,7 @@
             <li ngbDropdown class="nav-item me-3 dropdown" routerLinkActive="active">
               <a class="nav-link" ngbDropdownToggle id="specimen-menu">Specimens <i class="fa fa-caret-down"></i></a>
               <ul class="dropdown-menu" ngbDropdownMenu role="menu" aria-labelledby="specimen-menu">
-                <li><a class="dropdown-item" [href]="'/specimens/search' | oldKotkaUrl">Search specimens</a></li>
+                <li><a class="dropdown-item" routerLink="/specimens/search">Search specimens</a></li>
                 <li><a class="dropdown-item" [href]="'/specimens/search-sample' | oldKotkaUrl">Search preparations/samples</a></li>
                 <li><a class="dropdown-item" [href]="'/specimens/search-branch' | oldKotkaUrl">Search branches</a></li>
                 <li><a class="dropdown-item" [href]="'/culture' | oldKotkaUrl">Search cultures</a></li>
