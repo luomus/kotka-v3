@@ -5,7 +5,7 @@ import { FormViewContainerComponent } from '@kotka/ui/form-view';
 import { FormViewComponent } from '@kotka/ui/form-view';
 import { DialogService, navigationEnd$, UserService } from '@kotka/ui/services';
 import { Router } from '@angular/router';
-import { Observable, of, Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 type UrlDataType = 'botany'|'zoo'|'palaeontology'|'accession'|'culture';
