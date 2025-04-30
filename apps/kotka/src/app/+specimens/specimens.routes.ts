@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { SpecimenFormComponent } from './specimen-form/specimen-form.component';
 import { ComponentCanDeactivateGuard, formMatcher } from '@kotka/ui/services';
 import { SpecimenTableComponent } from './specimen-table/specimen-table.component';
+import { SpecimenVersionHistoryComponent } from './specimen-version-history/specimen-version-history.component';
 
 export const specimensRoutes: Routes = [
   {
@@ -19,5 +20,14 @@ export const specimensRoutes: Routes = [
     },
     canDeactivate: [ ComponentCanDeactivateGuard ],
     runGuardsAndResolvers: 'always'
+  },
+  {
+    path: 'history',
+    pathMatch: 'full',
+    component: SpecimenVersionHistoryComponent,
+    data: {
+      title: 'Specimen',
+      addUriToTitle: true
+    }
   }
 ];
