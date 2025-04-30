@@ -11,7 +11,7 @@ const types: {[ type in KotkaDocumentObjectFullType ]: string} = {
   [KotkaDocumentObjectFullType.dataset]: 'MHL.731',
   [KotkaDocumentObjectFullType.organization]: 'MHL.1152',
   [KotkaDocumentObjectFullType.transaction]: 'MHL.930',
-  [KotkaDocumentObjectFullType.document]: '',
+  [KotkaDocumentObjectFullType.document]: 'MHL.1158',
   [KotkaDocumentObjectFullType.sample]: ''
 };
 

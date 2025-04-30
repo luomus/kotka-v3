@@ -32,6 +32,7 @@ export class SpecimenController extends LajiStoreController<Document> {
       triplestoreService,
       triplestoreMapperService,
       type,
+      false
     );
   }
 
