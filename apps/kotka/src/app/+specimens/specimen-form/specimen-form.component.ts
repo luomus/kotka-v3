@@ -3,12 +3,18 @@ import { KotkaDocumentObjectType, Document } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
 import { FormViewContainerComponent } from '@kotka/ui/form-view';
 import { FormViewComponent } from '@kotka/ui/form-view';
-import { DialogService, navigationEnd$ } from '@kotka/ui/services';
+import { DialogService, navigationEnd$, UserService } from '@kotka/ui/services';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Observable, of, Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 type UrlDataType = 'botany'|'zoo'|'palaeontology'|'accession'|'culture';
 type DataType = 'botanyspecimen'|'zoospecimen'|'palaeontology'|'accession'|'culture';
+
+interface SpecimenFormDocument extends Document {
+  namespaceID?: string;
+  objectID?: string;
+}
 
 const urlToDataTypeMap: Record<UrlDataType, DataType> = {
   botany: 'botanyspecimen',
@@ -31,10 +37,13 @@ export class SpecimenFormComponent extends FormViewContainerComponent implements
 
   prefilledFormData?: Partial<Document>;
 
+  processFormDataBeforeSaveFunc = this.processFormDataBeforeSave.bind(this);
+
   private routerSub?: Subscription;
 
   constructor(
     dialogService: DialogService,
+    private userService: UserService,
     private router: Router,
     private cdr: ChangeDetectorRef,
   ) {
@@ -72,5 +81,24 @@ export class SpecimenFormComponent extends FormViewContainerComponent implements
     }
 
     return undefined;
+  }
+
+  private processFormDataBeforeSave(data: SpecimenFormDocument): Observable<Document> {
+    return this.userService.getCurrentLoggedInUser().pipe(
+      map(user => {
+        if (data.namespaceID && data.objectID) {
+          if (!data.namespaceID.includes(":")) {
+            const defaultPrefix = user.defaultQNamePrefix || "luomus";
+            data.namespaceID = defaultPrefix + ":" + data.namespaceID;
+          }
+          data.id = data.namespaceID + "." + data.objectID;
+        }
+
+        delete data.namespaceID;
+        delete data.objectID;
+
+        return data;
+      })
+    );
   }
 }

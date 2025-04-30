@@ -17,8 +17,9 @@ import {
   EMPTY,
   from,
   Observable,
+  of,
   Subscription,
-  switchMap,
+  switchMap
 } from 'rxjs';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ErrorMessages } from '@kotka/shared/models';
@@ -66,10 +67,14 @@ export class FormViewComponent<
   @Input({ required: true }) formId!: string;
   @Input({ required: true }) dataType!: T;
   @Input() dataTypeName = '';
+
   @Input() augmentFormFunc?: (
     form: LajiForm.SchemaForm,
   ) => Observable<LajiForm.SchemaForm>;
   @Input() prefilledFormData?: Partial<S>;
+  @Input() processFormDataBeforeSaveFunc?: (
+    formData: S
+  ) => Observable<S>;
 
   @Input() editModeHeaderTpl?: TemplateRef<unknown>;
   @Input() extraSectionTpl?: TemplateRef<unknown>;
@@ -223,14 +228,22 @@ export class FormViewComponent<
   }
 
   private save$(data: S): Observable<S> {
-    let save$: Observable<S>;
-    if (data.id) {
-      save$ = this.apiClient.updateDocument(this.dataType, data.id, data);
-    } else {
-      save$ = this.apiClient.createDocument(this.dataType, data);
-    }
+    const data$: Observable<S> = this.processFormDataBeforeSaveFunc
+      ? this.processFormDataBeforeSaveFunc(data)
+      : of(data);
 
-    return save$;
+    return data$.pipe(
+      switchMap(data => {
+        if (this.editMode) {
+          if (!data.id) {
+            throw new Error('Document is missing an id');
+          }
+          return this.apiClient.updateDocument(this.dataType, data.id, data);
+        } else {
+          return this.apiClient.createDocument(this.dataType, data);
+        }
+      })
+    );
   }
 
   private copyAsNew(data: Partial<S>, excludedFields: string[] = []) {
