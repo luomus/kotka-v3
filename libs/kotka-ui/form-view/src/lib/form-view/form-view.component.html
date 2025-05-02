@@ -30,28 +30,35 @@
           You can only view this {{ dataTypeName }}. To be able to edit this {{ dataTypeName }}, you must belong to {{ vm.formData.owner | label }}
         </ngb-alert>
 
-        <kotka-meta-fields
-          [formData]="vm.formData"
-          [editMode]="editMode"
-          [dataURI]="dataURI"
-          [extraSectionTpl]="extraSectionTpl"
-        ></kotka-meta-fields>
-        <kui-laji-form
-          [form]="vm.form"
-          [formData]="vm.formData"
-          [hasChanges]="vm.formHasChanges"
-          [disabled]="vm.disabled"
-          [showDeleteButton]="vm.showDeleteButton"
-          [showCopyButton]="vm.showCopyButton"
-          [mediaMetadata]="vm.mediaMetadata"
-          (formReady)="onFormReady()"
-          (formChange)="onChange($event)"
-          (formSubmit)="onSubmit($event)"
-          (delete)="onDelete($event)"
-          (formCopy)="onCopy($event)"
-          (formSubmitAndCopy)="onSubmitAndCopy($event)"
-        >
-        </kui-laji-form>
+        <ng-container *ngIf="formContainerTpl else formContent">
+          <ng-container *ngTemplateOutlet="formContainerTpl; context: {$implicit: formContent}">
+          </ng-container>
+        </ng-container>
+
+        <ng-template #formContent>
+          <kotka-meta-fields
+            [formData]="vm.formData"
+            [editMode]="editMode"
+            [dataURI]="dataURI"
+            [containerTpl]="metaFieldsContainerTpl"
+          ></kotka-meta-fields>
+          <kui-laji-form
+            [form]="vm.form"
+            [formData]="vm.formData"
+            [hasChanges]="vm.formHasChanges"
+            [disabled]="vm.disabled"
+            [showDeleteButton]="vm.showDeleteButton"
+            [showCopyButton]="vm.showCopyButton"
+            [mediaMetadata]="vm.mediaMetadata"
+            (formReady)="onFormReady()"
+            (formChange)="onChange($event)"
+            (formSubmit)="onSubmit($event)"
+            (delete)="onDelete($event)"
+            (formCopy)="onCopy($event)"
+            (formSubmitAndCopy)="onSubmitAndCopy($event)"
+          >
+          </kui-laji-form>
+        </ng-template>
       </ng-container>
     </ng-container>
   </ng-container>

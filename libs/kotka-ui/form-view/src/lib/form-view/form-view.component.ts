@@ -77,7 +77,8 @@ export class FormViewComponent<
   ) => Observable<S>;
 
   @Input() editModeHeaderTpl?: TemplateRef<unknown>;
-  @Input() extraSectionTpl?: TemplateRef<unknown>;
+  @Input() formContainerTpl?: TemplateRef<unknown>;
+  @Input() metaFieldsContainerTpl?: TemplateRef<unknown>;
 
   editMode = false;
   dataURI?: string;

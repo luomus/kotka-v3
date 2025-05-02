@@ -4,7 +4,7 @@
   [dataTypeName]="'transaction'"
   [augmentFormFunc]="augmentFormFunc"
   [editModeHeaderTpl]="editModeHeaderTpl"
-  [extraSectionTpl]="extraSection"
+  [metaFieldsContainerTpl]="metaFieldsContainer"
   (formInit)="onFormInit($event)"
   (formDataChange)="onFormDataChange($event)"
   (disabledChange)="setDisabled($event)"
@@ -18,9 +18,16 @@
   </h1>
 </ng-template>
 
-<ng-template #extraSection>
-  <kotka-transaction-pdf-sheets
-    *ngIf="isSpecimenTransaction(formData)"
-    [data]="formData">
-  </kotka-transaction-pdf-sheets>
+<ng-template #metaFieldsContainer let-metaFieldsTpl>
+  <div class="row">
+    <div class="col-lg-6 col-md-5 col-sm-4 col-12 order-sm-last">
+      <kotka-transaction-pdf-sheets
+        *ngIf="isSpecimenTransaction(formData)"
+        [data]="formData">
+      </kotka-transaction-pdf-sheets>
+    </div>
+    <div class="col-lg-6 col-md-7 col-sm-8 col-12 order-sm-first">
+      <ng-container *ngTemplateOutlet="metaFieldsTpl"></ng-container>
+    </div>
+  </div>
 </ng-template>

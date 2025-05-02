@@ -20,13 +20,19 @@ import { globals } from '../../../environments/globals';
 import { FormViewContainerComponent } from '@kotka/ui/form-view';
 import { TransactionPdfSheetsComponent } from '../transaction-pdf-sheets/transaction-pdf-sheets.component';
 import { CommonModule } from '@angular/common';
+import { LabelPipe } from '@kotka/ui/pipes';
 
 @Component({
   selector: 'kotka-transaction-form',
   templateUrl: './transaction-form.component.html',
   styleUrls: ['./transaction-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormViewComponent, TransactionPdfSheetsComponent],
+  imports: [
+    CommonModule,
+    FormViewComponent,
+    TransactionPdfSheetsComponent,
+    LabelPipe,
+  ],
   providers: [TransactionFormEmbedService],
 })
 export class TransactionFormComponent
@@ -129,7 +135,10 @@ export class TransactionFormComponent
         this.formView.lajiForm?.unBlock();
       },
       error: (e) => {
-        this.logger.error('Failed to fetch a specimen range', { 'error': e, 'range': range });
+        this.logger.error('Failed to fetch a specimen range', {
+          error: e,
+          range: range,
+        });
         this.dialogService.alert('An unexpected error occurred.');
         this.formView.lajiForm?.unBlock();
       },

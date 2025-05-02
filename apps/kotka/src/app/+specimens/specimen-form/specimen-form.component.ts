@@ -7,6 +7,7 @@ import { DialogService, navigationEnd$, UserService } from '@kotka/ui/services';
 import { Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { NgTemplateOutlet } from '@angular/common';
 
 type UrlDataType = 'botany'|'zoo'|'palaeontology'|'accession'|'culture';
 type DataType = 'botanyspecimen'|'zoospecimen'|'palaeontology'|'accession'|'culture';
@@ -28,10 +29,13 @@ const urlToDataTypeMap: Record<UrlDataType, DataType> = {
   selector: 'kotka-specimen-form',
   templateUrl: './specimen-form.component.html',
   styleUrls: ['./specimen-form.component.scss'],
-  imports: [FormViewComponent],
+  imports: [FormViewComponent, NgTemplateOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SpecimenFormComponent extends FormViewContainerComponent implements OnInit, OnDestroy {
+export class SpecimenFormComponent
+  extends FormViewContainerComponent
+  implements OnInit, OnDestroy
+{
   formId = globals.specimenFormId;
   dataType: KotkaDocumentObjectType.specimen = KotkaDocumentObjectType.specimen;
 
@@ -62,7 +66,15 @@ export class SpecimenFormComponent extends FormViewContainerComponent implements
     this.routerSub?.unsubscribe();
   }
 
-  private getPrefilledFormDataFromCurrentUrl(): Partial<Document>|undefined {
+  startMarkingAdvancedFields() {
+    console.log('start marking advanced fields clicked');
+  }
+
+  showOnlyBasicFields() {
+    console.log('show only basic fields clicked');
+  }
+
+  private getPrefilledFormDataFromCurrentUrl(): Partial<Document> | undefined {
     const dataType = this.getDataTypeFromCurrentUrl();
 
     if (dataType) {
@@ -72,8 +84,10 @@ export class SpecimenFormComponent extends FormViewContainerComponent implements
     return undefined;
   }
 
-  private getDataTypeFromCurrentUrl(): DataType|undefined {
-    const urlParts: string[] = this.router.routerState.snapshot.url.split('/').filter(part => !!part);
+  private getDataTypeFromCurrentUrl(): DataType | undefined {
+    const urlParts: string[] = this.router.routerState.snapshot.url
+      .split('/')
+      .filter((part) => !!part);
     const firstPart = urlParts[0];
 
     if (Object.keys(urlToDataTypeMap).includes(firstPart)) {
@@ -83,22 +97,24 @@ export class SpecimenFormComponent extends FormViewContainerComponent implements
     return undefined;
   }
 
-  private processFormDataBeforeSave(data: SpecimenFormDocument): Observable<Document> {
+  private processFormDataBeforeSave(
+    data: SpecimenFormDocument,
+  ): Observable<Document> {
     return this.userService.getCurrentLoggedInUser().pipe(
-      map(user => {
+      map((user) => {
         if (data.namespaceID && data.objectID) {
-          if (!data.namespaceID.includes(":")) {
-            const defaultPrefix = user.defaultQNamePrefix || "luomus";
-            data.namespaceID = defaultPrefix + ":" + data.namespaceID;
+          if (!data.namespaceID.includes(':')) {
+            const defaultPrefix = user.defaultQNamePrefix || 'luomus';
+            data.namespaceID = defaultPrefix + ':' + data.namespaceID;
           }
-          data.id = data.namespaceID + "." + data.objectID;
+          data.id = data.namespaceID + '.' + data.objectID;
         }
 
         delete data.namespaceID;
         delete data.objectID;
 
         return data;
-      })
+      }),
     );
   }
 }
