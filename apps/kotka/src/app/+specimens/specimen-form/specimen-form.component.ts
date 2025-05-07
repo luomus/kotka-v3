@@ -43,7 +43,8 @@ const classFields = [
   '/gatherings',
   '/gatherings/units',
   '/gatherings/units/identifications',
-  '/gatherings/units/typeSpecimens'
+  '/gatherings/units/typeSpecimens',
+  '/gatherings/units/samples'
 ];
 
 @Component({
