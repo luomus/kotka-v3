@@ -1,18 +1,18 @@
 <kui-main-content
-  [header]="editMode ? (editModeHeaderTpl ? undefined : 'Edit ' + dataTypeName + ' ' + (dataURI || '')) : 'Add ' + dataTypeName"
-  [headerTpl]="editMode && editModeHeaderTpl ? editModeHeaderTplWithContext : undefined"
+  [header]="editMode() ? (editModeHeaderTpl() ? undefined : 'Edit ' + dataTypeName() + ' ' + (dataURI || '')) : 'Add ' + dataTypeName()"
+  [headerTpl]="editMode() && editModeHeaderTpl() ? editModeHeaderTplWithContext : undefined"
   [containerClass]="'container'"
 >
   <ng-template #editModeHeaderTplWithContext>
-    <ng-container *ngIf="editModeHeaderTpl">
-      <ng-container *ngTemplateOutlet="editModeHeaderTpl; context: { dataURI, formData: $any((vm$ | async)).formData }"></ng-container>
+    <ng-container *ngIf="editModeHeaderTpl() as tpl">
+      <ng-container *ngTemplateOutlet="tpl; context: { dataURI: dataURI(), formData: $any((vm$ | async)).formData }"></ng-container>
     </ng-container>
   </ng-template>
 
   <ng-container *ngIf="vm$ | async as vm else spinner">
     <ngb-alert *ngIf="isErrorViewModel(vm)" [type]="'danger'" [dismissible]="false">
       <ng-container *ngIf="vm.errorType === formErrorEnum.dataNotFound else genericError">
-        {{ dataTypeName | titlecase }} <ng-container *ngIf="dataURI">with URI {{ dataURI }} </ng-container>was not found.
+        {{ dataTypeName() | titlecase }} <ng-container *ngIf="dataURI() as uri">with URI {{ uri }} </ng-container>was not found.
       </ng-container>
       <ng-template #genericError>
         An unexpected error occurred
@@ -23,33 +23,36 @@
       <ng-container *ngIf="vm.form && vm.formData else spinner">
         <ngb-alert *ngIf="vm.showDeleteTargetInUseAlert" [type]="'danger'" (closed)="hideDeleteTargetInUseAlert()">
           <strong>Delete failed:</strong>
-          This {{ dataTypeName}} can't be deleted because there are resources that are attached to it.
+          This {{ dataTypeName() }} can't be deleted because there are resources that are attached to it.
         </ngb-alert>
         <ngb-alert *ngIf="vm.disabled && !vm.disabledAlertDismissed" [type]="'warning'" (closed)="dismissDisabledAlert()">
           <strong>Note:</strong>
-          You can only view this {{ dataTypeName }}. To be able to edit this {{ dataTypeName }}, you must belong to {{ vm.formData.owner | label }}
+          You can only view this {{ dataTypeName() }}. To be able to edit this {{ dataTypeName() }}, you must belong to {{ vm.formData.owner | label }}
         </ngb-alert>
 
-        <ng-container *ngIf="formContainerTpl else formContent">
-          <ng-container *ngTemplateOutlet="formContainerTpl; context: {$implicit: formContent}">
+        <ng-container *ngIf="formContainerTpl() as tpl else formContent">
+          <ng-container *ngTemplateOutlet="tpl; context: {$implicit: formContent}">
           </ng-container>
         </ng-container>
 
         <ng-template #formContent>
           <kotka-meta-fields
             [formData]="vm.formData"
-            [editMode]="editMode"
-            [dataURI]="dataURI"
-            [containerTpl]="metaFieldsContainerTpl"
+            [editMode]="editMode()"
+            [dataURI]="dataURI()"
+            [containerTpl]="metaFieldsContainerTpl()"
           ></kotka-meta-fields>
           <kui-laji-form
             [form]="vm.form"
             [formData]="vm.formData"
             [hasChanges]="vm.formHasChanges"
             [disabled]="vm.disabled"
+            [footerDisabled]="footerDisabled()"
             [showDeleteButton]="vm.showDeleteButton"
             [showCopyButton]="vm.showCopyButton"
             [mediaMetadata]="vm.mediaMetadata"
+            [hiddenFields]="hiddenFields()"
+            [customFormSchema]="customFormSchema()"
             (formReady)="onFormReady()"
             (formChange)="onChange($event)"
             (formSubmit)="onSubmit($event)"

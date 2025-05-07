@@ -1,9 +1,9 @@
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component,
+  Component, computed,
   OnDestroy,
-  OnInit, Signal
+  OnInit, signal, Signal
 } from '@angular/core';
 import { KotkaDocumentObjectType, Document } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
@@ -17,7 +17,7 @@ import {
 import { Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { NgTemplateOutlet } from '@angular/common';
+import { NgClass, NgTemplateOutlet } from '@angular/common';
 import {
   LajiFormComponent,
   LajiFormFieldChooserService
@@ -50,7 +50,7 @@ const classFields = [
   selector: 'kotka-specimen-form',
   templateUrl: './specimen-form.component.html',
   styleUrls: ['./specimen-form.component.scss'],
-  imports: [FormViewComponent, NgTemplateOutlet],
+  imports: [FormViewComponent, NgTemplateOutlet, NgClass],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SpecimenFormComponent
@@ -64,8 +64,23 @@ export class SpecimenFormComponent
   processFormDataBeforeSaveFunc = this.processFormDataBeforeSave.bind(this);
 
   markAdvancedFieldsActive: Signal<boolean>;
+  advancedFields = signal<string[]>([]);
+  showOnlyBasicFields = signal(true);
+  hiddenFields: Signal<string[]>;
 
   lajiForm?: LajiFormComponent;
+
+  customFormSchema = {
+    type: 'object',
+    properties: {
+      namespaceID: {
+        type: 'string',
+      },
+      objectID: {
+        type: 'string',
+      },
+    },
+  };
 
   private routerSub?: Subscription;
 
@@ -79,6 +94,11 @@ export class SpecimenFormComponent
     super(dialogService);
     this.prefilledFormData = this.getPrefilledFormDataFromCurrentUrl();
     this.markAdvancedFieldsActive = this.lajiFormFieldChooserService.isActive;
+    this.hiddenFields = computed(() =>
+      this.showOnlyBasicFields() && !this.markAdvancedFieldsActive()
+        ? this.advancedFields()
+        : [],
+    );
   }
 
   ngOnInit() {
@@ -101,20 +121,20 @@ export class SpecimenFormComponent
       return;
     }
     if (this.markAdvancedFieldsActive()) {
-      const advancedFields =
-        this.lajiFormFieldChooserService.stopFieldChooser();
-      console.log(advancedFields);
+      this.advancedFields.set(
+        this.lajiFormFieldChooserService.stopFieldChooser(),
+      );
     } else {
       this.lajiFormFieldChooserService.startFieldChooser(
         this.lajiForm,
-        [],
-        classFields
+        this.advancedFields(),
+        classFields,
       );
     }
   }
 
-  showOnlyBasicFields() {
-    console.log('show only basic fields clicked');
+  toggleShowOnlyBasicFields() {
+    this.showOnlyBasicFields.update(value => !value);
   }
 
   private getPrefilledFormDataFromCurrentUrl(): Partial<Document> | undefined {

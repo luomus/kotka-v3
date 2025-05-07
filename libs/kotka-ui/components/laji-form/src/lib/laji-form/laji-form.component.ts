@@ -15,12 +15,12 @@ import {
 } from '@angular/core';
 import LajiForm from '@luomus/laji-form/lib/index';
 import { Theme as LajiFormTheme } from '@luomus/laji-form/lib/themes/theme';
-import { scrollIntoViewIfNeeded } from '@luomus/laji-form/lib/utils';
+import { scrollIntoViewIfNeeded, uiSchemaJSONPointer, updateSafelyWithJSONPointer } from '@luomus/laji-form/lib/utils';
 import { LajiForm as LajiFormModel } from '@kotka/shared/models';
 import { combineLatest } from 'rxjs';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { MediaMetadata } from '@luomus/laji-form/lib/components/LajiForm';
-import { ToastService } from '@kotka/ui/services';
+import { Logger, ToastService } from '@kotka/ui/services';
 import { FormApiClient } from '@kotka/ui/services';
 import { FormFooterComponent } from '../form-footer/form-footer.component';
 
@@ -41,7 +41,11 @@ export class LajiFormComponent<T extends FormData = FormData>
   @Input() formData: Partial<T> = {};
   @Input() hasChanges? = false;
   @Input() disabled? = false;
+  @Input() footerDisabled?: boolean;
   @Input() mediaMetadata?: MediaMetadata;
+  @Input() hiddenFields?: string[];
+  @Input() customFormSchema?: any;
+
   @Input() showFooter? = true;
   @Input() showDeleteButton? = false;
   @Input() showCopyButton? = false;
@@ -71,6 +75,7 @@ export class LajiFormComponent<T extends FormData = FormData>
     @Inject(DOCUMENT) private document: Document,
     private apiClient: FormApiClient,
     private notifier: ToastService,
+    private logger: Logger,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
   ) {}
@@ -84,13 +89,14 @@ export class LajiFormComponent<T extends FormData = FormData>
       return;
     }
 
-    if (changes['form'] || changes['formData'] || changes['mediaMetadata']) {
+    if (changes['form'] || changes['formData'] || changes['mediaMetadata'] || changes['disabled'] || changes['hiddenFields']) {
       const form = this.form as LajiFormModel.SchemaForm;
 
       this.ngZone.runOutsideAngular(() => {
         this.lajiFormWrapper?.setState({
           schema: form.schema,
-          uiSchema: form.uiSchema,
+          uiSchema: this.getUiSchema(form, this.disabled, this.hiddenFields, this.customFormSchema),
+          uiSchemaContext: this.getUiSchemaContext(form, this.disabled),
           formData: this.formData,
           mediaMetadata: this.mediaMetadata,
           validators: form.validators,
@@ -180,11 +186,8 @@ export class LajiFormComponent<T extends FormData = FormData>
             rootElem: this.lajiFormRoot.nativeElement,
             theme: this.lajiFormTheme,
             schema: form.schema,
-            uiSchema: { ...form.uiSchema, 'ui:readonly': this.disabled },
-            uiSchemaContext: {
-              ...form.uiSchemaContext,
-              isEdit: !this.disabled,
-            },
+            uiSchema: this.getUiSchema(form, this.disabled, this.hiddenFields, this.customFormSchema),
+            uiSchemaContext: this.getUiSchemaContext(form, this.disabled),
             formData: this.formData,
             validators: form.validators,
             warnings: form.warnings,
@@ -214,8 +217,46 @@ export class LajiFormComponent<T extends FormData = FormData>
     }
   }
 
+  private getUiSchema(form: LajiFormModel.SchemaForm, disabled?: boolean, hiddenFields?: string[], customFormSchema?: any) {
+    let uiSchema = form.uiSchema;
+
+    (hiddenFields || []).forEach(field => {
+      let uiSchemaPointer: string|undefined;
+      try {
+        uiSchemaPointer = uiSchemaJSONPointer(form.schema, field);
+      } catch (err) {
+        if (customFormSchema) {
+          try {
+            uiSchemaPointer = uiSchemaJSONPointer(customFormSchema, field);
+          } catch (e) {
+            this.logger.error('Failed to parse hidden field pointer', err);
+          }
+        } else {
+          this.logger.error('Failed to parse hidden field pointer', err);
+        }
+      }
+
+      if (uiSchemaPointer) {
+        uiSchema = updateSafelyWithJSONPointer(
+          uiSchema,
+          { "ui:field": "HiddenField" },
+          uiSchemaPointer
+        );
+      }
+    });
+
+    return { ...uiSchema, 'ui:readonly': disabled };
+  }
+
+  private getUiSchemaContext(form: LajiFormModel.SchemaForm, disabled?: boolean) {
+    return {
+      ...form.uiSchemaContext,
+      isEdit: !disabled,
+    };
+  }
+
   private onError(error: Error, info: any) {
-    console.log('LajiForm crashed', { error, info, document: this.formData });
+    this.logger.error('LajiForm crashed', { error, info, document: this.formData });
     this.notifier?.showError('An unexpected error occurred');
   }
 
@@ -225,7 +266,7 @@ export class LajiFormComponent<T extends FormData = FormData>
         this.lajiFormWrapper?.unmount();
       });
     } catch (err) {
-      console.log('Unmounting failed', err);
+      this.logger.error('Unmounting failed', err);
     }
     this.formDestroy.emit();
   }

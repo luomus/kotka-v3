@@ -4,6 +4,9 @@
   [dataTypeName]="'specimen'"
   [prefilledFormData]="prefilledFormData"
   [processFormDataBeforeSaveFunc]="processFormDataBeforeSaveFunc"
+  [footerDisabled]="markAdvancedFieldsActive()"
+  [hiddenFields]="hiddenFields()"
+  [customFormSchema]="customFormSchema"
   [formContainerTpl]="formContainer"
   (formInit)="onFormInit($event)"
 >
@@ -15,6 +18,10 @@
         <div class="btn-group-vertical col-12">
           <button
             class="btn btn-light"
+            [ngClass]="{
+              'btn-light': !markAdvancedFieldsActive(),
+              'btn-success': markAdvancedFieldsActive()
+            }"
             [disabled]="!lajiForm"
             (click)="toggleMarkAdvancedFields()"
           >
@@ -23,9 +30,9 @@
           @if (!markAdvancedFieldsActive()) {
             <button
               class="btn btn-light"
-              (click)="showOnlyBasicFields()"
+              (click)="toggleShowOnlyBasicFields()"
             >
-              Show only basic fields
+              {{ showOnlyBasicFields() ? 'Show basic and advanced fields' : 'Show only basic fields' }}
             </button>
           }
         </div>

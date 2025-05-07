@@ -2,13 +2,11 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  Input,
   ViewChild,
   TemplateRef,
-  EventEmitter,
-  Output,
-  OnChanges,
   OnDestroy,
+  input,
+  output, effect, signal
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { KotkaDocumentObjectType, KotkaDocumentObjectMap, LajiForm } from '@kotka/shared/models';
@@ -62,26 +60,30 @@ export class FormViewComponent<
     T extends KotkaDocumentObjectType = KotkaDocumentObjectType,
     S extends KotkaDocumentObjectMap[T] = KotkaDocumentObjectMap[T],
   >
-  implements OnChanges, OnDestroy
+  implements OnDestroy
 {
-  @Input({ required: true }) formId!: string;
-  @Input({ required: true }) dataType!: T;
-  @Input() dataTypeName = '';
+  formId = input.required<string>();
+  dataType = input.required<T>();
+  dataTypeName = input('');
 
-  @Input() augmentFormFunc?: (
+  augmentFormFunc = input<(
     form: LajiForm.SchemaForm,
-  ) => Observable<LajiForm.SchemaForm>;
-  @Input() prefilledFormData?: Partial<S>;
-  @Input() processFormDataBeforeSaveFunc?: (
+  ) => Observable<LajiForm.SchemaForm>>();
+  prefilledFormData = input<Partial<S>>();
+  processFormDataBeforeSaveFunc = input<(
     formData: S
-  ) => Observable<S>;
+  ) => Observable<S>>();
 
-  @Input() editModeHeaderTpl?: TemplateRef<unknown>;
-  @Input() formContainerTpl?: TemplateRef<unknown>;
-  @Input() metaFieldsContainerTpl?: TemplateRef<unknown>;
+  footerDisabled = input<boolean>();
+  hiddenFields = input<string[]>();
+  customFormSchema = input<any>();
 
-  editMode = false;
-  dataURI?: string;
+  editModeHeaderTpl = input<TemplateRef<unknown>>();
+  formContainerTpl = input<TemplateRef<unknown>>();
+  metaFieldsContainerTpl = input<TemplateRef<unknown>>();
+
+  editMode = signal(false);
+  dataURI = signal<string|undefined>(undefined);
 
   vm$: Observable<FormState<S> | ErrorViewModel>;
 
@@ -90,9 +92,9 @@ export class FormViewComponent<
   isErrorViewModel = isErrorViewModel;
   isSuccessViewModel = isSuccessViewModel;
 
-  @Output() formDataChange = new EventEmitter<Partial<S | undefined>>();
-  @Output() formInit = new EventEmitter<LajiFormComponent>();
-  @Output() disabledChange = new EventEmitter<boolean | undefined>();
+  formDataChange = output<Partial<S | undefined>>();
+  formInit = output<LajiFormComponent>();
+  disabledChange = output<boolean | undefined>();
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
 
@@ -108,15 +110,15 @@ export class FormViewComponent<
     private formViewFacade: FormViewFacade<T, S>,
     private cdr: ChangeDetectorRef,
   ) {
-    this.setRouteParamsIfChanged();
+    this.setRouteParams();
 
     this.vm$ = this.formViewFacade.vm$;
 
     this.initSubscriptions();
-  }
 
-  ngOnChanges() {
-    this.updateInputs();
+    effect(() => {
+      this.updateInputs();
+    });
   }
 
   ngOnDestroy() {
@@ -207,7 +209,7 @@ export class FormViewComponent<
     }
 
     this.lajiForm?.block();
-    this.apiClient.deleteDocument(this.dataType, data.id).subscribe({
+    this.apiClient.deleteDocument(this.dataType(), data.id).subscribe({
       next: () => {
         this.formViewFacade.setFormHasChanges(false);
         this.lajiForm?.unBlock();
@@ -229,19 +231,20 @@ export class FormViewComponent<
   }
 
   private save$(data: S): Observable<S> {
-    const data$: Observable<S> = this.processFormDataBeforeSaveFunc
-      ? this.processFormDataBeforeSaveFunc(data)
+    const processFormDataBeforeSaveFunc = this.processFormDataBeforeSaveFunc();
+    const data$: Observable<S> = processFormDataBeforeSaveFunc
+      ? processFormDataBeforeSaveFunc(data)
       : of(data);
 
     return data$.pipe(
       switchMap(data => {
-        if (this.editMode) {
+        if (this.editMode()) {
           if (!data.id) {
             throw new Error('Document is missing an id');
           }
-          return this.apiClient.updateDocument(this.dataType, data.id, data);
+          return this.apiClient.updateDocument(this.dataType(), data.id, data);
         } else {
-          return this.apiClient.createDocument(this.dataType, data);
+          return this.apiClient.createDocument(this.dataType(), data);
         }
       })
     );
@@ -292,9 +295,7 @@ export class FormViewComponent<
   private initSubscriptions() {
     this.subscription.add(
       navigationEnd$(this.router).subscribe(() => {
-        if (this.setRouteParamsIfChanged()) {
-          this.updateInputs();
-        }
+        this.setRouteParams();
       }),
     );
 
@@ -326,27 +327,22 @@ export class FormViewComponent<
     );
   }
 
-  private setRouteParamsIfChanged(): boolean {
+  private setRouteParams() {
     const editMode = this.activeRoute.snapshot.url[0].path === 'edit';
     const dataURI = this.activeRoute.snapshot.queryParams['uri'];
 
-    if (this.editMode !== editMode || this.dataURI !== dataURI) {
-      this.editMode = editMode;
-      this.dataURI = dataURI;
-      return true;
-    }
-
-    return false;
+    this.editMode.set(editMode);
+    this.dataURI.set(dataURI);
   }
 
   private updateInputs() {
     this.formViewFacade.setInputs({
-      formId: this.formId,
-      dataType: this.dataType,
-      editMode: this.editMode,
-      dataURI: this.dataURI,
-      augmentFormFunc: this.augmentFormFunc,
-      prefilledFormData: this.prefilledFormData
+      formId: this.formId(),
+      dataType: this.dataType(),
+      editMode: this.editMode(),
+      dataURI: this.dataURI(),
+      augmentFormFunc: this.augmentFormFunc(),
+      prefilledFormData: this.prefilledFormData()
     });
   }
 }

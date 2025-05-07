@@ -2,7 +2,7 @@
 <kui-form-footer
   *ngIf="showFooter"
   [hasChanges]="hasChanges"
-  [disabled]="disabled"
+  [disabled]="disabled || footerDisabled"
   [hasOnlyWarnings]="hasOnlyWarnings"
   [showDeleteButton]="showDeleteButton"
   [showCopyButton]="showCopyButton"

@@ -108,11 +108,6 @@ export class LajiFormFieldChooserComponent {
     if (selected) {
       newSelected.push(field);
     }
-/*
-    this.highlightIndexesByField()[field].forEach(idx => {
-      this.highlightSelectedByIdx[idx] = selected;
-    });
-*/
     this.selectedFieldsChange.emit(newSelected);
   }
 
