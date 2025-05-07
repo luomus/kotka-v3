@@ -1,13 +1,27 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnDestroy,
+  OnInit, Signal
+} from '@angular/core';
 import { KotkaDocumentObjectType, Document } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
 import { FormViewContainerComponent } from '@kotka/ui/form-view';
 import { FormViewComponent } from '@kotka/ui/form-view';
-import { DialogService, navigationEnd$, UserService } from '@kotka/ui/services';
+import {
+  DialogService,
+  navigationEnd$,
+  UserService,
+} from '@kotka/ui/services';
 import { Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { NgTemplateOutlet } from '@angular/common';
+import {
+  LajiFormComponent,
+  LajiFormFieldChooserService
+} from '@kotka/ui/laji-form';
 
 type UrlDataType = 'botany'|'zoo'|'palaeontology'|'accession'|'culture';
 type DataType = 'botanyspecimen'|'zoospecimen'|'palaeontology'|'accession'|'culture';
@@ -25,6 +39,13 @@ const urlToDataTypeMap: Record<UrlDataType, DataType> = {
   culture: 'culture',
 };
 
+const classFields = [
+  '/gatherings',
+  '/gatherings/units',
+  '/gatherings/units/identifications',
+  '/gatherings/units/typeSpecimens'
+];
+
 @Component({
   selector: 'kotka-specimen-form',
   templateUrl: './specimen-form.component.html',
@@ -40,8 +61,11 @@ export class SpecimenFormComponent
   dataType: KotkaDocumentObjectType.specimen = KotkaDocumentObjectType.specimen;
 
   prefilledFormData?: Partial<Document>;
-
   processFormDataBeforeSaveFunc = this.processFormDataBeforeSave.bind(this);
+
+  markAdvancedFieldsActive: Signal<boolean>;
+
+  lajiForm?: LajiFormComponent;
 
   private routerSub?: Subscription;
 
@@ -49,10 +73,12 @@ export class SpecimenFormComponent
     dialogService: DialogService,
     private userService: UserService,
     private router: Router,
+    private lajiFormFieldChooserService: LajiFormFieldChooserService,
     private cdr: ChangeDetectorRef,
   ) {
     super(dialogService);
     this.prefilledFormData = this.getPrefilledFormDataFromCurrentUrl();
+    this.markAdvancedFieldsActive = this.lajiFormFieldChooserService.isActive;
   }
 
   ngOnInit() {
@@ -66,8 +92,25 @@ export class SpecimenFormComponent
     this.routerSub?.unsubscribe();
   }
 
-  startMarkingAdvancedFields() {
-    console.log('start marking advanced fields clicked');
+  onFormInit(lajiForm: LajiFormComponent) {
+    this.lajiForm = lajiForm;
+  }
+
+  toggleMarkAdvancedFields() {
+    if (!this.lajiForm) {
+      return;
+    }
+    if (this.markAdvancedFieldsActive()) {
+      const advancedFields =
+        this.lajiFormFieldChooserService.stopFieldChooser();
+      console.log(advancedFields);
+    } else {
+      this.lajiFormFieldChooserService.startFieldChooser(
+        this.lajiForm,
+        [],
+        classFields
+      );
+    }
   }
 
   showOnlyBasicFields() {

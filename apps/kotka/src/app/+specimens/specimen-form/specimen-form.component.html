@@ -5,6 +5,7 @@
   [prefilledFormData]="prefilledFormData"
   [processFormDataBeforeSaveFunc]="processFormDataBeforeSaveFunc"
   [formContainerTpl]="formContainer"
+  (formInit)="onFormInit($event)"
 >
 </kotka-form-view>
 <ng-template #formContainer let-formContentTpl>
@@ -14,16 +15,19 @@
         <div class="btn-group-vertical col-12">
           <button
             class="btn btn-light"
-            (click)="startMarkingAdvancedFields()"
+            [disabled]="!lajiForm"
+            (click)="toggleMarkAdvancedFields()"
           >
-            Start marking advanced fields
+            {{ markAdvancedFieldsActive() ? 'Marking advanced fields. Stop and save' : 'Start marking advanced fields' }}
           </button>
-          <button
-            class="btn btn-light"
-            (click)="showOnlyBasicFields()"
-          >
-            Show only basic fields
-          </button>
+          @if (!markAdvancedFieldsActive()) {
+            <button
+              class="btn btn-light"
+              (click)="showOnlyBasicFields()"
+            >
+              Show only basic fields
+            </button>
+          }
         </div>
       </div>
     </div>

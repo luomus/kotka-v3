@@ -20,7 +20,6 @@ import { globals } from '../../../environments/globals';
 import { FormViewContainerComponent } from '@kotka/ui/form-view';
 import { TransactionPdfSheetsComponent } from '../transaction-pdf-sheets/transaction-pdf-sheets.component';
 import { CommonModule } from '@angular/common';
-import { LabelPipe } from '@kotka/ui/pipes';
 
 @Component({
   selector: 'kotka-transaction-form',
@@ -30,8 +29,7 @@ import { LabelPipe } from '@kotka/ui/pipes';
   imports: [
     CommonModule,
     FormViewComponent,
-    TransactionPdfSheetsComponent,
-    LabelPipe,
+    TransactionPdfSheetsComponent
   ],
   providers: [TransactionFormEmbedService],
 })
