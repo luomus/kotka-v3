@@ -46,6 +46,7 @@ const getHighlightElemIdFromSchemaElemId = (schemaElemId: string): string => {
         [left]="highlight.left"
         [width]="highlight.width"
         [height]="highlight.height"
+        [label]="highlight.field"
         [selected]="highlightSelectedByIdx()[idx]"
         (selectedChange)="setSelected(highlight.field, $event)"
       ></kui-laji-form-field-chooser-highlight>
