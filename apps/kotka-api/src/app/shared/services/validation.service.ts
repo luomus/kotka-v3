@@ -46,7 +46,7 @@ export class ValidationService {
     const members: Dataset[] = await lastValueFrom(this.lajiStoreService.search<Dataset>('GX.dataset', { query: { match: { [datasetNameField]: datasetName }}}).pipe(map(res => res.data?.member)));
 
     if (members.length !== 0 && !(members.length === 1 && members[0].id && members[0].id === data.id)) {
-      return this.getError(datasetNameField, "Dataset name must be unique.");
+      return this.getError(datasetNameField, 'Dataset name must be unique.');
     }
 
     return {};
@@ -64,10 +64,10 @@ export class ValidationService {
     try {
       const isValid = await this.abschService.checkIRCCNumberIsValid(value);
       if (!isValid) {
-        return this.getError(field, "Invalid IRCC number \"%{value}\" given.", value);
+        return this.getError(field, 'Invalid IRCC number "%{value}" given.', value);
       }
     } catch (e) {
-      return this.getError(field, "ABSCH API didn't respond in time.");
+      return this.getError(field, 'ABSCH API didn\'t respond in time.');
     }
 
     return {};

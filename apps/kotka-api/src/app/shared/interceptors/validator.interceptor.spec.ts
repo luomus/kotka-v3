@@ -9,118 +9,118 @@ import { of } from 'rxjs';
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces';
 
 const mockForm = {
-  "schema": {
-    "type": "object",
-    "properties": {
-      "owner": {
-        "type": "string",
-        "title": "Owner of record"
+  'schema': {
+    'type': 'object',
+    'properties': {
+      'owner': {
+        'type': 'string',
+        'title': 'Owner of record'
       },
-      "datasetType": {
-        "type": "string",
-        "oneOf": [
+      'datasetType': {
+        'type': 'string',
+        'oneOf': [
           {
-            "const": "",
-            "title": ""
+            'const': '',
+            'title': ''
           },
           {
-            "const": "GX.datasetTypeProject",
-            "title": "Project"
+            'const': 'GX.datasetTypeProject',
+            'title': 'Project'
           }
         ],
-        "title": "Dataset type"
+        'title': 'Dataset type'
       },
-      "datasetName": {
-        "type": "object",
-        "properties": {
-          "fi": {
-            "type": "string"
+      'datasetName': {
+        'type': 'object',
+        'properties': {
+          'fi': {
+            'type': 'string'
           },
-          "sv": {
-            "type": "string"
+          'sv': {
+            'type': 'string'
           },
-          "en": {
-            "type": "string"
+          'en': {
+            'type': 'string'
           }
         },
-        "title": "Name"
+        'title': 'Name'
       },
-      "personsResponsible": {
-        "type": "string",
-        "title": "Person(s) responsible"
+      'personsResponsible': {
+        'type': 'string',
+        'title': 'Person(s) responsible'
       },
-      "description": {
-        "type": "object",
-        "properties": {
-          "fi": {
-            "type": "string"
+      'description': {
+        'type': 'object',
+        'properties': {
+          'fi': {
+            'type': 'string'
           },
-          "sv": {
-            "type": "string"
+          'sv': {
+            'type': 'string'
           },
-          "en": {
-            "type": "string"
+          'en': {
+            'type': 'string'
           }
         },
-        "title": "Description"
+        'title': 'Description'
       },
-      "researchFundingSource": {
-        "type": "string",
-        "title": "Research funding source"
+      'researchFundingSource': {
+        'type': 'string',
+        'title': 'Research funding source'
       },
-      "researchFundingRecipient": {
-        "type": "string",
-        "title": "Research funding recipient"
+      'researchFundingRecipient': {
+        'type': 'string',
+        'title': 'Research funding recipient'
       },
-      "researchFundingDuration": {
-        "type": "string",
-        "title": "Research funding duration"
+      'researchFundingDuration': {
+        'type': 'string',
+        'title': 'Research funding duration'
       },
-      "researchCollaborator": {
-        "type": "string",
-        "title": "Research collaborator(s)"
+      'researchCollaborator': {
+        'type': 'string',
+        'title': 'Research collaborator(s)'
       },
-      "benefitsDerivedAndShared": {
-        "type": "string",
-        "title": "Benefits derived and shared"
+      'benefitsDerivedAndShared': {
+        'type': 'string',
+        'title': 'Benefits derived and shared'
       }
     },
-    "required": [
-      "owner",
-      "datasetName",
-      "personsResponsible"
+    'required': [
+      'owner',
+      'datasetName',
+      'personsResponsible'
     ]
   },
-  "validators": {
-    "owner": {
-      "format": {
-        "pattern": "^MOS\\.\\d+",
-        "message": "Unknown organization"
+  'validators': {
+    'owner': {
+      'format': {
+        'pattern': '^MOS\\.\\d+',
+        'message': 'Unknown organization'
       }
     },
-    "datasetName": {
-      "properties": {
-        "en": {
-          "presence": {
-            "message": "Required field."
+    'datasetName': {
+      'properties': {
+        'en': {
+          'presence': {
+            'message': 'Required field.'
           },
-          "remote": {
-            "validator": "kotkaDatasetNameUnique"
+          'remote': {
+            'validator': 'kotkaDatasetNameUnique'
           }
         }
       }
     },
-    "description": {
-      "properties": {
-        "en": {
-          "presence": {
-            "message": "Required field."
+    'description': {
+      'properties': {
+        'en': {
+          'presence': {
+            'message': 'Required field.'
           }
         }
       }
     }
   },
-  "warnings": {},
+  'warnings': {},
 };
 
 describe('ValidationInterceptor', () => {

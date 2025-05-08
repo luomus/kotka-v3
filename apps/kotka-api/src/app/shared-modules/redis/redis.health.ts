@@ -27,6 +27,6 @@ export class RedisHealthIndicator extends HealthIndicator {
       return this.getStatus(key, true);
     }
 
-    throw new HealthCheckError("Redis connection failed", this.getStatus(key, false));
+    throw new HealthCheckError('Redis connection failed', this.getStatus(key, false));
   }
 }

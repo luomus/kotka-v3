@@ -55,7 +55,7 @@ export class ValidatorInterceptor implements NestInterceptor {
         }
         let message = error.message;
         if (error.keyword === 'enum' && error.params && error.params.allowedValues) {
-          message += ` '${error.params.allowedValues.join(`', '`)}.`;
+          message += ` '${error.params.allowedValues.join('\', \'')}.`;
         }
         errors[error.instancePath].push(message);
 

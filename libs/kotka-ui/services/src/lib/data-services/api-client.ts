@@ -111,9 +111,9 @@ export class ApiClient {
     const idsPart = ids.slice(startIdx, endIdx);
 
     const searchQueryObject: ElasticsearchQuery = {
-      "query": {
-        "terms": {
-          "id": idsPart
+      'query': {
+        'terms': {
+          'id': idsPart
         }
       }
     };

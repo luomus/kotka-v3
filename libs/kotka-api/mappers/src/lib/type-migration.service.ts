@@ -115,13 +115,13 @@ export class TypeMigrationService {
     'HRA.transaction': {
       'status': {
         type: 'partial',
-        target: "HRA.transactionStatus",
-        replacer: "HRX.status",
+        target: 'HRA.transactionStatus',
+        replacer: 'HRX.status',
       },
       'transportMethod': {
         type: 'partial',
-        target: "HRA.sentType",
-        replacer: "HRX.transportMethod",
+        target: 'HRA.sentType',
+        replacer: 'HRX.transportMethod',
       },
       'type': {
         type: 'partial',

@@ -13,7 +13,7 @@ type RendererParams = ICellRendererParams & RendererExtraParams;
 
 @Component({
   selector: 'kui-transaction-count-renderer',
-  template: ` <span title="{{ result }}">{{ result }}</span> `,
+  template: ' <span title="{{ result }}">{{ result }}</span> ',
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -14,6 +14,7 @@
     "kotka:cli": "ts-node --project=./apps/kotka-cli/tsconfig.app.json -r tsconfig-paths/register ./apps/kotka-cli/src/console.ts",
     "lint": "nx lint",
     "lint:all": "nx run-many --target=lint",
+    "lint:all:fix": "nx run-many --target=lint --fix",
     "prepare": "husky install"
   },
   "private": true,

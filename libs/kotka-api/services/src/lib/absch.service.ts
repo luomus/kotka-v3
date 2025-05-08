@@ -8,7 +8,7 @@ export class AbschService {
     private readonly httpService: HttpService,
   ) {}
 
-  private baseUrl = "https://api.cbd.int/api/v2013/";
+  private baseUrl = 'https://api.cbd.int/api/v2013/';
 
   public async checkIRCCNumberIsValid(IRCCNumber: string): Promise<boolean> {
     const match = IRCCNumber.match(/^ABSCH-IRCC-[A-Z]{2}-([0-9]{6,7})-[1-9]$/);

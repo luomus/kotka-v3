@@ -60,7 +60,7 @@ export class LajiFormFieldChooserService {
     }
 
     const containerElem: HTMLElement = lajiForm.lajiFormRoot.nativeElement;
-    containerElem.children[0].setAttribute("inert", "");
+    containerElem.children[0].setAttribute('inert', '');
     this.formContainerElem.set(containerElem);
 
     const componentRef = this.componentService.createComponentFromType(LajiFormFieldChooserComponent);

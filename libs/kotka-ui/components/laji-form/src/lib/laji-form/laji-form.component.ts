@@ -230,7 +230,7 @@ export class LajiFormComponent<T extends FormData = FormData>
       if (uiSchemaPointer) {
         uiSchema = updateSafelyWithJSONPointer(
           uiSchema,
-          { "ui:field": "HiddenField" },
+          { 'ui:field': 'HiddenField' },
           uiSchemaPointer
         );
       }

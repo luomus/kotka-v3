@@ -188,7 +188,7 @@ export class TransactionTableComponent {
         field: 'correspondentPerson',
       },
       {
-        headerName: "Sender's transaction ID",
+        headerName: 'Sender\'s transaction ID',
         field: 'externalID',
       },
       {

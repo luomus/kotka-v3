@@ -3,7 +3,7 @@ import { CellRendererComponent } from './cell-renderer';
 
 @Component({
   selector: 'kui-due-days-renderer',
-  template: ` <span title="{{ result }}">{{ result }}</span> `,
+  template: ' <span title="{{ result }}">{{ result }}</span> ',
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
