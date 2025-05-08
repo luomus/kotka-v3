@@ -1,5 +1,5 @@
 <kui-main-content
-  [header]="editMode() ? (editModeHeaderTpl() ? undefined : 'Edit ' + dataTypeName() + ' ' + (dataURI || '')) : 'Add ' + dataTypeName()"
+  [header]="editMode() ? (editModeHeaderTpl() ? undefined : 'Edit ' + dataTypeName() + ' ' + (dataURI() || '')) : 'Add ' + dataTypeName()"
   [headerTpl]="editMode() && editModeHeaderTpl() ? editModeHeaderTplWithContext : undefined"
   [containerClass]="'container'"
 >

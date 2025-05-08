@@ -20,7 +20,6 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
         background: transparent;
         border: none;
         position: absolute;
-        z-index: 1039;
       }
       .laji-form-field-chooser-highlight:focus-visible, .laji-form-field-chooser-highlight:hover {
         background-color: rgb(220, 53, 69, 10%);
