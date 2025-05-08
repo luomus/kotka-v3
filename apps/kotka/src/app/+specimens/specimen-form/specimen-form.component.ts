@@ -1,7 +1,7 @@
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component, computed,
+  Component, computed, effect,
   OnDestroy,
   OnInit, signal, Signal
 } from '@angular/core';
@@ -22,6 +22,7 @@ import {
   LajiFormComponent,
   LajiFormFieldChooserService
 } from '@kotka/ui/laji-form';
+import { LocalStorageService } from 'ngx-webstorage';
 
 type UrlDataType = 'botany'|'zoo'|'palaeontology'|'accession'|'culture';
 type DataType = 'botanyspecimen'|'zoospecimen'|'palaeontology'|'accession'|'culture';
@@ -47,6 +48,15 @@ const classFields = [
   '/gatherings/units/samples'
 ];
 
+const defaultAdvancedFields = [
+  '/publicityRestrictions','/legID','/additionalIDs','/dataSource','/publication','/separatedFrom','/separatedTo','/duplicatesIn','/acquiredFrom','/acquisitionDate','/exsiccatum','/preservation','/URL','/language',
+  '/gatherings/coordinateRadius','/gatherings/alt','/gatherings/depth','/gatherings/AFEQuadrat','/gatherings/UTMQuadrat', '/gatherings/units/coordinateNotes',
+  '/gatherings/substrate','/gatherings/localityID','/gatherings/localityDescription','/gatherings/habitatDescription','/gatherings/habitatClassification','/gatherings/notes',
+  '/gatherings/units/sex','/gatherings/units/age','/gatherings/units/count','/gatherings/units/populationAbundance', '/gatherings/units/DBH','/gatherings/units/decayStage',
+  '/gatherings/units/chemistry','/gatherings/units/microscopy','/gatherings/units/macroscopy','/gatherings/units/ring','/gatherings/units/preparations','/gatherings/units/notes',
+  '/gatherings/units/identifications/genusQualifier','/gatherings/units/identifications/speciesQualifier','/gatherings/units/identifications/taxonID','/gatherings/units/identifications/identificationNotes'
+];
+
 @Component({
   selector: 'kotka-specimen-form',
   templateUrl: './specimen-form.component.html',
@@ -65,11 +75,9 @@ export class SpecimenFormComponent
   processFormDataBeforeSaveFunc = this.processFormDataBeforeSave.bind(this);
 
   markAdvancedFieldsActive: Signal<boolean>;
-  advancedFields = signal<string[]>([]);
+  advancedFields = signal<string[]|undefined>([]);
   showOnlyBasicFields = signal(true);
-  hiddenFields: Signal<string[]>;
-
-  lajiForm?: LajiFormComponent;
+  hiddenFields: Signal<string[]|undefined>;
 
   customFormSchema = {
     type: 'object',
@@ -83,6 +91,9 @@ export class SpecimenFormComponent
     },
   };
 
+  lajiForm?: LajiFormComponent;
+
+  private advancedFieldsStorageKey= signal<string|undefined>(undefined);
   private routerSub?: Subscription;
 
   constructor(
@@ -90,16 +101,34 @@ export class SpecimenFormComponent
     private userService: UserService,
     private router: Router,
     private lajiFormFieldChooserService: LajiFormFieldChooserService,
+    private storage: LocalStorageService,
     private cdr: ChangeDetectorRef,
   ) {
     super(dialogService);
+
     this.prefilledFormData = this.getPrefilledFormDataFromCurrentUrl();
+
     this.markAdvancedFieldsActive = this.lajiFormFieldChooserService.isActive;
+
     this.hiddenFields = computed(() =>
       this.showOnlyBasicFields() && !this.markAdvancedFieldsActive()
         ? this.advancedFields()
         : [],
     );
+
+    this.userService.getCurrentLoggedInUser().pipe(
+      map(user => `${this.dataType}-form-${user.id}-advanced-fields`)
+    ).subscribe(key => {
+      this.advancedFieldsStorageKey.set(key);
+      this.advancedFields.set(this.storage.retrieve(key) || defaultAdvancedFields);
+    });
+
+    effect(() => {
+      const key = this.advancedFieldsStorageKey();
+      if (key) {
+        this.storage.store(key, this.advancedFields());
+      }
+    });
   }
 
   ngOnInit() {

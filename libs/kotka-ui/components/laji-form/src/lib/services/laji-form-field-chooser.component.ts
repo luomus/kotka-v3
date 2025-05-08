@@ -89,7 +89,7 @@ export class LajiFormFieldChooserComponent {
     this.highlightSelectedByIdx = computed(() => {
       const result: Record<number, boolean> = {};
       this.selectedFields().forEach(field => {
-        this.highlightIndexesByField()[field].forEach(idx => {
+        this.highlightIndexesByField()[field]?.forEach(idx => {
           result[idx] = true;
         });
       });
