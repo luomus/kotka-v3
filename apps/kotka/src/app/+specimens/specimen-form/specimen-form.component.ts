@@ -15,7 +15,7 @@ import {
   UserService,
 } from '@kotka/ui/services';
 import { Router } from '@angular/router';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
 import {
@@ -26,11 +26,6 @@ import { LocalStorageService } from 'ngx-webstorage';
 
 type UrlDataType = 'botany'|'zoo'|'palaeontology'|'accession'|'culture';
 type DataType = 'botanyspecimen'|'zoospecimen'|'palaeontology'|'accession'|'culture';
-
-interface SpecimenFormDocument extends Document {
-  namespaceID?: string;
-  objectID?: string;
-}
 
 const urlToDataTypeMap: Record<UrlDataType, DataType> = {
   botany: 'botanyspecimen',
@@ -72,24 +67,11 @@ export class SpecimenFormComponent
   dataType: KotkaDocumentObjectType.specimen = KotkaDocumentObjectType.specimen;
 
   prefilledFormData?: Partial<Document>;
-  processFormDataBeforeSaveFunc = this.processFormDataBeforeSave.bind(this);
 
   markAdvancedFieldsActive: Signal<boolean>;
   advancedFields = signal<string[]|undefined>([]);
   showOnlyBasicFields = signal(true);
   hiddenFields: Signal<string[]|undefined>;
-
-  customFormSchema = {
-    type: 'object',
-    properties: {
-      namespaceID: {
-        type: 'string',
-      },
-      objectID: {
-        type: 'string',
-      },
-    },
-  };
 
   lajiForm?: LajiFormComponent;
 
@@ -188,26 +170,5 @@ export class SpecimenFormComponent
     }
 
     return undefined;
-  }
-
-  private processFormDataBeforeSave(
-    data: SpecimenFormDocument,
-  ): Observable<Document> {
-    return this.userService.getCurrentLoggedInUser().pipe(
-      map((user) => {
-        if (data.namespaceID && data.objectID) {
-          if (!data.namespaceID.includes(':')) {
-            const defaultPrefix = user.defaultQNamePrefix || 'luomus';
-            data.namespaceID = defaultPrefix + ':' + data.namespaceID;
-          }
-          data.id = data.namespaceID + '.' + data.objectID;
-        }
-
-        delete data.namespaceID;
-        delete data.objectID;
-
-        return data;
-      }),
-    );
   }
 }

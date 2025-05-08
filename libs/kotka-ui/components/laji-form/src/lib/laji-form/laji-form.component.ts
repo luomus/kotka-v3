@@ -44,7 +44,6 @@ export class LajiFormComponent<T extends FormData = FormData>
   @Input() footerDisabled?: boolean;
   @Input() mediaMetadata?: MediaMetadata;
   @Input() hiddenFields?: string[];
-  @Input() customFormSchema?: any;
 
   @Input() showFooter? = true;
   @Input() showDeleteButton? = false;
@@ -95,7 +94,7 @@ export class LajiFormComponent<T extends FormData = FormData>
       this.ngZone.runOutsideAngular(() => {
         this.lajiFormWrapper?.setState({
           schema: form.schema,
-          uiSchema: this.getUiSchema(form, this.disabled, this.hiddenFields, this.customFormSchema),
+          uiSchema: this.getUiSchema(form, this.disabled, this.hiddenFields),
           uiSchemaContext: this.getUiSchemaContext(form, this.disabled),
           formData: this.formData,
           mediaMetadata: this.mediaMetadata,
@@ -186,7 +185,7 @@ export class LajiFormComponent<T extends FormData = FormData>
             rootElem: this.lajiFormRoot.nativeElement,
             theme: this.lajiFormTheme,
             schema: form.schema,
-            uiSchema: this.getUiSchema(form, this.disabled, this.hiddenFields, this.customFormSchema),
+            uiSchema: this.getUiSchema(form, this.disabled, this.hiddenFields),
             uiSchemaContext: this.getUiSchemaContext(form, this.disabled),
             formData: this.formData,
             validators: form.validators,
@@ -217,7 +216,7 @@ export class LajiFormComponent<T extends FormData = FormData>
     }
   }
 
-  private getUiSchema(form: LajiFormModel.SchemaForm, disabled?: boolean, hiddenFields?: string[], customFormSchema?: any) {
+  private getUiSchema(form: LajiFormModel.SchemaForm, disabled?: boolean, hiddenFields?: string[]) {
     let uiSchema = form.uiSchema;
 
     (hiddenFields || []).forEach(field => {
@@ -225,15 +224,7 @@ export class LajiFormComponent<T extends FormData = FormData>
       try {
         uiSchemaPointer = uiSchemaJSONPointer(form.schema, field);
       } catch (err) {
-        if (customFormSchema) {
-          try {
-            uiSchemaPointer = uiSchemaJSONPointer(customFormSchema, field);
-          } catch (e) {
-            this.logger.error('Failed to parse hidden field pointer', err);
-          }
-        } else {
-          this.logger.error('Failed to parse hidden field pointer', err);
-        }
+        this.logger.error('Failed to parse hidden field pointer', err);
       }
 
       if (uiSchemaPointer) {

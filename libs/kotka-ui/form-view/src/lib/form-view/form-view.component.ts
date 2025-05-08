@@ -15,7 +15,6 @@ import {
   EMPTY,
   from,
   Observable,
-  of,
   Subscription,
   switchMap
 } from 'rxjs';
@@ -70,13 +69,9 @@ export class FormViewComponent<
     form: LajiForm.SchemaForm,
   ) => Observable<LajiForm.SchemaForm>>();
   prefilledFormData = input<Partial<S>>();
-  processFormDataBeforeSaveFunc = input<(
-    formData: S
-  ) => Observable<S>>();
 
   footerDisabled = input<boolean>();
   hiddenFields = input<string[]>();
-  customFormSchema = input<any>();
 
   editModeHeaderTpl = input<TemplateRef<unknown>>();
   formContainerTpl = input<TemplateRef<unknown>>();
@@ -231,23 +226,14 @@ export class FormViewComponent<
   }
 
   private save$(data: S): Observable<S> {
-    const processFormDataBeforeSaveFunc = this.processFormDataBeforeSaveFunc();
-    const data$: Observable<S> = processFormDataBeforeSaveFunc
-      ? processFormDataBeforeSaveFunc(data)
-      : of(data);
-
-    return data$.pipe(
-      switchMap(data => {
-        if (this.editMode()) {
-          if (!data.id) {
-            throw new Error('Document is missing an id');
-          }
-          return this.apiClient.updateDocument(this.dataType(), data.id, data);
-        } else {
-          return this.apiClient.createDocument(this.dataType(), data);
-        }
-      })
-    );
+    if (this.editMode()) {
+      if (!data.id) {
+        throw new Error('Document is missing an id');
+      }
+      return this.apiClient.updateDocument(this.dataType(), data.id, data);
+    } else {
+      return this.apiClient.createDocument(this.dataType(), data);
+    }
   }
 
   private copyAsNew(data: Partial<S>, excludedFields: string[] = []) {
