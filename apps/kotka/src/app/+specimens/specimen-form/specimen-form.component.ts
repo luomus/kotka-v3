@@ -19,6 +19,7 @@ import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
 import {
+  getRequiredFields,
   LajiFormComponent,
   LajiFormFieldChooserService
 } from '@kotka/ui/laji-form';
@@ -137,10 +138,17 @@ export class SpecimenFormComponent
         this.lajiFormFieldChooserService.stopFieldChooser(),
       );
     } else {
+      const schema = this.lajiForm.form?.schema;
+      if (!schema) {
+        throw new Error('Form is undefined');
+      }
+
       this.lajiFormFieldChooserService.startFieldChooser(
         this.lajiForm,
         this.advancedFields(),
         classFields,
+        getRequiredFields(schema),
+        'Can\'t mark required field as advanced field!'
       );
     }
   }

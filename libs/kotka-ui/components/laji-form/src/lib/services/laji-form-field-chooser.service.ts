@@ -21,6 +21,8 @@ export class LajiFormFieldChooserService {
 
   private selectedFields = signal<string[]>([]);
   private ignoreFields = signal<string[]>([]);
+  private unselectableFields = signal<string[]>([]);
+  private unselectableFieldsErrorMsg = signal<string|undefined>(undefined);
 
   private lajiFormDestroySub?: Subscription;
 
@@ -33,11 +35,28 @@ export class LajiFormFieldChooserService {
     effect(() => {
       this.fieldChooserComponentRef()?.setInput('ignoreFields', this.ignoreFields());
     });
+    effect(() => {
+      this.fieldChooserComponentRef()?.setInput('unselectableFields', this.unselectableFields());
+    });
+    effect(() => {
+      this.fieldChooserComponentRef()?.setInput('unselectableFieldsErrorMsg', this.unselectableFieldsErrorMsg());
+    });
   }
 
-  startFieldChooser(lajiForm: LajiFormComponent, selectedFields: string[] = [], ignoreFields: string[] = []) {
+  startFieldChooser(
+    lajiForm: LajiFormComponent,
+    selectedFields: string[] = [],
+    ignoreFields: string[] = [],
+    unselectableFields: string[] = [],
+    unselectableFieldsErrorMsg?: string
+  ) {
     if (this.isActive()) {
       throw new Error('Field chooser is already started');
+    }
+
+    const schema = lajiForm.form?.schema;
+    if (!schema) {
+      throw new Error('Form is missing');
     }
 
     const containerElem: HTMLElement = lajiForm.lajiFormRoot.nativeElement;
@@ -54,6 +73,8 @@ export class LajiFormFieldChooserService {
     this.isActiveSignal.set(true);
     this.selectedFields.set(selectedFields);
     this.ignoreFields.set(ignoreFields);
+    this.unselectableFields.set(unselectableFields);
+    this.unselectableFieldsErrorMsg.set(unselectableFieldsErrorMsg);
 
     this.lajiFormDestroySub = lajiForm.formDestroy.subscribe(() => {
       this.stopFieldChooser();
@@ -80,6 +101,8 @@ export class LajiFormFieldChooserService {
     this.isActiveSignal.set(false);
     this.selectedFields.set([]);
     this.ignoreFields.set([]);
+    this.unselectableFields.set([]);
+    this.unselectableFieldsErrorMsg.set(undefined);
 
     this.lajiFormDestroySub?.unsubscribe();
 

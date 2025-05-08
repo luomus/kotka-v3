@@ -11,6 +11,7 @@ import {
   LajiFormFieldChooserHighlightComponent,
 } from './laji-form-field-chooser-highlight.component';
 import { DOCUMENT } from '@angular/common';
+import { DialogService } from '@kotka/ui/services';
 
 interface HighlightDimensions {
   top: number;
@@ -59,6 +60,8 @@ const getHighlightElemIdFromSchemaElemId = (schemaElemId: string): string => {
 export class LajiFormFieldChooserComponent {
   selectedFields = input<string[]>([]);
   ignoreFields = input<string[]>([]);
+  unselectableFields = input<string[]>([]);
+  unselectableFieldsErrorMsg = input<string|undefined>(undefined);
 
   highlights = signal<HighlightData[]>([]);
   highlightSelectedByIdx: Signal<Record<number, boolean>>;
@@ -69,7 +72,8 @@ export class LajiFormFieldChooserComponent {
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
-    @Inject('Window') private window: Window
+    @Inject('Window') private window: Window,
+    private dialogService: DialogService
   ) {
     effect(() => {
       this.highlights.set(this.getHighlights(this.ignoreFields()));
@@ -105,6 +109,10 @@ export class LajiFormFieldChooserComponent {
   }
 
   setSelected(field: string, selected: boolean) {
+    if (selected && this.unselectableFields().includes(field)) {
+      this.dialogService.alert(this.unselectableFieldsErrorMsg() || 'Field can\'t be selected');
+      return;
+    }
     const newSelected: string[] = this.selectedFields().filter(f => f !== field);
     if (selected) {
       newSelected.push(field);
