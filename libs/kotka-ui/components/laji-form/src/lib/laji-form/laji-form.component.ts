@@ -39,6 +39,7 @@ export class LajiFormComponent<T extends FormData = FormData>
   static BOTTOM_OFFSET = 50;
   @Input() form: LajiFormModel.SchemaForm | null = null;
   @Input() formData: Partial<T> = {};
+  @Input() editMode? = false;
   @Input() hasChanges? = false;
   @Input() disabled? = false;
   @Input() footerDisabled?: boolean;
@@ -88,14 +89,14 @@ export class LajiFormComponent<T extends FormData = FormData>
       return;
     }
 
-    if (changes['form'] || changes['formData'] || changes['mediaMetadata'] || changes['disabled'] || changes['hiddenFields']) {
+    if (changes['form'] || changes['formData'] || changes['mediaMetadata'] || changes['editMode'] || changes['disabled'] || changes['hiddenFields']) {
       const form = this.form as LajiFormModel.SchemaForm;
 
       this.ngZone.runOutsideAngular(() => {
         this.lajiFormWrapper?.setState({
           schema: form.schema,
           uiSchema: this.getUiSchema(form, this.disabled, this.hiddenFields),
-          uiSchemaContext: this.getUiSchemaContext(form, this.disabled),
+          uiSchemaContext: this.getUiSchemaContext(form, this.editMode),
           formData: this.formData,
           mediaMetadata: this.mediaMetadata,
           validators: form.validators,
@@ -186,7 +187,7 @@ export class LajiFormComponent<T extends FormData = FormData>
             theme: this.lajiFormTheme,
             schema: form.schema,
             uiSchema: this.getUiSchema(form, this.disabled, this.hiddenFields),
-            uiSchemaContext: this.getUiSchemaContext(form, this.disabled),
+            uiSchemaContext: this.getUiSchemaContext(form, this.editMode),
             formData: this.formData,
             validators: form.validators,
             warnings: form.warnings,
@@ -239,10 +240,10 @@ export class LajiFormComponent<T extends FormData = FormData>
     return { ...uiSchema, 'ui:readonly': disabled };
   }
 
-  private getUiSchemaContext(form: LajiFormModel.SchemaForm, disabled?: boolean) {
+  private getUiSchemaContext(form: LajiFormModel.SchemaForm, isEdit?: boolean) {
     return {
       ...form.uiSchemaContext,
-      isEdit: !disabled,
+      isEdit
     };
   }
 
