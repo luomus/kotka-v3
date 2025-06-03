@@ -74,6 +74,11 @@ export class SpecimenFormComponent
   showOnlyBasicFields = signal(true);
   hiddenFields: Signal<string[]|undefined>;
 
+  markUnreliableFieldsActive: Signal<boolean>;
+  unreliableFieldPointers = signal<string[]|undefined>([]);
+
+  lastPressedMarkFieldsBtnType = signal<'advancedFields'|'unreliableFields'>('advancedFields');
+
   lajiForm?: LajiFormComponent;
 
   private advancedFieldsStorageKey= signal<string|undefined>(undefined);
@@ -91,7 +96,13 @@ export class SpecimenFormComponent
 
     this.prefilledFormData = this.getPrefilledFormDataFromCurrentUrl();
 
-    this.markAdvancedFieldsActive = this.lajiFormFieldChooserService.isActive;
+    this.markAdvancedFieldsActive = computed(() =>
+      this.lastPressedMarkFieldsBtnType() === 'advancedFields' && this.lajiFormFieldChooserService.isActive()
+    );
+
+    this.markUnreliableFieldsActive = computed(() =>
+      this.lastPressedMarkFieldsBtnType() === 'unreliableFields' && this.lajiFormFieldChooserService.isActive()
+    );
 
     this.hiddenFields = computed(() =>
       this.showOnlyBasicFields() && !this.markAdvancedFieldsActive()
@@ -130,9 +141,12 @@ export class SpecimenFormComponent
   }
 
   toggleMarkAdvancedFields() {
+    this.lastPressedMarkFieldsBtnType.set('advancedFields');
+
     if (!this.lajiForm) {
       return;
     }
+
     if (this.markAdvancedFieldsActive()) {
       this.advancedFields.set(
         this.lajiFormFieldChooserService.stopFieldChooser(),
@@ -145,10 +159,35 @@ export class SpecimenFormComponent
 
       this.lajiFormFieldChooserService.startFieldChooser(
         this.lajiForm,
-        this.advancedFields(),
-        classFields,
-        getRequiredFields(schema),
-        'Can\'t mark required field as advanced field!'
+        {
+          selected: this.advancedFields(),
+          ignoreFields: classFields,
+          unselectableFields: getRequiredFields(schema),
+          unselectableFieldsErrorMsg: 'Can\'t mark required field as advanced field!'
+        }
+      );
+    }
+  }
+
+  toggleMarkUnreliableFields() {
+    this.lastPressedMarkFieldsBtnType.set('unreliableFields');
+
+    if (!this.lajiForm) {
+      return;
+    }
+
+    if (this.markUnreliableFieldsActive()) {
+      this.unreliableFieldPointers.set(
+        this.lajiFormFieldChooserService.stopFieldChooser()
+      );
+    } else {
+      this.lajiFormFieldChooserService.startFieldChooser(
+        this.lajiForm,
+        {
+          mode: 'jsonPointerSelect',
+          ignoreFields: classFields,
+          colorTheme: 'yellow'
+        }
       );
     }
   }

@@ -16,23 +16,38 @@
     <div class="col-lg-3 col-md-3 col-sm-3 col-12 order-sm-last">
       <div class="button-group-container d-sm-inline-block mb-2">
         <div class="btn-group-vertical col-12">
-          <button
-            class="btn btn-light"
-            [ngClass]="{
-              'btn-light': !markAdvancedFieldsActive(),
-              'btn-success': markAdvancedFieldsActive()
-            }"
-            [disabled]="!lajiForm"
-            (click)="toggleMarkAdvancedFields()"
-          >
-            {{ markAdvancedFieldsActive() ? 'Marking advanced fields. Stop and save' : 'Start marking advanced fields' }}
-          </button>
-          @if (!markAdvancedFieldsActive()) {
+          @if (!markUnreliableFieldsActive()) {
             <button
-              class="btn btn-light"
+              class="btn"
+              [ngClass]="{
+                'btn-light': !markAdvancedFieldsActive(),
+                'btn-success': markAdvancedFieldsActive()
+              }"
+              [disabled]="!lajiForm"
+              (click)="toggleMarkAdvancedFields()"
+            >
+              {{ markAdvancedFieldsActive() ? 'Marking advanced fields. Stop and save' : 'Start marking advanced fields' }}
+            </button>
+          }
+          @if (!(markAdvancedFieldsActive() || markUnreliableFieldsActive())) {
+            <button
+              class="btn btn-light mb-3"
               (click)="toggleShowOnlyBasicFields()"
             >
               {{ showOnlyBasicFields() ? 'Show basic and advanced fields' : 'Show only basic fields' }}
+            </button>
+          }
+          @if (!markAdvancedFieldsActive()) {
+            <button
+              class="btn"
+              [ngClass]="{
+                'btn-light': !markUnreliableFieldsActive(),
+                'btn-success': markUnreliableFieldsActive()
+              }"
+              [disabled]="!lajiForm"
+              (click)="toggleMarkUnreliableFields()"
+            >
+              {{ markUnreliableFieldsActive() ? 'Stop marking unreliable fields' : 'Start marking unreliable fields' }}
             </button>
           }
         </div>

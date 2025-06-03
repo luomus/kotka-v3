@@ -8,10 +8,13 @@ import {
   output, signal, Signal
 } from '@angular/core';
 import {
-  LajiFormFieldChooserHighlightComponent,
+  FieldChooserColorTheme,
+  LajiFormFieldChooserHighlightComponent
 } from './laji-form-field-chooser-highlight.component';
 import { DOCUMENT } from '@angular/common';
 import { DialogService } from '@kotka/ui/services';
+
+export type FieldChooserMode = 'fieldSelect'|'jsonPointerSelect';
 
 interface HighlightDimensions {
   top: number;
@@ -20,17 +23,23 @@ interface HighlightDimensions {
   height: number;
 }
 
-export interface HighlightData extends HighlightDimensions {
+interface HighlightData extends HighlightDimensions {
   id: string;
   field: string;
+  jsonPointer: string;
   selected: boolean;
   schemaElem: HTMLElement;
 }
 
-export const getFieldJsonPointerFromId = (schemaElemId: string): string => {
+const getJsonPointerFromId = (schemaElemId: string): string => {
   return schemaElemId
-    .replace(/_laji-form_root|_[0-9]/g, '')
+    .replace(/_laji-form_root/g, '')
     .replace(/_/g, '/');
+};
+
+const getFieldFromJsonPointer = (jsonPointer: string): string => {
+  return jsonPointer
+    .replace(/\/[0-9]/g, '');
 };
 
 const getHighlightElemIdFromSchemaElemId = (schemaElemId: string): string => {
@@ -48,8 +57,9 @@ const getHighlightElemIdFromSchemaElemId = (schemaElemId: string): string => {
         [width]="highlight.width"
         [height]="highlight.height"
         [label]="highlight.field"
+        [colorTheme]="colorTheme()"
         [selected]="highlightSelectedByIdx()[idx]"
-        (selectedChange)="setSelected(highlight.field, $event)"
+        (selectedChange)="setSelected(highlight, $event)"
       ></kui-laji-form-field-chooser-highlight>
     }
   `,
@@ -58,17 +68,22 @@ const getHighlightElemIdFromSchemaElemId = (schemaElemId: string): string => {
   imports: [LajiFormFieldChooserHighlightComponent],
 })
 export class LajiFormFieldChooserComponent {
-  selectedFields = input<string[]>([]);
+  mode = input<FieldChooserMode>('fieldSelect');
+
+  selected = input<string[]>([]); // if the mode is fieldSelect this should be a list of fields (i.e. ["/gatherings/dateBegin"]), and if the mode is jsonPointerSelect this should be a list of jsonPointers (i.e. ["/gatherings/0/dateBegin"])
+
   ignoreFields = input<string[]>([]);
   unselectableFields = input<string[]>([]);
   unselectableFieldsErrorMsg = input<string|undefined>(undefined);
 
+  colorTheme = input<FieldChooserColorTheme>('red');
+
   highlights = signal<HighlightData[]>([]);
   highlightSelectedByIdx: Signal<Record<number, boolean>>;
 
-  selectedFieldsChange = output<string[]>();
+  selectedChange = output<string[]>();
 
-  private highlightIndexesByField: Signal<Record<string, number[]>>;
+  private highlightIndexesBySelectedProp: Signal<Record<string, number[]>>;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -79,24 +94,30 @@ export class LajiFormFieldChooserComponent {
       this.highlights.set(this.getHighlights(this.ignoreFields()));
     });
 
-    this.highlightIndexesByField = computed(() => {
+    this.highlightIndexesBySelectedProp = computed(() => {
       const result: Record<string, number[]> = {};
+
+      const prop = this.mode() === 'fieldSelect' ? 'field' : 'jsonPointer';
+
       this.highlights().forEach((highlight, idx) => {
-        if (!result[highlight.field]) {
-          result[highlight.field] = [];
+        if (!result[highlight[prop]]) {
+          result[highlight[prop]] = [];
         }
-        result[highlight.field].push(idx);
+        result[highlight[prop]].push(idx);
       });
+
       return result;
     });
 
     this.highlightSelectedByIdx = computed(() => {
       const result: Record<number, boolean> = {};
-      this.selectedFields().forEach(field => {
-        this.highlightIndexesByField()[field]?.forEach(idx => {
+
+      this.selected().forEach(fieldOrJsonPointer => {
+        this.highlightIndexesBySelectedProp()[fieldOrJsonPointer]?.forEach(idx => {
           result[idx] = true;
         });
       });
+
       return result;
     });
   }
@@ -108,16 +129,29 @@ export class LajiFormFieldChooserComponent {
     );
   }
 
-  setSelected(field: string, selected: boolean) {
+  setSelected(highlight: HighlightData, selected: boolean) {
+    const { field, jsonPointer } = highlight;
+
     if (selected && this.unselectableFields().includes(field)) {
       this.dialogService.alert(this.unselectableFieldsErrorMsg() || 'Field can\'t be selected');
       return;
     }
-    const newSelected: string[] = this.selectedFields().filter(f => f !== field);
-    if (selected) {
-      newSelected.push(field);
+
+    let newSelected: string[];
+
+    if (this.mode() === 'fieldSelect') {
+      newSelected = this.selected().filter(val => val !== field);
+      if (selected) {
+        newSelected.push(field);
+      }
+    } else {
+      newSelected = this.selected().filter(val => val !== jsonPointer);
+      if (selected) {
+        newSelected.push(jsonPointer);
+      }
     }
-    this.selectedFieldsChange.emit(newSelected);
+
+    this.selectedChange.emit(newSelected);
   }
 
   private getHighlights(ignoreFields: string[]) {
@@ -132,7 +166,8 @@ export class LajiFormFieldChooserComponent {
         return;
       }
 
-      const field = getFieldJsonPointerFromId(schemaElem.id);
+      const jsonPointer = getJsonPointerFromId(schemaElem.id);
+      const field = getFieldFromJsonPointer(jsonPointer);
 
       if (ignoreFields.includes(field)) {
         return;
@@ -140,7 +175,8 @@ export class LajiFormFieldChooserComponent {
 
       highlights.push({
         id: getHighlightElemIdFromSchemaElemId(schemaElem.id),
-        field: field,
+        field,
+        jsonPointer,
         ...this.getDimensions(schemaElem),
         schemaElem,
         selected: false
