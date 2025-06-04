@@ -23,6 +23,7 @@ export type FieldChooserColorTheme = 'red'|'yellow';
         background: transparent;
         border: none;
         position: absolute;
+        z-index: 2;
       }
 
       .laji-form-field-chooser-highlight.laji-form-field-chooser-highlight-red:focus-visible,
