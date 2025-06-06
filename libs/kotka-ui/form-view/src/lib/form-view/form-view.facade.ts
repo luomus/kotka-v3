@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { computed, Injectable, OnDestroy, signal } from '@angular/core';
 import { ApiClient, FormService, UserService } from '@kotka/ui/services';
 import {
   catchError,
@@ -6,13 +6,10 @@ import {
   forkJoin,
   Observable,
   of,
-  ReplaySubject,
-  shareReplay,
   Subscription,
-  switchMap,
-  throwError,
+  switchMap, throwError
 } from 'rxjs';
-import { distinctUntilChanged, map, take } from 'rxjs/operators';
+import { filter, map, take } from 'rxjs/operators';
 import {
   allowEditForUser,
   allowDeleteForUser,
@@ -27,6 +24,7 @@ import {
   Image
 } from '@kotka/shared/models';
 import { MediaMetadata } from '@luomus/laji-form/lib/components/LajiForm';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 export enum FormErrorEnum {
   dataNotFound = 'dataNotFound',
@@ -45,8 +43,11 @@ export interface FormInputs<T extends KotkaDocumentObjectType, S extends KotkaDo
 }
 
 export interface FormState<S extends KotkaDocumentObject> {
+  loading: boolean;
+  errorType?: FormErrorEnum;
   form?: LajiForm.SchemaForm;
-  formData?: Partial<S>;
+  formData?: Partial<S>; // Contains up-to-date form data with all the user changes
+  formDataLastForceUpdatedVersion?: Partial<S>; // This is updated when the form data needs to be changed from the parent component. Using this as an input to the form component instead of the formData improves performance since this doesn't change so often
   disabled?: boolean;
   showDeleteButton?: boolean;
   showCopyButton?: boolean;
@@ -54,25 +55,6 @@ export interface FormState<S extends KotkaDocumentObject> {
   formHasChanges?: boolean;
   disabledAlertDismissed?: boolean;
   showDeleteTargetInUseAlert?: boolean;
-}
-
-export interface ErrorViewModel {
-  errorType: FormErrorEnum;
-}
-
-export type ViewModel<S extends KotkaDocumentObject> =
-  | FormState<S>
-  | ErrorViewModel;
-
-export function isSuccessViewModel<S extends KotkaDocumentObject>(
-  viewModel: ViewModel<S>,
-): viewModel is FormState<S> {
-  return !isErrorViewModel(viewModel);
-}
-export function isErrorViewModel<S extends KotkaDocumentObject>(
-  viewModel: ViewModel<S>,
-): viewModel is ErrorViewModel {
-  return 'errorType' in viewModel;
 }
 
 interface KotkaMediaMetadata extends MediaMetadata {
@@ -85,32 +67,21 @@ export class FormViewFacade<
   S extends KotkaDocumentObjectMap[T],
 > implements OnDestroy
 {
-  private store = new ReplaySubject<FormState<S>>(1);
-  state$ = this.store.asObservable();
+  private store = signal<FormState<S>>({ loading: false });
+  state = this.store.asReadonly();
 
-  formData$ = this.state$.pipe(
-    map((state) => state.formData),
-    distinctUntilChanged(),
-  );
-  disabled$ = this.state$.pipe(
-    map((state) => state.disabled),
-    distinctUntilChanged(),
-  );
+  formData = computed(() => (this.state()?.formData));
+  disabled = computed(() => (this.state()?.disabled));
 
-  vm$: Observable<ViewModel<S>>;
-
-  private inputs$ = new ReplaySubject<FormInputs<T, S>>(1);
+  private inputs = signal<FormInputs<T, S>|undefined>(undefined);
 
   private initialStateSub: Subscription;
-
-  private _state: FormState<S> = {};
 
   constructor(
     private userService: UserService,
     private formService: FormService,
     private apiClient: ApiClient,
   ) {
-    this.vm$ = this.getVm$();
     this.initialStateSub = this.getInitialStateSub();
   }
 
@@ -119,54 +90,77 @@ export class FormViewFacade<
   }
 
   setInputs(inputs: FormInputs<T, S>) {
-    this.inputs$.next(inputs);
+    this.inputs.set(inputs);
   }
 
-  setFormData(formData: Partial<S>, formHasChanges = true) {
-    const mediaMetadata = this._state.mediaMetadata
+  setFormData(formData: Partial<S>, formHasChanges = true, forceUpdate = false) {
+    const state = this.state();
+
+    const formDataLastForceUpdatedVersion = forceUpdate ? formData : state.formDataLastForceUpdatedVersion;
+
+    const intellectualOwner = formData.owner || '';
+
+    const mediaMetadata = state.mediaMetadata && state.mediaMetadata.intellectualOwner !== intellectualOwner
       ? {
-          ...this._state.mediaMetadata,
+          ...state.mediaMetadata,
           intellectualOwner: formData.owner || '',
         }
-      : undefined;
-    this.setState({ ...this._state, formData, formHasChanges, mediaMetadata });
+      : state.mediaMetadata;
+
+    this.setState({ ...state, formData, formDataLastForceUpdatedVersion, formHasChanges, mediaMetadata });
   }
 
   setCopiedFormData(formData: Partial<S>) {
     this.getEmptyFormData$(formData)
       .pipe(take(1))
       .subscribe((formData) => {
-        this.setFormData(formData, false);
+        this.setFormData(formData, false, true);
       });
   }
 
   setFormHasChanges(formHasChanges: boolean) {
-    this.setState({ ...this._state, formHasChanges });
+    this.setState({ ...this.state(), formHasChanges });
   }
 
   setDisabledAlertDismissed(disabledAlertDismissed: boolean) {
-    this.setState({ ...this._state, disabledAlertDismissed });
+    this.setState({ ...this.state(), disabledAlertDismissed });
   }
 
   setShowDeleteTargetInUseAlert(showDeleteTargetInUseAlert: boolean) {
-    this.setState({ ...this._state, showDeleteTargetInUseAlert });
+    this.setState({ ...this.state(), showDeleteTargetInUseAlert });
   }
 
-  private getVm$(): Observable<ViewModel<S>> {
-    return this.inputs$.pipe(
-      switchMap(() =>
-        this.state$.pipe(
-          catchError((err) => {
-            const errorType =
-              err.message === FormErrorEnum.dataNotFound
-                ? FormErrorEnum.dataNotFound
-                : FormErrorEnum.genericError;
-            return of({ errorType });
-          }),
+  private getInitialStateSub(): Subscription {
+    return toObservable(this.inputs)
+      .pipe(
+        filter((inputs) => !!inputs),
+        switchMap((inputs) =>
+          concat(
+            of({ loading: true }), // reset the state before the values load
+            forkJoin([
+              this.getAugmentedForm$(inputs),
+              this.getInitialFormData$(inputs),
+              this.userService.getCurrentLoggedInUser(),
+            ]).pipe(
+              map(([form, formData, user]) =>
+                this.getInitialFormState(inputs, form, formData, user),
+              ),
+            ),
+          ),
         ),
-      ),
-      shareReplay(1),
-    );
+      )
+      .subscribe({
+        next: (state: FormState<S>) => {
+          this.setState(state);
+        },
+        error: (err) => {
+          const errorType =
+            err.message === FormErrorEnum.dataNotFound
+              ? FormErrorEnum.dataNotFound
+              : FormErrorEnum.genericError;
+          this.setState({ loading: false, errorType: errorType });
+        },
+      });
   }
 
   private getAugmentedForm$(
@@ -215,32 +209,6 @@ export class FormViewFacade<
     );
   }
 
-  private getInitialStateSub(): Subscription {
-    return this.inputs$
-      .pipe(
-        switchMap((inputs) =>
-          concat(
-            of({}), // set the state first as empty object before the values load
-            forkJoin([
-              this.getAugmentedForm$(inputs),
-              this.getInitialFormData$(inputs),
-              this.userService.getCurrentLoggedInUser(),
-            ]).pipe(
-              map(([form, formData, user]) =>
-                this.getInitialFormState(inputs, form, formData, user),
-              ),
-            ),
-          ),
-        ),
-      )
-      .subscribe({
-        next: (state: FormState<S>) => {
-          this.setState(state);
-        },
-        error: (err) => this.store.error(err),
-      });
-  }
-
   private getInitialFormState(
     inputs: FormInputs<T, S>,
     form: LajiForm.SchemaForm,
@@ -254,8 +222,10 @@ export class FormViewFacade<
     const showCopyButton = isEditMode && !!form.options?.allowTemplate;
 
     return {
+      loading: false,
       form,
       formData,
+      formDataLastForceUpdatedVersion: formData,
       disabled,
       showDeleteButton,
       showCopyButton,
@@ -279,7 +249,6 @@ export class FormViewFacade<
   }
 
   private setState(state: FormState<S>) {
-    this._state = state;
-    this.store.next(this._state);
+    this.store.set(state);
   }
 }

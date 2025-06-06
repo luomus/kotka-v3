@@ -6,13 +6,11 @@ import {
   TemplateRef,
   OnDestroy,
   input,
-  output, effect, signal
+  output, effect, signal, Signal
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { KotkaDocumentObjectType, KotkaDocumentObjectMap, LajiForm } from '@kotka/shared/models';
 import {
-  catchError,
-  EMPTY,
   from,
   Observable,
   Subscription,
@@ -22,11 +20,8 @@ import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ErrorMessages } from '@kotka/shared/models';
 import {
   FormErrorEnum,
-  ErrorViewModel,
   FormState,
-  FormViewFacade,
-  isErrorViewModel,
-  isSuccessViewModel,
+  FormViewFacade
 } from './form-view.facade';
 import { filter, take } from 'rxjs/operators';
 import { FormViewUtils } from './form-view-utils';
@@ -36,8 +31,9 @@ import { MainContentComponent } from '@kotka/ui/main-content';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 import { MetaFieldsComponent } from '../meta-fields/meta-fields.component';
 import { SpinnerComponent } from '@kotka/ui/spinner';
-import { CommonModule } from '@angular/common';
+import { NgTemplateOutlet, TitleCasePipe } from '@angular/common';
 import { LabelPipe } from '@kotka/ui/pipes';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'kotka-form-view',
@@ -46,28 +42,27 @@ import { LabelPipe } from '@kotka/ui/pipes';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [FormViewFacade],
   imports: [
-    CommonModule,
     MainContentComponent,
     NgbAlert,
     MetaFieldsComponent,
     LajiFormComponent,
     SpinnerComponent,
     LabelPipe,
+    NgTemplateOutlet,
+    TitleCasePipe
   ],
 })
 export class FormViewComponent<
-    T extends KotkaDocumentObjectType = KotkaDocumentObjectType,
-    S extends KotkaDocumentObjectMap[T] = KotkaDocumentObjectMap[T],
-  >
-  implements OnDestroy
+  T extends KotkaDocumentObjectType = KotkaDocumentObjectType,
+  S extends KotkaDocumentObjectMap[T] = KotkaDocumentObjectMap[T],
+> implements OnDestroy
 {
   formId = input.required<string>();
   dataType = input.required<T>();
   dataTypeName = input('');
 
-  augmentFormFunc = input<(
-    form: LajiForm.SchemaForm,
-  ) => Observable<LajiForm.SchemaForm>>();
+  augmentFormFunc =
+    input<(form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>>();
   prefilledFormData = input<Partial<S>>();
 
   footerDisabled = input<boolean>();
@@ -78,14 +73,11 @@ export class FormViewComponent<
   metaFieldsContainerTpl = input<TemplateRef<unknown>>();
 
   editMode = signal(false);
-  dataURI = signal<string|undefined>(undefined);
+  dataURI = signal<string | undefined>(undefined);
 
-  vm$: Observable<FormState<S> | ErrorViewModel>;
+  formState: Signal<FormState<S>>;
 
   formErrorEnum = FormErrorEnum;
-
-  isErrorViewModel = isErrorViewModel;
-  isSuccessViewModel = isSuccessViewModel;
 
   formDataChange = output<Partial<S | undefined>>();
   formInit = output<LajiFormComponent>();
@@ -93,8 +85,7 @@ export class FormViewComponent<
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
 
-  private state?: FormState<S>;
-  private subscription: Subscription = new Subscription();
+  private routeParamUpdateSub: Subscription;
 
   constructor(
     private notifier: ToastService,
@@ -105,19 +96,29 @@ export class FormViewComponent<
     private formViewFacade: FormViewFacade<T, S>,
     private cdr: ChangeDetectorRef,
   ) {
+    this.formState = this.formViewFacade.state;
+
     this.setRouteParams();
 
-    this.vm$ = this.formViewFacade.vm$;
-
-    this.initSubscriptions();
+    this.routeParamUpdateSub = navigationEnd$(this.router).subscribe(() => {
+      this.setRouteParams();
+    });
 
     effect(() => {
       this.updateInputs();
     });
+
+    effect(() => {
+      this.formDataChange.emit(this.formViewFacade.formData());
+    });
+
+    effect(() => {
+      this.disabledChange.emit(this.formViewFacade.disabled());
+    });
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
+    this.routeParamUpdateSub.unsubscribe();
   }
 
   onFormReady() {
@@ -161,7 +162,7 @@ export class FormViewComponent<
   }
 
   onCopy(data: Partial<S>) {
-    const excludedFields = this.state?.disabled ? ['owner'] : [];
+    const excludedFields = this.formState().disabled ? ['owner'] : [];
     this.copyAsNew(data, excludedFields);
   }
 
@@ -182,12 +183,12 @@ export class FormViewComponent<
   }
 
   setFormData(data: Partial<S>) {
-    this.formViewFacade.setFormData(data);
+    this.formViewFacade.setFormData(data, true, true);
     this.formDataChange.emit(data);
   }
 
   getFormHasChanges(): boolean {
-    return this.state?.formHasChanges || false;
+    return this.formState().formHasChanges || false;
   }
 
   dismissDisabledAlert() {
@@ -240,7 +241,7 @@ export class FormViewComponent<
     this.lajiForm?.block();
 
     excludedFields = excludedFields.concat(
-      this.state?.form?.excludeFromCopy || [],
+      this.formState().form?.excludeFromCopy || [],
     );
     const newData = FormViewUtils.removeMetaAndExcludedFields<S>(
       data,
@@ -249,7 +250,7 @@ export class FormViewComponent<
 
     return this.navigateToAdd()
       .pipe(
-        switchMap(() => this.formViewFacade.formData$), // wait that the initial form data has loaded
+        switchMap(() => toObservable(this.formViewFacade.formData)), // wait that the initial form data has loaded
         filter((formData) => formData !== undefined),
         take(1),
       )
@@ -278,41 +279,6 @@ export class FormViewComponent<
     );
   }
 
-  private initSubscriptions() {
-    this.subscription.add(
-      navigationEnd$(this.router).subscribe(() => {
-        this.setRouteParams();
-      }),
-    );
-
-    this.subscription.add(
-      this.formViewFacade.state$
-        .pipe(catchError(() => EMPTY))
-        .subscribe((state) => {
-          this.state = state;
-          this.cdr.markForCheck();
-        }),
-    );
-
-    this.subscription.add(
-      this.formViewFacade.disabled$
-        .pipe(catchError(() => EMPTY))
-        .subscribe((disabled) => {
-          this.disabledChange.emit(disabled);
-          this.cdr.markForCheck();
-        }),
-    );
-
-    this.subscription.add(
-      this.formViewFacade.formData$
-        .pipe(catchError(() => EMPTY))
-        .subscribe((formData) => {
-          this.formDataChange.emit(formData);
-          this.cdr.markForCheck();
-        }),
-    );
-  }
-
   private setRouteParams() {
     const editMode = this.activeRoute.snapshot.url[0].path === 'edit';
     const dataURI = this.activeRoute.snapshot.queryParams['uri'];
@@ -328,7 +294,7 @@ export class FormViewComponent<
       editMode: this.editMode(),
       dataURI: this.dataURI(),
       augmentFormFunc: this.augmentFormFunc(),
-      prefilledFormData: this.prefilledFormData()
+      prefilledFormData: this.prefilledFormData(),
     });
   }
 }
