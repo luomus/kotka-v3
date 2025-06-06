@@ -46,8 +46,7 @@ export class TransactionFormComponent
 
   isSpecimenTransaction = isSpecimenTransaction;
 
-  @ViewChild(FormViewComponent, { static: true })
-  formView!: FormViewComponent<KotkaDocumentObjectType.transaction>;
+  @ViewChild(FormViewComponent, { static: true }) formView!: FormViewComponent<KotkaDocumentObjectType.transaction>;
 
   private specimenRangeButtonClickSubscription?: Subscription;
 

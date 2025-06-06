@@ -3,9 +3,9 @@ import {
   ChangeDetectorRef,
   Component, computed, effect,
   OnDestroy,
-  OnInit, signal, Signal
+  OnInit, signal, Signal, ViewChild
 } from '@angular/core';
-import { KotkaDocumentObjectType, Document } from '@kotka/shared/models';
+import { KotkaDocumentObjectType, Document, Gathering } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
 import { FormViewContainerComponent } from '@kotka/ui/form-view';
 import { FormViewComponent } from '@kotka/ui/form-view';
@@ -24,9 +24,22 @@ import {
   LajiFormFieldChooserService
 } from '@kotka/ui/laji-form';
 import { LocalStorageService } from 'ngx-webstorage';
+import { isEqual } from 'lodash';
+import { convertCoordinatesToWGS84 } from '@kotka/shared/utils';
+import { MYCoordinateSystems } from '@luomus/laji-schema';
 
 type UrlDataType = 'botany'|'zoo'|'palaeontology'|'accession'|'culture';
+
 type DataType = 'botanyspecimen'|'zoospecimen'|'palaeontology'|'accession'|'culture';
+
+interface PointCoordinates {
+  latitude: string;
+  longitude: string;
+}
+
+interface PointCoordinatesWithSystem extends PointCoordinates {
+  coordinateSystem: MYCoordinateSystems;
+}
 
 const urlToDataTypeMap: Record<UrlDataType, DataType> = {
   botany: 'botanyspecimen',
@@ -80,6 +93,12 @@ export class SpecimenFormComponent
   lastPressedMarkFieldsBtnType = signal<'advancedFields'|'unreliableFields'>('advancedFields');
 
   lajiForm?: LajiFormComponent;
+
+  @ViewChild(FormViewComponent, { static: true }) formView!: FormViewComponent<KotkaDocumentObjectType.specimen>;
+
+  private formData?: Document | Partial<Document>;
+  private coordinates?: PointCoordinatesWithSystem;
+  private mapCoordinates?: PointCoordinates;
 
   private advancedFieldsStorageKey= signal<string|undefined>(undefined);
   private routerSub?: Subscription;
@@ -138,6 +157,16 @@ export class SpecimenFormComponent
 
   onFormInit(lajiForm: LajiFormComponent) {
     this.lajiForm = lajiForm;
+  }
+
+  onFormDataChange(formData?: Partial<Document>) {
+    this.formData = formData;
+
+    const gathering = formData?.gatherings?.[0];
+
+    if (gathering) {
+      this.checkGatheringCoordinates(gathering);
+    }
   }
 
   toggleMarkAdvancedFields() {
@@ -217,5 +246,51 @@ export class SpecimenFormComponent
     }
 
     return undefined;
+  }
+
+  private checkGatheringCoordinates(gathering: Gathering) {
+    let newCoordinates: PointCoordinatesWithSystem | undefined = undefined;
+
+    if (gathering.latitude && gathering.longitude && gathering.coordinateSystem) {
+      newCoordinates = { latitude: gathering.latitude, longitude: gathering.longitude, coordinateSystem: gathering.coordinateSystem };
+    }
+
+    if (!isEqual(newCoordinates, this.coordinates)) {
+      this.coordinates = newCoordinates;
+
+      if (this.coordinates) {
+        const { latitude, longitude, coordinateSystem } = this.coordinates;
+        const result = convertCoordinatesToWGS84(latitude, longitude, coordinateSystem);
+
+        if (result) {
+          this.mapCoordinates = { latitude: '' + result[0], longitude: '' + result[1] };
+          this.updateGatheringData({ wgs84Latitude: this.mapCoordinates.latitude, wgs84Longitude: this.mapCoordinates.longitude });
+        }
+      }
+    } else {
+      let newMapCoordinates: PointCoordinates | undefined = undefined;
+
+      if (gathering.wgs84Latitude && gathering.wgs84Longitude) {
+        newMapCoordinates = { latitude: gathering.wgs84Latitude, longitude: gathering.wgs84Longitude };
+      }
+
+      if (!isEqual(newMapCoordinates, this.mapCoordinates)) {
+        this.mapCoordinates = newMapCoordinates;
+
+        if (this.mapCoordinates) {
+          this.coordinates = { latitude: this.mapCoordinates.latitude, longitude: this.mapCoordinates.longitude, coordinateSystem: 'MY.coordinateSystemWgs84' };
+          this.updateGatheringData(this.coordinates);
+        }
+      }
+    }
+  }
+
+  private updateGatheringData(updateObject: Partial<Gathering>) {
+    const [first, ...rest] = this.formData?.gatherings || [];
+    const gathering = { ...(first || {}), ...updateObject };
+    const gatherings: [Gathering, ...Gathering[]] = [gathering, ...rest];
+    const formData: Partial<Document> = { ...(this.formData || {}), gatherings };
+
+    this.formView.setFormData(formData);
   }
 }

@@ -1,16 +1,17 @@
-@if (advancedFields()) {
-  <kotka-form-view
-    [formId]="formId"
-    [dataType]="dataType"
-    [dataTypeName]="'specimen'"
-    [prefilledFormData]="prefilledFormData"
-    [footerDisabled]="markAdvancedFieldsActive()"
-    [hiddenFields]="hiddenFields()"
-    [formContainerTpl]="formContainer"
-    (formInit)="onFormInit($event)"
-  >
-  </kotka-form-view>
-}
+<kotka-form-view
+  [style.visibility]="advancedFields() ? 'visible' : 'hidden'"
+  [formId]="formId"
+  [dataType]="dataType"
+  [dataTypeName]="'specimen'"
+  [prefilledFormData]="prefilledFormData"
+  [footerDisabled]="markAdvancedFieldsActive()"
+  [hiddenFields]="hiddenFields()"
+  [formContainerTpl]="formContainer"
+  (formInit)="onFormInit($event)"
+  (formDataChange)="onFormDataChange($event)"
+>
+</kotka-form-view>
+
 <ng-template #formContainer let-formContentTpl>
   <div class="row">
     <div class="col-lg-3 col-md-3 col-sm-3 col-12 order-sm-last">
