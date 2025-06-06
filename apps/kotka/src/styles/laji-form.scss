@@ -2,6 +2,14 @@
 @import "node_modules/bootstrap/scss/variables";
 
 .laji-form {
+  label:not(.btn) {
+    font-weight: 700;
+  }
+
+  label.btn {
+    line-height: 15px;
+  }
+
   legend {
     margin-top: map-get($spacers, 2);
     font-size: $h2-font-size;
@@ -21,6 +29,54 @@
   .verbatim-field {
     input, textarea {
       background: url("/assets/paper-bgr.jpg") top left repeat;
+    }
+  }
+
+  .field-array[id$=_units], .field-array[id$=_identifications], .field-array[id$=_typeSpecimens], .field-array[id$=_samples] {
+    .card {
+      box-shadow: 1px 1px 10px 0 rgba(0,0,0,0.6);
+      margin-top: ($spacer * .5);
+      margin-bottom: ($spacer * .5);
+    }
+  }
+
+  .field-array[id$=_units] {
+    .card-header {
+      background-color: rgba(254,90,0,0.15);
+      border-color: rgba(254,90,0,0.15);
+    }
+    .card-body {
+      background-color: rgba(0,0,0,0.05);
+    }
+  }
+
+  .field-array[id$=_identifications] {
+    .card-header {
+      background-color: rgba(166,138,2,0.15);
+      border-color: rgba(166,138,2,0.15);
+    }
+    .card-body {
+      background-color: rgba(0,0,0,0.05);
+    }
+  }
+
+  .field-array[id$=_typeSpecimens] {
+    .card-header {
+      background-color: rgba(15,159,132,0.15);
+      border-color: rgba(15,159,132,0.15);
+    }
+    .card-body {
+      background-color: rgba(0,0,0,0.05);
+    }
+  }
+
+  .field-array[id$=_samples] {
+    .card-header {
+      background-color: rgba(0,0,0,0.15);
+      border-color: rgba(0,0,0,0.15);
+    }
+    .card-body {
+      background-color: white;
     }
   }
 }
