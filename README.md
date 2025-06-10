@@ -2,7 +2,7 @@
 
 This is the new Angular and Nestjs-based version of Kotka CMS.
 
-Start the development server with docker-compose using `docker-compose up` in the root of the project.
+Start the development server with docker-compose using `docker compose up` in the root of the project.
 
 ## Testing
 
@@ -27,8 +27,18 @@ Before running the tests, you should put CYPRESS_TEST_EMAIL and CYPRESS_TEST_PAS
 
 3. Run the tests with docker-compose:
     ```
-    docker-compose -f ./docker-compose.e2e.yml --env-file .env.e2e up 
+    docker compose -f ./docker-compose.e2e.yml --env-file .env.e2e up 
     ```
+
+### Updating dependencies
+
+Nx can update many of the dependencies. Please refer to the nx docs for more detailed instructions.
+
+```
+npx nx migrate latest
+npm install
+npx nx migrate --run-migrations
+```
 
 ## Useful commands
 ```

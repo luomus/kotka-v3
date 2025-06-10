@@ -43,10 +43,13 @@ Cypress.Commands.add('setUserAsLoggedIn', (email, password) => {
 
 Cypress.Commands.add('login', (email, password) => {
   cy.disableSameSiteCookieRestrictions();
-  cy.get('#local-login').click();
-  cy.get('[name="email"]').type(email);
-  cy.get('[name="password"]').type(password);
-  cy.get('button.submit').click();
+
+  cy.origin(Cypress.env('LAJI_AUTH_ORIGIN'), { args: { email, password } }, ({ email, password }) => {
+    cy.get('#local-login').click();
+    cy.get('[name="email"]').type(email);
+    cy.get('[name="password"]').type(password);
+    cy.get('button.submit').click();
+  });
 });
 
 Cypress.Commands.add('logout', () => {

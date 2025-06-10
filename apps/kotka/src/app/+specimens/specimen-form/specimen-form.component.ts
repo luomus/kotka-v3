@@ -24,7 +24,7 @@ import {
   LajiFormFieldChooserService
 } from '@kotka/ui/laji-form';
 import { LocalStorageService } from 'ngx-webstorage';
-import { isEqual } from 'lodash';
+import { isEqual } from 'lodash-es';
 import { convertCoordinatesToWGS84 } from '@kotka/shared/utils';
 import { MYCoordinateSystems } from '@luomus/laji-schema';
 

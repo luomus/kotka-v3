@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { get, isNil } from 'lodash';
+import { get, isNil } from 'lodash-es';
 import { Collection, Organization } from '@luomus/laji-schema';
 
 export interface AutocompleteResult {

@@ -20,7 +20,7 @@ import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { KotkaDocumentObjectType, KotkaDocumentObjectMap } from '@kotka/shared/models';
-import { isEqual } from 'lodash';
+import { isEqual } from 'lodash-es';
 import { navigationEnd$ } from '@kotka/ui/services';
 import { MainContentComponent } from '@kotka/ui/main-content';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';

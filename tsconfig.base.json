@@ -30,9 +30,7 @@
       "@kotka/ui/document-datatable": [
         "libs/kotka-ui/components/document-datatable/src/index.ts"
       ],
-      "@kotka/ui/form-view": [
-        "libs/kotka-ui/form-view/src/index.ts"
-      ],
+      "@kotka/ui/form-view": ["libs/kotka-ui/form-view/src/index.ts"],
       "@kotka/ui/laji-form": [
         "libs/kotka-ui/components/laji-form/src/index.ts"
       ],
