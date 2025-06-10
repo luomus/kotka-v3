@@ -24,7 +24,7 @@ function convertYkjToWGS84<T extends string | number>(lat: T, lng: T): [number, 
 
   try {
     return convertLatLng([latPadded, lngPadded], 'EPSG:2393', 'WGS84');
-  } catch (e) {
+  } catch (e: any) {
     return undefined;
   }
 }

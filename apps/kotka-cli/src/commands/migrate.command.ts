@@ -179,7 +179,7 @@ export class MigrateCommand {
 
         const migrateSpecimenTransactionPrivacy = (data) => {
           if (data['publicityRestrictions'] === undefined) {
-            data['publicityRestrictions'] === 'MZ.publicityRestrictionsPrivate';
+            data['publicityRestrictions'] = 'MZ.publicityRestrictionsPrivate';
           }
         };
 
