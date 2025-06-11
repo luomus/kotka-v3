@@ -265,6 +265,9 @@ export class SpecimenFormComponent
         if (result) {
           this.mapCoordinates = { latitude: '' + result[0], longitude: '' + result[1] };
           this.updateGatheringData({ wgs84Latitude: this.mapCoordinates.latitude, wgs84Longitude: this.mapCoordinates.longitude });
+        } else {
+          this.mapCoordinates = undefined;
+          this.updateGatheringData({ wgs84Latitude: undefined, wgs84Longitude: undefined });
         }
       }
     } else {

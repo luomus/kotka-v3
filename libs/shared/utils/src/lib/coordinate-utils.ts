@@ -15,7 +15,13 @@ export function convertCoordinatesToWGS84(latitude: string | number, longitude: 
     lng = dmsToDegrees(longitude);
   }
 
-  return isNumber(lat) && isNumber(lng) ? [lat, lng] : undefined;
+  if (isNumber(lat) && isNumber(lng)) {
+    if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+      return [lat, lng];
+    }
+  }
+
+  return undefined;
 }
 
 function convertYkjToWGS84<T extends string | number>(lat: T, lng: T): [number, number] | undefined {
