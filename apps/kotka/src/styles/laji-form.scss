@@ -39,7 +39,7 @@
   }
 
   .field-array[id$=_units], .field-array[id$=_identifications], .field-array[id$=_typeSpecimens], .field-array[id$=_samples] {
-    .card {
+    [id$=-panel].card {
       box-shadow: 1px 1px 10px 0 rgba(0,0,0,0.6);
       margin-top: map-get($spacers, 2);
       margin-bottom: map-get($spacers, 2);
