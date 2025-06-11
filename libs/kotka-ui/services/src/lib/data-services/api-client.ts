@@ -23,7 +23,7 @@ import {
 } from '@kotka/shared/models';
 import { Collection } from '@luomus/laji-schema';
 import { map } from 'rxjs/operators';
-import { get, set } from 'lodash-es';
+import { get, set } from 'lodash';
 import { LOGIN_REDIRECT_ENABLED } from '../interceptors';
 import { ElasticsearchQuery } from '@kotka/shared/models';
 

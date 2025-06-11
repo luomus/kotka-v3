@@ -39,7 +39,7 @@ import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-mod
 import { TotalCountComponent } from '../total-count/total-count.component';
 import { SpinnerComponent } from '@kotka/ui/spinner';
 import { AgGridAngular } from '@ag-grid-community/angular';
-import { isEqual } from 'lodash-es';
+import { isEqual } from 'lodash';
 import {
   getVisibleColDefs,
   getDefaultColumnSettings,

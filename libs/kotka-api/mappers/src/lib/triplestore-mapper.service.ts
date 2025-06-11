@@ -8,7 +8,7 @@ import { parse, serialize, graph } from 'rdflib';
 import { compact, toRDF } from 'jsonld';
 import { LajiApiService, SchemaService } from '@kotka/api/services';
 import { StoreObject } from '@luomus/laji-schema';
-import { escapeRegExp, set } from 'lodash-es';
+import { escapeRegExp, set } from 'lodash';
 import { TypeMigrationService } from './type-migration.service';
 
 const documentTypes = [

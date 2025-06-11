@@ -22,7 +22,7 @@ import {
   UseInterceptors
 } from '@nestjs/common';
 import { StoreObject } from '@kotka/shared/models';
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep } from 'lodash';
 import { UserInterceptor } from '../interceptors/user.interceptor';
 import { DateInterceptor } from '../interceptors/date.interceptor';
 import { ValidatorInterceptor } from '../interceptors/validator.interceptor';

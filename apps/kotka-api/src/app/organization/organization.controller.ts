@@ -19,7 +19,7 @@ import { ApiMethodAccessGuard } from '../shared/guards/api-method-access.guard';
 import { Organization } from '@luomus/laji-schema';
 import { KotkaDocumentObjectFullType, KotkaDocumentObjectType, Person } from '@kotka/shared/models';
 import { lastValueFrom } from 'rxjs';
-import { set } from 'lodash-es';
+import { set } from 'lodash';
 import { OrganizationFullNameInterceptor } from './organization-fullname.interceptor';
 import { InUseTypesSet } from '../shared/decorators/in-use-types-set.decorator';
 import { InUseGuard } from '../shared/guards/in-use.guard';

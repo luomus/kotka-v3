@@ -1,5 +1,5 @@
 import { JSONPath } from 'jsonpath-plus';
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep } from 'lodash';
 import { KotkaDocumentObject } from '@kotka/shared/models';
 
 export class FormViewUtils {
