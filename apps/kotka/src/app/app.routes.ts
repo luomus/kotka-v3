@@ -1,6 +1,6 @@
 import { Routes, UrlMatchResult, UrlSegment } from '@angular/router';
 import { NotFoundComponent } from '@kotka/ui/base';
-import { OnlyLoggedInGuard} from '@kotka/ui/services';
+import { OnlyLoggedInGuard, RouteReuseStrategyEnum } from '@kotka/ui/services';
 import { BaseComponent } from '@kotka/ui/base';
 import { environment } from '../environments/environment';
 
@@ -28,7 +28,7 @@ const baseRoutes: Routes = [
       { path: 'tags', loadChildren: () => import('./+datasets/datasets.routes').then(m => m.datasetsRoutes), data: {preload: false} },
       { path: 'organizations', loadChildren: () => import('./+organizations/organizations.routes').then(m => m.organizationsRoutes), data: {preload: false} },
       { path: 'transactions', loadChildren: () => import('./+transactions/transactions.routes').then(m => m.transactionsRoutes), data: {preload: false} },
-      { matcher: specimenMatcher, loadChildren: () => import('./+specimens/specimens.routes').then(m => m.specimensRoutes), data: {preload: false} },
+      { matcher: specimenMatcher, loadChildren: () => import('./+specimens/specimens.routes').then(m => m.specimensRoutes), data: {preload: false, routeReuseStrategy: RouteReuseStrategyEnum.urlMatch} },
       { path: '**', pathMatch: 'full', component: NotFoundComponent }
     ]
   }

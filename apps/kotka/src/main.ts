@@ -2,7 +2,12 @@ import { enableProdMode, ErrorHandler } from '@angular/core';
 import { environment } from './environments/environment';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from '@kotka/ui/base';
-import { provideRouter, withEnabledBlockingInitialNavigation, withPreloading } from '@angular/router';
+import {
+  provideRouter,
+  RouteReuseStrategy,
+  withEnabledBlockingInitialNavigation,
+  withPreloading
+} from '@angular/router';
 import { routes } from './app/app.routes';
 import { QuicklinkStrategy } from 'ngx-quicklink';
 import { provideNgxWebstorage, withLocalStorage, withNgxWebstorageConfig } from 'ngx-webstorage';
@@ -15,6 +20,7 @@ import {
   withInterceptorsFromDi
 } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { KotkaRouteReuseStrategy } from '@kotka/ui/services';
 
 if (environment.production) {
   enableProdMode();
@@ -36,6 +42,7 @@ bootstrapApplication(AppComponent, {
       withNgxWebstorageConfig({ prefix: 'kotka-', separator: '' }),
       withLocalStorage()
     ),
+    { provide: RouteReuseStrategy, useClass: KotkaRouteReuseStrategy },
     { provide: ErrorHandler, useClass: ErrorHandlerService },
     { provide: LocationStrategy, useClass: PathLocationStrategy },
     {

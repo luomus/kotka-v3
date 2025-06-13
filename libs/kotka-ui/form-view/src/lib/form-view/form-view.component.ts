@@ -149,7 +149,7 @@ export class FormViewComponent<
 
   onDelete(data: Partial<S>) {
     this.dialogService
-      .confirm(`Are you sure you want to delete this ${this.dataTypeName}?`)
+      .confirm(`Are you sure you want to delete this ${this.dataTypeName()}?`)
       .subscribe((confirm) => {
         if (confirm) {
           this.delete(data);

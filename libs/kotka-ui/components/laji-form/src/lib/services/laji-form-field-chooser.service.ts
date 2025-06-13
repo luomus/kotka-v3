@@ -93,7 +93,6 @@ export class LajiFormFieldChooserService {
 
     this.lajiFormDestroySub = lajiForm.formDestroy.subscribe(() => {
       this.stopFieldChooser();
-      throw new Error('Laji form got destroyed while the field chooser was active');
     });
   }
 
@@ -104,7 +103,7 @@ export class LajiFormFieldChooserService {
 
     const selected = this.selected();
 
-    this.formContainerElem()?.children[0].removeAttribute('inert');
+    this.formContainerElem()?.children[0]?.removeAttribute('inert');
     this.formContainerElem.set(undefined);
 
     const componentRef = this.fieldChooserComponentRef();

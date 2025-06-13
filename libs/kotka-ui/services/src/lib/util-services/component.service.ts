@@ -52,7 +52,7 @@ export class ComponentService {
 
   removeComponent<T>(componentRef: ComponentRef<T>) {
     const parent = componentRef.location.nativeElement.parentElement;
-    parent.removeChild(componentRef.location.nativeElement);
+    parent?.removeChild(componentRef.location.nativeElement);
     this.appRef.detachView(componentRef.hostView);
     componentRef.destroy();
   }
