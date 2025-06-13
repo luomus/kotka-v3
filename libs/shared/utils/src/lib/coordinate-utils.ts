@@ -13,6 +13,8 @@ export function convertCoordinatesToWGS84(latitude: string | number, longitude: 
   } else if (coordinateSystem === 'MY.coordinateSystemWgs84dms') {
     lat = dmsToDegrees(latitude);
     lng = dmsToDegrees(longitude);
+  } else if (coordinateSystem === 'MY.coordinateSystemEtrs-tm35fin') {
+    return convertEtrsTm35FinToWGS84(latitude, longitude);
   }
 
   if (isNumber(lat) && isNumber(lng)) {
@@ -30,6 +32,14 @@ function convertYkjToWGS84<T extends string | number>(lat: T, lng: T): [number, 
 
   try {
     return convertLatLng([latPadded, lngPadded], 'EPSG:2393', 'WGS84');
+  } catch (e: any) {
+    return undefined;
+  }
+}
+
+function convertEtrsTm35FinToWGS84<T extends string | number>(lat: T, lng: T): [number, number] | undefined {
+  try {
+    return convertLatLng([+lat, +lng], 'EPSG:3067', 'WGS84');
   } catch (e: any) {
     return undefined;
   }

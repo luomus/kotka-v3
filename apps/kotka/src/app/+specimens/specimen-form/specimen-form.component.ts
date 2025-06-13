@@ -251,7 +251,7 @@ export class SpecimenFormComponent
   private checkGatheringCoordinates(gathering: Gathering) {
     let newCoordinates: PointCoordinatesWithSystem | undefined = undefined;
 
-    if (gathering.latitude && gathering.longitude && gathering.coordinateSystem) {
+    if (gathering.latitude !== undefined && gathering.longitude !== undefined && gathering.coordinateSystem) {
       newCoordinates = { latitude: gathering.latitude, longitude: gathering.longitude, coordinateSystem: gathering.coordinateSystem };
     }
 
@@ -273,7 +273,7 @@ export class SpecimenFormComponent
     } else {
       let newMapCoordinates: PointCoordinates | undefined = undefined;
 
-      if (gathering.wgs84Latitude && gathering.wgs84Longitude) {
+      if (gathering.wgs84Latitude !== undefined && gathering.wgs84Longitude !== undefined) {
         newMapCoordinates = { latitude: gathering.wgs84Latitude, longitude: gathering.wgs84Longitude };
       }
 
