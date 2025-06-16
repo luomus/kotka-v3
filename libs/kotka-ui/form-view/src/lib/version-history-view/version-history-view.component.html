@@ -2,7 +2,7 @@
   <kui-main-content
     class="mb-5"
     [containerClass]="'container'"
-    [header]="(dataTypeName | titlecase) + (dataURI ? (' ' + dataURI) : '')"
+    [title]="(dataTypeName | titlecase) + (dataURI ? (' ' + dataURI) : '')"
   >
     <ngb-alert *ngIf="isErrorViewModel(vm)" [type]="'danger'" [dismissible]="false">
       <ng-container *ngIf="vm.errorType === versionHistoryErrorEnum.dataNotFound else genericError">

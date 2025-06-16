@@ -16,7 +16,9 @@ function specimenMatcher(segments: UrlSegment[]): UrlMatchResult|null {
   ) {
     return {
       consumed: [segments[0], segments[1]],
-      posParams: {}
+      posParams: {
+        specimenDataType: segments[0]
+      }
     };
   }
   return null;

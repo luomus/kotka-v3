@@ -1,9 +1,7 @@
 import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
+  ChangeDetectionStrategy, ChangeDetectorRef,
   Component, computed, effect,
-  OnDestroy,
-  OnInit, signal, Signal, ViewChild
+  signal, Signal, ViewChild
 } from '@angular/core';
 import { KotkaDocumentObjectType, Document, Gathering } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
@@ -11,11 +9,9 @@ import { FormViewContainerComponent } from '@kotka/ui/form-view';
 import { FormViewComponent } from '@kotka/ui/form-view';
 import {
   DialogService,
-  navigationEnd$,
-  UserService,
+  UserService
 } from '@kotka/ui/services';
-import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
 import {
@@ -27,6 +23,7 @@ import { LocalStorageService } from 'ngx-webstorage';
 import { isEqual } from 'lodash';
 import { convertCoordinatesToWGS84 } from '@kotka/shared/utils';
 import { MYCoordinateSystems } from '@luomus/laji-schema';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 type UrlDataType = 'botany'|'zoo'|'palaeontology'|'accession'|'culture';
 
@@ -44,6 +41,14 @@ interface PointCoordinatesWithSystem extends PointCoordinates {
 const urlToDataTypeMap: Record<UrlDataType, DataType> = {
   botany: 'botanyspecimen',
   zoo: 'zoospecimen',
+  palaeontology: 'palaeontology',
+  accession: 'accession',
+  culture: 'culture',
+};
+
+const dataTypeToNameMap: Record<DataType, string> = {
+  botanyspecimen: 'botany',
+  zoospecimen: 'zoo',
   palaeontology: 'palaeontology',
   accession: 'accession',
   culture: 'culture',
@@ -73,54 +78,73 @@ const defaultAdvancedFields = [
   imports: [FormViewComponent, NgTemplateOutlet, NgClass],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SpecimenFormComponent
-  extends FormViewContainerComponent
-  implements OnInit, OnDestroy
-{
+export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocumentObjectType.specimen> {
   formId = globals.specimenFormId;
-  dataType: KotkaDocumentObjectType.specimen = KotkaDocumentObjectType.specimen;
+  formDataType: KotkaDocumentObjectType.specimen =
+    KotkaDocumentObjectType.specimen;
 
-  prefilledFormData?: Partial<Document>;
+  title: Signal<string>;
+  prefilledFormData: Signal<Partial<Document> | undefined>;
 
   markAdvancedFieldsActive: Signal<boolean>;
-  advancedFields = signal<string[]|undefined>([]);
+  advancedFields = signal<string[] | undefined>([]);
   showOnlyBasicFields = signal(true);
-  hiddenFields: Signal<string[]|undefined>;
+  hiddenFields: Signal<string[] | undefined>;
 
   markUnreliableFieldsActive: Signal<boolean>;
-  unreliableFieldPointers = signal<string[]|undefined>([]);
+  unreliableFieldPointers = signal<string[] | undefined>([]);
 
-  lastPressedMarkFieldsBtnType = signal<'advancedFields'|'unreliableFields'>('advancedFields');
+  lastPressedMarkFieldsBtnType = signal<'advancedFields' | 'unreliableFields'>(
+    'advancedFields',
+  );
 
   lajiForm?: LajiFormComponent;
 
-  @ViewChild(FormViewComponent, { static: true }) formView!: FormViewComponent<KotkaDocumentObjectType.specimen>;
+  @ViewChild(FormViewComponent, { static: true })
+  formView!: FormViewComponent<KotkaDocumentObjectType.specimen>;
 
   private formData?: Document | Partial<Document>;
   private coordinates?: PointCoordinatesWithSystem;
   private mapCoordinates?: PointCoordinates;
 
-  private advancedFieldsStorageKey= signal<string|undefined>(undefined);
-  private routerSub?: Subscription;
+  private dataType: Signal<DataType | undefined>;
+  private advancedFieldsStorageKey = signal<string | undefined>(undefined);
 
   constructor(
     dialogService: DialogService,
+    activeRoute: ActivatedRoute,
+    router: Router,
+    cdr: ChangeDetectorRef,
     private userService: UserService,
-    private router: Router,
     private lajiFormFieldChooserService: LajiFormFieldChooserService,
     private storage: LocalStorageService,
-    private cdr: ChangeDetectorRef,
   ) {
-    super(dialogService);
+    super(dialogService, activeRoute, router, cdr);
 
-    this.prefilledFormData = this.getPrefilledFormDataFromCurrentUrl();
-
-    this.markAdvancedFieldsActive = computed(() =>
-      this.lastPressedMarkFieldsBtnType() === 'advancedFields' && this.lajiFormFieldChooserService.isActive()
+    this.dataType = toSignal(
+      this.activeRoute.paramMap.pipe(
+        map((paramMap) => this.getDataTypeFromParamMap(paramMap)),
+      ),
     );
 
-    this.markUnreliableFieldsActive = computed(() =>
-      this.lastPressedMarkFieldsBtnType() === 'unreliableFields' && this.lajiFormFieldChooserService.isActive()
+    this.title = computed(() =>
+      this.getTitle(this.dataType(), this.editMode(), this.dataURI()),
+    );
+
+    this.prefilledFormData = computed(() =>
+      this.dataType() ? { dataType: this.dataType()! } : undefined,
+    );
+
+    this.markAdvancedFieldsActive = computed(
+      () =>
+        this.lastPressedMarkFieldsBtnType() === 'advancedFields' &&
+        this.lajiFormFieldChooserService.isActive(),
+    );
+
+    this.markUnreliableFieldsActive = computed(
+      () =>
+        this.lastPressedMarkFieldsBtnType() === 'unreliableFields' &&
+        this.lajiFormFieldChooserService.isActive(),
     );
 
     this.hiddenFields = computed(() =>
@@ -129,12 +153,17 @@ export class SpecimenFormComponent
         : [],
     );
 
-    this.userService.getCurrentLoggedInUser().pipe(
-      map(user => `${this.dataType}-form-${user.id}-advanced-fields`)
-    ).subscribe(key => {
-      this.advancedFieldsStorageKey.set(key);
-      this.advancedFields.set(this.storage.retrieve(key) || defaultAdvancedFields);
-    });
+    this.userService
+      .getCurrentLoggedInUser()
+      .pipe(
+        map((user) => `${this.formDataType}-form-${user.id}-advanced-fields`),
+      )
+      .subscribe((key) => {
+        this.advancedFieldsStorageKey.set(key);
+        this.advancedFields.set(
+          this.storage.retrieve(key) || defaultAdvancedFields,
+        );
+      });
 
     effect(() => {
       const key = this.advancedFieldsStorageKey();
@@ -142,17 +171,6 @@ export class SpecimenFormComponent
         this.storage.store(key, this.advancedFields());
       }
     });
-  }
-
-  ngOnInit() {
-    this.routerSub = navigationEnd$(this.router).subscribe(() => {
-      this.prefilledFormData = this.getPrefilledFormDataFromCurrentUrl();
-      this.cdr.markForCheck();
-    });
-  }
-
-  ngOnDestroy() {
-    this.routerSub?.unsubscribe();
   }
 
   onFormInit(lajiForm: LajiFormComponent) {
@@ -186,15 +204,13 @@ export class SpecimenFormComponent
         throw new Error('Form is undefined');
       }
 
-      this.lajiFormFieldChooserService.startFieldChooser(
-        this.lajiForm,
-        {
-          selected: this.advancedFields(),
-          ignoreFields: classFields,
-          unselectableFields: getRequiredFields(schema),
-          unselectableFieldsErrorMsg: 'Can\'t mark required field as advanced field!'
-        }
-      );
+      this.lajiFormFieldChooserService.startFieldChooser(this.lajiForm, {
+        selected: this.advancedFields(),
+        ignoreFields: classFields,
+        unselectableFields: getRequiredFields(schema),
+        unselectableFieldsErrorMsg:
+          'Can\'t mark required field as advanced field!',
+      });
     }
   }
 
@@ -207,52 +223,59 @@ export class SpecimenFormComponent
 
     if (this.markUnreliableFieldsActive()) {
       this.unreliableFieldPointers.set(
-        this.lajiFormFieldChooserService.stopFieldChooser()
+        this.lajiFormFieldChooserService.stopFieldChooser(),
       );
     } else {
-      this.lajiFormFieldChooserService.startFieldChooser(
-        this.lajiForm,
-        {
-          mode: 'jsonPointerSelect',
-          ignoreFields: classFields,
-          colorTheme: 'yellow'
-        }
-      );
+      this.lajiFormFieldChooserService.startFieldChooser(this.lajiForm, {
+        mode: 'jsonPointerSelect',
+        ignoreFields: classFields,
+        colorTheme: 'yellow',
+      });
     }
   }
 
   toggleShowOnlyBasicFields() {
-    this.showOnlyBasicFields.update(value => !value);
+    this.showOnlyBasicFields.update((value) => !value);
   }
 
-  private getPrefilledFormDataFromCurrentUrl(): Partial<Document> | undefined {
-    const dataType = this.getDataTypeFromCurrentUrl();
+  private getDataTypeFromParamMap(paramMap: ParamMap): DataType | undefined {
+    const urlDataType = paramMap.get('specimenDataType') || '';
 
-    if (dataType) {
-      return { datatype: dataType };
+    if (Object.keys(urlToDataTypeMap).includes(urlDataType)) {
+      return urlToDataTypeMap[urlDataType as UrlDataType];
     }
 
     return undefined;
   }
 
-  private getDataTypeFromCurrentUrl(): DataType | undefined {
-    const urlParts: string[] = this.router.routerState.snapshot.url
-      .split('/')
-      .filter((part) => !!part);
-    const firstPart = urlParts[0];
-
-    if (Object.keys(urlToDataTypeMap).includes(firstPart)) {
-      return urlToDataTypeMap[firstPart as UrlDataType];
+  private getTitle(
+    dataType?: DataType,
+    editMode?: boolean,
+    dataURI?: string,
+  ): string {
+    const dataTypeName = dataType
+      ? dataTypeToNameMap[dataType] + ' specimen'
+      : 'specimen';
+    if (!editMode) {
+      return 'Create new ' + dataTypeName;
+    } else {
+      return 'Edit ' + dataTypeName + (dataURI ? ' ' + dataURI : '');
     }
-
-    return undefined;
   }
 
   private checkGatheringCoordinates(gathering: Gathering) {
     let newCoordinates: PointCoordinatesWithSystem | undefined = undefined;
 
-    if (gathering.latitude !== undefined && gathering.longitude !== undefined && gathering.coordinateSystem) {
-      newCoordinates = { latitude: gathering.latitude, longitude: gathering.longitude, coordinateSystem: gathering.coordinateSystem };
+    if (
+      gathering.latitude !== undefined &&
+      gathering.longitude !== undefined &&
+      gathering.coordinateSystem
+    ) {
+      newCoordinates = {
+        latitude: gathering.latitude,
+        longitude: gathering.longitude,
+        coordinateSystem: gathering.coordinateSystem,
+      };
     }
 
     if (!isEqual(newCoordinates, this.coordinates)) {
@@ -260,28 +283,51 @@ export class SpecimenFormComponent
 
       if (this.coordinates) {
         const { latitude, longitude, coordinateSystem } = this.coordinates;
-        const result = convertCoordinatesToWGS84(latitude, longitude, coordinateSystem);
+        const result = convertCoordinatesToWGS84(
+          latitude,
+          longitude,
+          coordinateSystem,
+        );
 
         if (result) {
-          this.mapCoordinates = { latitude: '' + result[0], longitude: '' + result[1] };
-          this.updateGatheringData({ wgs84Latitude: this.mapCoordinates.latitude, wgs84Longitude: this.mapCoordinates.longitude });
+          this.mapCoordinates = {
+            latitude: '' + result[0],
+            longitude: '' + result[1],
+          };
+          this.updateGatheringData({
+            wgs84Latitude: this.mapCoordinates.latitude,
+            wgs84Longitude: this.mapCoordinates.longitude,
+          });
         } else {
           this.mapCoordinates = undefined;
-          this.updateGatheringData({ wgs84Latitude: undefined, wgs84Longitude: undefined });
+          this.updateGatheringData({
+            wgs84Latitude: undefined,
+            wgs84Longitude: undefined,
+          });
         }
       }
     } else {
       let newMapCoordinates: PointCoordinates | undefined = undefined;
 
-      if (gathering.wgs84Latitude !== undefined && gathering.wgs84Longitude !== undefined) {
-        newMapCoordinates = { latitude: gathering.wgs84Latitude, longitude: gathering.wgs84Longitude };
+      if (
+        gathering.wgs84Latitude !== undefined &&
+        gathering.wgs84Longitude !== undefined
+      ) {
+        newMapCoordinates = {
+          latitude: gathering.wgs84Latitude,
+          longitude: gathering.wgs84Longitude,
+        };
       }
 
       if (!isEqual(newMapCoordinates, this.mapCoordinates)) {
         this.mapCoordinates = newMapCoordinates;
 
         if (this.mapCoordinates) {
-          this.coordinates = { latitude: this.mapCoordinates.latitude, longitude: this.mapCoordinates.longitude, coordinateSystem: 'MY.coordinateSystemWgs84' };
+          this.coordinates = {
+            latitude: this.mapCoordinates.latitude,
+            longitude: this.mapCoordinates.longitude,
+            coordinateSystem: 'MY.coordinateSystemWgs84',
+          };
           this.updateGatheringData(this.coordinates);
         }
       }
@@ -292,7 +338,10 @@ export class SpecimenFormComponent
     const [first, ...rest] = this.formData?.gatherings || [];
     const gathering = { ...(first || {}), ...updateObject };
     const gatherings: [Gathering, ...Gathering[]] = [gathering, ...rest];
-    const formData: Partial<Document> = { ...(this.formData || {}), gatherings };
+    const formData: Partial<Document> = {
+      ...(this.formData || {}),
+      gatherings,
+    };
 
     this.formView.setFormData(formData);
   }

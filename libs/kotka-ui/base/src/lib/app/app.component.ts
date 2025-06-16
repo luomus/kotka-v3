@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { TitleService } from '@kotka/ui/services';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
@@ -8,8 +7,4 @@ import { RouterOutlet } from '@angular/router';
   styles: [],
   imports: [RouterOutlet],
 })
-export class AppComponent {
-  constructor(private titleService: TitleService) {
-    this.titleService.startRouteListener();
-  }
-}
+export class AppComponent {}

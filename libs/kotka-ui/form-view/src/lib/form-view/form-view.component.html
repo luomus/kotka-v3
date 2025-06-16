@@ -1,12 +1,14 @@
 @let vm = formState();
+@let defaultTitle = editMode() ? 'Edit ' + dataTypeName() + ' ' + (dataURI() || '') : 'Add ' + dataTypeName();
+
 <kui-main-content
-  [header]="editMode() ? (editModeHeaderTpl() ? undefined : 'Edit ' + dataTypeName() + ' ' + (dataURI() || '')) : 'Add ' + dataTypeName()"
-  [headerTpl]="editMode() && editModeHeaderTpl() ? editModeHeaderTplWithContext : undefined"
+  [title]="title() ? title()! : defaultTitle"
+  [headerTpl]="headerTpl() ? headerTplWithContext : undefined"
   [containerClass]="'container'"
 >
-  <ng-template #editModeHeaderTplWithContext>
-    @if (editModeHeaderTpl(); as tpl) {
-      <ng-container *ngTemplateOutlet="tpl; context: { dataURI: dataURI(), formData: vm.formData }"></ng-container>
+  <ng-template #headerTplWithContext>
+    @if (headerTpl(); as tpl) {
+      <ng-container *ngTemplateOutlet="tpl; context: { editMode: editMode(), dataURI: dataURI(), formData: vm.formData }"></ng-container>
     }
   </ng-template>
 

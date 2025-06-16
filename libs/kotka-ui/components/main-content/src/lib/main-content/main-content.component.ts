@@ -1,21 +1,26 @@
 import {
   Component,
   ChangeDetectionStrategy,
-  Input,
   TemplateRef,
+  input,
+  effect
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'kui-main-content',
   template: `
-    <main [class]="containerClass">
-      <div *ngIf="header || headerTpl" class="pb-2 mt-4 mb-2 border-bottom">
-        <h1 *ngIf="header" data-cy="main-header">{{ header }}</h1>
-        <ng-container *ngIf="headerTpl">
-          <ng-container *ngTemplateOutlet="headerTpl"></ng-container>
-        </ng-container>
-      </div>
+    <main [class]="containerClass()">
+      @if (headerTpl() || title()) {
+        <div class="pb-2 mt-4 mb-2 border-bottom">
+          @if (headerTpl()) {
+            <ng-container *ngTemplateOutlet="headerTpl()!"></ng-container>
+          } @else if (title()) {
+            <h1 data-cy="main-header">{{ title() }}</h1>
+          }
+        </div>
+      }
       <ng-content></ng-content>
     </main>
   `,
@@ -30,7 +35,20 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule]
 })
 export class MainContentComponent {
-  @Input() header?: string;
-  @Input() containerClass = 'container-xl';
-  @Input() headerTpl?: TemplateRef<unknown>;
+  title = input.required<string>();
+  containerClass = input('container-xl');
+  headerTpl = input<TemplateRef<unknown>>();
+
+  constructor(
+    private titleService: Title
+  ) {
+    effect(() => {
+      const titleParts: string[] = [];
+      if (this.title()) {
+        titleParts.push(this.title()!);
+      }
+      titleParts.push('Kotka');
+      this.titleService.setTitle(titleParts.join(' - '));
+    });
+  }
 }

@@ -8,26 +8,17 @@ export const specimensRoutes: Routes = [
   {
     path: 'search',
     pathMatch: 'full',
-    component: SpecimenTableComponent,
-    data: { title: 'Search specimens' }
+    component: SpecimenTableComponent
   },
   {
     matcher: formMatcher,
     component: SpecimenFormComponent,
-    data: {
-      add: { title: 'Add specimen' },
-      edit: { title: 'Edit specimen', addUriToTitle: true }
-    },
     canDeactivate: [ ComponentCanDeactivateGuard ],
     runGuardsAndResolvers: 'always'
   },
   {
     path: 'history',
     pathMatch: 'full',
-    component: SpecimenVersionHistoryComponent,
-    data: {
-      title: 'Specimen',
-      addUriToTitle: true
-    }
+    component: SpecimenVersionHistoryComponent
   }
 ];

@@ -11,7 +11,7 @@ import { FormViewComponent } from '@kotka/ui/form-view';
   imports: [FormViewComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OrganizationFormComponent extends FormViewContainerComponent {
+export class OrganizationFormComponent extends FormViewContainerComponent<KotkaDocumentObjectType.organization> {
   formId = globals.organizationFormId;
   dataType: KotkaDocumentObjectType.organization =
     KotkaDocumentObjectType.organization;

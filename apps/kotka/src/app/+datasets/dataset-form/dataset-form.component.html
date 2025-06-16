@@ -2,17 +2,25 @@
   [formId]="formId"
   [dataType]="dataType"
   [dataTypeName]="'tag'"
-  [editModeHeaderTpl]="editModeHeaderTpl"
+  [editMode]="editMode()"
+  [dataURI]="dataURI()"
+  [headerTpl]="headerTpl"
+  (saveSuccess)="onSaveSuccess($event)"
+  (deleteSuccess)="onDeleteSuccess()"
 >
 </kotka-form-view>
 
-<ng-template #editModeHeaderTpl let-dataURI="dataURI" let-formData="formData">
-  <h1 data-cy="main-header">Edit tag {{ dataURI }}</h1>
-  <a
-    *ngIf="isDataset(formData)"
-    [href]='("/specimens/search?q=dataset.raw:\"" + formData.datasetName.en + "\"") | oldKotkaUrl'
-    target="_blank"
-  >
-    Specimens with this tag
-  </a>
+<ng-template #headerTpl let-editMode="editMode" let-dataURI="dataURI" let-formData="formData">
+  @if (!editMode) {
+    <h1 data-cy="main-header">Add tag</h1>
+  } @else {
+    <h1 data-cy="main-header">Edit tag {{ dataURI }}</h1>
+    <a
+      *ngIf="isDataset(formData)"
+      [href]='("/specimens/search?q=dataset.raw:\"" + formData.datasetName.en + "\"") | oldKotkaUrl'
+      target="_blank"
+    >
+      Specimens with this tag
+    </a>
+  }
 </ng-template>

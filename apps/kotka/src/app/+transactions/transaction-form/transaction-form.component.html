@@ -2,19 +2,30 @@
   [formId]="formId"
   [dataType]="dataType"
   [dataTypeName]="'transaction'"
+  [editMode]="editMode()"
+  [dataURI]="dataURI()"
+  [allowCopy]="true"
+  [prefilledFormData]="copyData()"
   [augmentFormFunc]="augmentFormFunc"
-  [editModeHeaderTpl]="editModeHeaderTpl"
+  [headerTpl]="headerTpl"
   [metaFieldsContainerTpl]="metaFieldsContainer"
   (formInit)="onFormInit($event)"
   (formDataChange)="onFormDataChange($event)"
   (disabledChange)="setDisabled($event)"
+  (saveSuccess)="onSaveSuccess($event)"
+  (deleteSuccess)="onDeleteSuccess()"
+  (copyData)="onCopyData($event)"
 >
 </kotka-form-view>
 
-<ng-template #editModeHeaderTpl let-dataURI="dataURI" let-formData="formData">
+<ng-template #headerTpl let-editMode="editMode" let-dataURI="dataURI" let-formData="formData">
   <h1 data-cy="main-header">
-    Edit transaction {{ dataURI }}
-    <ng-container *ngIf="formData?.legacyID as legacyID">({{ legacyID }})</ng-container>
+    @if (!editMode) {
+      Add transaction {{ dataURI }}
+    } @else {
+      Edit transaction {{ dataURI }}
+      <ng-container *ngIf="formData?.legacyID as legacyID">({{ legacyID }})</ng-container>
+    }
   </h1>
 </ng-template>
 

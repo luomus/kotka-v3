@@ -1,16 +1,22 @@
 <kotka-form-view
   [style.visibility]="advancedFields() ? 'visible' : 'hidden'"
   [formId]="formId"
-  [dataType]="dataType"
+  [dataType]="formDataType"
   [dataTypeName]="'specimen'"
-  [prefilledFormData]="prefilledFormData"
+  [editMode]="editMode()"
+  [dataURI]="dataURI()"
+  [allowCopy]="true"
+  [prefilledFormData]="copyData() || prefilledFormData()"
   [footerDisabled]="markAdvancedFieldsActive()"
   [hiddenFields]="hiddenFields()"
+  [title]="title()"
   [formContainerTpl]="formContainer"
   (formInit)="onFormInit($event)"
   (formDataChange)="onFormDataChange($event)"
+  (saveSuccess)="onSaveSuccess($event)"
+  (deleteSuccess)="onDeleteSuccess()"
+  (copyData)="onCopyData($event)"
 >
-</kotka-form-view>
 
 <ng-template #formContainer let-formContentTpl>
   <div class="row">
@@ -59,3 +65,4 @@
     </div>
   </div>
 </ng-template>
+</kotka-form-view>

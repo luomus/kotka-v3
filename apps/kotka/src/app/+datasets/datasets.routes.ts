@@ -9,26 +9,17 @@ export const datasetsRoutes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    component: DatasetTableComponent,
-    data: { title: 'Tags' }
+    component: DatasetTableComponent
   },
   {
     matcher: formMatcher,
     component: DatasetFormComponent,
-    data: {
-      add: { title: 'Add tag' },
-      edit: { title: 'Edit tag', addUriToTitle: true }
-    },
     canDeactivate: [ ComponentCanDeactivateGuard ],
     runGuardsAndResolvers: 'always'
   },
   {
     path: 'history',
     pathMatch: 'full',
-    component: DatasetVersionHistoryComponent,
-    data: {
-      title: 'Transaction',
-      addUriToTitle: true
-    }
+    component: DatasetVersionHistoryComponent
   }
 ];

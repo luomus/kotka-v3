@@ -9,7 +9,7 @@ import {
   Subscription,
   switchMap, throwError
 } from 'rxjs';
-import { filter, map, take } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import {
   allowEditForUser,
   allowDeleteForUser,
@@ -36,6 +36,7 @@ export interface FormInputs<T extends KotkaDocumentObjectType, S extends KotkaDo
   dataType: T;
   editMode: boolean;
   dataURI?: string;
+  allowCopy?: boolean;
   augmentFormFunc?: (
     form: LajiForm.SchemaForm,
   ) => Observable<LajiForm.SchemaForm>;
@@ -108,14 +109,6 @@ export class FormViewFacade<
       : state.mediaMetadata;
 
     this.setState({ ...state, formData, formDataLastForceUpdatedVersion, formHasChanges, mediaMetadata });
-  }
-
-  setCopiedFormData(formData: Partial<S>) {
-    this.getEmptyFormData$(formData)
-      .pipe(take(1))
-      .subscribe((formData) => {
-        this.setFormData(formData, false, true);
-      });
   }
 
   setFormHasChanges(formHasChanges: boolean) {
@@ -219,7 +212,6 @@ export class FormViewFacade<
     const disabled = isEditMode && !allowEditForUser(formData, user);
     const showDeleteButton =
       isEditMode && !disabled && allowDeleteForUser(<S>formData, user);
-    const showCopyButton = isEditMode && !!form.options?.allowTemplate;
 
     return {
       loading: false,
@@ -228,7 +220,7 @@ export class FormViewFacade<
       formDataLastForceUpdatedVersion: formData,
       disabled,
       showDeleteButton,
-      showCopyButton,
+      showCopyButton: isEditMode && inputs.allowCopy,
       mediaMetadata: this.getMediaMetadata(user, formData),
       formHasChanges: false,
       disabledAlertDismissed: false,

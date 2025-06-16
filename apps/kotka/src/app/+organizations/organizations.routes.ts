@@ -9,15 +9,13 @@ export const organizationsRoutes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    component: OrganizationTableComponent,
-    data: { title: 'Organizations' }
+    component: OrganizationTableComponent
   },
   {
     matcher: formMatcher,
     component: OrganizationFormComponent,
     data: {
-      add: { title: 'Add organization' },
-      edit: { title: 'Edit organization', addUriToTitle: true }
+      add: { title: 'Add organization' }
     },
     canDeactivate: [ ComponentCanDeactivateGuard ],
     runGuardsAndResolvers: 'always'
@@ -25,10 +23,6 @@ export const organizationsRoutes: Routes = [
   {
     path: 'history',
     pathMatch: 'full',
-    component: OrganizationVersionHistoryComponent,
-    data: {
-      title: 'Organization',
-      addUriToTitle: true
-    }
+    component: OrganizationVersionHistoryComponent
   }
 ];

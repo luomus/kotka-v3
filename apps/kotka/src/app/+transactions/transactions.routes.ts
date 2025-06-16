@@ -9,26 +9,17 @@ export const transactionsRoutes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    component: TransactionTableComponent,
-    data: { title: 'Transactions' }
+    component: TransactionTableComponent
   },
   {
     matcher: formMatcher,
     component: TransactionFormComponent,
-    data: {
-      add: { title: 'Add transaction' },
-      edit: { title: 'Edit transaction', addUriToTitle: true }
-    },
     canDeactivate: [ ComponentCanDeactivateGuard ],
     runGuardsAndResolvers: 'always'
   },
   {
     path: 'history',
     pathMatch: 'full',
-    component: TransactionVersionHistoryComponent,
-    data: {
-      title: 'Transaction',
-      addUriToTitle: true
-    }
+    component: TransactionVersionHistoryComponent
   }
 ];

@@ -4,17 +4,14 @@ import {
   Component,
   ViewChild,
   TemplateRef,
-  OnDestroy,
   input,
-  output, effect, signal, Signal
+  output,
+  effect,
+  Signal
 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
 import { KotkaDocumentObjectType, KotkaDocumentObjectMap, LajiForm } from '@kotka/shared/models';
 import {
-  from,
-  Observable,
-  Subscription,
-  switchMap
+  Observable
 } from 'rxjs';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ErrorMessages } from '@kotka/shared/models';
@@ -23,17 +20,14 @@ import {
   FormState,
   FormViewFacade
 } from './form-view.facade';
-import { filter, take } from 'rxjs/operators';
 import { FormViewUtils } from './form-view-utils';
-import { ToastService, DialogService, navigationEnd$, ApiClient } from '@kotka/ui/services';
-import { getUri } from '@kotka/shared/utils';
+import { ToastService, DialogService, ApiClient } from '@kotka/ui/services';
 import { MainContentComponent } from '@kotka/ui/main-content';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 import { MetaFieldsComponent } from '../meta-fields/meta-fields.component';
 import { SpinnerComponent } from '@kotka/ui/spinner';
 import { NgTemplateOutlet, TitleCasePipe } from '@angular/common';
 import { LabelPipe } from '@kotka/ui/pipes';
-import { toObservable } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'kotka-form-view',
@@ -55,11 +49,15 @@ import { toObservable } from '@angular/core/rxjs-interop';
 export class FormViewComponent<
   T extends KotkaDocumentObjectType = KotkaDocumentObjectType,
   S extends KotkaDocumentObjectMap[T] = KotkaDocumentObjectMap[T],
-> implements OnDestroy
+>
 {
   formId = input.required<string>();
   dataType = input.required<T>();
   dataTypeName = input('');
+
+  editMode = input.required<boolean>();
+  dataURI = input.required<string | undefined>();
+  allowCopy = input<boolean>();
 
   augmentFormFunc =
     input<(form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>>();
@@ -68,12 +66,11 @@ export class FormViewComponent<
   footerDisabled = input<boolean>();
   hiddenFields = input<string[]>();
 
-  editModeHeaderTpl = input<TemplateRef<unknown>>();
+  title = input<string>();
+  headerTpl = input<TemplateRef<unknown>>();
+
   formContainerTpl = input<TemplateRef<unknown>>();
   metaFieldsContainerTpl = input<TemplateRef<unknown>>();
-
-  editMode = signal(false);
-  dataURI = signal<string | undefined>(undefined);
 
   formState: Signal<FormState<S>>;
 
@@ -83,29 +80,31 @@ export class FormViewComponent<
   formInit = output<LajiFormComponent>();
   disabledChange = output<boolean | undefined>();
 
-  @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
+  saveSuccess = output<S>();
+  deleteSuccess = output<void>();
+  copyData = output<Partial<S>>();
 
-  private routeParamUpdateSub: Subscription;
+  @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
 
   constructor(
     private notifier: ToastService,
-    private activeRoute: ActivatedRoute,
     private apiClient: ApiClient,
     private dialogService: DialogService,
-    private router: Router,
     private formViewFacade: FormViewFacade<T, S>,
     private cdr: ChangeDetectorRef,
   ) {
     this.formState = this.formViewFacade.state;
 
-    this.setRouteParams();
-
-    this.routeParamUpdateSub = navigationEnd$(this.router).subscribe(() => {
-      this.setRouteParams();
-    });
-
     effect(() => {
-      this.updateInputs();
+      this.formViewFacade.setInputs({
+        formId: this.formId(),
+        dataType: this.dataType(),
+        editMode: this.editMode(),
+        dataURI: this.dataURI(),
+        allowCopy: this.allowCopy(),
+        augmentFormFunc: this.augmentFormFunc(),
+        prefilledFormData: this.prefilledFormData(),
+      });
     });
 
     effect(() => {
@@ -117,27 +116,21 @@ export class FormViewComponent<
     });
   }
 
-  ngOnDestroy() {
-    this.routeParamUpdateSub.unsubscribe();
-  }
-
   onFormReady() {
     if (this.lajiForm) {
       this.formInit.emit(this.lajiForm);
     }
   }
+
   onSubmit(data: S) {
     this.lajiForm?.block();
 
     this.save$(data).subscribe({
       next: (formData) => {
         this.formViewFacade.setFormHasChanges(false);
-
-        this.navigateToEdit(formData.id || '').subscribe(() => {
-          this.lajiForm?.unBlock();
-          this.notifier.showSuccess('Save success!');
-          this.cdr.markForCheck();
-        });
+        this.lajiForm?.unBlock();
+        this.notifier.showSuccess('Save success!');
+        this.saveSuccess.emit(formData);
       },
       error: () => {
         this.lajiForm?.unBlock();
@@ -210,7 +203,7 @@ export class FormViewComponent<
         this.formViewFacade.setFormHasChanges(false);
         this.lajiForm?.unBlock();
         this.notifier.showSuccess('Success!');
-        this.navigateAway();
+        this.deleteSuccess.emit();
       },
       error: (err) => {
         this.lajiForm?.unBlock();
@@ -238,63 +231,15 @@ export class FormViewComponent<
   }
 
   private copyAsNew(data: Partial<S>, excludedFields: string[] = []) {
-    this.lajiForm?.block();
-
     excludedFields = excludedFields.concat(
       this.formState().form?.excludeFromCopy || [],
     );
+
     const newData = FormViewUtils.removeMetaAndExcludedFields<S>(
       data,
       excludedFields,
     );
 
-    return this.navigateToAdd()
-      .pipe(
-        switchMap(() => toObservable(this.formViewFacade.formData)), // wait that the initial form data has loaded
-        filter((formData) => formData !== undefined),
-        take(1),
-      )
-      .subscribe(() => {
-        this.formViewFacade.setCopiedFormData(newData);
-        this.lajiForm?.unBlock();
-      });
-  }
-
-  private navigateAway() {
-    this.router.navigate(['..'], { relativeTo: this.activeRoute });
-  }
-
-  private navigateToAdd(): Observable<boolean> {
-    return from(
-      this.router.navigate(['..', 'add'], { relativeTo: this.activeRoute }),
-    );
-  }
-
-  private navigateToEdit(id: string): Observable<boolean> {
-    return from(
-      this.router.navigate(['..', 'edit'], {
-        relativeTo: this.activeRoute,
-        queryParams: { uri: getUri(id) },
-      }),
-    );
-  }
-
-  private setRouteParams() {
-    const editMode = this.activeRoute.snapshot.url[0].path === 'edit';
-    const dataURI = this.activeRoute.snapshot.queryParams['uri'];
-
-    this.editMode.set(editMode);
-    this.dataURI.set(dataURI);
-  }
-
-  private updateInputs() {
-    this.formViewFacade.setInputs({
-      formId: this.formId(),
-      dataType: this.dataType(),
-      editMode: this.editMode(),
-      dataURI: this.dataURI(),
-      augmentFormFunc: this.augmentFormFunc(),
-      prefilledFormData: this.prefilledFormData(),
-    });
+    this.copyData.emit(newData);
   }
 }

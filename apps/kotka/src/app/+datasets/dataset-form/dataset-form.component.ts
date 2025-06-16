@@ -4,6 +4,7 @@ import { globals } from '../../../environments/globals';
 import { FormViewContainerComponent, FormViewComponent } from '@kotka/ui/form-view';
 import { CommonModule } from '@angular/common';
 import { OldKotkaUrlPipe } from '@kotka/ui/pipes';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'kotka-organization-form',
@@ -12,9 +13,10 @@ import { OldKotkaUrlPipe } from '@kotka/ui/pipes';
   imports: [CommonModule, FormViewComponent, OldKotkaUrlPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DatasetFormComponent extends FormViewContainerComponent {
+export class DatasetFormComponent extends FormViewContainerComponent<KotkaDocumentObjectType.dataset> {
   formId = globals.datasetFormId;
   dataType: KotkaDocumentObjectType.dataset = KotkaDocumentObjectType.dataset;
 
   protected readonly isDataset = isDataset;
+  protected readonly saveAs = saveAs;
 }

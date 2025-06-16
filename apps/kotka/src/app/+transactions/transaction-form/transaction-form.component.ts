@@ -1,8 +1,8 @@
 import {
-  ChangeDetectionStrategy,
+  ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
   OnDestroy,
-  ViewChild,
+  ViewChild
 } from '@angular/core';
 import {
   KotkaDocumentObjectType,
@@ -20,21 +20,18 @@ import { globals } from '../../../environments/globals';
 import { FormViewContainerComponent } from '@kotka/ui/form-view';
 import { TransactionPdfSheetsComponent } from '../transaction-pdf-sheets/transaction-pdf-sheets.component';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'kotka-transaction-form',
   templateUrl: './transaction-form.component.html',
   styleUrls: ['./transaction-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    CommonModule,
-    FormViewComponent,
-    TransactionPdfSheetsComponent
-  ],
+  imports: [CommonModule, FormViewComponent, TransactionPdfSheetsComponent],
   providers: [TransactionFormEmbedService],
 })
 export class TransactionFormComponent
-  extends FormViewContainerComponent
+  extends FormViewContainerComponent<KotkaDocumentObjectType.transaction>
   implements OnDestroy
 {
   formId = globals.transactionFormId;
@@ -46,7 +43,8 @@ export class TransactionFormComponent
 
   isSpecimenTransaction = isSpecimenTransaction;
 
-  @ViewChild(FormViewComponent, { static: true }) formView!: FormViewComponent<KotkaDocumentObjectType.transaction>;
+  @ViewChild(FormViewComponent, { static: true })
+  formView!: FormViewComponent<KotkaDocumentObjectType.transaction>;
 
   private specimenRangeButtonClickSubscription?: Subscription;
 
@@ -56,14 +54,18 @@ export class TransactionFormComponent
     private apiClient: ApiClient,
     private formService: FormService,
     dialogService: DialogService,
+    activeRoute: ActivatedRoute,
+    router: Router,
+    cdr: ChangeDetectorRef,
     private logger: Logger,
     private transactionFormEmbedService: TransactionFormEmbedService,
   ) {
-    super(dialogService);
+    super(dialogService, activeRoute, router, cdr);
   }
 
-  ngOnDestroy() {
+  override ngOnDestroy() {
     this.specimenRangeButtonClickSubscription?.unsubscribe();
+    super.ngOnDestroy();
   }
 
   onFormInit(lajiForm: LajiFormComponent) {
