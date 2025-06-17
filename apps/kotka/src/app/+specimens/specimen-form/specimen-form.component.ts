@@ -3,7 +3,7 @@ import {
   Component, computed, effect,
   signal, Signal, ViewChild
 } from '@angular/core';
-import { KotkaDocumentObjectType, Document, Gathering } from '@kotka/shared/models';
+import { KotkaDocumentObjectType, Document, Gathering} from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
 import { FormViewContainerComponent } from '@kotka/ui/form-view';
 import { FormViewComponent } from '@kotka/ui/form-view';
@@ -20,10 +20,11 @@ import {
   LajiFormFieldChooserService
 } from '@kotka/ui/laji-form';
 import { LocalStorageService } from 'ngx-webstorage';
-import { isEqual } from 'lodash';
+import { isEqual, invert } from 'lodash';
 import { convertCoordinatesToWGS84 } from '@kotka/shared/utils';
 import { MYCoordinateSystems } from '@luomus/laji-schema';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { from } from 'rxjs';
 
 type UrlDataType = 'botany'|'zoo'|'palaeontology'|'accession'|'culture';
 
@@ -83,6 +84,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
   formDataType: KotkaDocumentObjectType.specimen =
     KotkaDocumentObjectType.specimen;
 
+  dataType: Signal<DataType | undefined>;
   title: Signal<string>;
   prefilledFormData: Signal<Partial<Document> | undefined>;
 
@@ -107,7 +109,6 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
   private coordinates?: PointCoordinatesWithSystem;
   private mapCoordinates?: PointCoordinates;
 
-  private dataType: Signal<DataType | undefined>;
   private advancedFieldsStorageKey = signal<string | undefined>(undefined);
 
   constructor(
@@ -131,8 +132,8 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
       this.getTitle(this.dataType(), this.editMode(), this.dataURI()),
     );
 
-    this.prefilledFormData = computed(() =>
-      this.dataType() ? { dataType: this.dataType()! } : undefined,
+    this.prefilledFormData = computed((): Partial<Document> | undefined =>
+      this.dataType() ? { datatype: this.dataType()! } : undefined,
     );
 
     this.markAdvancedFieldsActive = computed(
@@ -179,6 +180,11 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
 
   onFormDataChange(formData?: Partial<Document>) {
     this.formData = formData;
+
+    if (!this.dataType() && formData?.datatype) {
+      const urlDataType = this.getUrlDataTypeFromDataType(formData.datatype);
+      this.router.navigate([urlDataType, 'specimens', this.editMode() ? 'edit' : 'add'], { replaceUrl: true, queryParamsHandling: 'preserve' });
+    }
 
     const gathering = formData?.gatherings?.[0];
 
@@ -238,6 +244,21 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     this.showOnlyBasicFields.update((value) => !value);
   }
 
+  override onCopyData(formData: Partial<Document>) {
+    if (!formData.datatype) {
+      throw new Error('Missing a datatype');
+    }
+
+    const urlDataType = this.getUrlDataTypeFromDataType(formData.datatype);
+
+    from(
+      this.router.navigate([urlDataType, 'specimens', 'add'], { state: { routeReuseStrategy: 'urlMatch' } }),
+    ).subscribe(() => {
+      this.copyData.set(formData);
+      this.cdr.markForCheck();
+    });
+  }
+
   private getDataTypeFromParamMap(paramMap: ParamMap): DataType | undefined {
     const urlDataType = paramMap.get('specimenDataType') || '';
 
@@ -246,6 +267,16 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     }
 
     return undefined;
+  }
+
+  private getUrlDataTypeFromDataType(dataType: string): UrlDataType {
+    const dataTypeToUrlMap = invert(urlToDataTypeMap);
+
+    if (!Object.keys(dataTypeToUrlMap).includes(dataType)) {
+      throw new Error('Invalid datatype');
+    }
+
+    return dataTypeToUrlMap[dataType] as UrlDataType;
   }
 
   private getTitle(

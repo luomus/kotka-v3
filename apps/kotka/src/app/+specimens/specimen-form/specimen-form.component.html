@@ -5,7 +5,7 @@
   [dataTypeName]="'specimen'"
   [editMode]="editMode()"
   [dataURI]="dataURI()"
-  [allowCopy]="true"
+  [allowCopy]="!!dataType()"
   [prefilledFormData]="copyData() || prefilledFormData()"
   [footerDisabled]="markAdvancedFieldsActive()"
   [hiddenFields]="hiddenFields()"

@@ -1,24 +1,14 @@
 import { Routes, UrlMatchResult, UrlSegment } from '@angular/router';
 import { NotFoundComponent } from '@kotka/ui/base';
-import { OnlyLoggedInGuard, RouteReuseStrategyEnum } from '@kotka/ui/services';
+import { OnlyLoggedInGuard } from '@kotka/ui/services';
 import { BaseComponent } from '@kotka/ui/base';
 import { environment } from '../environments/environment';
 
 function specimenMatcher(segments: UrlSegment[]): UrlMatchResult|null {
-  if (segments[0]?.path === 'specimens') {
+  if (['specimens', 'botany', 'zoo', 'palaeontology', 'accession', 'culture'].includes(segments[0]?.path)) {
     return {
-      consumed: [segments[0]],
+      consumed: [],
       posParams: {}
-    };
-  } else if (
-    ['botany', 'zoo', 'palaeontology', 'accession', 'culture'].includes(segments[0]?.path) &&
-    segments[1]?.path === 'specimens'
-  ) {
-    return {
-      consumed: [segments[0], segments[1]],
-      posParams: {
-        specimenDataType: segments[0]
-      }
     };
   }
   return null;
@@ -30,7 +20,7 @@ const baseRoutes: Routes = [
       { path: 'tags', loadChildren: () => import('./+datasets/datasets.routes').then(m => m.datasetsRoutes), data: {preload: false} },
       { path: 'organizations', loadChildren: () => import('./+organizations/organizations.routes').then(m => m.organizationsRoutes), data: {preload: false} },
       { path: 'transactions', loadChildren: () => import('./+transactions/transactions.routes').then(m => m.transactionsRoutes), data: {preload: false} },
-      { matcher: specimenMatcher, loadChildren: () => import('./+specimens/specimens.routes').then(m => m.specimensRoutes), data: {preload: false, routeReuseStrategy: RouteReuseStrategyEnum.urlMatch} },
+      { matcher: specimenMatcher, loadChildren: () => import('./+specimens/specimens.routes').then(m => m.specimensRoutes), data: {preload: false} },
       { path: '**', pathMatch: 'full', component: NotFoundComponent }
     ]
   }

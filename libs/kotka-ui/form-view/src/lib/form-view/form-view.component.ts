@@ -165,6 +165,7 @@ export class FormViewComponent<
     this.save$(data).subscribe({
       next: (data) => {
         this.formViewFacade.setFormHasChanges(false);
+        this.lajiForm?.unBlock();
         this.copyAsNew(data);
       },
       error: () => {
