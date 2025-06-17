@@ -57,18 +57,19 @@ export class FormViewComponent<
 
   editMode = input.required<boolean>();
   dataURI = input.required<string | undefined>();
-  allowCopy = input<boolean>();
 
   augmentFormFunc =
     input<(form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>>();
   prefilledFormData = input<Partial<S>>();
 
-  footerDisabled = input<boolean>();
   hiddenFields = input<string[]>();
 
   title = input<string>();
-  headerTpl = input<TemplateRef<unknown>>();
+  allowCopy = input<boolean>();
+  footerDisabled = input<boolean>();
+  historyPageLink = input<string[]|string>(['..', 'history']);
 
+  headerTpl = input<TemplateRef<unknown>>();
   formContainerTpl = input<TemplateRef<unknown>>();
   metaFieldsContainerTpl = input<TemplateRef<unknown>>();
 

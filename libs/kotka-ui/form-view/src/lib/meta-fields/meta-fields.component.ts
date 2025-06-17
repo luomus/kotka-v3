@@ -15,6 +15,7 @@ export class MetaFieldsComponent {
   @Input() formData?: Partial<KotkaDocumentObject>;
   @Input() editMode?: boolean;
   @Input() dataURI?: string;
+  @Input() historyPageLink?: string[]|string;
 
   @Input() containerTpl?: TemplateRef<unknown>;
 }

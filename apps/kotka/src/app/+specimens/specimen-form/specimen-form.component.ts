@@ -181,7 +181,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
   onFormDataChange(formData?: Partial<Document>) {
     this.formData = formData;
 
-    if (!this.dataType() && formData?.datatype) {
+    if (formData?.datatype && this.dataType() !== formData.datatype) {
       const urlDataType = this.getUrlDataTypeFromDataType(formData.datatype);
       this.router.navigate([urlDataType, 'specimens', this.editMode() ? 'edit' : 'add'], { replaceUrl: true, queryParamsHandling: 'preserve' });
     }
