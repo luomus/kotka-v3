@@ -109,6 +109,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
   private coordinates?: PointCoordinatesWithSystem;
   private mapCoordinates?: PointCoordinates;
 
+  private showOnlyBasicFieldsStorageKey = signal<string | undefined>(undefined);
   private advancedFieldsStorageKey = signal<string | undefined>(undefined);
 
   constructor(
@@ -156,15 +157,27 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
 
     this.userService
       .getCurrentLoggedInUser()
-      .pipe(
-        map((user) => `${this.formDataType}-form-${user.id}-advanced-fields`),
-      )
-      .subscribe((key) => {
-        this.advancedFieldsStorageKey.set(key);
+      .subscribe(user => {
+        const showOnlyBasicFieldsKey = `specimen-form-${user.id}-show-only-basic-fields`;
+        const advancedFieldsKey = `specimen-form-${user.id}-advanced-fields`;
+
+        this.showOnlyBasicFieldsStorageKey.set(showOnlyBasicFieldsKey);
+        this.showOnlyBasicFields.set(
+          this.storage.retrieve(showOnlyBasicFieldsKey) ?? true
+        );
+
+        this.advancedFieldsStorageKey.set(advancedFieldsKey);
         this.advancedFields.set(
-          this.storage.retrieve(key) || defaultAdvancedFields,
+          this.storage.retrieve(advancedFieldsKey) ?? defaultAdvancedFields
         );
       });
+
+    effect(() => {
+      const key = this.showOnlyBasicFieldsStorageKey();
+      if (key) {
+        this.storage.store(key, this.showOnlyBasicFields());
+      }
+    });
 
     effect(() => {
       const key = this.advancedFieldsStorageKey();
