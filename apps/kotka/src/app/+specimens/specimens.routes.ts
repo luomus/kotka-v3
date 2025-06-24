@@ -3,6 +3,7 @@ import { SpecimenFormComponent } from './specimen-form/specimen-form.component';
 import { ComponentCanDeactivateGuard, formMatcher, RouteReuseStrategyEnum } from '@kotka/ui/services';
 import { SpecimenTableComponent } from './specimen-table/specimen-table.component';
 import { SpecimenVersionHistoryComponent } from './specimen-version-history/specimen-version-history.component';
+import { NotFoundComponent } from '@kotka/ui/base';
 
 function specimenFormMatcher(segments: UrlSegment[]): UrlMatchResult|null {
   if (['botany', 'zoo', 'palaeontology', 'accession', 'culture'].includes(segments[0]?.path) && segments[1]?.path === 'specimens') {
@@ -34,6 +35,11 @@ export const specimensRoutes: Routes = [
         path: 'history',
         pathMatch: 'full',
         component: SpecimenVersionHistoryComponent
+      },
+      {
+        path: '**',
+        pathMatch: 'full',
+        component: NotFoundComponent
       }
     ]
   },
@@ -51,6 +57,11 @@ export const specimensRoutes: Routes = [
         data: {
           routeReuseStrategy: RouteReuseStrategyEnum.default
         }
+      },
+      {
+        path: '**',
+        pathMatch: 'full',
+        component: NotFoundComponent
       }
     ]
   }
