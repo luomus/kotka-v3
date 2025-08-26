@@ -257,6 +257,14 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     this.showOnlyBasicFields.update((value) => !value);
   }
 
+  expandAll() {
+    this.formView.lajiForm?.openAllMultiActiveArrays();
+  }
+
+  collapseAll() {
+    this.formView.lajiForm?.closeAllMultiActiveArrays();
+  }
+
   override onCopyData(formData: Partial<Document>) {
     if (!formData.datatype) {
       throw new Error('Missing a datatype');

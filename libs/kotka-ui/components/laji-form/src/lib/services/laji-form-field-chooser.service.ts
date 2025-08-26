@@ -42,6 +42,9 @@ export class LajiFormFieldChooserService {
     private componentService: ComponentService
   ) {
     effect(() => {
+      this.fieldChooserComponentRef()?.setInput('formElem', this.formContainerElem()?.children[0]);
+    });
+    effect(() => {
       this.fieldChooserComponentRef()?.setInput('mode', this.mode());
     });
     effect(() => {

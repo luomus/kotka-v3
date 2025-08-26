@@ -1,11 +1,15 @@
 import {
   ChangeDetectionStrategy,
-  Component, computed,
+  Component,
+  computed,
   effect,
   HostListener,
   Inject,
   input,
-  output, signal, Signal
+  OnDestroy,
+  output,
+  signal,
+  Signal
 } from '@angular/core';
 import {
   FieldChooserColorTheme,
@@ -67,9 +71,10 @@ const getHighlightElemIdFromSchemaElemId = (schemaElemId: string): string => {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [LajiFormFieldChooserHighlightComponent],
 })
-export class LajiFormFieldChooserComponent {
-  mode = input<FieldChooserMode>('fieldSelect');
+export class LajiFormFieldChooserComponent implements OnDestroy {
+  formElem = input<HTMLElement|undefined>(undefined);
 
+  mode = input<FieldChooserMode>('fieldSelect');
   selected = input<string[]>([]); // if the mode is fieldSelect this should be a list of fields (i.e. ["/gatherings/dateBegin"]), and if the mode is jsonPointerSelect this should be a list of jsonPointers (i.e. ["/gatherings/0/dateBegin"])
 
   ignoreFields = input<string[]>([]);
@@ -84,42 +89,44 @@ export class LajiFormFieldChooserComponent {
   selectedChange = output<string[]>();
 
   private highlightIndexesBySelectedProp: Signal<Record<string, number[]>>;
+  private mutationObserver: MutationObserver;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
     @Inject('Window') private window: Window,
     private dialogService: DialogService
   ) {
+    this.mutationObserver = new MutationObserver(() => (
+      this.highlights.set(this.getHighlights(this.ignoreFields()))
+    ));
+
+    effect(() => {
+      this.mutationObserver.disconnect();
+
+      const element = this.formElem();
+      if (element) {
+        this.mutationObserver.observe(element, { childList: true, subtree: true });
+      }
+    });
+
     effect(() => {
       this.highlights.set(this.getHighlights(this.ignoreFields()));
     });
 
-    this.highlightIndexesBySelectedProp = computed(() => {
-      const result: Record<string, number[]> = {};
+    this.highlightIndexesBySelectedProp = computed(() => (
+      this.getHighlightIndexesBySelectedProp(
+        this.highlights(),
+        this.mode() === 'fieldSelect' ? 'field' : 'jsonPointer'
+      )
+    ));
 
-      const prop = this.mode() === 'fieldSelect' ? 'field' : 'jsonPointer';
+    this.highlightSelectedByIdx = computed(() => (
+      this.getHighlightSelectedByIdx(this.selected(), this.highlightIndexesBySelectedProp())
+    ));
+  }
 
-      this.highlights().forEach((highlight, idx) => {
-        if (!result[highlight[prop]]) {
-          result[highlight[prop]] = [];
-        }
-        result[highlight[prop]].push(idx);
-      });
-
-      return result;
-    });
-
-    this.highlightSelectedByIdx = computed(() => {
-      const result: Record<number, boolean> = {};
-
-      this.selected().forEach(fieldOrJsonPointer => {
-        this.highlightIndexesBySelectedProp()[fieldOrJsonPointer]?.forEach(idx => {
-          result[idx] = true;
-        });
-      });
-
-      return result;
-    });
+  ngOnDestroy() {
+    this.mutationObserver.disconnect();
   }
 
   @HostListener('window:resize', [])
@@ -154,7 +161,7 @@ export class LajiFormFieldChooserComponent {
     this.selectedChange.emit(newSelected);
   }
 
-  private getHighlights(ignoreFields: string[]) {
+  private getHighlights(ignoreFields: string[]): HighlightData[] {
     const highlights: HighlightData[] = [];
 
     const schemaElems = Array.from<HTMLElement>(
@@ -184,6 +191,31 @@ export class LajiFormFieldChooserComponent {
     });
 
     return highlights;
+  }
+
+  private getHighlightIndexesBySelectedProp(highlights: HighlightData[], prop: keyof Pick<HighlightData, 'field'|'jsonPointer'>): Record<string, number[]> {
+    const result: Record<string, number[]> = {};
+
+    highlights.forEach((highlight, idx) => {
+      if (!result[highlight[prop]]) {
+        result[highlight[prop]] = [];
+      }
+      result[highlight[prop]].push(idx);
+    });
+
+    return result;
+  }
+
+  private getHighlightSelectedByIdx(selected: string[], highlightIndexesBySelectedProp: Record<string, number[]>) {
+    const result: Record<number, boolean> = {};
+
+    selected.forEach(fieldOrJsonPointer => {
+      highlightIndexesBySelectedProp[fieldOrJsonPointer]?.forEach(idx => {
+        result[idx] = true;
+      });
+    });
+
+    return result;
   }
 
   private getDimensions(schemaElem: HTMLElement): HighlightDimensions {

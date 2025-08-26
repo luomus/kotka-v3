@@ -128,6 +128,14 @@ export class LajiFormComponent<T extends FormData = FormData>
     }
   }
 
+  openAllMultiActiveArrays() {
+    this.lajiFormWrapper?.openAllMultiActiveArrays();
+  }
+
+  closeAllMultiActiveArrays() {
+    this.lajiFormWrapper?.closeAllMultiActiveArrays();
+  }
+
   saveFormClicked() {
     this.copyAfterSubmit = false;
     this.ngZone.runOutsideAngular(() => {
