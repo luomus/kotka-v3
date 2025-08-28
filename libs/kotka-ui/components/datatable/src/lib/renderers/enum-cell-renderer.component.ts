@@ -4,6 +4,7 @@ import { LajiForm } from '@kotka/shared/models';
 import { CellRendererComponent } from './cell-renderer';
 import { EnumPipe } from '@kotka/ui/pipes';
 import { CommonModule } from '@angular/common';
+import { getEnumValue } from '@kotka/ui/services';
 
 interface RendererExtraParams {
   field: LajiForm.Field;
@@ -31,11 +32,6 @@ export class EnumCellRendererComponent extends CellRendererComponent<RendererPar
     row: any,
     params: RendererExtraParams,
   ): string {
-    if (!value) {
-      return '';
-    }
-
-    const valueOptions = params.field.options?.value_options;
-    return valueOptions?.[value || ''] || '';
+    return getEnumValue(value, params.field);
   }
 }

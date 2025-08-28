@@ -1,0 +1,25 @@
+<div class="btn-group-vertical btn-group-nav col-12 mb-3">
+  @for (navItem of navItems(); track navItem.id) {
+    <button
+      class="btn btn-light"
+      [ngClass]="{'active-btn': active === navItem.id}"
+      (click)="onNavItemClick(navItem)"
+    >
+      {{ navItem.label }}
+    </button>
+
+    @if (active === navItem.id) {
+      <div class="btn-group-vertical col-12 mb-1">
+        @for (child of navItem.children; track child.id) {
+          <button
+            class="btn btn-light btn-sm"
+            [ngClass]="{'active-btn': activeChild === child.id}"
+            (click)="onNavItemClick(child)"
+          >
+            {{ child.label }}
+          </button>
+        }
+      </div>
+    }
+  }
+</div>

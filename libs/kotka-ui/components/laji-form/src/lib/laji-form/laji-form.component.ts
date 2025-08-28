@@ -136,6 +136,10 @@ export class LajiFormComponent<T extends FormData = FormData>
     this.lajiFormWrapper?.closeAllMultiActiveArrays();
   }
 
+  focusField(id: string) {
+    this.lajiFormWrapper?.focusField(id);
+  }
+
   saveFormClicked() {
     this.copyAfterSubmit = false;
     this.ngZone.runOutsideAngular(() => {
@@ -215,7 +219,7 @@ export class LajiFormComponent<T extends FormData = FormData>
               error: (msg: string) => this.notifier?.showError(msg),
             },
             onError: this.onError.bind(this),
-            onComponentDidMount: onReady ? onReady() : () => undefined,
+            componentDidMount: onReady ? onReady : () => undefined,
             optimizeOnChange: true,
           });
         });

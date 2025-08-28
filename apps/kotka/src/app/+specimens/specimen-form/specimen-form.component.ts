@@ -1,9 +1,9 @@
 import {
   ChangeDetectionStrategy, ChangeDetectorRef,
-  Component, computed, effect,
+  Component, computed, effect, Inject,
   signal, Signal, ViewChild
 } from '@angular/core';
-import { KotkaDocumentObjectType, Document, Gathering} from '@kotka/shared/models';
+import { KotkaDocumentObjectType, Document as KotkaDocument, Gathering} from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
 import { FormViewContainerComponent } from '@kotka/ui/form-view';
 import { FormViewComponent } from '@kotka/ui/form-view';
@@ -13,7 +13,7 @@ import {
 } from '@kotka/ui/services';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { map } from 'rxjs/operators';
-import { NgClass, NgTemplateOutlet } from '@angular/common';
+import { DOCUMENT, NgClass, NgTemplateOutlet } from '@angular/common';
 import {
   getRequiredFields,
   LajiFormComponent,
@@ -25,6 +25,7 @@ import { convertCoordinatesToWGS84 } from '@kotka/shared/utils';
 import { MYCoordinateSystems } from '@luomus/laji-schema';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { from } from 'rxjs';
+import { SpecimenFormNavComponent } from '../specimen-form-nav/specimen-form-nav';
 
 type UrlDataType = 'botany'|'zoo'|'palaeontology'|'accession'|'culture';
 
@@ -76,7 +77,12 @@ const defaultAdvancedFields = [
   selector: 'kotka-specimen-form',
   templateUrl: './specimen-form.component.html',
   styleUrls: ['./specimen-form.component.scss'],
-  imports: [FormViewComponent, NgTemplateOutlet, NgClass],
+  imports: [
+    FormViewComponent,
+    NgTemplateOutlet,
+    NgClass,
+    SpecimenFormNavComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocumentObjectType.specimen> {
@@ -86,7 +92,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
 
   dataType: Signal<DataType | undefined>;
   title: Signal<string>;
-  prefilledFormData: Signal<Partial<Document> | undefined>;
+  prefilledFormData: Signal<Partial<KotkaDocument> | undefined>;
 
   markAdvancedFieldsActive: Signal<boolean>;
   advancedFields = signal<string[] | undefined>([]);
@@ -101,11 +107,11 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
   );
 
   lajiForm?: LajiFormComponent;
+  formData?: KotkaDocument | Partial<KotkaDocument>;
 
   @ViewChild(FormViewComponent, { static: true })
   formView!: FormViewComponent<KotkaDocumentObjectType.specimen>;
 
-  private formData?: Document | Partial<Document>;
   private coordinates?: PointCoordinatesWithSystem;
   private mapCoordinates?: PointCoordinates;
 
@@ -117,9 +123,10 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     activeRoute: ActivatedRoute,
     router: Router,
     cdr: ChangeDetectorRef,
+    @Inject(DOCUMENT) private document: Document,
     private userService: UserService,
     private lajiFormFieldChooserService: LajiFormFieldChooserService,
-    private storage: LocalStorageService,
+    private storage: LocalStorageService
   ) {
     super(dialogService, activeRoute, router, cdr);
 
@@ -133,8 +140,11 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
       this.getTitle(this.dataType(), this.editMode(), this.dataURI()),
     );
 
-    this.prefilledFormData = computed((): Partial<Document> | undefined =>
-      this.dataType() ? { datatype: this.dataType()! } : undefined,
+    this.prefilledFormData = computed(
+      (): Partial<KotkaDocument> | undefined => ({
+        datatype: this.dataType(),
+        gatherings: [{ units: [{}] }],
+      }),
     );
 
     this.markAdvancedFieldsActive = computed(
@@ -155,22 +165,20 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
         : [],
     );
 
-    this.userService
-      .getCurrentLoggedInUser()
-      .subscribe(user => {
-        const showOnlyBasicFieldsKey = `specimen-form-${user.id}-show-only-basic-fields`;
-        const advancedFieldsKey = `specimen-form-${user.id}-advanced-fields`;
+    this.userService.getCurrentLoggedInUser().subscribe((user) => {
+      const showOnlyBasicFieldsKey = `specimen-form-${user.id}-show-only-basic-fields`;
+      const advancedFieldsKey = `specimen-form-${user.id}-advanced-fields`;
 
-        this.showOnlyBasicFieldsStorageKey.set(showOnlyBasicFieldsKey);
-        this.showOnlyBasicFields.set(
-          this.storage.retrieve(showOnlyBasicFieldsKey) ?? true
-        );
+      this.showOnlyBasicFieldsStorageKey.set(showOnlyBasicFieldsKey);
+      this.showOnlyBasicFields.set(
+        this.storage.retrieve(showOnlyBasicFieldsKey) ?? true,
+      );
 
-        this.advancedFieldsStorageKey.set(advancedFieldsKey);
-        this.advancedFields.set(
-          this.storage.retrieve(advancedFieldsKey) ?? defaultAdvancedFields
-        );
-      });
+      this.advancedFieldsStorageKey.set(advancedFieldsKey);
+      this.advancedFields.set(
+        this.storage.retrieve(advancedFieldsKey) ?? defaultAdvancedFields,
+      );
+    });
 
     effect(() => {
       const key = this.showOnlyBasicFieldsStorageKey();
@@ -191,19 +199,19 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     this.lajiForm = lajiForm;
   }
 
-  onFormDataChange(formData?: Partial<Document>) {
+  onFormDataChange(formData?: Partial<KotkaDocument>) {
     this.formData = formData;
 
     if (formData?.datatype && this.dataType() !== formData.datatype) {
       const urlDataType = this.getUrlDataTypeFromDataType(formData.datatype);
-      this.router.navigate([urlDataType, 'specimens', this.editMode() ? 'edit' : 'add'], { replaceUrl: true, queryParamsHandling: 'preserve' });
+      this.router.navigate(
+        [urlDataType, 'specimens', this.editMode() ? 'edit' : 'add'],
+        { replaceUrl: true, queryParamsHandling: 'preserve' },
+      );
     }
 
     const gathering = formData?.gatherings?.[0];
-
-    if (gathering) {
-      this.checkGatheringCoordinates(gathering);
-    }
+    this.checkGatheringCoordinates(gathering);
   }
 
   toggleMarkAdvancedFields() {
@@ -265,7 +273,15 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     this.formView.lajiForm?.closeAllMultiActiveArrays();
   }
 
-  override onCopyData(formData: Partial<Document>) {
+  scrollToId(id: string) {
+    this.document.getElementById(id)?.scrollIntoView();
+  }
+
+  scrollToField(field: string) {
+    this.formView.lajiForm?.focusField(field);
+  }
+
+  override onCopyData(formData: Partial<KotkaDocument>) {
     if (!formData.datatype) {
       throw new Error('Missing a datatype');
     }
@@ -273,7 +289,9 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     const urlDataType = this.getUrlDataTypeFromDataType(formData.datatype);
 
     from(
-      this.router.navigate([urlDataType, 'specimens', 'add'], { state: { routeReuseStrategy: 'urlMatch' } }),
+      this.router.navigate([urlDataType, 'specimens', 'add'], {
+        state: { routeReuseStrategy: 'urlMatch' },
+      }),
     ).subscribe(() => {
       this.copyData.set(formData);
       this.cdr.markForCheck();
@@ -315,13 +333,13 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     }
   }
 
-  private checkGatheringCoordinates(gathering: Gathering) {
+  private checkGatheringCoordinates(gathering?: Gathering) {
     let newCoordinates: PointCoordinatesWithSystem | undefined = undefined;
 
     if (
-      gathering.latitude !== undefined &&
-      gathering.longitude !== undefined &&
-      gathering.coordinateSystem
+      gathering?.latitude !== undefined &&
+      gathering?.longitude !== undefined &&
+      gathering?.coordinateSystem
     ) {
       newCoordinates = {
         latitude: gathering.latitude,
@@ -362,8 +380,8 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
       let newMapCoordinates: PointCoordinates | undefined = undefined;
 
       if (
-        gathering.wgs84Latitude !== undefined &&
-        gathering.wgs84Longitude !== undefined
+        gathering?.wgs84Latitude !== undefined &&
+        gathering?.wgs84Longitude !== undefined
       ) {
         newMapCoordinates = {
           latitude: gathering.wgs84Latitude,
@@ -390,7 +408,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     const [first, ...rest] = this.formData?.gatherings || [];
     const gathering = { ...(first || {}), ...updateObject };
     const gatherings: [Gathering, ...Gathering[]] = [gathering, ...rest];
-    const formData: Partial<Document> = {
+    const formData: Partial<KotkaDocument> = {
       ...(this.formData || {}),
       gatherings,
     };
