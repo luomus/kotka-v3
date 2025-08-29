@@ -27,11 +27,39 @@
     flex: 0 0 auto;
   }
 
+  .laji-form-error-container, .laji-form-warning-container {
+    margin-bottom: 0;
+  }
+
   .verbatim-field {
     input, textarea {
-      background: url("/assets/paper-bgr.jpg") top left repeat;
+      background-image: url("/assets/paper-bgr.jpg");
     }
   }
+
+  .unreliable-field {
+    &::after {
+      font-family: "FontAwesome", $font-family-base;
+      content: "\f059" " Unreliable field";
+      color: $warning;
+    }
+
+    input, textarea, .btn {
+      border-color: $warning;
+    }
+  }
+
+  /*.unreliable-field {
+    input, textarea, .laji-form-checkbox-buttons .btn {
+      background-color: rgba($warning, 0.6);
+    }
+  }
+
+  .verbatim-field.unreliable-field {
+    input, textarea {
+      background-image: linear-gradient(to right, rgba($warning, 0.6), rgba($warning, 0.6)), url("/assets/paper-bgr.jpg");
+    }
+  }*/
 
   .highlight-container {
     background-color: rgba(0, 0, 0, 0.05);

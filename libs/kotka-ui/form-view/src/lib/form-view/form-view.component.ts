@@ -63,6 +63,7 @@ export class FormViewComponent<
   prefilledFormData = input<Partial<S>>();
 
   hiddenFields = input<string[]>();
+  additionalClassNames = input<Record<string, string>>();
 
   title = input<string>();
   allowCopy = input<boolean>();

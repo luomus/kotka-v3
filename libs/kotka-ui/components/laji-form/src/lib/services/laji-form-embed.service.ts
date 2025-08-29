@@ -1,6 +1,5 @@
 import { ComponentRef, Type, Injector } from '@angular/core';
 import { LajiFormComponent } from '../laji-form/laji-form.component';
-import { take } from 'rxjs';
 import {
   EmbeddedComponentData,
   EmbedOptions,
@@ -37,7 +36,7 @@ export class LajiFormEmbedService {
       { childList: true, subtree: true }
     );
 
-    this.lajiForm.formDestroy.pipe(take(1)).subscribe(() => {
+    this.lajiForm.formDestroy.subscribe(() => {
       this.mutationObserver.disconnect();
       this.componentData.forEach((d) => {
         d.componentRef.destroy();

@@ -1,17 +1,15 @@
 import {
   Component,
-  Input,
   ViewChild,
   ElementRef,
   AfterViewInit,
   OnDestroy,
   NgZone,
-  EventEmitter,
-  Output,
-  OnChanges,
-  SimpleChanges,
   ChangeDetectorRef,
   Inject,
+  input,
+  output,
+  effect
 } from '@angular/core';
 import LajiForm from '@luomus/laji-form/lib/index';
 import { Theme as LajiFormTheme } from '@luomus/laji-form/lib/themes/theme';
@@ -33,22 +31,23 @@ type FormData = Record<string, any>;
   imports: [CommonModule, FormFooterComponent],
 })
 export class LajiFormComponent<T extends FormData = FormData>
-  implements AfterViewInit, OnChanges, OnDestroy
+  implements AfterViewInit, OnDestroy
 {
   static TOP_OFFSET = 0;
   static BOTTOM_OFFSET = 50;
-  @Input() form: LajiFormModel.SchemaForm | null = null;
-  @Input() formData: Partial<T> = {};
-  @Input() editMode? = false;
-  @Input() hasChanges? = false;
-  @Input() disabled? = false;
-  @Input() footerDisabled?: boolean;
-  @Input() mediaMetadata?: MediaMetadata;
-  @Input() hiddenFields?: string[];
+  form = input<LajiFormModel.SchemaForm | null>(null);
+  formData = input<Partial<T>>({});
+  editMode = input<boolean>();
+  hasChanges = input<boolean>();
+  disabled = input<boolean>();
+  footerDisabled = input<boolean>();
+  mediaMetadata = input<MediaMetadata>();
+  hiddenFields = input<string[]>();
+  additionalClassNames = input<Record<string, string>>();
 
-  @Input() showFooter? = true;
-  @Input() showDeleteButton? = false;
-  @Input() showCopyButton? = false;
+  showFooter = input(true);
+  showDeleteButton = input<boolean>();
+  showCopyButton = input<boolean>();
 
   hasOnlyWarnings = false;
 
@@ -58,16 +57,14 @@ export class LajiFormComponent<T extends FormData = FormData>
   private isBlocked = false;
   private copyAfterSubmit = false;
 
-  @Output() formReady: EventEmitter<void> = new EventEmitter<void>();
-  @Output() formDestroy: EventEmitter<void> = new EventEmitter<void>();
+  formReady = output<void>();
+  formDestroy = output<void>();
 
-  @Output() formChange: EventEmitter<Partial<T>> = new EventEmitter<
-    Partial<T>
-  >();
-  @Output() formSubmit: EventEmitter<T> = new EventEmitter<T>();
-  @Output() delete: EventEmitter<Partial<T>> = new EventEmitter<Partial<T>>();
-  @Output() formCopy: EventEmitter<Partial<T>> = new EventEmitter<Partial<T>>();
-  @Output() formSubmitAndCopy: EventEmitter<T> = new EventEmitter<T>();
+  formChange = output<Partial<T>>();
+  formSubmit = output<T>();
+  delete = output<Partial<T>>();
+  formCopy = output<Partial<T>>();
+  formSubmitAndCopy = output<T>();
 
   @ViewChild('lajiForm', { static: true }) lajiFormRoot!: ElementRef;
 
@@ -78,32 +75,31 @@ export class LajiFormComponent<T extends FormData = FormData>
     private logger: Logger,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
-  ) {}
+  ) {
+    effect(() => {
+      if (!this.form()) {
+        return;
+      }
+
+      const form = this.form() as LajiFormModel.SchemaForm;
+      const state = {
+        schema: form.schema,
+        uiSchema: this.getUiSchema(form, this.disabled(), this.hiddenFields()),
+        uiSchemaContext: this.getUiSchemaContext(form, this.editMode(), this.additionalClassNames()),
+        formData: this.formData(),
+        mediaMetadata: this.mediaMetadata(),
+        validators: form.validators,
+        warnings: form.warnings,
+      };
+
+      this.ngZone.runOutsideAngular(() => {
+        this.lajiFormWrapper?.setState(state);
+      });
+    });
+  }
 
   ngAfterViewInit() {
     this.mount();
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (!this.lajiFormWrapper || !this.form) {
-      return;
-    }
-
-    if (changes['form'] || changes['formData'] || changes['mediaMetadata'] || changes['editMode'] || changes['disabled'] || changes['hiddenFields']) {
-      const form = this.form as LajiFormModel.SchemaForm;
-
-      this.ngZone.runOutsideAngular(() => {
-        this.lajiFormWrapper?.setState({
-          schema: form.schema,
-          uiSchema: this.getUiSchema(form, this.disabled, this.hiddenFields),
-          uiSchemaContext: this.getUiSchemaContext(form, this.editMode),
-          formData: this.formData,
-          mediaMetadata: this.mediaMetadata,
-          validators: form.validators,
-          warnings: form.warnings,
-        });
-      });
-    }
   }
 
   ngOnDestroy() {
@@ -188,8 +184,8 @@ export class LajiFormComponent<T extends FormData = FormData>
   }
 
   private createNewLajiForm(onReady?: () => void) {
-    if (this.lajiFormWrapperProto && this.form) {
-      const form = this.form as LajiFormModel.SchemaForm;
+    if (this.lajiFormWrapperProto && this.form()) {
+      const form = this.form() as LajiFormModel.SchemaForm;
       try {
         this.ngZone.runOutsideAngular(() => {
           this.unMount();
@@ -198,16 +194,16 @@ export class LajiFormComponent<T extends FormData = FormData>
             rootElem: this.lajiFormRoot.nativeElement,
             theme: this.lajiFormTheme,
             schema: form.schema,
-            uiSchema: this.getUiSchema(form, this.disabled, this.hiddenFields),
-            uiSchemaContext: this.getUiSchemaContext(form, this.editMode),
-            formData: this.formData,
+            uiSchema: this.getUiSchema(form, this.disabled(), this.hiddenFields()),
+            uiSchemaContext: this.getUiSchemaContext(form, this.editMode(), this.additionalClassNames()),
+            formData: this.formData(),
             validators: form.validators,
             warnings: form.warnings,
             onSubmit: this.onSubmit.bind(this),
             onChange: this.onChange.bind(this),
             onValidationError: this.onValidationError.bind(this),
             apiClient: this.apiClient,
-            mediaMetadata: this.mediaMetadata,
+            mediaMetadata: this.mediaMetadata(),
             lang: 'en',
             renderSubmit: false,
             topOffset: LajiFormComponent.TOP_OFFSET,
@@ -229,7 +225,7 @@ export class LajiFormComponent<T extends FormData = FormData>
     }
   }
 
-  private getUiSchema(form: LajiFormModel.SchemaForm, disabled?: boolean, hiddenFields?: string[]) {
+  private getUiSchema(form: LajiFormModel.SchemaForm, disabled: boolean | undefined, hiddenFields: string[] | undefined) {
     let uiSchema = form.uiSchema;
 
     (hiddenFields || []).forEach(field => {
@@ -252,15 +248,16 @@ export class LajiFormComponent<T extends FormData = FormData>
     return { ...uiSchema, 'ui:readonly': disabled };
   }
 
-  private getUiSchemaContext(form: LajiFormModel.SchemaForm, isEdit?: boolean) {
+  private getUiSchemaContext(form: LajiFormModel.SchemaForm, isEdit: boolean | undefined, additionalClassNames: Record<string, string> | undefined) {
     return {
       ...form.uiSchemaContext,
-      isEdit
+      isEdit,
+      additionalClassNames
     };
   }
 
   private onError(error: Error, info: any) {
-    this.logger.error('LajiForm crashed', { error, info, document: this.formData });
+    this.logger.error('LajiForm crashed', { error, info, document: this.formData() });
     this.notifier?.showError('An unexpected error occurred');
   }
 
@@ -292,7 +289,6 @@ export class LajiFormComponent<T extends FormData = FormData>
   private onChange(data: Partial<T>) {
     this.ngZone.run(() => {
       this.hasOnlyWarnings = false;
-      this.formData = data;
       this.formChange.emit(data);
       this.cdr.markForCheck();
     });

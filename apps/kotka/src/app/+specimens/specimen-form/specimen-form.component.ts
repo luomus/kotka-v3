@@ -1,7 +1,7 @@
 import {
   ChangeDetectionStrategy, ChangeDetectorRef,
   Component, computed, effect, Inject,
-  signal, Signal, ViewChild
+  signal, Signal, untracked, ViewChild
 } from '@angular/core';
 import { KotkaDocumentObjectType, Document as KotkaDocument, Gathering} from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
@@ -98,22 +98,24 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
   advancedFields = signal<string[] | undefined>([]);
   showOnlyBasicFields = signal(true);
   hiddenFields: Signal<string[] | undefined>;
+  additionalClassNames: Signal<Record<string, string>>;
 
   markUnreliableFieldsActive: Signal<boolean>;
-  unreliableFieldPointers = signal<string[] | undefined>([]);
 
   lastPressedMarkFieldsBtnType = signal<'advancedFields' | 'unreliableFields'>(
     'advancedFields',
   );
 
   lajiForm?: LajiFormComponent;
-  formData?: KotkaDocument | Partial<KotkaDocument>;
+  formData = signal<KotkaDocument | Partial<KotkaDocument> | undefined>(undefined);
 
   @ViewChild(FormViewComponent, { static: true })
   formView!: FormViewComponent<KotkaDocumentObjectType.specimen>;
 
-  private coordinates?: PointCoordinatesWithSystem;
-  private mapCoordinates?: PointCoordinates;
+  private formDataDataType: Signal<string | undefined>;
+  private unreliableFields: Signal<string[]>;
+  private coordinates: Signal<PointCoordinatesWithSystem | undefined>;
+  private mapCoordinates: Signal<PointCoordinates | undefined>;
 
   private showOnlyBasicFieldsStorageKey = signal<string | undefined>(undefined);
   private advancedFieldsStorageKey = signal<string | undefined>(undefined);
@@ -165,6 +167,24 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
         : [],
     );
 
+    this.additionalClassNames = computed(() => (
+      this.markUnreliableFieldsActive()
+        ? {}
+        : this.unreliableFields().reduce((result, field) => {
+          result[field] = 'unreliable-field';
+          return result;
+        }, {} as Record<string, string>)
+    ));
+
+    this.formDataDataType = computed(() => this.formData()?.datatype);
+    this.unreliableFields = computed(() => this.formData()?.unreliableFields?.split(',') || [], {equal: isEqual});
+    this.coordinates = computed(() => this.getCoordinates(this.formData()), {equal: isEqual});
+    this.mapCoordinates = computed(() => this.getMapCoordinates(this.formData()), {equal: isEqual});
+
+    this.initEffects();
+  }
+
+  initEffects() {
     this.userService.getCurrentLoggedInUser().subscribe((user) => {
       const showOnlyBasicFieldsKey = `specimen-form-${user.id}-show-only-basic-fields`;
       const advancedFieldsKey = `specimen-form-${user.id}-advanced-fields`;
@@ -193,6 +213,24 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
         this.storage.store(key, this.advancedFields());
       }
     });
+
+    effect(() => {
+      if (this.formDataDataType() && this.dataType() !== this.formDataDataType()) {
+        const urlDataType = this.getUrlDataTypeFromDataType(this.formDataDataType()!);
+        this.router.navigate(
+          [urlDataType, 'specimens', this.editMode() ? 'edit' : 'add'],
+          { replaceUrl: true, queryParamsHandling: 'preserve' },
+        );
+      }
+    });
+
+    effect(() => {
+      this.onCoordinatesChange(this.coordinates(), untracked(() => this.mapCoordinates()));
+    });
+
+    effect(() => {
+      this.onMapCoordinatesChange(this.mapCoordinates(), untracked(() => this.coordinates()));
+    });
   }
 
   onFormInit(lajiForm: LajiFormComponent) {
@@ -200,18 +238,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
   }
 
   onFormDataChange(formData?: Partial<KotkaDocument>) {
-    this.formData = formData;
-
-    if (formData?.datatype && this.dataType() !== formData.datatype) {
-      const urlDataType = this.getUrlDataTypeFromDataType(formData.datatype);
-      this.router.navigate(
-        [urlDataType, 'specimens', this.editMode() ? 'edit' : 'add'],
-        { replaceUrl: true, queryParamsHandling: 'preserve' },
-      );
-    }
-
-    const gathering = formData?.gatherings?.[0];
-    this.checkGatheringCoordinates(gathering);
+    this.formData.set(formData);
   }
 
   toggleMarkAdvancedFields() {
@@ -226,7 +253,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
         this.lajiFormFieldChooserService.stopFieldChooser(),
       );
     } else {
-      const schema = this.lajiForm.form?.schema;
+      const schema = this.lajiForm.form()?.schema;
       if (!schema) {
         throw new Error('Form is undefined');
       }
@@ -249,11 +276,11 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     }
 
     if (this.markUnreliableFieldsActive()) {
-      this.unreliableFieldPointers.set(
-        this.lajiFormFieldChooserService.stopFieldChooser(),
-      );
+      const unreliableFields = this.lajiFormFieldChooserService.stopFieldChooser().join(',');
+      this.formView.setFormData({...this.formData(), unreliableFields});
     } else {
       this.lajiFormFieldChooserService.startFieldChooser(this.lajiForm, {
+        selected: this.unreliableFields(),
         mode: 'jsonPointerSelect',
         ignoreFields: classFields,
         colorTheme: 'yellow',
@@ -333,83 +360,86 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     }
   }
 
-  private checkGatheringCoordinates(gathering?: Gathering) {
-    let newCoordinates: PointCoordinatesWithSystem | undefined = undefined;
-
+  private getCoordinates(formData?: KotkaDocument | Partial<KotkaDocument>) {
+    const gathering = formData?.gatherings?.[0];
     if (
       gathering?.latitude !== undefined &&
       gathering?.longitude !== undefined &&
       gathering?.coordinateSystem
     ) {
-      newCoordinates = {
+      return  {
         latitude: gathering.latitude,
         longitude: gathering.longitude,
         coordinateSystem: gathering.coordinateSystem,
       };
     }
 
-    if (!isEqual(newCoordinates, this.coordinates)) {
-      this.coordinates = newCoordinates;
+    return undefined;
+  }
 
-      if (this.coordinates) {
-        const { latitude, longitude, coordinateSystem } = this.coordinates;
-        const result = convertCoordinatesToWGS84(
-          latitude,
-          longitude,
-          coordinateSystem,
-        );
+  private getMapCoordinates(formData?: KotkaDocument | Partial<KotkaDocument>) {
+    const gathering = formData?.gatherings?.[0];
+    if (
+      gathering?.wgs84Latitude !== undefined &&
+      gathering?.wgs84Longitude !== undefined
+    ) {
+      return  {
+        latitude: gathering.wgs84Latitude,
+        longitude: gathering.wgs84Longitude,
+      };
+    }
 
-        if (result) {
-          this.mapCoordinates = {
-            latitude: '' + result[0],
-            longitude: '' + result[1],
-          };
-          this.updateGatheringData({
-            wgs84Latitude: this.mapCoordinates.latitude,
-            wgs84Longitude: this.mapCoordinates.longitude,
-          });
-        } else {
-          this.mapCoordinates = undefined;
-          this.updateGatheringData({
-            wgs84Latitude: undefined,
-            wgs84Longitude: undefined,
-          });
-        }
-      }
-    } else {
-      let newMapCoordinates: PointCoordinates | undefined = undefined;
+    return undefined;
+  }
 
-      if (
-        gathering?.wgs84Latitude !== undefined &&
-        gathering?.wgs84Longitude !== undefined
-      ) {
-        newMapCoordinates = {
-          latitude: gathering.wgs84Latitude,
-          longitude: gathering.wgs84Longitude,
+  private onCoordinatesChange(coordinates: PointCoordinatesWithSystem | undefined, currentMapCoordinates: PointCoordinates | undefined) {
+    if (coordinates) {
+      const { latitude, longitude, coordinateSystem } = coordinates;
+      const result = convertCoordinatesToWGS84(
+        latitude,
+        longitude,
+        coordinateSystem,
+      );
+
+      let mapCoordinates: PointCoordinates | undefined = undefined;
+      if (result) {
+        mapCoordinates = {
+          latitude: '' + result[0],
+          longitude: '' + result[1],
         };
       }
 
-      if (!isEqual(newMapCoordinates, this.mapCoordinates)) {
-        this.mapCoordinates = newMapCoordinates;
+      if (!isEqual(mapCoordinates, currentMapCoordinates)) {
+        this.updateGatheringData({
+          wgs84Latitude: mapCoordinates?.latitude,
+          wgs84Longitude: mapCoordinates?.longitude,
+        });
+      }
+    }
+  }
 
-        if (this.mapCoordinates) {
-          this.coordinates = {
-            latitude: this.mapCoordinates.latitude,
-            longitude: this.mapCoordinates.longitude,
-            coordinateSystem: 'MY.coordinateSystemWgs84',
-          };
-          this.updateGatheringData(this.coordinates);
-        }
+  private onMapCoordinatesChange(mapCoordinates: PointCoordinates | undefined, currentCoordinates: PointCoordinatesWithSystem | undefined) {
+    if (mapCoordinates) {
+      const coordinates: PointCoordinatesWithSystem = {
+        latitude: mapCoordinates.latitude,
+        longitude: mapCoordinates.longitude,
+        coordinateSystem: 'MY.coordinateSystemWgs84',
+      };
+
+      const converted = currentCoordinates ? convertCoordinatesToWGS84(currentCoordinates.latitude, currentCoordinates.longitude, currentCoordinates.coordinateSystem) : undefined;
+
+      if (coordinates.latitude !== '' + converted?.[0] || coordinates.longitude !== '' + converted?.[1]) {
+        this.updateGatheringData(coordinates);
       }
     }
   }
 
   private updateGatheringData(updateObject: Partial<Gathering>) {
-    const [first, ...rest] = this.formData?.gatherings || [];
+    const [first, ...rest] = this.formData()?.gatherings || [];
     const gathering = { ...(first || {}), ...updateObject };
     const gatherings: [Gathering, ...Gathering[]] = [gathering, ...rest];
     const formData: Partial<KotkaDocument> = {
-      ...(this.formData || {}),
+      ...(this.formData() || {}),
       gatherings,
     };
 

@@ -2,12 +2,12 @@ import {
   ComponentRef,
   effect,
   Injectable,
+  OutputRefSubscription,
   signal
 } from '@angular/core';
 import { LajiFormComponent } from '../laji-form/laji-form.component';
 import { ComponentService } from '@kotka/ui/services';
 import { FieldChooserMode, LajiFormFieldChooserComponent } from './laji-form-field-chooser.component';
-import { Subscription } from 'rxjs';
 import { FieldChooserColorTheme } from './laji-form-field-chooser-highlight.component';
 
 export interface LajiFormFieldChooserOptions {
@@ -36,7 +36,7 @@ export class LajiFormFieldChooserService {
   private unselectableFieldsErrorMsg = signal<string|undefined>(undefined);
   private colorTheme = signal<FieldChooserColorTheme>('red');
 
-  private lajiFormDestroySub?: Subscription;
+  private lajiFormDestroySub?: OutputRefSubscription;
 
   constructor(
     private componentService: ComponentService
@@ -69,7 +69,7 @@ export class LajiFormFieldChooserService {
       throw new Error('Field chooser is already started');
     }
 
-    const schema = lajiForm.form?.schema;
+    const schema = lajiForm.form()?.schema;
     if (!schema) {
       throw new Error('Form is missing');
     }
