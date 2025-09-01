@@ -56,14 +56,6 @@ const dataTypeToNameMap: Record<DataType, string> = {
   culture: 'culture',
 };
 
-const classFields = [
-  '/gatherings',
-  '/gatherings/units',
-  '/gatherings/units/identifications',
-  '/gatherings/units/typeSpecimens',
-  '/gatherings/units/samples'
-];
-
 const defaultAdvancedFields = [
   '/publicityRestrictions','/legID','/additionalIDs','/dataSource','/publication','/separatedFrom','/separatedTo','/duplicatesIn','/acquiredFrom','/acquisitionDate','/exsiccatum','/preservation','/URL','/language',
   '/gatherings/coordinateRadius','/gatherings/alt','/gatherings/depth','/gatherings/AFEQuadrat','/gatherings/UTMQuadrat', '/gatherings/units/coordinateNotes',
@@ -260,7 +252,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
 
       this.lajiFormFieldChooserService.startFieldChooser(this.lajiForm, {
         selected: this.advancedFields(),
-        ignoreFields: classFields,
+        ignoreFieldsOfType: ['objectArray'],
         unselectableFields: getRequiredFields(schema),
         unselectableFieldsErrorMsg:
           'Can\'t mark required field as advanced field!',
@@ -282,7 +274,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
       this.lajiFormFieldChooserService.startFieldChooser(this.lajiForm, {
         selected: this.unreliableFields(),
         mode: 'jsonPointerSelect',
-        ignoreFields: classFields,
+        ignoreFieldsOfType: ['objectArray', 'itemInObjectArray'],
         colorTheme: 'yellow',
       });
     }

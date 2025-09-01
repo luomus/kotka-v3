@@ -7,13 +7,18 @@ import {
 } from '@angular/core';
 import { LajiFormComponent } from '../laji-form/laji-form.component';
 import { ComponentService } from '@kotka/ui/services';
-import { FieldChooserMode, LajiFormFieldChooserComponent } from './laji-form-field-chooser.component';
+import {
+  FieldChooserIgnoreFieldType,
+  FieldChooserMode,
+  LajiFormFieldChooserComponent
+} from './laji-form-field-chooser.component';
 import { FieldChooserColorTheme } from './laji-form-field-chooser-highlight.component';
+import { LajiForm } from '@kotka/shared/models';
 
 export interface LajiFormFieldChooserOptions {
   mode?: FieldChooserMode;
   selected?: string[];
-  ignoreFields?: string[];
+  ignoreFieldsOfType?: FieldChooserIgnoreFieldType[];
   unselectableFields?: string[];
   unselectableFieldsErrorMsg?: string;
   colorTheme?: FieldChooserColorTheme;
@@ -26,12 +31,14 @@ export class LajiFormFieldChooserService {
   private isActiveSignal = signal<boolean>(false);
   isActive = this.isActiveSignal.asReadonly();
 
-  private formContainerElem = signal<HTMLElement|undefined>(undefined);
   private fieldChooserComponentRef = signal<ComponentRef<LajiFormFieldChooserComponent>|undefined>(undefined);
+
+  private form = signal<LajiForm.SchemaForm|undefined>(undefined);
+  private formContainerElem = signal<HTMLElement|undefined>(undefined);
 
   private mode = signal<FieldChooserMode>('fieldSelect');
   private selected = signal<string[]>([]);
-  private ignoreFields = signal<string[]>([]);
+  private ignoreFieldsOfType = signal<FieldChooserIgnoreFieldType[]>([]);
   private unselectableFields = signal<string[]>([]);
   private unselectableFieldsErrorMsg = signal<string|undefined>(undefined);
   private colorTheme = signal<FieldChooserColorTheme>('red');
@@ -42,6 +49,9 @@ export class LajiFormFieldChooserService {
     private componentService: ComponentService
   ) {
     effect(() => {
+      this.fieldChooserComponentRef()?.setInput('form', this.form());
+    });
+    effect(() => {
       this.fieldChooserComponentRef()?.setInput('formElem', this.formContainerElem()?.children[0]);
     });
     effect(() => {
@@ -51,7 +61,7 @@ export class LajiFormFieldChooserService {
       this.fieldChooserComponentRef()?.setInput('selected', this.selected());
     });
     effect(() => {
-      this.fieldChooserComponentRef()?.setInput('ignoreFields', this.ignoreFields());
+      this.fieldChooserComponentRef()?.setInput('ignoreFieldsOfType', this.ignoreFieldsOfType());
     });
     effect(() => {
       this.fieldChooserComponentRef()?.setInput('unselectableFields', this.unselectableFields());
@@ -69,10 +79,12 @@ export class LajiFormFieldChooserService {
       throw new Error('Field chooser is already started');
     }
 
-    const schema = lajiForm.form()?.schema;
-    if (!schema) {
+    const form = lajiForm.form();
+    if (!form) {
       throw new Error('Form is missing');
     }
+
+    this.form.set(form);
 
     const containerElem: HTMLElement = lajiForm.lajiFormRoot.nativeElement;
     containerElem.children[0].setAttribute('inert', '');
@@ -89,7 +101,7 @@ export class LajiFormFieldChooserService {
 
     this.mode.set(options?.mode || 'fieldSelect');
     this.selected.set(options?.selected || []);
-    this.ignoreFields.set(options?.ignoreFields || []);
+    this.ignoreFieldsOfType.set(options?.ignoreFieldsOfType || []);
     this.unselectableFields.set(options?.unselectableFields || []);
     this.unselectableFieldsErrorMsg.set(options?.unselectableFieldsErrorMsg);
     this.colorTheme.set(options?.colorTheme || 'red');
@@ -119,7 +131,7 @@ export class LajiFormFieldChooserService {
 
     this.mode.set('fieldSelect');
     this.selected.set([]);
-    this.ignoreFields.set([]);
+    this.ignoreFieldsOfType.set([]);
     this.unselectableFields.set([]);
     this.unselectableFieldsErrorMsg.set(undefined);
     this.colorTheme.set('red');

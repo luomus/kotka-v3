@@ -7,7 +7,7 @@
   [dataURI]="dataURI()"
   [allowCopy]="!!dataType()"
   [prefilledFormData]="copyData() || prefilledFormData()"
-  [footerDisabled]="markAdvancedFieldsActive()"
+  [footerDisabled]="markAdvancedFieldsActive() || markUnreliableFieldsActive()"
   [hiddenFields]="hiddenFields()"
   [additionalClassNames]="additionalClassNames()"
   [title]="title()"

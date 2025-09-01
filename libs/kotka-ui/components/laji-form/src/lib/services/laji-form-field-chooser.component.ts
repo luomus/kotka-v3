@@ -17,8 +17,12 @@ import {
 } from './laji-form-field-chooser-highlight.component';
 import { DOCUMENT } from '@angular/common';
 import { DialogService } from '@kotka/ui/services';
+import { LajiForm } from '@kotka/shared/models';
+import { parseSchemaFromFormDataPointer } from '@luomus/laji-form/lib/utils';
 
 export type FieldChooserMode = 'fieldSelect'|'jsonPointerSelect';
+
+export type FieldChooserIgnoreFieldType = 'objectArray'|'itemInObjectArray'|'arrayItem';
 
 interface HighlightDimensions {
   top: number;
@@ -72,12 +76,13 @@ const getHighlightElemIdFromSchemaElemId = (schemaElemId: string): string => {
   imports: [LajiFormFieldChooserHighlightComponent],
 })
 export class LajiFormFieldChooserComponent implements OnDestroy {
+  form = input<LajiForm.SchemaForm|undefined>(undefined);
   formElem = input<HTMLElement|undefined>(undefined);
 
   mode = input<FieldChooserMode>('fieldSelect');
   selected = input<string[]>([]); // if the mode is fieldSelect this should be a list of fields (i.e. ["/gatherings/dateBegin"]), and if the mode is jsonPointerSelect this should be a list of jsonPointers (i.e. ["/gatherings/0/dateBegin"])
 
-  ignoreFields = input<string[]>([]);
+  ignoreFieldsOfType = input<FieldChooserIgnoreFieldType[]>([]);
   unselectableFields = input<string[]>([]);
   unselectableFieldsErrorMsg = input<string|undefined>(undefined);
 
@@ -96,9 +101,12 @@ export class LajiFormFieldChooserComponent implements OnDestroy {
     @Inject('Window') private window: Window,
     private dialogService: DialogService
   ) {
-    this.mutationObserver = new MutationObserver(() => (
-      this.highlights.set(this.getHighlights(this.ignoreFields()))
-    ));
+    this.mutationObserver = new MutationObserver(() => {
+      if (!this.form()) {
+        return;
+      }
+      this.highlights.set(this.getHighlights(this.form()!, this.mode(), this.ignoreFieldsOfType()))
+    });
 
     effect(() => {
       this.mutationObserver.disconnect();
@@ -110,7 +118,10 @@ export class LajiFormFieldChooserComponent implements OnDestroy {
     });
 
     effect(() => {
-      this.highlights.set(this.getHighlights(this.ignoreFields()));
+      if (!this.form()) {
+        return;
+      }
+      this.highlights.set(this.getHighlights(this.form()!, this.mode(), this.ignoreFieldsOfType()));
     });
 
     this.highlightIndexesBySelectedProp = computed(() => (
@@ -161,7 +172,7 @@ export class LajiFormFieldChooserComponent implements OnDestroy {
     this.selectedChange.emit(newSelected);
   }
 
-  private getHighlights(ignoreFields: string[]): HighlightData[] {
+  private getHighlights(form: LajiForm.SchemaForm, mode: FieldChooserMode, ignore: FieldChooserIgnoreFieldType[]): HighlightData[] {
     const highlights: HighlightData[] = [];
 
     const schemaElems = Array.from<HTMLElement>(
@@ -169,16 +180,19 @@ export class LajiFormFieldChooserComponent implements OnDestroy {
     );
 
     schemaElems.forEach((schemaElem: HTMLElement) => {
-      if (schemaElem.id?.match(/^(.*)_\d$/)) {
-        return;
-      }
-
       const jsonPointer = getJsonPointerFromId(schemaElem.id);
-      const field = getFieldFromJsonPointer(jsonPointer);
-
-      if (ignoreFields.includes(field)) {
+      const schema = parseSchemaFromFormDataPointer(form.schema, jsonPointer);
+      const isArrayItem = jsonPointer.match(/^(.*)\/\d$/);
+      
+      if ((mode === 'fieldSelect' || ignore.includes('arrayItem')) && isArrayItem) {
+        return;
+      } else if (ignore.includes('objectArray') && schema.type === 'array' && schema.items.type === 'object') {
+        return;
+      } else if (ignore.includes('itemInObjectArray') && schema.type === 'object' && isArrayItem) {
         return;
       }
+
+      const field = getFieldFromJsonPointer(jsonPointer);
 
       highlights.push({
         id: getHighlightElemIdFromSchemaElemId(schemaElem.id),
