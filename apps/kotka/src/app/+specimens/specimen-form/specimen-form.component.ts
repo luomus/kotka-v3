@@ -271,11 +271,19 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
       const unreliableFields = this.lajiFormFieldChooserService.stopFieldChooser().join(',');
       this.formView.setFormData({...this.formData(), unreliableFields});
     } else {
+      const schema = this.lajiForm.form()?.schema;
+      if (!schema) {
+        throw new Error('Form is undefined');
+      }
+
       this.lajiFormFieldChooserService.startFieldChooser(this.lajiForm, {
         selected: this.unreliableFields(),
         mode: 'jsonPointerSelect',
         ignoreFieldsOfType: ['objectArray', 'itemInObjectArray'],
         colorTheme: 'yellow',
+        unselectableFields: ['/namespaceID', '/objectID'].concat(getRequiredFields(schema)),
+        unselectableFieldsErrorMsg:
+          'This field can\'t be marked as unreliable!',
       });
     }
   }

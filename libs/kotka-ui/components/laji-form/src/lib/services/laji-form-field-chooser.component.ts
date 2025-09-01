@@ -183,7 +183,7 @@ export class LajiFormFieldChooserComponent implements OnDestroy {
       const jsonPointer = getJsonPointerFromId(schemaElem.id);
       const schema = parseSchemaFromFormDataPointer(form.schema, jsonPointer);
       const isArrayItem = jsonPointer.match(/^(.*)\/\d$/);
-      
+
       if ((mode === 'fieldSelect' || ignore.includes('arrayItem')) && isArrayItem) {
         return;
       } else if (ignore.includes('objectArray') && schema.type === 'array' && schema.items.type === 'object') {
