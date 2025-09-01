@@ -105,7 +105,7 @@ export class LajiFormFieldChooserComponent implements OnDestroy {
       if (!this.form()) {
         return;
       }
-      this.highlights.set(this.getHighlights(this.form()!, this.mode(), this.ignoreFieldsOfType()))
+      this.highlights.set(this.getHighlights(this.form()!, this.mode(), this.ignoreFieldsOfType()));
     });
 
     effect(() => {
