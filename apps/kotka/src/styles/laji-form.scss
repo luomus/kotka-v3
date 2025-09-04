@@ -1,6 +1,8 @@
 @use "sass:map";
 @import "variables";
 @import "node_modules/bootstrap/scss/variables";
+@import "node_modules/@fortawesome/fontawesome-free/scss/variables";
+@import "node_modules/@fortawesome/fontawesome-free/scss/functions";
 
 .laji-form {
   label:not(.btn) {
@@ -39,8 +41,8 @@
 
   .unreliable-field {
     &::after {
-      font-family: "FontAwesome", $font-family-base;
-      content: "\f059" " Unreliable field";
+      font-family: $font-family-base, $fa-style-family;
+      content: fa-content($fa-var-question-circle) " Unreliable field";
       color: $warning;
     }
 
