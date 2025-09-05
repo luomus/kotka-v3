@@ -279,8 +279,8 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
       this.lajiFormFieldChooserService.startFieldChooser(this.lajiForm, {
         selected: this.unreliableFields(),
         mode: 'jsonPointerSelect',
-        ignoreFieldsOfType: ['objectArray', 'itemInObjectArray'],
-        colorTheme: 'yellow',
+        ignoreFieldsOfType: ['array', 'object'],
+        colorTheme: 'orange',
         unselectableFields: ['/namespaceID', '/objectID'].concat(getRequiredFields(schema)),
         unselectableFieldsErrorMsg:
           'This field can\'t be marked as unreliable!',

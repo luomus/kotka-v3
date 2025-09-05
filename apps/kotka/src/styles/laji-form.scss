@@ -33,6 +33,10 @@
     margin-bottom: 0;
   }
 
+  .laji-form-dropdown-caret-container {
+    background-color: inherit;
+  }
+
   .verbatim-field {
     input, textarea {
       background-image: url("/assets/paper-bgr.jpg");
@@ -40,14 +44,66 @@
   }
 
   .unreliable-field {
+    $unreliable-border-color: $orange;
+    $unreliable-border-width: 2px;
+
     &::after {
       font-family: $font-family-base, $fa-style-family;
       content: fa-content($fa-var-question-circle) " Unreliable field";
-      color: $warning;
+      color: $unreliable-border-color;
     }
 
-    input, textarea, .btn {
-      border-color: $warning;
+    input, textarea, .rw-widget-picker.rw-widget-container {
+      border-color: $unreliable-border-color;
+      border-width: $unreliable-border-width;
+    }
+
+    .input-group {
+      input:not(:last-child) {
+        border-right-color: $border-color;
+        border-right-width: $border-width;
+      }
+
+      input:not(:first-child) {
+        border-left-color: $border-color;
+        border-left-width: $border-width;
+      }
+
+      .input-group-text, .input-group-button button {
+        border-top-color: $unreliable-border-color;
+        border-bottom-color: $unreliable-border-color;
+        border-top-width: $unreliable-border-width;
+        border-bottom-width: $unreliable-border-width;
+      }
+
+      .input-group-text:first-child, .input-group-button:first-child button {
+        border-left-color: $unreliable-border-color;
+        border-left-width: $unreliable-border-width;
+      }
+
+      .input-group-text:last-child, .input-group-button:last-child button {
+        border-right-color: $unreliable-border-color;
+        border-right-width: $unreliable-border-width;
+      }
+    }
+
+    .btn-group {
+      .btn {
+        border-top-color: $unreliable-border-color;
+        border-bottom-color: $unreliable-border-color;
+        border-top-width: $unreliable-border-width;
+        border-bottom-width: $unreliable-border-width;
+
+        &:first-of-type {
+          border-left-color: $unreliable-border-color;
+          border-left-width: $unreliable-border-width;
+        }
+
+        &:last-of-type {
+          border-right-color: $unreliable-border-color;
+          border-right-width: $unreliable-border-width;
+        }
+      }
     }
   }
 

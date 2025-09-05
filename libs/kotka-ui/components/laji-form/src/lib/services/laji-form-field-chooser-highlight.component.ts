@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { NgClass } from '@angular/common';
 
-export type FieldChooserColorTheme = 'red'|'yellow';
+export type FieldChooserColorTheme = 'red'|'orange';
 
 @Component({
   selector: 'kui-laji-form-field-chooser-highlight',
@@ -35,13 +35,13 @@ export type FieldChooserColorTheme = 'red'|'yellow';
         background-color: rgb(220, 53, 69, 60%);
       }
 
-      .laji-form-field-chooser-highlight.laji-form-field-chooser-highlight-yellow:focus-visible,
-      .laji-form-field-chooser-highlight.laji-form-field-chooser-highlight-yellow:hover {
-        background-color: rgb(255, 193, 7, 10%);
+      .laji-form-field-chooser-highlight.laji-form-field-chooser-highlight-orange:focus-visible,
+      .laji-form-field-chooser-highlight.laji-form-field-chooser-highlight-orange:hover {
+        background-color: rgb(253, 126, 20, 10%);
       }
 
-      .laji-form-field-chooser-highlight.laji-form-field-chooser-highlight-yellow[aria-pressed='true'] {
-        background-color: rgb(255, 193, 7, 60%);
+      .laji-form-field-chooser-highlight.laji-form-field-chooser-highlight-orange[aria-pressed='true'] {
+        background-color: rgb(253, 126, 20, 60%);
       }
     `,
   ],

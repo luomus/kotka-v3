@@ -22,7 +22,7 @@ import { parseSchemaFromFormDataPointer } from '@luomus/laji-form/lib/utils';
 
 export type FieldChooserMode = 'fieldSelect'|'jsonPointerSelect';
 
-export type FieldChooserIgnoreFieldType = 'objectArray'|'itemInObjectArray'|'arrayItem';
+export type FieldChooserIgnoreFieldType = 'objectArray'|'objectArrayItem'|'array'|'arrayItem'|'object';
 
 interface HighlightDimensions {
   top: number;
@@ -175,6 +175,10 @@ export class LajiFormFieldChooserComponent implements OnDestroy {
   private getHighlights(form: LajiForm.SchemaForm, mode: FieldChooserMode, ignore: FieldChooserIgnoreFieldType[]): HighlightData[] {
     const highlights: HighlightData[] = [];
 
+    if (mode === 'fieldSelect') {
+      ignore = [...ignore, 'arrayItem'];
+    }
+
     const schemaElems = Array.from<HTMLElement>(
       this.document.querySelectorAll('[id^=_laji-form_root_]'),
     );
@@ -184,12 +188,16 @@ export class LajiFormFieldChooserComponent implements OnDestroy {
       const schema = parseSchemaFromFormDataPointer(form.schema, jsonPointer);
       const isArrayItem = jsonPointer.match(/^(.*)\/\d$/);
 
-      if ((mode === 'fieldSelect' || ignore.includes('arrayItem')) && isArrayItem) {
+      if (ignore.includes('arrayItem') && isArrayItem) {
         return;
-      } else if (ignore.includes('objectArray') && schema.type === 'array' && schema.items.type === 'object') {
-        return;
-      } else if (ignore.includes('itemInObjectArray') && schema.type === 'object' && isArrayItem) {
-        return;
+      } else if (schema.type === 'array') {
+        if (ignore.includes('array') || (ignore.includes('objectArray') && schema.items.type === 'object')) {
+          return;
+        }
+      } else if (schema.type === 'object') {
+        if (ignore.includes('object') || (ignore.includes('objectArrayItem') && isArrayItem)) {
+          return;
+        }
       }
 
       const field = getFieldFromJsonPointer(jsonPointer);
