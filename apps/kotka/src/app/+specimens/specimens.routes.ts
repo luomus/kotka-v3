@@ -37,7 +37,7 @@ export const specimensRoutes: Routes = [
         component: SpecimenVersionHistoryComponent
       },
       {
-        path: '**',
+        path: '',
         pathMatch: 'full',
         component: NotFoundComponent
       }
