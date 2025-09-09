@@ -169,7 +169,8 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     ));
 
     this.formDataDataType = computed(() => this.formData()?.datatype);
-    this.unreliableFields = computed(() => this.formData()?.unreliableFields?.split(',') || [], {equal: isEqual});
+    // @ts-ignore TODO remove after specimen schema changes (remove ts-ignore)
+    this.unreliableFields = computed(() => this.formData()?.unreliableFields || [], {equal: isEqual});
     this.coordinates = computed(() => this.getCoordinates(this.formData()), {equal: isEqual});
     this.mapCoordinates = computed(() => this.getMapCoordinates(this.formData()), {equal: isEqual});
 
@@ -268,7 +269,8 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     }
 
     if (this.markUnreliableFieldsActive()) {
-      const unreliableFields = this.lajiFormFieldChooserService.stopFieldChooser().join(',');
+      const unreliableFields = this.lajiFormFieldChooserService.stopFieldChooser();
+      // @ts-ignore TODO remove after specimen schema changes (remove ts-ignore)
       this.formView.setFormData({...this.formData(), unreliableFields});
     } else {
       const schema = this.lajiForm.form()?.schema;

@@ -65,12 +65,13 @@ export class LajiApiController {
       });
 
       proxyRes.on('end', async () => {
-        const body = Buffer.concat(data);
+        let body = Buffer.concat(data);
         if (proxyRes.statusCode === 400 && body.toString().includes('INVALID TOKEN')) {
           this.authService.invalidateSession(req);
           res.status(401).json({ message: ErrorMessages.loginRequired, error: 'Unauthorized', statusCode: 401 });
         } else {
           this.forwardAllHeaders(proxyRes, res);
+          body = this.patchSpecimenForm(req.path, body);
           res.status(proxyRes.statusCode).send(body);
         }
 
@@ -114,5 +115,71 @@ export class LajiApiController {
     Object.keys(proxyRes.headers).forEach((key) => {
       res.append(key, proxyRes.headers[key]);
     });
+  }
+
+  // TODO remove after specimen schema changes
+  private patchSpecimenForm(path: string, body: any) {
+    const findFieldIdx = (fields: {name: string}[], field: string) => {
+      return fields.findIndex(f => f.name === field);
+    };
+
+    if (path === '/forms/MHL.1158') {
+      const jsonString = body.toString();
+      if (!jsonString) {
+        return body;
+      }
+
+      const data = JSON.parse(jsonString);
+
+      if (data.schema) {
+        data.schema.properties.unreliableFields = {
+          ...data.schema.properties.unreliableFields,
+          'type': 'array',
+          'items': {
+            'type': 'string'
+          }
+        };
+        data.schema.properties.gatherings.items.properties.samplingAreaSizeInSquareMeters = {
+          ...data.schema.properties.gatherings.items.properties.samplingAreaSizeInSquareMeters,
+          'type': 'string'
+        };
+
+        data.schema.properties.gatherings.items.properties.units.items.properties.identifications.items.properties.preferredIdentification = {
+          ...data.schema.properties.gatherings.items.properties.units.items.properties.identifications.items.properties.preferredIdentification,
+          'type': 'boolean'
+        };
+      } else if (data.fields) {
+        const unreliableFieldsIdx = findFieldIdx(data.fields, 'unreliableFields');
+        const gatheringsIdx = findFieldIdx(data.fields, 'gatherings');
+        const samplingAreaSizeInSquareMetersIdx = findFieldIdx(data.fields[gatheringsIdx].fields, 'samplingAreaSizeInSquareMeters');
+        const unitsIdx = findFieldIdx(data.fields[gatheringsIdx].fields, 'units');
+        const identificationsIdx = findFieldIdx(data.fields[gatheringsIdx].fields[unitsIdx].fields, 'identifications');
+        const preferredIdentificationIdx = findFieldIdx(data.fields[gatheringsIdx].fields[unitsIdx].fields[identificationsIdx].fields, 'preferredIdentification');
+
+        data.fields[unreliableFieldsIdx] = {
+          ...data.fields[unreliableFieldsIdx],
+          'type': 'collection',
+          'options': {
+            'target_element': {
+              'type': 'text'
+            }
+          }
+        };
+
+        data.fields[gatheringsIdx].fields[samplingAreaSizeInSquareMetersIdx] = {
+          ...data.fields[gatheringsIdx].fields[samplingAreaSizeInSquareMetersIdx],
+          'type': 'text'
+        };
+
+        data.fields[gatheringsIdx].fields[unitsIdx].fields[identificationsIdx].fields[preferredIdentificationIdx] = {
+          ...data.fields[gatheringsIdx].fields[unitsIdx].fields[identificationsIdx].fields[preferredIdentificationIdx],
+          'type': 'checkbox'
+        };
+      }
+
+      return Buffer.from(JSON.stringify(data));
+    }
+
+    return body;
   }
 }

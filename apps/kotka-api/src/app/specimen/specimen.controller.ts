@@ -3,7 +3,7 @@ https://docs.nestjs.com/controllers#controllers
 */
 
 import { LajiStoreService, OldKotkaApiService, TriplestoreService } from '@kotka/api/services';
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards, UseInterceptors } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
 import { ApiMethodAccessGuard } from '../shared/guards/api-method-access.guard';
@@ -11,6 +11,7 @@ import { KotkaDocumentObjectFullType, KotkaDocumentObjectType } from '@kotka/sha
 import { ControllerType } from '../shared/decorators/controller-type.decorator';
 import { LajiStoreController } from '../shared/controllers/laji-store.controller';
 import { TriplestoreMapperService } from '@kotka/api/mappers';
+import { SpecimenConvertDataToOldFormatInterceptor } from './specimen-convert-data-to-old-format.interceptor';
 
 const type = KotkaDocumentObjectFullType.document;
 
@@ -20,6 +21,7 @@ const type = KotkaDocumentObjectFullType.document;
   AuthenticateCookieGuard,
   ApiMethodAccessGuard,
 )
+@UseInterceptors(SpecimenConvertDataToOldFormatInterceptor)
 export class SpecimenController extends LajiStoreController<Document> {
   constructor(
     private readonly oldKotkaApiService: OldKotkaApiService,
