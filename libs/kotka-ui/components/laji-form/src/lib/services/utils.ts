@@ -1,3 +1,6 @@
+import { getUUID } from '@luomus/laji-form/lib/utils';
+import { isEqual } from 'lodash';
+
 export const getRequiredFields = (schema: any, path = '/'): string[] => {
   let results: string[] = [];
   if (schema.type === 'object' && schema.required) {
@@ -11,4 +14,13 @@ export const getRequiredFields = (schema: any, path = '/'): string[] => {
     results = results.concat(getRequiredFields(schema.items, path));
   }
   return results;
+};
+
+export const formDataItemsAreEqual = (item1: any, item2: any): boolean => {
+  const item1Id = getUUID(item1);
+  const item2Id = getUUID(item2);
+  if (item1Id !== undefined || item2Id !== undefined) {
+    return item1Id === item2Id;
+  }
+  return isEqual(item1, item2);
 };
