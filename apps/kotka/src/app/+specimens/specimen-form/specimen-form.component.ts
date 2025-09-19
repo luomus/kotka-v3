@@ -22,12 +22,11 @@ import {
 } from '@kotka/ui/laji-form';
 import { LocalStorageService } from 'ngx-webstorage';
 import { isEqual, invert } from 'lodash';
-import { convertCoordinatesToWGS84 } from '@kotka/shared/utils';
+import { convertCoordinatesToWGS84, parseJSONPointer } from '@kotka/shared/utils';
 import { MYCoordinateSystems } from '@luomus/laji-schema';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { from } from 'rxjs';
 import { SpecimenFormNavComponent } from '../specimen-form-nav/specimen-form-nav';
-import { JSONPath } from 'jsonpath-plus';
 
 type UrlDataType = 'botany'|'zoo'|'palaeontology'|'accession'|'culture';
 
@@ -481,12 +480,12 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     let hasChanges = false;
 
     arrayFieldsToMonitor.forEach(field => {
-      const array: any[] | undefined = JSONPath({ path: field.split('/'), json: formData || {}, wrap: false });
+      const array: any[] | undefined = parseJSONPointer(formData || {}, field);
       if (!array?.length) {
         newUnreliableFields = this.getUnreliableFieldsAfterArrayDeletion(newUnreliableFields, field);
         hasChanges = true;
       } else {
-        const prevArray: any[] | undefined = JSONPath({ path: field.split('/'), json: prevFormData || {}, wrap: false });
+        const prevArray: any[] | undefined = parseJSONPointer(prevFormData || {}, field);
         if (prevArray && (array.length < prevArray.length)) {
           newUnreliableFields = this.getUnreliableFieldsAfterArrayItemDeletion(newUnreliableFields, field, array, prevArray);
           hasChanges = true;
