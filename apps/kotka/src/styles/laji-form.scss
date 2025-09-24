@@ -53,6 +53,14 @@
       color: $unreliable-border-color;
     }
 
+    &.laji-form-multiselect-tag {
+      border-color: $unreliable-border-color;
+
+      &::after {
+        margin-left: 1px;
+      }
+    }
+
     input, textarea, .rw-widget-picker.rw-widget-container {
       border-color: $unreliable-border-color;
       border-width: $unreliable-border-width;
@@ -106,18 +114,6 @@
       }
     }
   }
-
-  /*.unreliable-field {
-    input, textarea, .laji-form-checkbox-buttons .btn {
-      background-color: rgba($warning, 0.6);
-    }
-  }
-
-  .verbatim-field.unreliable-field {
-    input, textarea {
-      background-image: linear-gradient(to right, rgba($warning, 0.6), rgba($warning, 0.6)), url("/assets/paper-bgr.jpg");
-    }
-  }*/
 
   .highlight-container {
     background-color: rgba(0, 0, 0, 0.05);
