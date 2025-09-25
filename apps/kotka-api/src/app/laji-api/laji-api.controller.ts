@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthenticationService } from '../authentication/authentication.service';
-import { createProxyMiddleware, RequestHandler } from 'http-proxy-middleware';
+import { createProxyMiddleware, RequestHandler, fixRequestBody } from 'http-proxy-middleware';
 import { Request, Response } from 'express';
 import { ErrorMessages, Person } from '@kotka/shared/models';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
@@ -41,13 +41,18 @@ export class LajiApiController {
       selfHandleResponse: true,
       pathRewrite: this.pathRewrite.bind(this),
       on: {
+        proxyReq: fixRequestBody,
         proxyRes: this.proxyRes.bind(this)
       }
     });
   }
 
   private proxyRes(proxyRes: Request, req: UserRequest, res: Response) {
-    if (req.path === '/html-to-pdf') {
+    // check if responses with status code 400 contain the person token expired error message, process other responses normally
+    if (
+      req.path !== '/forms/MHL.1158' && // TODO remove after specimen schema changes
+      proxyRes.statusCode !== 400
+    ) {
       this.forwardAllHeaders(proxyRes, res);
       res.status(proxyRes.statusCode);
 
@@ -66,7 +71,7 @@ export class LajiApiController {
 
       proxyRes.on('end', async () => {
         let body = Buffer.concat(data);
-        if (proxyRes.statusCode === 400 && body.toString().includes('INVALID TOKEN')) {
+        if (body.toString().includes('INVALID TOKEN')) {
           this.authService.invalidateSession(req);
           res.status(401).json({ message: ErrorMessages.loginRequired, error: 'Unauthorized', statusCode: 401 });
         } else {
