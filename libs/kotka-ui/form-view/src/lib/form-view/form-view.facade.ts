@@ -21,9 +21,7 @@ import {
   KotkaDocumentObjectMap,
   LajiForm,
   Person,
-  Image
 } from '@kotka/shared/models';
-import { MediaMetadata } from '@luomus/laji-form/lib/components/LajiForm';
 import { toObservable } from '@angular/core/rxjs-interop';
 
 export enum FormErrorEnum {
@@ -52,14 +50,9 @@ export interface FormState<S extends KotkaDocumentObject> {
   disabled?: boolean;
   showDeleteButton?: boolean;
   showCopyButton?: boolean;
-  mediaMetadata?: KotkaMediaMetadata;
   formHasChanges?: boolean;
   disabledAlertDismissed?: boolean;
   showDeleteTargetInUseAlert?: boolean;
-}
-
-interface KotkaMediaMetadata extends MediaMetadata {
-  publicityRestrictions?: Image['publicityRestrictions'];
 }
 
 @Injectable()
@@ -99,16 +92,7 @@ export class FormViewFacade<
 
     const formDataLastForceUpdatedVersion = forceUpdate ? formData : state.formDataLastForceUpdatedVersion;
 
-    const intellectualOwner = formData.owner || '';
-
-    const mediaMetadata = state.mediaMetadata && state.mediaMetadata.intellectualOwner !== intellectualOwner
-      ? {
-          ...state.mediaMetadata,
-          intellectualOwner: formData.owner || '',
-        }
-      : state.mediaMetadata;
-
-    this.setState({ ...state, formData, formDataLastForceUpdatedVersion, formHasChanges, mediaMetadata });
+    this.setState({ ...state, formData, formDataLastForceUpdatedVersion, formHasChanges });
   }
 
   setFormHasChanges(formHasChanges: boolean) {
@@ -221,22 +205,9 @@ export class FormViewFacade<
       disabled,
       showDeleteButton,
       showCopyButton: isEditMode && inputs.allowCopy,
-      mediaMetadata: this.getMediaMetadata(user, formData),
       formHasChanges: false,
       disabledAlertDismissed: false,
       showDeleteTargetInUseAlert: false,
-    };
-  }
-
-  private getMediaMetadata(
-    user: Person,
-    formData: Partial<S>,
-  ): KotkaMediaMetadata {
-    return {
-      intellectualRights: 'MZ.intellectualRightsARR',
-      intellectualOwner: formData.owner || '',
-      capturerVerbatim: user.fullName,
-      publicityRestrictions: 'MZ.publicityRestrictionsPrivate',
     };
   }
 

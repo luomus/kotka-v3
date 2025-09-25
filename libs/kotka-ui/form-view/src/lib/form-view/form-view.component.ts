@@ -13,7 +13,7 @@ import { KotkaDocumentObjectType, KotkaDocumentObjectMap, LajiForm } from '@kotk
 import {
   Observable
 } from 'rxjs';
-import { LajiFormComponent } from '@kotka/ui/laji-form';
+import { FormMediaMetadata, LajiFormComponent } from '@kotka/ui/laji-form';
 import { ErrorMessages } from '@kotka/shared/models';
 import {
   FormErrorEnum,
@@ -61,6 +61,7 @@ export class FormViewComponent<
   augmentFormFunc =
     input<(form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>>();
   prefilledFormData = input<Partial<S>>();
+  mediaMetadata = input<FormMediaMetadata>();
 
   hiddenFields = input<string[]>();
   additionalClassNames = input<Record<string, string>>();

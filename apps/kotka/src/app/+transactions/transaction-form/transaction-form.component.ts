@@ -1,7 +1,7 @@
 import {
   ChangeDetectionStrategy, ChangeDetectorRef,
-  Component,
-  OnDestroy,
+  Component, computed,
+  OnDestroy, signal, Signal,
   ViewChild
 } from '@angular/core';
 import {
@@ -11,9 +11,9 @@ import {
   isSpecimenTransaction,
 } from '@kotka/shared/models';
 import { Observable, of, Subscription, switchMap } from 'rxjs';
-import { DialogService, Logger } from '@kotka/ui/services';
+import { DialogService, Logger, UserService } from '@kotka/ui/services';
 import { FormViewComponent } from '@kotka/ui/form-view';
-import { LajiFormComponent } from '@kotka/ui/laji-form';
+import { FormMediaMetadata, LajiFormComponent } from '@kotka/ui/laji-form';
 import { ApiClient, FormService } from '@kotka/ui/services';
 import { TransactionFormEmbedService } from '../transaction-form-embed/transaction-form-embed.service';
 import { globals } from '../../../environments/globals';
@@ -21,6 +21,8 @@ import { FormViewContainerComponent } from '@kotka/ui/form-view';
 import { TransactionPdfSheetsComponent } from '../transaction-pdf-sheets/transaction-pdf-sheets.component';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { map } from 'rxjs/operators';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'kotka-transaction-form',
@@ -38,6 +40,7 @@ export class TransactionFormComponent
   dataType: KotkaDocumentObjectType.transaction =
     KotkaDocumentObjectType.transaction;
   augmentFormFunc = this.augmentForm.bind(this);
+  mediaMetadata: Signal<FormMediaMetadata>;
 
   formData?: SpecimenTransaction | Partial<SpecimenTransaction>;
 
@@ -45,6 +48,9 @@ export class TransactionFormComponent
 
   @ViewChild(FormViewComponent, { static: true })
   formView!: FormViewComponent<KotkaDocumentObjectType.transaction>;
+
+  private userName: Signal<string | undefined>;
+  private owner = signal<string | undefined>(undefined);
 
   private specimenRangeButtonClickSubscription?: Subscription;
 
@@ -59,8 +65,22 @@ export class TransactionFormComponent
     cdr: ChangeDetectorRef,
     private logger: Logger,
     private transactionFormEmbedService: TransactionFormEmbedService,
+    private userService: UserService,
   ) {
     super(dialogService, activeRoute, router, cdr);
+
+    this.userName = toSignal(
+      this.userService.getCurrentLoggedInUser().pipe(
+        map(user => user.fullName)
+      )
+    );
+
+    this.mediaMetadata = computed(() => ({
+      intellectualRights: 'MZ.intellectualRightsARR',
+      intellectualOwner: this.owner() || '',
+      capturerVerbatim: this.userName() || '',
+      publicityRestrictions: 'MZ.publicityRestrictionsPrivate',
+    }));
   }
 
   override ngOnDestroy() {
@@ -86,6 +106,8 @@ export class TransactionFormComponent
   onFormDataChange(formData?: Partial<SpecimenTransaction>) {
     this.formData = formData;
     this.transactionFormEmbedService.updateEmbeddedComponents(formData);
+
+    this.owner.set(this.formData?.owner);
   }
 
   setDisabled(disabled?: boolean) {

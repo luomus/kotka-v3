@@ -18,7 +18,7 @@ import {
   getRequiredFields,
   formDataItemsAreEqual,
   LajiFormComponent,
-  LajiFormFieldChooserService
+  LajiFormFieldChooserService, FormMediaMetadata
 } from '@kotka/ui/laji-form';
 import { LocalStorageService } from 'ngx-webstorage';
 import { isEqual, invert } from 'lodash';
@@ -88,6 +88,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
   dataType: Signal<DataType | undefined>;
   title: Signal<string>;
   prefilledFormData: Signal<Partial<KotkaDocument> | undefined>;
+  mediaMetadata: Signal<FormMediaMetadata>;
 
   markAdvancedFieldsActive: Signal<boolean>;
   advancedFields = signal<string[] | undefined>([]);
@@ -146,6 +147,14 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
         gatherings: [{ units: [{}] }],
       }),
     );
+
+    this.mediaMetadata = computed(() => ({
+      documentURI: this.dataURI() ? [this.dataURI()] : undefined,
+      intellectualRights: 'MZ.intellectualRightsCC-BY-SA-4.0',
+      intellectualOwner: 'Luomus',
+      capturerVerbatim: '',
+      publicityRestrictions: 'MZ.publicityRestrictionsPublic'
+    }));
 
     this.markAdvancedFieldsActive = computed(
       () =>
