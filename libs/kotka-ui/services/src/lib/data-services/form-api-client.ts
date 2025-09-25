@@ -52,7 +52,7 @@ export class FormApiClient {
       headers?: { [header: string]: string | string[] };
     },
   ): Promise<unknown> {
-    const queryParameters = { ...query };
+    const queryParameters = { ...query, includePersonToken: true };
 
     if (!options) {
       options = {};

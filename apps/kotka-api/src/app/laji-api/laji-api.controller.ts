@@ -24,12 +24,12 @@ export class LajiApiController {
     this.lajiApiProxy = this.getLajiApiProxy();
   }
 
-  @Get(['forms{*all}', 'person{*all}', 'areas{*all}'])
+  @Get(['forms{*all}', 'person{*all}', 'areas{*all}', 'images{*all}'])
   proxyGetRequest(@Req() req: Request, @Res() res: Response) {
     void this.lajiApiProxy(req, res);
   }
 
-  @Post(['logger{*all}', 'html-to-pdf{*all}'])
+  @Post(['logger{*all}', 'html-to-pdf{*all}', 'images{*all}'])
   proxyPostRequest(@Req() req: Request, @Res() res: Response) {
     void this.lajiApiProxy(req, res);
   }
