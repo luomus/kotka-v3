@@ -384,7 +384,7 @@ describe('ValidationInterceptor', () => {
       const mockRequest = {
         method: 'POST',
         body: mockBody
-      }
+      };
 
       const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
         getRequest: () => mockRequest
@@ -410,7 +410,7 @@ describe('ValidationInterceptor', () => {
       const mockRequest = {
         method: 'POST',
         body: mockBody
-      }
+      };
 
       const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
         getRequest: () => mockRequest
@@ -438,7 +438,7 @@ describe('ValidationInterceptor', () => {
       const mockRequest = {
         method: 'POST',
         body: mockBody
-      }
+      };
 
       const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
         getRequest: () => mockRequest
@@ -466,7 +466,7 @@ describe('ValidationInterceptor', () => {
       const mockRequest = {
         method: 'POST',
         body: mockBody
-      }
+      };
 
       const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
         getRequest: () => mockRequest
@@ -492,7 +492,7 @@ describe('ValidationInterceptor', () => {
       const mockRequest = {
         method: 'POST',
         body: mockBody
-      }
+      };
 
       const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
         getRequest: () => mockRequest
@@ -518,7 +518,7 @@ describe('ValidationInterceptor', () => {
       const mockRequest = {
         method: 'POST',
         body: mockBody
-      }
+      };
 
       const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
         getRequest: () => mockRequest
@@ -546,7 +546,7 @@ describe('ValidationInterceptor', () => {
       const mockRequest = {
         method: 'POST',
         body: mockBody
-      }
+      };
 
       const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
         getRequest: () => mockRequest
@@ -572,7 +572,7 @@ describe('ValidationInterceptor', () => {
       const mockRequest = {
         method: 'POST',
         body: mockBody
-      }
+      };
 
       const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
         getRequest: () => mockRequest
@@ -598,7 +598,7 @@ describe('ValidationInterceptor', () => {
       const mockRequest = {
         method: 'POST',
         body: mockBody
-      }
+      };
 
       const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
         getRequest: () => mockRequest
@@ -626,7 +626,7 @@ describe('ValidationInterceptor', () => {
       const mockRequest = {
         method: 'POST',
         body: mockBody
-      }
+      };
 
       const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
         getRequest: () => mockRequest

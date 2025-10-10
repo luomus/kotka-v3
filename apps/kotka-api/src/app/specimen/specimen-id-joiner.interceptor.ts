@@ -2,17 +2,15 @@
 https://docs.nestjs.com/interceptors#interceptors
 */
 
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler, HttpException, HttpStatus, UnprocessableEntityException } from '@nestjs/common';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler, HttpException, HttpStatus } from '@nestjs/common';
 import { Document } from '@kotka/shared/models';
 import { NamespaceService } from '../shared/services/namespace.service';
-import { acceptedPrefixes, defaultPrefix } from '@kotka/shared/utils';
-import { ValidationService } from '../shared/services/validation.service';
+import { defaultPrefix } from '@kotka/shared/utils';
 
 @Injectable()
 export class SpecimenIdJoinerInterceptor implements NestInterceptor {
   constructor (
     private readonly namespaceService: NamespaceService,
-    private readonly validationService: ValidationService
   ) {}
 
   async intercept(context: ExecutionContext, next: CallHandler): Promise<any> {

@@ -3,7 +3,6 @@ import { createMock } from '@golevelup/ts-jest';
 import { CallHandler, ExecutionContext } from '@nestjs/common';
 import { SpecimenIdJoinerInterceptor } from './specimen-id-joiner.interceptor';
 import { NamespaceService } from '../shared/services/namespace.service';
-import { ValidationService } from '../shared/services/validation.service';
 import { AbschService, LajiApiService, LajiStoreService } from '@kotka/api/services';
 
 const mockLajiApiService = jest.mock<LajiApiService>;
@@ -42,13 +41,12 @@ const mockNamespaceService = {
 describe('SpecimenIdJoinerIntereptor', () => {
   let specimenIdJoinerInterceptor: SpecimenIdJoinerInterceptor;
   let namespaceService: NamespaceService;
-  let validationService: ValidationService;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [],
       controllers: [],
-      providers: [SpecimenIdJoinerInterceptor, ValidationService,
+      providers: [SpecimenIdJoinerInterceptor,
       { provide: NamespaceService, useValue: mockNamespaceService },
       { provide: LajiApiService, useValue: mockLajiApiService },
       { provide: LajiStoreService, useValue: mockLajiStoreService },
@@ -58,7 +56,6 @@ describe('SpecimenIdJoinerIntereptor', () => {
 
     namespaceService = moduleRef.get<NamespaceService>(NamespaceService);
     specimenIdJoinerInterceptor = moduleRef.get<SpecimenIdJoinerInterceptor>(SpecimenIdJoinerInterceptor);
-    validationService = moduleRef.get<ValidationService>(ValidationService);
   });
 
   afterEach(async () => {
@@ -74,7 +71,7 @@ describe('SpecimenIdJoinerIntereptor', () => {
     const mockRequest = {
       method: 'POST',
       body: mockBody
-    }
+    };
 
     const mockContext = createMock<ExecutionContext>({switchToHttp: () => ({
       getRequest: () => (mockRequest)
@@ -101,7 +98,7 @@ describe('SpecimenIdJoinerIntereptor', () => {
     const mockRequest = {
       method: 'POST',
       body: mockBody
-    }
+    };
 
     const mockContext = createMock<ExecutionContext>({switchToHttp: () => ({
       getRequest: () => (mockRequest)
@@ -128,7 +125,7 @@ describe('SpecimenIdJoinerIntereptor', () => {
     const mockRequest = {
       method: 'POST',
       body: mockBody
-    }
+    };
 
     const mockContext = createMock<ExecutionContext>({switchToHttp: () => ({
       getRequest: () => (mockRequest)
@@ -155,7 +152,7 @@ describe('SpecimenIdJoinerIntereptor', () => {
     const mockRequest = {
       method: 'POST',
       body: mockBody
-    }
+    };
 
     const mockContext = createMock<ExecutionContext>({switchToHttp: () => ({
       getRequest: () => (mockRequest)
@@ -182,7 +179,7 @@ describe('SpecimenIdJoinerIntereptor', () => {
     const mockRequest = {
       method: 'POST',
       body: mockBody
-    }
+    };
 
     const mockContext = createMock<ExecutionContext>({switchToHttp: () => ({
       getRequest: () => (mockRequest)
@@ -208,7 +205,7 @@ describe('SpecimenIdJoinerIntereptor', () => {
     const mockRequest = {
       method: 'POST',
       body: mockBody
-    }
+    };
 
     const mockContext = createMock<ExecutionContext>({switchToHttp: () => ({
       getRequest: () => (mockRequest)
