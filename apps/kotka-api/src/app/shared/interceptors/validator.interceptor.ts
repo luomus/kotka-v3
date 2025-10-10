@@ -48,7 +48,6 @@ export class ValidatorInterceptor implements NestInterceptor {
     const errors = {};
 
     if (form.schema && !this.ajv.validate(form.schema, req.body)) {
-
       this.ajv.errors.map(error => {
         if (!errors[error.instancePath]) {
           errors[error.instancePath] = [];

@@ -27,10 +27,12 @@ import { MYCoordinateSystems } from '@luomus/laji-schema';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { from } from 'rxjs';
 import { SpecimenFormNavComponent } from '../specimen-form-nav/specimen-form-nav';
-
-type UrlDataType = 'botany'|'zoo'|'palaeontology'|'accession'|'culture';
-
-type DataType = 'botanyspecimen'|'zoospecimen'|'palaeontology'|'accession'|'culture';
+import {
+SpecimenDataType as DataType,
+SpecimenUrlDataType as UrlDataType,
+specimenDataTypeToNameMap as dataTypeToNameMap,
+specimenUrlToDataTypeMap as urlToDataTypeMap,
+} from '@kotka/shared/models';
 
 interface PointCoordinates {
   latitude: string;
@@ -42,22 +44,6 @@ interface PointCoordinatesWithSystem extends PointCoordinates {
 }
 
 type FormData = KotkaDocument | Partial<KotkaDocument> | undefined;
-
-const urlToDataTypeMap: Record<UrlDataType, DataType> = {
-  botany: 'botanyspecimen',
-  zoo: 'zoospecimen',
-  palaeontology: 'palaeontology',
-  accession: 'accession',
-  culture: 'culture',
-};
-
-const dataTypeToNameMap: Record<DataType, string> = {
-  botanyspecimen: 'botany',
-  zoospecimen: 'zoo',
-  palaeontology: 'palaeontology',
-  accession: 'accession',
-  culture: 'culture',
-};
 
 const defaultAdvancedFields = [
   '/publicityRestrictions','/legID','/additionalIDs','/dataSource','/publication','/separatedFrom','/separatedTo','/duplicatesIn','/acquiredFrom','/acquisitionDate','/exsiccatum','/preservation','/URL','/language',

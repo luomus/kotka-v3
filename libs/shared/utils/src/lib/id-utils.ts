@@ -7,6 +7,10 @@ const domainMap: Record<string, string> = {
   'gbif-dataset:': 'https://www.gbif.org/dataset/',
 };
 
+export const defaultPrefix = 'tun';
+export const acceptedPrefixes = ['luomus', 'zmuo', 'herbo', 'utu', 'gbif-dataset', 'tun'];
+export type QnamePrefix = 'luomus' | 'zmuo' | 'herbo' | 'utu' | 'gbif-dataset' | 'tun'
+
 export function getId(value: string): string {
   if (typeof value !== 'string' || value === '') return value;
 

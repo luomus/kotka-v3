@@ -1,6 +1,25 @@
 import { Dataset, Document, Organization, Sample, SpecimenTransaction } from '@luomus/laji-schema';
 export * from '@luomus/laji-schema';
 
+export type SpecimenDataType = 'botanyspecimen'|'zoospecimen'|'palaeontology'|'accession'|'culture';
+export type SpecimenUrlDataType = 'botany'|'zoo'|'palaeontology'|'accession'|'culture';
+
+export const specimenUrlToDataTypeMap: Record<SpecimenUrlDataType, SpecimenDataType> = {
+  botany: 'botanyspecimen',
+  zoo: 'zoospecimen',
+  palaeontology: 'palaeontology',
+  accession: 'accession',
+  culture: 'culture',
+};
+
+export const specimenDataTypeToNameMap: Record<SpecimenDataType, SpecimenUrlDataType> = {
+  botanyspecimen: 'botany',
+  zoospecimen: 'zoo',
+  palaeontology: 'palaeontology',
+  accession: 'accession',
+  culture: 'culture',
+};
+
 export type KotkaDocumentObject =
   | Dataset
   | Document

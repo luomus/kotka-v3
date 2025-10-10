@@ -5,9 +5,39 @@ import { ValidatorInterceptor } from './validator.interceptor';
 import { ApiServicesModule, FormService, LajiStoreService } from '@kotka/api/services';
 import { Reflector } from '@nestjs/core';
 import { ValidationService } from '../services/validation.service';
+import { NamespaceService } from '../services/namespace.service';
 import { of } from 'rxjs';
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces';
 
+const mockNamespaceService = {
+  getNamespaces: jest.fn().mockImplementation(() => Promise.resolve([{
+      namespace_id: 'AA',
+      person_in_charge: '',
+      purpose: '',
+      namespace_type: 'all',
+      qname_prefix: ''
+    },{
+      namespace_id: 'AB',
+      person_in_charge: '',
+      purpose: '',
+      namespace_type: 'zoo',
+      qname_prefix: 'utu'
+    },{
+      namespace_id: 'AC',
+      person_in_charge: '',
+      purpose: '',
+      namespace_type: 'botany',
+      qname_prefix: 'utu'
+    },
+    {
+      namespace_id: 'AD',
+      person_in_charge: '',
+      purpose: '',
+      namespace_type: 'all',
+      qname_prefix: 'all'
+    }
+  ]))
+};
 const mockForm = {
   'schema': {
     'type': 'object',
@@ -123,170 +153,495 @@ const mockForm = {
   'warnings': {},
 };
 
+const specimenRemoteValidatorSchema = {
+  'schema': {
+    'type': 'object',
+    'properties': {
+      'datatype': {
+        'type': 'string',
+        'title': 'Datatype'
+      },
+      'namespaceID': {
+        'type': 'string',
+        'title': 'Identifier namespace ID'
+      },
+      'objectID': {
+        'type': 'string',
+        'title': 'Identifier object ID'
+      }
+    },
+    'required': [
+      'datatype'
+    ]
+  },
+  'validators': {
+    'namespaceID': {
+      'remote': {
+        'validator': 'kotkaAllowedNamespace'
+      }
+    },
+  },
+};
+
 describe('ValidationInterceptor', () => {
   let validatorInterceptor: ValidatorInterceptor;
   let lajiStoreService: LajiStoreService;
   let formService: FormService;
+  let namespaceService: NamespaceService;
   let reflector: Reflector;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [ApiServicesModule],
       controllers: [],
-      providers: [ValidatorInterceptor, ValidationService, Reflector],
+      providers: [ValidatorInterceptor, ValidationService, Reflector, { provide: NamespaceService, useValue: mockNamespaceService }],
     }).compile();
 
     validatorInterceptor = moduleRef.get<ValidatorInterceptor>(ValidatorInterceptor);
     lajiStoreService = moduleRef.get<LajiStoreService>(LajiStoreService);
     formService = moduleRef.get<FormService>(FormService);
     reflector = moduleRef.get<Reflector>(Reflector);
+    namespaceService = moduleRef.get<NamespaceService>(NamespaceService);
 
-    jest.spyOn(formService, 'getForm').mockImplementation(() => new Promise((resolve) => resolve(mockForm) ));
-    jest.spyOn(reflector, 'get').mockImplementation(() => 'GX.dataset');
     jest.spyOn(lajiStoreService, 'search').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [] }} as AxiosResponse));
   });
 
-  it('Missing body in request results in error thrown in validator', async () => {
-    const mockContext = createMock<ExecutionContext>({switchToHttp: () => ({
-      getRequest: () => ({
-        method: 'POST',
-      })
-    })});
+  describe('General validator tests', () => {
+    beforeEach(() => {
+      jest.spyOn(reflector, 'get').mockImplementation(() => 'GX.dataset');
+      jest.spyOn(formService, 'getForm').mockImplementation(() => new Promise((resolve) => resolve(mockForm)));
+    });
 
-    const mockNext = createMock<CallHandler>();
+    it('Missing body in request results in error thrown in validator', async () => {
+      const mockContext = createMock<ExecutionContext>({switchToHttp: () => ({
+        getRequest: () => ({
+          method: 'POST',
+        })
+      })});
 
-    expect.assertions(2);
-    try {
-      await validatorInterceptor.intercept(mockContext, mockNext);
-    } catch (e) {
-      expect(e.message).toEqual('No request body to validate.');
-      expect(mockNext.handle).toBeCalledTimes(0);
-    }
-  });
+      const mockNext = createMock<CallHandler>();
 
-  it('Missing required property in body results in thrown error from schema', async () => {
-     const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
-      getRequest: () => ({
-        method: 'POST',
-        body: {
-          owner: 'MOS.1',
-          datasetName: {
-            en: 'Test'
+      expect.assertions(2);
+      try {
+        await validatorInterceptor.intercept(mockContext, mockNext);
+      } catch (e) {
+        expect(e.message).toEqual('No request body to validate.');
+        expect(mockNext.handle).toBeCalledTimes(0);
+      }
+    });
+
+    it('Missing required property in body results in thrown error from schema', async () => {
+      const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+        getRequest: () => ({
+          method: 'POST',
+          body: {
+            owner: 'MOS.1',
+            datasetName: {
+              en: 'Test'
+            }
           }
-        }
-      })
-     })});
+        })
+      })});
 
-     const mockNext = createMock<CallHandler>();
+      const mockNext = createMock<CallHandler>();
 
-     expect.assertions(2);
+      expect.assertions(2);
 
-     try {
-      await validatorInterceptor.intercept(mockContext, mockNext);
-     } catch (e) {
-      expect(JSON.stringify(e)).toContain('must have required property \'personsResponsible\'');
-      expect(mockNext.handle).toBeCalledTimes(0);
-     }
+      try {
+        await validatorInterceptor.intercept(mockContext, mockNext);
+      } catch (e) {
+        expect(JSON.stringify(e)).toContain('must have required property \'personsResponsible\'');
+        expect(mockNext.handle).toBeCalledTimes(0);
+      }
+    });
+
+    it('Missing required property specified in validators results in thrown error from validators', async () => {
+      const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+        getRequest: () => ({
+          method: 'POST',
+          body: {
+            owner: 'MOS.1',
+            datasetName: {
+              fi: 'Test'
+            },
+            personsResponsible: 'Tester'
+          }
+        })
+      })});
+
+      const mockNext = createMock<CallHandler>();
+
+      expect.assertions(2);
+
+      try {
+        await validatorInterceptor.intercept(mockContext, mockNext);
+      } catch (e) {
+        expect(JSON.stringify(e)).toContain('"datasetName":{"en":{"errors":["Required field."]}');
+        expect(mockNext.handle).toBeCalledTimes(0);
+      }
+    });
+
+    it('Failure to fetch the mock form results in no calls to next handler and thrown error', async () => {
+      jest.spyOn(formService, 'getForm').mockImplementation(() => new Promise(() => { throw new InternalServerErrorException('Unable to fetch form for validation.', 'Message'); }));
+      const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+        getRequest: () => ({
+          method: 'POST',
+          body: {
+            owner: 'MOS.1',
+            datasetName: {
+              en: 'Test'
+            },
+            personsResponsible: 'Tester'
+          }
+        })
+      })});
+
+      const mockNext = createMock<CallHandler>();
+
+      expect.assertions(2);
+
+      try {
+        await validatorInterceptor.intercept(mockContext, mockNext);
+      } catch (e) {
+        expect(JSON.stringify(e)).toContain('Unable to fetch form for validation.');
+        expect(mockNext.handle).toBeCalledTimes(0);
+      }
+    });
   });
 
-  it('Missing required property specified in validators results in thrown error from validators', async () => {
-    const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
-      getRequest: () => ({
-        method: 'POST',
-        body: {
-          owner: 'MOS.1',
-          datasetName: {
-            fi: 'Test'
-          },
-          personsResponsible: 'Tester'
-        }
-      })
-     })});
+  describe('Dataset kotkaDatasetNameUnique tests', () => {
+    beforeEach(() => {
+      jest.spyOn(reflector, 'get').mockImplementation(() => 'GX.dataset');
+      jest.spyOn(formService, 'getForm').mockImplementation(() => new Promise((resolve) => resolve(mockForm)));
+    });
 
-     const mockNext = createMock<CallHandler>();
+    it('Error in overriden remote validation for datasetName uniqueness results in error being thrown', async () => {
+      const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+        getRequest: () => ({
+          method: 'POST',
+          body: {
+            owner: 'MOS.1',
+            datasetName: {
+              en: 'Test'
+            },
+            personsResponsible: 'Tester'
+          }
+        })
+      })});
 
-     expect.assertions(2);
+      const mockNext = createMock<CallHandler>();
+      jest.spyOn(lajiStoreService, 'search').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [{id: 'GX.1'}] }} as AxiosResponse));
+      expect.assertions(3);
 
-     try {
+      try {
+        await validatorInterceptor.intercept(mockContext, mockNext);
+      } catch (e) {
+        expect(lajiStoreService.search).toBeCalledTimes(1);
+        expect(JSON.stringify(e)).toContain('"datasetName":{"en":{"errors":["Dataset name must be unique."]}');
+        expect(mockNext.handle).toBeCalledTimes(0);
+      }
+    });
+
+    it('Correct body results in no errors and a call to next handler.', async () => {
+      const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+        getRequest: () => ({
+          method: 'POST',
+          body: {
+            owner: 'MOS.1',
+            datasetName: {
+              en: 'test'
+            },
+            personsResponsible: 'Tester'
+          }
+        })
+      })});
+
+      const mockNext = createMock<CallHandler>();
+
       await validatorInterceptor.intercept(mockContext, mockNext);
-     } catch (e) {
-      expect(JSON.stringify(e)).toContain('"datasetName":{"en":{"errors":["Required field."]}');
-      expect(mockNext.handle).toBeCalledTimes(0);
-     }
+
+      expect(mockNext.handle).toBeCalledTimes(1);
+    });
   });
 
-  it('Error in overriden remote validation for datasetName uniqueness results in error being thrown', async () => {
-    const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
-      getRequest: () => ({
+  describe('Specimen kotkaAllowedNamespace tests', () => {
+    beforeEach(() => {
+      jest.spyOn(reflector, 'get').mockImplementation(() => 'MY.document');
+      jest.spyOn(formService, 'getForm').mockImplementation(() => new Promise((resolve) => resolve(specimenRemoteValidatorSchema)));
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it('Correct namespace for given type causes no error', async () => {
+      const mockBody = {
+        namespaceID: 'AB',
+        objectID: '123',
+        datatype: 'zoospecimen',
+        gatherings: []
+      };
+      const mockRequest = {
         method: 'POST',
-        body: {
-          owner: 'MOS.1',
-          datasetName: {
-            en: 'Test'
-          },
-          personsResponsible: 'Tester'
-        }
-      })
-     })});
+        body: mockBody
+      }
 
-     const mockNext = createMock<CallHandler>();
-     jest.spyOn(lajiStoreService, 'search').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [{id: 'GX.1'}] }} as AxiosResponse));
-     expect.assertions(3);
+      const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+        getRequest: () => mockRequest
+      })});
 
-     try {
+      const mockNext = createMock<CallHandler>();
+
       await validatorInterceptor.intercept(mockContext, mockNext);
-     } catch (e) {
-      expect(lajiStoreService.search).toBeCalledTimes(1);
-      expect(JSON.stringify(e)).toContain('"datasetName":{"en":{"errors":["Dataset name must be unique."]}');
-      expect(mockNext.handle).toBeCalledTimes(0);
-     }
-  });
 
-  it('Correct body results in no errors and a call to next handler.', async () => {
-    const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
-      getRequest: () => ({
+      const req = mockContext.switchToHttp().getRequest();
+      expect(req).toEqual(mockRequest);
+      expect(mockNext.handle).toHaveBeenCalledTimes(1);
+      expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(1);
+    })
+
+    it('Unknown namespace for given datatype causes validation error', async () => {
+      const mockBody = {
+        namespaceID: 'BB',
+        objectID: '123',
+        datatype: 'zoospecimen',
+        gatherings: []
+      };
+      const mockRequest = {
         method: 'POST',
-        body: {
-          owner: 'MOS.1',
-          datasetName: {
-            en: 'test'
-          },
-          personsResponsible: 'Tester'
-        }
-      })
-    })});
+        body: mockBody
+      }
 
-    const mockNext = createMock<CallHandler>();
+      const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+        getRequest: () => mockRequest
+      })});
 
-    await validatorInterceptor.intercept(mockContext, mockNext);
+      const mockNext = createMock<CallHandler>();
+      expect.assertions(3);
 
-    expect(mockNext.handle).toBeCalledTimes(1);
-  });
+      try {
+        await validatorInterceptor.intercept(mockContext, mockNext);
+      } catch (e) {
+        expect(namespaceService.getNamespaces).toBeCalledTimes(1);
+        expect(e.options).toEqual({namespaceID:{errors:['Unknown namespace "BB".']}});
+        expect(mockNext.handle).toBeCalledTimes(0);
+      }
+    });
 
-  it('Failure to fetch the mock form results in no calls to next handler and thrown error', async () => {
-    jest.spyOn(formService, 'getForm').mockImplementation(() => new Promise(() => { throw new InternalServerErrorException('Unable to fetch form for validation.', 'Message'); }));
-    const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
-      getRequest: () => ({
+    it('Incorrect namespace for given datatype causes validation error', async () => {
+      const mockBody = {
+        namespaceID: 'AC',
+        objectID: '123',
+        datatype: 'zoospecimen',
+        gatherings: []
+      };
+      const mockRequest = {
         method: 'POST',
-        body: {
-          owner: 'MOS.1',
-          datasetName: {
-            en: 'Test'
-          },
-          personsResponsible: 'Tester'
-        }
-      })
-    })});
+        body: mockBody
+      }
 
-    const mockNext = createMock<CallHandler>();
+      const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+        getRequest: () => mockRequest
+      })});
 
-    expect.assertions(2);
+      const mockNext = createMock<CallHandler>();
+      expect.assertions(3);
 
-    try {
+      try {
+        await validatorInterceptor.intercept(mockContext, mockNext);
+      } catch (e) {
+        expect(namespaceService.getNamespaces).toBeCalledTimes(1);
+        expect(e.options).toEqual({namespaceID:{errors:['Namespace "AC" is not allowed for specimen of type "zoospecimen".']}});
+        expect(mockNext.handle).toBeCalledTimes(0);
+      }
+    });
+
+     it('Namespace with type "all" for given datatype causes no validation error', async () => {
+      const mockBody = {
+        namespaceID: 'AA',
+        objectID: '123',
+        datatype: 'zoospecimen',
+        gatherings: []
+      };
+      const mockRequest = {
+        method: 'POST',
+        body: mockBody
+      }
+
+      const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+        getRequest: () => mockRequest
+      })});
+
+      const mockNext = createMock<CallHandler>();
+
       await validatorInterceptor.intercept(mockContext, mockNext);
-     } catch (e) {
-      expect(JSON.stringify(e)).toContain('Unable to fetch form for validation.');
-      expect(mockNext.handle).toBeCalledTimes(0);
-     }
+
+      const req = mockContext.switchToHttp().getRequest();
+      expect(req).toEqual(mockRequest);
+      expect(mockNext.handle).toHaveBeenCalledTimes(1);
+      expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(1);
+    });
+
+    it('If namespaceID has a correct prefix for the namespace no validation error', async () => {
+      const mockBody = {
+        namespaceID: 'utu:AC',
+        objectID: '123',
+        datatype: 'botanyspecimen',
+        gatherings: []
+      };
+      const mockRequest = {
+        method: 'POST',
+        body: mockBody
+      }
+
+      const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+        getRequest: () => mockRequest
+      })});
+
+      const mockNext = createMock<CallHandler>();
+
+      await validatorInterceptor.intercept(mockContext, mockNext);
+
+      const req = mockContext.switchToHttp().getRequest();
+      expect(req).toEqual(mockRequest);
+      expect(mockNext.handle).toHaveBeenCalledTimes(1);
+      expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(1);
+    });
+
+    it('If namespaceID has incorrect prefix for to namespace causes validation error', async () => {
+      const mockBody = {
+        namespaceID: 'tun:AC',
+        objectID: '123',
+        datatype: 'botanyspecimen',
+        gatherings: []
+      };
+      const mockRequest = {
+        method: 'POST',
+        body: mockBody
+      }
+
+      const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+        getRequest: () => mockRequest
+      })});
+
+      const mockNext = createMock<CallHandler>();
+      expect.assertions(3);
+
+      try {
+        await validatorInterceptor.intercept(mockContext, mockNext);
+      } catch (e) {
+        expect(namespaceService.getNamespaces).toBeCalledTimes(1);
+        expect(e.options).toEqual({namespaceID:{errors:['Unacceptable prefix in namespace, has "tun" but accepts only "utu".']}});
+        expect(mockNext.handle).toBeCalledTimes(0);
+      }
+    });
+
+    it('If namespace has prefix type "all" allow any prefix without validation error', async () => {
+      const mockBody = {
+        namespaceID: 'utu:AD',
+        objectID: '123',
+        datatype: 'botanyspecimen',
+        gatherings: []
+      };
+      const mockRequest = {
+        method: 'POST',
+        body: mockBody
+      }
+
+      const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+        getRequest: () => mockRequest
+      })});
+
+      const mockNext = createMock<CallHandler>();
+
+      await validatorInterceptor.intercept(mockContext, mockNext);
+
+      const req = mockContext.switchToHttp().getRequest();
+      expect(req).toEqual(mockRequest);
+      expect(mockNext.handle).toHaveBeenCalledTimes(1);
+      expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(1);
+    });
+
+    it('If namespace has empty prefix type accept "tun" prefix', async () => {
+      const mockBody = {
+        namespaceID: 'tun:AA',
+        objectID: '123',
+        datatype: 'botanyspecimen',
+        gatherings: []
+      };
+      const mockRequest = {
+        method: 'POST',
+        body: mockBody
+      }
+
+      const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+        getRequest: () => mockRequest
+      })});
+
+      const mockNext = createMock<CallHandler>();
+
+      await validatorInterceptor.intercept(mockContext, mockNext);
+
+      const req = mockContext.switchToHttp().getRequest();
+      expect(req).toEqual(mockRequest);
+      expect(mockNext.handle).toHaveBeenCalledTimes(1);
+      expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(1);
+    });
+
+    it('If namespace has empty prefix type don\'t accept prefix other than "tun"', async () => {
+      const mockBody = {
+        namespaceID: 'utu:AA',
+        objectID: '123',
+        datatype: 'botanyspecimen',
+        gatherings: []
+      };
+      const mockRequest = {
+        method: 'POST',
+        body: mockBody
+      }
+
+      const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+        getRequest: () => mockRequest
+      })});
+
+      const mockNext = createMock<CallHandler>();
+      expect.assertions(3);
+
+      try {
+        await validatorInterceptor.intercept(mockContext, mockNext);
+      } catch (e) {
+        expect(namespaceService.getNamespaces).toBeCalledTimes(1);
+        expect(e.options).toEqual({namespaceID:{errors:['Unacceptable prefix in namespace, has "utu" but accepts only "tun".']}});
+        expect(mockNext.handle).toBeCalledTimes(0);
+      }
+    });
+
+   it('If prefix not one of the known ones throw error', async () => {
+      const mockBody = {
+        namespaceID: 'test:AA',
+        objectID: '123',
+        datatype: 'botanyspecimen',
+        gatherings: []
+      };
+      const mockRequest = {
+        method: 'POST',
+        body: mockBody
+      }
+
+      const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+        getRequest: () => mockRequest
+      })});
+
+      const mockNext = createMock<CallHandler>();
+      expect.assertions(3);
+
+      try {
+        await validatorInterceptor.intercept(mockContext, mockNext);
+      } catch (e) {
+        expect(namespaceService.getNamespaces).toBeCalledTimes(1);
+        expect(e.options).toEqual({namespaceID:{errors:['Unknown prefix "test" not accepted.']}});
+        expect(mockNext.handle).toBeCalledTimes(0);
+      }
+    });
   });
 });

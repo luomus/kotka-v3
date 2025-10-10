@@ -26,4 +26,8 @@ export class TriplestoreService {
   public delete(resource: string, params = {}) {
     return this.httpService.delete(this.baseUrl + resource, { headers: this.headers, params: Object.assign({}, this.baseParams, params) });
   }
+
+  public namespaces() {
+    return this.httpService.get(process.env['NAMESPACE_URL'])
+  }
 }

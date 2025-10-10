@@ -11,6 +11,7 @@ import { KotkaDocumentObjectFullType, KotkaDocumentObjectType } from '@kotka/sha
 import { ControllerType } from '../shared/decorators/controller-type.decorator';
 import { LajiStoreController } from '../shared/controllers/laji-store.controller';
 import { TriplestoreMapperService } from '@kotka/api/mappers';
+import { SpecimenIdJoinerInterceptor } from './specimen-id-joiner.interceptor';
 import { SpecimenConvertDataToOldFormatInterceptor } from './specimen-convert-data-to-old-format.interceptor';
 
 const type = KotkaDocumentObjectFullType.document;
@@ -21,7 +22,10 @@ const type = KotkaDocumentObjectFullType.document;
   AuthenticateCookieGuard,
   ApiMethodAccessGuard,
 )
-@UseInterceptors(SpecimenConvertDataToOldFormatInterceptor)
+@UseInterceptors(
+  SpecimenConvertDataToOldFormatInterceptor,
+  SpecimenIdJoinerInterceptor,
+)
 export class SpecimenController extends LajiStoreController<Document> {
   constructor(
     private readonly oldKotkaApiService: OldKotkaApiService,
