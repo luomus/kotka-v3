@@ -28,6 +28,6 @@ export class TriplestoreService {
   }
 
   public namespaces() {
-    return this.httpService.get(process.env['NAMESPACE_URL'])
+    return this.httpService.get(process.env['NAMESPACE_URL']);
   }
 }

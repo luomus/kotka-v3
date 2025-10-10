@@ -398,7 +398,7 @@ describe('ValidationInterceptor', () => {
       expect(req).toEqual(mockRequest);
       expect(mockNext.handle).toHaveBeenCalledTimes(1);
       expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(1);
-    })
+    });
 
     it('Unknown namespace for given datatype causes validation error', async () => {
       const mockBody = {
