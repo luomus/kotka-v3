@@ -182,7 +182,7 @@ export class ApiClient {
       | KotkaDocumentObjectType.organization,
     query = '',
   ): Observable<AutocompleteResult[]> {
-    const params = new HttpParams().set('q', query);
+    const params = new HttpParams().set('query', query);
     return this.httpClient.get<AutocompleteResult[]>(
       `${path}${type}/autocomplete`,
       { params },
@@ -219,7 +219,7 @@ export class ApiClient {
   }
 
   getCollectionAutocomplete(query = ''): Observable<AutocompleteResult[]> {
-    const params = new HttpParams().set('q', query);
+    const params = new HttpParams().set('query', query);
     return this.httpClient.get<AutocompleteResult[]>(
       `${path}collection/autocomplete`,
       { params },

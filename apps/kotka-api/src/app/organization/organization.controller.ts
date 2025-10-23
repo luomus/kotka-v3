@@ -59,7 +59,7 @@ export class OrganizationController extends LajiStoreController<Organization> {
   @Get('autocomplete')
   async getAutocomplete(
     @Req() req: any,
-    @Query('q') q = '',
+    @Query('query') query = '',
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
     @Query('onlyOwnOrganizations', new DefaultValuePipe(false),
     ParseBoolPipe) onlyOwnOrganizations: boolean
@@ -70,18 +70,18 @@ export class OrganizationController extends LajiStoreController<Organization> {
       const userOrganizations: string[] = user?.organisation || [];
 
       const body: Record<string, any> = {};
-      const should = q ? {
+      const should = query ? {
         bool: {
           should: [
             {
               term: {
-                id: q
+                id: query
               }
             },
             {
               term: {
                 'fullName.en': {
-                  value: q,
+                  value: query,
                   boost: 4
                 }
               }
@@ -89,14 +89,14 @@ export class OrganizationController extends LajiStoreController<Organization> {
             {
               wildcard: {
                 'fullName.en': {
-                  value: `${q}*`,
+                  value: `${query}*`,
                   boost: 2
                 }
               }
             },
             {
               wildcard: {
-                'fullName.en': `*${q}*`
+                'fullName.en': `*${query}*`
               }
             }
           ],
@@ -111,12 +111,12 @@ export class OrganizationController extends LajiStoreController<Organization> {
         };
 
         set(body, ['query', 'bool', 'must'], [terms]);
-        if (q) body.query.bool.must.push(should);
-      } else if (q) {
+        if (query) body.query.bool.must.push(should);
+      } else if (query) {
         set(body, ['query'], should);
       }
 
-      const params = {sort: q ? '_score desc': 'fullName.en', limit, fields: 'id,fullName.en'};
+      const params = {sort: query ? '_score desc': 'fullName.en', limit, fields: 'id,fullName.en'};
       const res = await lastValueFrom(this.lajiStoreService.search<Organization>(type, body, params));
 
       return res.data.member.map(data => ({

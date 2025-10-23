@@ -41,23 +41,23 @@ export class DatasetController extends LajiStoreController<Dataset> {
 
   @Get('autocomplete')
   async getAutocomplete(
-    @Query('q') q = '',
+    @Query('query') query = '',
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number
   ) {
     try {
-      const body = q ? {
+      const body = query ? {
         query: {
           bool: {
             should: [
               {
                 term: {
-                  id: `${q}`
+                  id: `${query}`
                 }
               },
               {
                 term: {
                   'datasetName.en': {
-                    value: q,
+                    value: query,
                     boost: 4
                   }
                 }
@@ -65,14 +65,14 @@ export class DatasetController extends LajiStoreController<Dataset> {
               {
                 wildcard: {
                   'datasetName.en': {
-                    value: `${q}*`,
+                    value: `${query}*`,
                     boost: 2
                   }
                 }
               },
               {
                 wildcard: {
-                  'datasetName.en': `*${q}*`
+                  'datasetName.en': `*${query}*`
                 }
               }
             ]
@@ -80,7 +80,7 @@ export class DatasetController extends LajiStoreController<Dataset> {
         }
       } : {};
 
-      const params = {sort: q ? '_score desc': 'datasetName.en', page_size: limit, fields: 'id,datasetName.en'};
+      const params = {sort: query ? '_score desc': 'datasetName.en', page_size: limit, fields: 'id,datasetName.en'};
       const res = await lastValueFrom(this.lajiStoreService.search<Dataset>(type, body, params));
 
       return res.data.member.map(data => ({

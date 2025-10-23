@@ -21,7 +21,7 @@ export class CollectionController {
   ) {}
 
   @Get('autocomplete')
-  async getCollectionAutocomplete(@Query('q') query = '', @Query('limit', new DefaultValuePipe('10'), ParseIntPipe) limit = 10) {
+  async getCollectionAutocomplete(@Query('query') query = '', @Query('limit', new DefaultValuePipe('10'), ParseIntPipe) limit = 10) {
     const jsonData = await this.oldKotkaDataService.getAllCollections();
     return this.autocompleteService.getAutocompleteResults(jsonData, 'collectionName.en', query, limit);
   }
