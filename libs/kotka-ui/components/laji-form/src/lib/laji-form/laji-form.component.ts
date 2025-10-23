@@ -44,6 +44,7 @@ export class LajiFormComponent<T extends FormData = FormData>
   mediaMetadata = input<MediaMetadata>();
   hiddenFields = input<string[]>();
   additionalClassNames = input<Record<string, string>>();
+  confirmFieldDelete = input<boolean>();
 
   showFooter = input(true);
   showDeleteButton = input<boolean>();
@@ -85,7 +86,7 @@ export class LajiFormComponent<T extends FormData = FormData>
       const state = {
         schema: form.schema,
         uiSchema: this.getUiSchema(form, this.disabled(), this.hiddenFields()),
-        uiSchemaContext: this.getUiSchemaContext(form, this.editMode(), this.additionalClassNames()),
+        uiSchemaContext: this.getUiSchemaContext(form, this.editMode(), this.additionalClassNames(), this.confirmFieldDelete()),
         formData: this.formData(),
         mediaMetadata: this.mediaMetadata(),
         validators: form.validators,
@@ -195,7 +196,7 @@ export class LajiFormComponent<T extends FormData = FormData>
             theme: this.lajiFormTheme,
             schema: form.schema,
             uiSchema: this.getUiSchema(form, this.disabled(), this.hiddenFields()),
-            uiSchemaContext: this.getUiSchemaContext(form, this.editMode(), this.additionalClassNames()),
+            uiSchemaContext: this.getUiSchemaContext(form, this.editMode(), this.additionalClassNames(), this.confirmFieldDelete()),
             formData: this.formData(),
             validators: form.validators,
             warnings: form.warnings,
@@ -248,11 +249,12 @@ export class LajiFormComponent<T extends FormData = FormData>
     return { ...uiSchema, 'ui:readonly': disabled };
   }
 
-  private getUiSchemaContext(form: LajiFormModel.SchemaForm, isEdit: boolean | undefined, additionalClassNames: Record<string, string> | undefined) {
+  private getUiSchemaContext(form: LajiFormModel.SchemaForm, isEdit: boolean | undefined, additionalClassNames: Record<string, string> | undefined, confirmFieldDelete: boolean | undefined) {
     return {
       ...form.uiSchemaContext,
       isEdit,
-      additionalClassNames
+      additionalClassNames,
+      confirmDelete: confirmFieldDelete
     };
   }
 

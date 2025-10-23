@@ -65,6 +65,7 @@ export class FormViewComponent<
 
   hiddenFields = input<string[]>();
   additionalClassNames = input<Record<string, string>>();
+  confirmFieldDelete = input<boolean>();
 
   title = input<string>();
   allowCopy = input<boolean>();
