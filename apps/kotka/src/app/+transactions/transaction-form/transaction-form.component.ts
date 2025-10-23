@@ -78,7 +78,7 @@ export class TransactionFormComponent
     this.mediaMetadata = computed(() => ({
       intellectualRights: 'MZ.intellectualRightsARR',
       intellectualOwner: this.owner() || '',
-      capturerVerbatim: this.userName() || '',
+      capturerVerbatim: this.userName(),
       publicityRestrictions: 'MZ.publicityRestrictionsPrivate',
     }));
   }

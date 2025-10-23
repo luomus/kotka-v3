@@ -138,7 +138,6 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
       documentURI: this.dataURI() ? [this.dataURI()] : undefined,
       intellectualRights: 'MZ.intellectualRightsCC-BY-SA-4.0',
       intellectualOwner: 'Luomus',
-      capturerVerbatim: '',
       publicityRestrictions: 'MZ.publicityRestrictionsPublic'
     }));
 
