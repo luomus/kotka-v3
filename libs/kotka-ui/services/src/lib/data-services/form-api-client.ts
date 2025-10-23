@@ -52,8 +52,6 @@ export class FormApiClient {
       headers?: { [header: string]: string | string[] };
     },
   ): Promise<unknown> {
-    const queryParameters = { ...query, includePersonToken: true };
-
     if (!options) {
       options = {};
     }
@@ -93,7 +91,7 @@ export class FormApiClient {
     return this.httpClient
       .request(options['method'] || 'GET', path, {
         headers: { ...options['headers'], timeout: '120000' },
-        params: queryParameters,
+        params: query,
         body: options['body'] || undefined,
         observe: 'response',
       })
