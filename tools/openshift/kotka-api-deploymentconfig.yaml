@@ -107,6 +107,11 @@ spec:
                 secretKeyRef:
                   name: kotka-secret
                   key: OLD_KOTKA_AUTH
+            - name: NAMESPACE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: kotka-config
+                  key: NAMESPACE_URL
           resources: {}
           imagePullPolicy: Always
       restartPolicy: Always
