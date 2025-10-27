@@ -102,7 +102,7 @@ export class LajiApiController {
     }
   }
 
-  private pathRewrite(path: string, req: UserRequest): string {
+  private pathRewrite(path: string): string {
     return path.replace(this.lajiApiBase, '');
   }
 
