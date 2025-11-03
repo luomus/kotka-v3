@@ -64,7 +64,7 @@ export class OrganizationController extends LajiStoreController<Organization> {
     @Query('onlyOwnOrganizations', new DefaultValuePipe(false),
     ParseBoolPipe) onlyOwnOrganizations: boolean
   ) {
-     try {
+    try {
       const user: Person|undefined = req.user?.profile;
       const userRoles: string[] = user?.role || [];
       const userOrganizations: string[] = user?.organisation || [];

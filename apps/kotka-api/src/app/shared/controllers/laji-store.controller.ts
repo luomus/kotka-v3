@@ -28,6 +28,7 @@ import { DateInterceptor } from '../interceptors/date.interceptor';
 import { ValidatorInterceptor } from '../interceptors/validator.interceptor';
 import { createPatch } from 'rfc6902';
 import { MediaIntellectualOwnerInterceptor } from '../interceptors/media-intellectual-owner.interceptor';
+import { PostIDExistsInterceptor } from '../interceptors/post-id-exists.interceptor';
 
 export abstract class LajiStoreController<T extends StoreObject> {
   constructor (
@@ -51,7 +52,7 @@ export abstract class LajiStoreController<T extends StoreObject> {
     }
   }
 
-  @UseInterceptors(UserInterceptor, DateInterceptor, ValidatorInterceptor, MediaIntellectualOwnerInterceptor)
+  @UseInterceptors(UserInterceptor, DateInterceptor, ValidatorInterceptor, MediaIntellectualOwnerInterceptor, PostIDExistsInterceptor)
   @Post()
   async post(@Req() req, @Body() body: T) {
     try {
