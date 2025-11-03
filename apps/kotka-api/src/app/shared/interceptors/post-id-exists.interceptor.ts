@@ -24,7 +24,6 @@ export class PostIDExistsInterceptor implements NestInterceptor {
   async intercept(context: ExecutionContext, next: CallHandler): Promise<any> {
     const req = context.switchToHttp().getRequest();
 
-    console.log(req.body)
     if (req.body.id === undefined) {
         return next.handle();
     }
