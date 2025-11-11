@@ -17,6 +17,7 @@ enum ResourceType {
   getCollectionResource,
   validateResource,
   pdfResource,
+  imageResource,
   other,
 }
 
@@ -31,6 +32,7 @@ const pathStartsWith: Record<string, ResourceType> = {
   '/organization/by-id': ResourceType.getOrganizationResource,
   '/collection/by-id': ResourceType.getCollectionResource,
   '/pdf': ResourceType.pdfResource,
+  '/images': ResourceType.imageResource
 };
 
 @Injectable({
@@ -78,9 +80,7 @@ export class FormApiClient {
         path = apiBase + '/validate';
         break;
       case ResourceType.pdfResource:
-        if (options.method === 'DELETE') {
-          return Promise.resolve({ json: () => '' });
-        }
+      case ResourceType.imageResource:
         path = apiBase + `/media${resource}`;
         break;
       default:

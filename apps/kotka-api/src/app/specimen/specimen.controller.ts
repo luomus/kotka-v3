@@ -13,6 +13,7 @@ import { LajiStoreController } from '../shared/controllers/laji-store.controller
 import { TriplestoreMapperService } from '@kotka/api/mappers';
 import { SpecimenIdJoinerInterceptor } from './specimen-id-joiner.interceptor';
 import { SpecimenConvertDataToOldFormatInterceptor } from './specimen-convert-data-to-old-format.interceptor';
+import { SpecimenImageInterceptor } from './specimen-image.interceptor';
 
 const type = KotkaDocumentObjectFullType.document;
 
@@ -25,6 +26,7 @@ const type = KotkaDocumentObjectFullType.document;
 @UseInterceptors(
   SpecimenConvertDataToOldFormatInterceptor,
   SpecimenIdJoinerInterceptor,
+  SpecimenImageInterceptor,
 )
 export class SpecimenController extends LajiStoreController<Document> {
   constructor(

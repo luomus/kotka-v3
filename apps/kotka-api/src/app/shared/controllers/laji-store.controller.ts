@@ -7,6 +7,7 @@ import { lastValueFrom } from 'rxjs';
 import { LajiStoreService, TriplestoreService } from '@kotka/api/services';
 import { TriplestoreMapperService } from '@kotka/api/mappers';
 import {
+  BadRequestException,
   Body,
   Delete,
   Get,
@@ -28,7 +29,8 @@ import { DateInterceptor } from '../interceptors/date.interceptor';
 import { ValidatorInterceptor } from '../interceptors/validator.interceptor';
 import { createPatch } from 'rfc6902';
 import { MediaIntellectualOwnerInterceptor } from '../interceptors/media-intellectual-owner.interceptor';
-import { PostIDExistsInterceptor } from '../interceptors/post-id-exists.interceptor';
+
+const existingErrorRegex = /^POST input body must not contain IDs for existing documents, found: \S+.$/
 
 export abstract class LajiStoreController<T extends StoreObject> {
   constructor (
@@ -52,7 +54,7 @@ export abstract class LajiStoreController<T extends StoreObject> {
     }
   }
 
-  @UseInterceptors(UserInterceptor, DateInterceptor, ValidatorInterceptor, MediaIntellectualOwnerInterceptor, PostIDExistsInterceptor)
+  @UseInterceptors(UserInterceptor, DateInterceptor, ValidatorInterceptor, MediaIntellectualOwnerInterceptor)
   @Post()
   async post(@Req() req, @Body() body: T) {
     try {
@@ -72,6 +74,11 @@ export abstract class LajiStoreController<T extends StoreObject> {
       return res.data;
     } catch (err) {
       console.error(err);
+      const message = err.response?.data?.message;
+
+      if (err.status === 400 && message && existingErrorRegex.test(message)) {
+        throw new BadRequestException(err.message)
+      }
       throw new InternalServerErrorException(err.message);
     }
   }

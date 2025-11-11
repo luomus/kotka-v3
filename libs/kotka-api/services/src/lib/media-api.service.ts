@@ -8,7 +8,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import FormData from 'form-data';
 import { merge } from 'lodash';
 import { catchError, map } from 'rxjs';
-import { Person, Image } from '@kotka/shared/models';
+import { Person, Image, Pdf } from '@kotka/shared/models';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Multer } from 'multer';
 import { Request, Response } from 'express';
@@ -26,20 +26,21 @@ export type NewMediaFile = {
 }
 
 export type Meta = {
+  id?: string,
   license: Image['intellectualRights'],
   rightsOwner: string,
   secret?: boolean,
   capturers?: string[],
-  captureDateTime?: string,
+  captureDateTime?: number,
   uploadedBy?: string,
   originalFilename?: string,
-  documentId?: string,
+  documentIds?: string[],
   tags?: string[],
   identifications?: Identifications,
   primaryForTaxon?: string[],
   caption?: string,
   taxonDescriptionCaption?: {
-    en: string,
+    en?: string,
     fi?: string,
     sv?: string,
   }
@@ -48,7 +49,7 @@ export type Meta = {
   plantLifeStage?: string[],
   type?: string[],
   sortOrder?: number,
-  uploadedDateTime?: string,
+  uploadDateTime?: number,
   sourceSystem?: string,
 }
 
@@ -102,7 +103,11 @@ export class MediaApiService {
         'content-length': req.headers['content-length'],
       }
     }, this.baseConfig), (response) => {
-      response.pipe(res);
+      const headers = new Headers({
+        'content-type': response.headers['content-type'],
+        'content-length': response.headers['content-length']
+      });
+      response.pipe(res.setHeaders(headers));
     });
 
     req.pipe(proxy);
@@ -137,9 +142,29 @@ export class MediaApiService {
       map(res => res.data),
       catchError(e => {
         console.error(e);
-        throw new InternalServerErrorException('Getting media from Media-API', e.message);
+        throw new InternalServerErrorException('Error getting media from Media-API', e.message);
       })
     );
+  }
+
+  findMediaByDocumentId(id: string, type: string) {
+    return this.httpService.get<Meta[]>(`${this.urlBase}api/${type}`, {...this.baseConfig, params: { documentIds: id }}).pipe(
+      map(res => res.data),
+      catchError(e => {
+        console.error(e);
+        throw new InternalServerErrorException('Error searching for media from Media-API', e.message);
+      })
+    );
+  }
+
+  deleteMedia(id: string, type: string) {
+    return this.httpService.delete(`${this.urlBase}api/${type}/${id}`, this.baseConfig).pipe(
+      map(res => res.data),
+      catchError(e => {
+        console.error(e);
+        throw new InternalServerErrorException('Error deleting media from Media-API', e.message);
+      })
+    )
   }
 
   postMetadata(type: string, meta: NewMediaFile[]) {
@@ -161,17 +186,39 @@ export class MediaApiService {
     );
   }
 
-  mediaToMeta(profile: Person, media: Image, current?: Meta): Meta {
+  typeToMeta(type: string, profile: Person, media: Image | Pdf): Meta {
+    switch (type) {
+      case 'pdf':
+        return this.pdfToMeta(profile, media as Pdf)
+      case 'images':
+        return this.imageToMeta(profile, media as Image)
+      default:
+        return;
+    }
+  }
+  imageToMeta(profile: Person, media: Image, current?: Meta): Meta {
+    return {
+      ...this.mediaToMeta(profile, media, current),
+      capturers: media.capturerVerbatim,
+      captureDateTime: media.captureDateTime ? new Date(media.captureDateTime).getTime() : undefined,
+      taxonDescriptionCaption: media.taxonDescriptionCaption,
+      sortOrder: media.sortOrder || current?.sortOrder,
+    };
+  }
+
+  pdfToMeta(profile: Person, media: Pdf, current?: Meta): Meta {
+    return this.mediaToMeta(profile, media, current);
+  }
+
+  mediaToMeta(profile: Person, media: Image | Pdf, current?: Meta): Meta {
     return {
       ...(current || {}),
-      capturers: media.capturerVerbatim,
+      documentIds: media.documentURI,
       rightsOwner: media.intellectualOwner,
       license: media.intellectualRights,
       caption: media.caption,
-      captureDateTime: media.captureDateTime,
       tags: media.keyword,
       uploadedBy: current?.uploadedBy || profile.id,
-      sortOrder: media.sortOrder || current?.sortOrder,
       secret: (media.publicityRestrictions && media.publicityRestrictions !== 'MZ.publicityRestrictionsPublic') || false
     };
   }
@@ -180,24 +227,17 @@ export class MediaApiService {
     switch (type) {
       case 'pdf':
         return this.metaToPDF(media);
+      case 'images':
+        return this.metaToImage(media);
       default:
         return;
     }
   }
 
-  metaToPDF(media: Media) {
-    const { meta, secretKey } = media;
-
-    const urls: Urls = {...media.urls};
-    Object.keys(urls).forEach((key: string) => {
-      if (urls[key as keyof Urls]) {
-        urls[key as keyof Urls] = urls[key as keyof Urls] + '?secret=' + secretKey;
-      }
-    });
-
+  metaToMedia<T extends Image | Pdf>(meta: Meta, urls: Urls): T{
     return {
       caption: meta.caption,
-      documentURI: meta.documentId ? [ meta.documentId ] : [],
+      documentURI: meta.documentIds,
       fullURL: urls.full,
       intellectualOwner: meta.rightsOwner,
       intellectualRights: meta.license,
@@ -205,13 +245,43 @@ export class MediaApiService {
       largeURL: urls.large,
       originalFilename: meta.originalFilename,
       originalURL: urls.original,
-      pdfUrl: urls.pdf,
       publicityRestrictions: meta.secret ? 'MZ.publicityRestrictionsPrivate' : 'MZ.publicityRestrictionsPublic',
       sourceSystem: meta.sourceSystem,
       squareThumbnailURL: urls.square,
+      taxonDescriptionCaption: meta.taxonDescriptionCaption,
       thumbnailURL: urls.thumbnail,
-      uploadDateTime: meta.uploadedDateTime,
+      uploadDateTime: meta.uploadDateTime ? new Date(meta.uploadDateTime * 1000).toISOString() : undefined,
       uploadedBy: meta.uploadedBy,
+    } as T;
+  }
+
+  metaToImage(media: Media): Image {
+    const { id, meta, urls } = media;
+
+    return {
+      id,
+      ...this.metaToMedia<Image>(meta, urls),
+      capturerVerbatim: meta.capturers,
+      captureDateTime: meta.captureDateTime ? new Date(meta.captureDateTime * 1000).toISOString() : undefined,
+      taxonDescriptionCaption: meta.taxonDescriptionCaption,
+      sortOrder: meta.sortOrder,
+    }
+  }
+
+
+  metaToPDF(media: Media): Pdf {
+    const { id, meta, urls, secretKey } = media;
+
+    Object.keys(urls).forEach((key: string) => {
+      if (urls[key as keyof Urls]) {
+        urls[key as keyof Urls] = urls[key as keyof Urls] + '?secret=' + secretKey;
+      }
+    });
+
+    return {
+      id,
+      ...this.metaToMedia(meta, urls),
+      pdfURL: urls.pdf
     };
   }
 }

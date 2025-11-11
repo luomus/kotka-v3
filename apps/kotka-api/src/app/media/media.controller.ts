@@ -2,11 +2,11 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { BadRequestException, Body, Controller, Get, Param, Post, Put, Req, Res, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Req, Res, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
 import { MediaApiService, NewMediaFile } from '@kotka/api/services';
 import { map } from 'rxjs';
-import { Image } from '@luomus/laji-schema';
+import { Image, Pdf } from '@luomus/laji-schema';
 import { MediaAccessInterceptor } from '../shared/interceptors/media-access.interceptor';
 import { ErrorMessages } from '@kotka/shared/models';
 
@@ -23,7 +23,7 @@ export class MediaController {
   }
 
   @Post(':type/:tempId')
-  postMetadata(@Req() request, @Param('type') type: string, @Param('tempId') tempId: string, @Body() body: Image) {
+  postMetadata(@Req() request, @Param('type') type: string, @Param('tempId') tempId: string, @Body() body: Image | Pdf) {
     if (!body.intellectualOwner) {
       throw new BadRequestException(ErrorMessages.missingIntellectualOwner);
     }
@@ -31,17 +31,26 @@ export class MediaController {
     const newMedia: NewMediaFile[] = [
       {
         tempFileId: tempId,
-        meta: this.mediaService.mediaToMeta(profile, body)
+        meta: this.mediaService.typeToMeta(type, profile, body)
       }
     ];
-
-    return this.mediaService.postMetadata(type, newMedia).pipe(map(data => data[0]));
+    return this.mediaService.postMetadata(type, newMedia).pipe(
+      map(data => data[0]),
+      map(data => this.mediaService.metaToType(type, data))
+    );
   }
 
   @UseInterceptors(MediaAccessInterceptor)
   @Get(':type/:id')
   getMedia(@Param('type') type: string, @Param('id') id: string) {
     return this.mediaService.getMedia(id, type).pipe(map(data => this.mediaService.metaToType(type, data)));
+  }
+
+  @UseInterceptors(MediaAccessInterceptor)
+  @Delete(':type/:id')
+  @HttpCode(204)
+  deleteMedia(@Param('type') type: string, @Param('id') id: string) {
+    return this.mediaService.deleteMedia(id, type)
   }
 
   @UseInterceptors(MediaAccessInterceptor)

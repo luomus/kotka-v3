@@ -31,7 +31,8 @@ export interface StoreQueryResult<T> {
 export enum ErrorMessages {
   deletionTargetInUse = 'Deletion target is in use.',
   missingIntellectualOwner = 'Missing an intellectualOwner',
-  loginRequired = 'Login is required'
+  loginRequired = 'Login is required',
+  uniqueIDRequired = 'Object must have an unique id, but given exists already.'
 }
 
 export interface LoginResult {

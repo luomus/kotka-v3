@@ -19,13 +19,13 @@ export class SpecimenIdJoinerInterceptor implements NestInterceptor {
     if (req.method !== 'POST') {
       return next.handle();
     }
-  
+
     const {namespaceID, objectID, ...body} = req.body as (Document & { namespaceID: string, objectID: string });
 
     if (!namespaceID && !objectID) {
       return next.handle();
     }
-    
+
     if (namespaceID && !objectID) throw new HttpException('objectID must be set if namespaceID is set', HttpStatus.BAD_REQUEST);
     if (!namespaceID && objectID) throw new HttpException('namespaceID must be set if objectID is set', HttpStatus.BAD_REQUEST);
 

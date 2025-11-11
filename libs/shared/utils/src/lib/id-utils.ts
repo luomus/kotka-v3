@@ -1,5 +1,6 @@
 const defaultDomain = 'http://tun.fi/';
 const domainMap: Record<string, string> = {
+  'tun:': defaultDomain,
   'luomus:': 'http://id.luomus.fi/',
   'zmuo:': 'http://id.zmuo.oulu.fi/',
   'herbo:': 'http://id.herb.oulu.fi/',
