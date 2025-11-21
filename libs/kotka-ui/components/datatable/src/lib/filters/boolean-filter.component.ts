@@ -3,11 +3,11 @@ import { FormsModule } from '@angular/forms';
 import { LabelPipe } from '@kotka/ui/pipes';
 import { IFilterAngularComp } from '@ag-grid-community/angular';
 import { IFilterParams } from '@ag-grid-community/core';
-import { NgForOf } from '@angular/common';
+
 import { BooleanFilterModel } from '../models/models';
 
 @Component({
-  imports: [FormsModule, NgForOf, LabelPipe],
+  imports: [FormsModule, LabelPipe],
   template: `
     <div class="ag-filter-wrapper">
       <div class="ag-filter-body-wrapper ag-simple-filter-body-wrapper">
@@ -16,18 +16,19 @@ import { BooleanFilterModel } from '../models/models';
             class="ag-picker-field-wrapper"
             [(ngModel)]="value"
             (ngModelChange)="updateFilter()"
-          >
-            <option
-              *ngFor="let option of [undefined, true, false]"
-              [ngValue]="option"
             >
-              {{ option | label }}
-            </option>
+            @for (option of [undefined, true, false]; track option) {
+              <option
+                [ngValue]="option"
+                >
+                {{ option | label }}
+              </option>
+            }
           </select>
         </div>
       </div>
     </div>
-  `,
+    `,
 })
 export class BooleanFilterComponent implements IFilterAngularComp {
   params!: IFilterParams;

@@ -1,4 +1,4 @@
-import { ComponentRef, Inject, Injectable, Type } from '@angular/core';
+import { ComponentRef, Injectable, Type, DOCUMENT, inject } from '@angular/core';
 import * as FileSaver from 'file-saver';
 import { Observable, of, switchMap } from 'rxjs';
 import { map, take } from 'rxjs/operators';
@@ -6,7 +6,7 @@ import { ApiClient } from '../api-client';
 import { HttpClient } from '@angular/common/http';
 import { ComponentService } from '../../util-services';
 import { PdfBaseComponent } from './pdf-base.component';
-import { DOCUMENT } from '@angular/common';
+
 
 export interface PdfTemplateComponent {
   context?: unknown;
@@ -17,12 +17,11 @@ export interface PdfTemplateComponent {
   providedIn: 'root',
 })
 export class PdfService {
-  constructor(
-    @Inject(DOCUMENT) private document: Document,
-    private apiClient: ApiClient,
-    private httpClient: HttpClient,
-    private componentService: ComponentService,
-  ) {}
+  private document = inject<Document>(DOCUMENT);
+  private apiClient = inject(ApiClient);
+  private httpClient = inject(HttpClient);
+  private componentService = inject(ComponentService);
+
 
   downloadSheet<T extends PdfTemplateComponent>(
     componentClass: Type<T>,

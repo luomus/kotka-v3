@@ -2,12 +2,14 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  HostListener, Inject,
+  HostListener,
   input,
-  output
+  output,
+  inject,
+  DOCUMENT
 } from '@angular/core';
 import { Document as KotkaDocument, LajiForm } from '@kotka/shared/models';
-import { DOCUMENT, NgClass } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { JSONPointerToId, parseSchemaFromFormDataPointer } from '@luomus/laji-form/lib/utils';
 import { getEnumValue } from '@kotka/ui/services';
 import { getUri } from '@kotka/shared/utils';
@@ -49,9 +51,7 @@ export class SpecimenFormNavComponent {
     ),
   );
 
-  constructor(
-    @Inject(DOCUMENT) private document: Document
-  ) {}
+  private document = inject(DOCUMENT);
 
   @HostListener('window:scroll', [])
   onScroll() {

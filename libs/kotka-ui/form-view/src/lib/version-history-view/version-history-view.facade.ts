@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { ApiClient, FormService, startWithUndefined } from '@kotka/ui/services';
 import {
   catchError,
@@ -73,6 +73,9 @@ export class VersionHistoryViewFacade<
   T extends KotkaDocumentObjectType,
   S extends KotkaDocumentObjectMap[T],
 > {
+  private formService = inject(FormService);
+  private apiClient = inject(ApiClient);
+
   versionList$: Observable<StoreVersion[] | undefined>;
   form$: Observable<LajiForm.SchemaForm | undefined>;
   jsonForm$: Observable<LajiForm.JsonForm | undefined>;
@@ -83,10 +86,7 @@ export class VersionHistoryViewFacade<
 
   private inputs$ = new ReplaySubject<VersionHistoryInputs<T>>(1);
 
-  constructor(
-    private formService: FormService,
-    private apiClient: ApiClient,
-  ) {
+  constructor() {
     this.versionList$ = this.getVersionList$();
     this.form$ = this.getForm$();
     this.jsonForm$ = this.getFormInJsonFormat$();

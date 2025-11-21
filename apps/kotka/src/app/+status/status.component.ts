@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { StatusService } from './status.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -17,9 +17,9 @@ import { AsyncPipe } from '@angular/common';
 export class StatusComponent {
   status$: Observable<string>;
 
-  constructor(
-    statusService: StatusService
-  ) {
+  constructor() {
+    const statusService = inject(StatusService);
+
     this.status$ = statusService.getApiStatus().pipe(
       map(status => status.status)
     );

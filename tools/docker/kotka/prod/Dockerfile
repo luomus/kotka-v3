@@ -9,7 +9,7 @@ RUN chown -Rh node:node /app
 USER node
 
 # Copy the things that are needed for installing node_modules
-COPY --chown=node:node ./package*.json ./decorate-angular-cli.js ./
+COPY --chown=node:node ./package*.json ./
 
 RUN npm ci \
  && npm cache clean --force

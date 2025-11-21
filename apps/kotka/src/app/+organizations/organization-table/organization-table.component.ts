@@ -1,7 +1,7 @@
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component,
+  Component, inject,
   OnDestroy,
   OnInit
 } from '@angular/core';
@@ -150,10 +150,10 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
   private nameFilterChangedSubject = new Subject<void>();
   private updateSearchQuerySub?: Subscription;
 
-  constructor(
-    private dataService: DatatableDataService,
-    private cdr: ChangeDetectorRef,
-  ) {
+  private dataService = inject(DatatableDataService);
+  private cdr = inject(ChangeDetectorRef);
+
+  constructor() {
     const multiLangNameFields: (keyof Organization)[] = [
       'organizationLevel1',
       'organizationLevel2',

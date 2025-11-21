@@ -1,13 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
 import { AutocompleteResult } from '@kotka/shared/models';
 import {
   debounceTime,
@@ -46,6 +37,8 @@ export type FetchAutocompleteResultsFunc = (
   imports: [FormsModule, NgbTypeahead],
 })
 export class AutocompleteComponent implements OnChanges {
+  private cdr = inject(ChangeDetectorRef);
+
   @Input() value?: string;
   @Input({ required: true }) fetchResultsFunc!: FetchAutocompleteResultsFunc;
   @Input() inputClassName = 'form-control';
@@ -55,8 +48,6 @@ export class AutocompleteComponent implements OnChanges {
   typeaheadValue: string | AutocompleteResult = '';
 
   @Output() valueChange = new EventEmitter<string | undefined>();
-
-  constructor(private cdr: ChangeDetectorRef) {}
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['value']) {

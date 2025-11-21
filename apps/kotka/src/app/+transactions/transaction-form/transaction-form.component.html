@@ -16,7 +16,7 @@
   (saveSuccess)="onSaveSuccess($event)"
   (deleteSuccess)="onDeleteSuccess()"
   (copyData)="onCopyData($event)"
->
+  >
 </kotka-form-view>
 
 <ng-template #headerTpl let-editMode="editMode" let-dataURI="dataURI" let-formData="formData">
@@ -25,7 +25,9 @@
       Add transaction {{ dataURI }}
     } @else {
       Edit transaction {{ dataURI }}
-      <ng-container *ngIf="formData?.legacyID as legacyID">({{ legacyID }})</ng-container>
+      @if (formData?.legacyID; as legacyID) {
+        ({{ legacyID }})
+      }
     }
   </h1>
 </ng-template>
@@ -33,10 +35,11 @@
 <ng-template #metaFieldsContainer let-metaFieldsTpl>
   <div class="row">
     <div class="col-lg-6 col-md-5 col-sm-4 col-12 order-sm-last">
-      <kotka-transaction-pdf-sheets
-        *ngIf="isSpecimenTransaction(formData)"
-        [data]="formData">
-      </kotka-transaction-pdf-sheets>
+      @if (isSpecimenTransaction(formData)) {
+        <kotka-transaction-pdf-sheets
+          [data]="formData">
+        </kotka-transaction-pdf-sheets>
+      }
     </div>
     <div class="col-lg-6 col-md-7 col-sm-8 col-12 order-sm-first">
       <ng-container *ngTemplateOutlet="metaFieldsTpl"></ng-container>

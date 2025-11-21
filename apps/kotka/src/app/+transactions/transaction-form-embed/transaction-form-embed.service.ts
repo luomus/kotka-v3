@@ -1,4 +1,4 @@
-import { ComponentRef, Injectable, Injector } from '@angular/core';
+import { ComponentRef, inject, Injectable, Injector } from '@angular/core';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { SpecimenTransaction } from '@kotka/shared/models';
 import { OrganizationAddressEmbedComponent } from './organization-address-embed';
@@ -15,10 +15,7 @@ export class TransactionFormEmbedService {
   private permitsInfoRef?: ComponentRef<PermitsInfoEmbedComponent>;
   private specimenRangeSelectRef?: ComponentRef<SpecimenRangeSelectEmbedComponent>;
 
-  constructor(
-    private injector: Injector
-  ) {}
-
+  private injector = inject(Injector);
 
   initEmbeddedComponents(lajiFormComponent: LajiFormComponent, formData?: Partial<SpecimenTransaction>) {
     const lajiFormEmbedService = new LajiFormEmbedService(this.injector, lajiFormComponent);

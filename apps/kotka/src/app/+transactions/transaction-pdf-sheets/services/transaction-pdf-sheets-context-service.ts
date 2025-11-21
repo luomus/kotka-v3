@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { ApiClient, FormService } from '@kotka/ui/services';
 import { Organization, SpecimenTransaction } from '@luomus/laji-schema';
 import { KotkaDocumentObjectType, LajiForm } from '@kotka/shared/models';
@@ -26,10 +26,8 @@ export interface TransactionBotanyShelfSlipContext {
   providedIn: 'root',
 })
 export class TransactionPdfSheetsContextService {
-  constructor(
-    private apiClient: ApiClient,
-    private formService: FormService,
-  ) {}
+  private apiClient = inject(ApiClient);
+  private formService = inject(FormService);
 
   getSheetContext(
     data: SpecimenTransaction,

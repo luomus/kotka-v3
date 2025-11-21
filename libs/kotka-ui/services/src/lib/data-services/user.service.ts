@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, catchError, Observable, of, switchMap } from 'rxjs';
 import { map, tap, distinctUntilChanged, share, take } from 'rxjs/operators';
 import { Person } from '@kotka/shared/models';
@@ -21,6 +21,9 @@ let _state: IUserServiceState = {
   providedIn: 'root',
 })
 export class UserService {
+  private window = inject<Window>('Window' as any);
+  private apiClient = inject(ApiClient);
+
   private store = new BehaviorSubject<IUserServiceState>(_state);
   private state$ = this.store.asObservable();
 
@@ -30,10 +33,7 @@ export class UserService {
   );
   isLoggedIn$: Observable<boolean>;
 
-  constructor(
-    @Inject('Window') private window: Window,
-    private apiClient: ApiClient,
-  ) {
+  constructor() {
     const profile$ = this.getSessionProfile().pipe(share());
 
     this.isLoggedIn$ = this.state$.pipe(

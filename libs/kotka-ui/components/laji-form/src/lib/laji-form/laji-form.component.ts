@@ -1,22 +1,10 @@
-import {
-  Component,
-  ViewChild,
-  ElementRef,
-  AfterViewInit,
-  OnDestroy,
-  NgZone,
-  ChangeDetectorRef,
-  Inject,
-  input,
-  output,
-  effect
-} from '@angular/core';
+import { Component, ViewChild, ElementRef, AfterViewInit, OnDestroy, NgZone, ChangeDetectorRef, input, output, effect, DOCUMENT, inject } from '@angular/core';
 import LajiForm from '@luomus/laji-form/lib/index';
 import { Theme as LajiFormTheme } from '@luomus/laji-form/lib/themes/theme';
 import { scrollIntoViewIfNeeded, uiSchemaJSONPointer, updateSafelyWithJSONPointer } from '@luomus/laji-form/lib/utils';
 import { LajiForm as LajiFormModel } from '@kotka/shared/models';
 import { combineLatest } from 'rxjs';
-import { CommonModule, DOCUMENT } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { MediaMetadata } from '@luomus/laji-form/lib/components/LajiForm';
 import { Logger, ToastService } from '@kotka/ui/services';
 import { FormApiClient } from '@kotka/ui/services';
@@ -33,6 +21,13 @@ type FormData = Record<string, any>;
 export class LajiFormComponent<T extends FormData = FormData>
   implements AfterViewInit, OnDestroy
 {
+  private document = inject<Document>(DOCUMENT);
+  private apiClient = inject(FormApiClient);
+  private notifier = inject(ToastService);
+  private logger = inject(Logger);
+  private ngZone = inject(NgZone);
+  private cdr = inject(ChangeDetectorRef);
+
   static TOP_OFFSET = 0;
   static BOTTOM_OFFSET = 50;
   form = input<LajiFormModel.SchemaForm | null>(null);
@@ -69,14 +64,7 @@ export class LajiFormComponent<T extends FormData = FormData>
 
   @ViewChild('lajiForm', { static: true }) lajiFormRoot!: ElementRef;
 
-  constructor(
-    @Inject(DOCUMENT) private document: Document,
-    private apiClient: FormApiClient,
-    private notifier: ToastService,
-    private logger: Logger,
-    private ngZone: NgZone,
-    private cdr: ChangeDetectorRef,
-  ) {
+  constructor() {
     effect(() => {
       if (!this.form()) {
         return;

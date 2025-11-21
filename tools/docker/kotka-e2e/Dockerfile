@@ -9,7 +9,7 @@ WORKDIR /app
 RUN chown -Rh node:node /app
 # USER node
 
-COPY --chown=node:node ./decorate-angular-cli.js ./package*.json ./
+COPY --chown=node:node ./package*.json ./
 
 RUN npm ci && npm cache clean --force
 

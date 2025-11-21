@@ -6,47 +6,47 @@ import { EnumPipe, LabelPipe } from '@kotka/ui/pipes';
 @Component({
   selector: 'kui-viewer-field-value',
   template: `
-    <ng-container *ngIf="field">
-      <span
-        *ngIf="data !== undefined && data !== null"
-        class="viewer-field-value"
+    @if (field) {
+      @if (data !== undefined && data !== null) {
+        <span
+          class="viewer-field-value"
         [ngClass]="{
           'viewer-field-value-removed':
             differenceData?.op === 'remove' || differenceData?.op === 'replace'
         }"
-      >
-        <ng-container
-          *ngTemplateOutlet="fieldValue; context: { value: data }"
-        ></ng-container>
-      </span>
-      <span
-        *ngIf="
-          differenceData?.value !== undefined && differenceData?.value !== null
-        "
-        class="viewer-field-value"
+          >
+          <ng-container
+            *ngTemplateOutlet="fieldValue; context: { value: data }"
+          ></ng-container>
+        </span>
+      }
+      @if (
+        differenceData?.value !== undefined && differenceData?.value !== null
+        ) {
+        <span
+          class="viewer-field-value"
         [ngClass]="{
           'viewer-field-value-added':
             differenceData?.op === 'add' || differenceData?.op === 'replace'
         }"
-      >
-        <ng-container
+          >
+          <ng-container
           *ngTemplateOutlet="
             fieldValue;
             context: { value: differenceData?.value }
           "
-        ></ng-container>
-      </span>
-
+          ></ng-container>
+        </span>
+      }
       <ng-template #fieldValue let-value="value">
-        <ng-container *ngIf="field.type === 'select'; else defaultFieldValue">
+        @if (field.type === 'select') {
           {{ $any(value) | enum: field }}
-        </ng-container>
-        <ng-template #defaultFieldValue>
+        } @else {
           {{ value | label }}
-        </ng-template>
+        }
       </ng-template>
-    </ng-container>
-  `,
+    }
+    `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, EnumPipe, LabelPipe]

@@ -1,10 +1,10 @@
 import { Component, Input } from '@angular/core';
 import { Organization, SpecimenTransaction } from '@luomus/laji-schema';
-import { CommonModule } from '@angular/common';
+
 import { ToFullUriPipe } from '@kotka/ui/pipes';
 
 @Component({
-  imports: [CommonModule, ToFullUriPipe],
+  imports: [ToFullUriPipe],
   selector: 'kotka-transaction-sheet-header',
   templateUrl: './transaction-sheet-header.html',
 })

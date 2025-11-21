@@ -110,7 +110,8 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/apps/kotka"],
       "options": {
-        "jestConfig": "apps/kotka/jest.config.ts"
+        "jestConfig": "apps/kotka/jest.config.ts",
+        "tsConfig": "apps/kotka/tsconfig.spec.json"
       }
     }
   }

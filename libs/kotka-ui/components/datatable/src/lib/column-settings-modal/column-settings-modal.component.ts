@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  Input,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import {
   ColDef,
@@ -24,6 +19,9 @@ import { AgGridAngular } from '@ag-grid-community/angular';
   imports: [AgGridAngular],
 })
 export class ColumnSettingsModalComponent {
+  modal = inject(NgbActiveModal);
+  private cdr = inject(ChangeDetectorRef);
+
   columnsSubject: ReplaySubject<ColDefWithExtra[]> = new ReplaySubject(1);
   @Input() set columns(columns: ColDefWithExtra[]) {
     this.columnsSubject.next(columns);
@@ -53,10 +51,7 @@ export class ColumnSettingsModalComponent {
   private rowIsDragged = false;
   private gridApi?: GridApi;
 
-  constructor(
-    public modal: NgbActiveModal,
-    private cdr: ChangeDetectorRef,
-  ) {
+  constructor() {
     combineLatest([
       this.columnsSubject,
       this.settingsSubject,

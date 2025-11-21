@@ -3,7 +3,7 @@ import { ICellRendererParams } from '@ag-grid-community/core';
 import { CellRendererComponent } from './cell-renderer';
 import { getDomainAndIdWithoutPrefix, getUri } from '@kotka/shared/utils';
 import { RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 
 interface RendererExtraParams {
   routerLink?: string[];
@@ -14,21 +14,23 @@ type RendererParams = ICellRendererParams & RendererExtraParams;
 @Component({
   selector: 'kui-uri-cell-renderer',
   template: `
-    <div *ngIf="id" class="uri-cell-layout">
-      <a
-        type="button"
-        class="btn btn-info edit-button"
-        [routerLink]="routerLink"
+    @if (id) {
+      <div class="uri-cell-layout">
+        <a
+          type="button"
+          class="btn btn-info edit-button"
+          [routerLink]="routerLink"
         [queryParams]="{
           uri: domain + id,
         }"
-      >
-        <i class="fa fa-pen-to-square"></i>
-      </a>
-      <small class="domain-value">{{ domain }}</small>
-      <span class="id-value" title="{{ id }}">{{ id }}</span>
-    </div>
-  `,
+          >
+          <i class="fa fa-pen-to-square"></i>
+        </a>
+        <small class="domain-value">{{ domain }}</small>
+        <span class="id-value" title="{{ id }}">{{ id }}</span>
+      </div>
+    }
+    `,
   styles: [
     `
       .uri-cell-layout {
@@ -58,7 +60,7 @@ type RendererParams = ICellRendererParams & RendererExtraParams;
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink],
+  imports: [RouterLink],
 })
 export class URICellRendererComponent extends CellRendererComponent<RendererParams> {
   domain = '';

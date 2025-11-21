@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  inject
 } from '@angular/core';
 import {
   LabelCellRendererComponent,
@@ -23,7 +24,7 @@ import { globals } from '../../../environments/globals';
 import { MainContentComponent } from '@kotka/ui/main-content';
 import { SpinnerComponent } from '@kotka/ui/spinner';
 import { DocumentDatatableComponent } from '@kotka/ui/document-datatable';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'kotka-transaction-table',
@@ -31,21 +32,20 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./transaction-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     MainContentComponent,
     SpinnerComponent,
-    DocumentDatatableComponent,
-  ],
+    DocumentDatatableComponent
+],
 })
 export class TransactionTableComponent {
   dataType = KotkaDocumentObjectType.transaction;
 
   columns?: DatatableColumn[];
 
-  constructor(
-    private formService: FormService,
-    private cdr: ChangeDetectorRef,
-  ) {
+  private formService = inject(FormService);
+  private cdr = inject(ChangeDetectorRef);
+
+  constructor() {
     this.formService
       .getFieldData(globals.transactionFormId)
       .subscribe((fieldData) => {
@@ -125,7 +125,7 @@ export class TransactionTableComponent {
         field: 'outgoingSent',
         cellRenderer: DateCellRendererComponent,
         cellRendererParams: {
-          format: 'YYYY',
+          format: 'yyyy',
         },
         filter: 'agDateColumnFilter',
         floatingFilterComponent: YearFloatingFilterComponent,
@@ -147,7 +147,7 @@ export class TransactionTableComponent {
         field: 'incomingReceived',
         cellRenderer: DateCellRendererComponent,
         cellRendererParams: {
-          format: 'YYYY',
+          format: 'yyyy',
         },
         filter: 'agDateColumnFilter',
         floatingFilterComponent: YearFloatingFilterComponent,

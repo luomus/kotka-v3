@@ -31,6 +31,8 @@ describe('datasets', () => {
         // remove the test tag if it already exists
         cy.getChangedCountFromText('[data-cy=total-count]', totalCount).then(count => {
           if (count > 0) {
+            // eslint-disable-next-line cypress/no-unnecessary-waiting
+            cy.wait(1000); // ag-grid throws an error without the wait
             cy.get('.edit-button').first().click();
             cy.get('[data-cy=form-delete]').click();
             cy.get('[data-cy=confirm-ok]').click();
@@ -58,14 +60,14 @@ describe('datasets', () => {
       cy.get('#root_description_en').type('Test');
       cy.get('[data-cy=form-submit]').click();
 
-      cy.get('[data-cy=toast]', { timeout: 40000 }).should('have.text', 'Save success!');
+      cy.get('[data-cy=toast]', { timeout: 40000 }).should('be.visible').should('contain.text', 'Save success!');
       cy.get('[data-cy=toast-close]').click();
       cy.get('[data-cy=main-header]').should('contain', 'Edit tag');
 
       cy.get('[data-cy=form-delete]').click();
       cy.get('[data-cy=confirm-ok]').click();
 
-      cy.get('[data-cy=toast]', { timeout: 10000 }).should('have.text', 'Success!');
+      cy.get('[data-cy=toast]', { timeout: 10000 }).should('be.visible').should('contain.text', 'Success!');
       cy.get('[data-cy=toast-close]').click();
       cy.url().should('equal', Cypress.config('baseUrl') + '/tags');
     });

@@ -1,10 +1,4 @@
-import {
-  Component,
-  ChangeDetectionStrategy,
-  TemplateRef,
-  input,
-  effect
-} from '@angular/core';
+import { Component, ChangeDetectionStrategy, TemplateRef, input, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 
@@ -35,13 +29,13 @@ import { Title } from '@angular/platform-browser';
   imports: [CommonModule]
 })
 export class MainContentComponent {
+  private titleService = inject(Title);
+
   title = input.required<string>();
   containerClass = input('container-xl');
   headerTpl = input<TemplateRef<unknown>>();
 
-  constructor(
-    private titleService: Title
-  ) {
+  constructor() {
     effect(() => {
       const titleParts: string[] = [];
       if (this.title()) {

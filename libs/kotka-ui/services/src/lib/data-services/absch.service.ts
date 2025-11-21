@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, of, shareReplay } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -27,12 +27,12 @@ export interface LinkData {
   providedIn: 'root',
 })
 export class AbschService {
+  private httpClient = inject(HttpClient);
+
   private countryLinksUrl =
     'https://api.cbd.int/api/v2013/index/select?fl=id,+identifier_s,+uniqueIdentifier_s,+url_ss,+government_s,rec_countryName:government_EN_t,+rec_title:title_EN_t,+rec_summary:description_t,rec_type:type_EN_t,+entryIntoForce_dt,adoption_dt,retired_dt,limitedApplication_dt&group=true&group.field=governmentSchemaIdentifier_s&group.limit=10&group.ngroups=true&q=(realm_ss:abs)+AND+NOT+version_s:*+AND+schema_s:(authority+absProcedure+absNationalReport)+AND+government_s:%country%&rows=500&start=0&wt=json';
   private maxCountryLinks = 3;
   private countryLinksCache: Record<string, Observable<LinkData[]>> = {};
-
-  constructor(private httpClient: HttpClient) {}
 
   getCountryLinks(country?: string): Observable<LinkData[]> {
     if (!country) {

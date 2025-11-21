@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { LocalStorageService } from 'ngx-webstorage';
 import { ColDefWithExtra, ColumnSettings, DatatableFilter } from '../models/models';
 import { cloneDeep } from 'lodash';
@@ -7,7 +7,8 @@ import { cloneDeep } from 'lodash';
   providedIn: 'root',
 })
 export class DatatableSettingsStoreService {
-  constructor(private storage: LocalStorageService) {}
+  private storage = inject(LocalStorageService);
+
 
   getStoredColumnSettings(settingsKey: string|undefined, defaultSettings: ColumnSettings): ColumnSettings|undefined {
     if (settingsKey) {

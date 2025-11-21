@@ -1,4 +1,4 @@
-import { Inject, Pipe, PipeTransform } from '@angular/core';
+import { Pipe, PipeTransform, inject } from '@angular/core';
 
 @Pipe({
   name: 'oldKotkaUrl',
@@ -7,7 +7,9 @@ import { Inject, Pipe, PipeTransform } from '@angular/core';
 export class OldKotkaUrlPipe implements PipeTransform {
   private readonly oldKotkaUrl: string;
 
-  constructor(@Inject('oldKotkaUrl') oldKotkaUrl: string) {
+  constructor() {
+    const oldKotkaUrl = inject<string>('oldKotkaUrl' as any);
+
     this.oldKotkaUrl = oldKotkaUrl;
   }
 

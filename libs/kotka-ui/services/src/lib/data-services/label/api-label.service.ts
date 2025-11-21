@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
   catchError,
   forkJoin,
@@ -25,12 +25,10 @@ export type ApiLabelType = 'person' | 'organization' | 'collection' | 'dataset';
   providedIn: 'root',
 })
 export class ApiLabelService {
-  private cache: Record<string, string | Observable<string>> = {};
+  private userService = inject(UserService);
+  private apiCient = inject(ApiClient);
 
-  constructor(
-    private userService: UserService,
-    private apiCient: ApiClient,
-  ) {}
+  private cache: Record<string, string | Observable<string>> = {};
 
   getApiLabelType(keys: any): ApiLabelType | undefined {
     if (!Array.isArray(keys)) {

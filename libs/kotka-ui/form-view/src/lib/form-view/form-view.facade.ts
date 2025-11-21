@@ -1,4 +1,4 @@
-import { computed, Injectable, OnDestroy, signal } from '@angular/core';
+import { computed, Injectable, OnDestroy, signal, inject } from '@angular/core';
 import { ApiClient, FormService, UserService } from '@kotka/ui/services';
 import {
   catchError,
@@ -61,6 +61,10 @@ export class FormViewFacade<
   S extends KotkaDocumentObjectMap[T],
 > implements OnDestroy
 {
+  private userService = inject(UserService);
+  private formService = inject(FormService);
+  private apiClient = inject(ApiClient);
+
   private store = signal<FormState<S>>({ loading: false });
   state = this.store.asReadonly();
 
@@ -71,11 +75,7 @@ export class FormViewFacade<
 
   private initialStateSub: Subscription;
 
-  constructor(
-    private userService: UserService,
-    private formService: FormService,
-    private apiClient: ApiClient,
-  ) {
+  constructor() {
     this.initialStateSub = this.getInitialStateSub();
   }
 

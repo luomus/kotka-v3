@@ -2,7 +2,7 @@ import { concatAll, from, Observable, of, switchMap, tap, toArray } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CellRendererComponent } from '../renderers/cell-renderer';
 import { ExportService } from '@kotka/ui/services';
-import { Injectable, Injector } from '@angular/core';
+import { Injectable, Injector, inject } from '@angular/core';
 import {
   ColDef,
   DatatableSource,
@@ -16,12 +16,10 @@ import { JSONPath } from 'jsonpath-plus';
   providedIn: 'root',
 })
 export class DatatableExportService {
-  private maxFetchRowCount = 1000;
+  private exportService = inject(ExportService);
+  private injector = inject(Injector);
 
-  constructor(
-    private exportService: ExportService,
-    private injector: Injector,
-  ) {}
+  private maxFetchRowCount = 1000;
 
   exportData(
     columns: ColDef[],

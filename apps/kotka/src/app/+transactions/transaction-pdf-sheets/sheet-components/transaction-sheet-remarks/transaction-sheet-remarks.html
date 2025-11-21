@@ -1,5 +1,7 @@
-<div *ngIf="data.publicRemarks" class="avoid-page-break">
-  <hr>
-  <h4>Remarks</h4>
-  <div class="text-with-line-breaks">{{ data.publicRemarks }}</div>
-</div>
+@if (data.publicRemarks) {
+  <div class="avoid-page-break">
+    <hr>
+      <h4>Remarks</h4>
+      <div class="text-with-line-breaks">{{ data.publicRemarks }}</div>
+    </div>
+  }

@@ -12,35 +12,37 @@ import { ArrayIndexRangePipe } from '../../pipes/array-index-range.pipe';
 @Component({
   selector: 'kui-viewer-collection',
   template: `
-    <div
-      class="row mt-3 mb-1"
-      *ngIf="field && (data?.length || differenceDataPatchArray?.length)"
-    >
-      <div class="col-12">
-        <h2>{{ field.label }}</h2>
-        <div
-          class="card card-body bg-light mb-2"
+    @if (field && (data?.length || differenceDataPatchArray?.length)) {
+      <div
+        class="row mt-3 mb-1"
+        >
+        <div class="col-12">
+          <h2>{{ field.label }}</h2>
+          @for (i of data | arrayIndexRange: differenceDataPatchArray; track i) {
+            <div
+              class="card card-body bg-light mb-2"
           [ngClass]="{
             'viewer-fieldset-removed':
               differenceDataPatchArray?.[i]?.op === 'remove',
             'viewer-fieldset-added':
               differenceDataPatchArray?.[i]?.op === 'add',
           }"
-          *ngFor="let i of data | arrayIndexRange: differenceDataPatchArray"
-        >
-          <kui-viewer-fieldset
-            [fields]="field.fields || []"
+              >
+              <kui-viewer-fieldset
+                [fields]="field.fields || []"
             [data]="
               differenceDataPatchArray?.[i]?.op === 'add'
                 ? differenceDataPatchArray?.[i]?.value
                 : data?.[i]
             "
-            [differenceData]="differenceDataObjectArray?.[i]"
-          ></kui-viewer-fieldset>
+                [differenceData]="differenceDataObjectArray?.[i]"
+              ></kui-viewer-fieldset>
+            </div>
+          }
         </div>
       </div>
-    </div>
-  `,
+    }
+    `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, forwardRef(() => ViewerFieldsetComponent), ArrayIndexRangePipe],

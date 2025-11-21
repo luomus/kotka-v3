@@ -1,13 +1,5 @@
-import {
-  ApplicationRef,
-  ComponentRef,
-  Inject,
-  Injectable,
-  Renderer2,
-  RendererFactory2,
-  Type,
-} from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { ApplicationRef, ComponentRef, Injectable, Renderer2, RendererFactory2, Type, DOCUMENT, inject } from '@angular/core';
+
 import { ComponentService } from '@kotka/ui/services';
 
 export type RelativePosition =
@@ -30,14 +22,15 @@ export interface EmbeddedComponentData {
   providedIn: 'root',
 })
 export class LajiFormComponentEmbedderService {
+  private document = inject<Document>(DOCUMENT);
+  private appRef = inject(ApplicationRef);
+  private componentService = inject(ComponentService);
+
   private renderer: Renderer2;
 
-  constructor(
-    @Inject(DOCUMENT) private document: Document,
-    rendererFactory: RendererFactory2,
-    private appRef: ApplicationRef,
-    private componentService: ComponentService,
-  ) {
+  constructor() {
+    const rendererFactory = inject(RendererFactory2);
+
     this.renderer = rendererFactory.createRenderer(null, null);
   }
 

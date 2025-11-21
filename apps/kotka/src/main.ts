@@ -26,9 +26,9 @@ if (environment.production) {
   enableProdMode();
 }
 
-function createLoggerLoader(httpClient: HttpClient): ILogger {
+function createLoggerLoader(): ILogger {
   if (environment.production) {
-    return new HttpLogger(httpClient);
+    return new HttpLogger();
   }
   return new ConsoleLogger();
 }

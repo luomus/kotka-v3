@@ -3,28 +3,27 @@ import {
   ChangeDetectorRef,
   Component,
   OnInit,
+  inject
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserService } from '@kotka/ui/services';
 import { environment } from '../../../environments/environment';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'kotka-logout',
   templateUrl: './logout.component.html',
   styleUrls: ['./logout.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, NgbAlert],
+  imports: [NgbAlert],
 })
 export class LogoutComponent implements OnInit {
   errorMsg?: string;
 
-  constructor(
-    private router: Router,
-    private userService: UserService,
-    private cdr: ChangeDetectorRef,
-  ) {}
+  private router = inject(Router);
+  private userService = inject(UserService);
+  private cdr = inject(ChangeDetectorRef);
 
   ngOnInit() {
     this.userService.logout().subscribe({

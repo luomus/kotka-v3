@@ -6,7 +6,7 @@ RUN chown -Rh node:node /app
 
 ENV CYPRESS_INSTALL_BINARY 0
 
-COPY --chown=node:node ./decorate-angular-cli.js ./package*.json ./
+COPY --chown=node:node ./package*.json ./
 
 RUN npm ci && npm cache clean --force
 

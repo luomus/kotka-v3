@@ -11,14 +11,14 @@ import { SpinnerComponent } from '@kotka/ui/spinner';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 import { MetaFieldsComponent } from '../../meta-fields/meta-fields.component';
 import { RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'kotka-version',
   templateUrl: './version.component.html',
   styleUrls: ['./version.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, SpinnerComponent, NgbAlert, MetaFieldsComponent, LajiFormComponent, RouterLink],
+  imports: [SpinnerComponent, NgbAlert, MetaFieldsComponent, LajiFormComponent, RouterLink],
 })
 export class VersionComponent<S extends KotkaDocumentObject>
   implements OnChanges

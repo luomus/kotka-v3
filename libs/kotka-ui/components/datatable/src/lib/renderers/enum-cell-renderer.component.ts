@@ -3,7 +3,7 @@ import { ICellRendererParams } from '@ag-grid-community/core';
 import { LajiForm } from '@kotka/shared/models';
 import { CellRendererComponent } from './cell-renderer';
 import { EnumPipe } from '@kotka/ui/pipes';
-import { CommonModule } from '@angular/common';
+
 import { getEnumValue } from '@kotka/ui/services';
 
 interface RendererExtraParams {
@@ -15,16 +15,17 @@ type RendererParams = ICellRendererParams & RendererExtraParams;
 @Component({
   selector: 'kui-enum-cell-renderer',
   template: `
-    <span
-      *ngIf="params.value && params.field"
-      title="{{ params.value | enum: params.field }}"
-    >
-      {{ params.value | enum: params.field }}
-    </span>
-  `,
+    @if (params.value && params.field) {
+      <span
+        title="{{ params.value | enum: params.field }}"
+        >
+        {{ params.value | enum: params.field }}
+      </span>
+    }
+    `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, EnumPipe]
+  imports: [EnumPipe]
 })
 export class EnumCellRendererComponent extends CellRendererComponent<RendererParams> {
   static override getExportValue(
