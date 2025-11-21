@@ -30,7 +30,7 @@ import { ValidatorInterceptor } from '../interceptors/validator.interceptor';
 import { createPatch } from 'rfc6902';
 import { MediaIntellectualOwnerInterceptor } from '../interceptors/media-intellectual-owner.interceptor';
 
-const existingErrorRegex = /^POST input body must not contain IDs for existing documents, found: \S+.$/
+const existingErrorRegex = /^POST input body must not contain IDs for existing documents, found: \S+.$/;
 
 export abstract class LajiStoreController<T extends StoreObject> {
   constructor (
@@ -77,7 +77,7 @@ export abstract class LajiStoreController<T extends StoreObject> {
       const message = err.response?.data?.message;
 
       if (err.status === 400 && message && existingErrorRegex.test(message)) {
-        throw new BadRequestException(err.message)
+        throw new BadRequestException(err.message);
       }
       throw new InternalServerErrorException(err.message);
     }

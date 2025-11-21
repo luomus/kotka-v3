@@ -6,7 +6,7 @@ import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nes
 import { Document } from '@kotka/shared/models';
 import { getUri } from '@kotka/shared/utils';
 import { map, mergeMap, Observable } from 'rxjs';
-import { MediaApiService } from '../../../../../libs/kotka-api/services/src/lib/media-api.service';
+import { MediaApiService } from '@kotka/api/services';
 import { Meta } from '@kotka/api/services';
 
 @Injectable()
@@ -36,11 +36,11 @@ export class SpecimenImageInterceptor implements NestInterceptor {
 
               return data;
             })
-          )
+          );
         })
-      )
+      );
     }
 
-    return next.handle()
+    return next.handle();
   }
 }

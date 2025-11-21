@@ -50,14 +50,14 @@ describe('SpecimenImageIntereptor', () => {
       }
     )});
 
-    const mockMediaFind = jest.spyOn(mediaApiService, 'findMediaByDocumentId')
+    const mockMediaFind = jest.spyOn(mediaApiService, 'findMediaByDocumentId');
     const mockNext = createMock<CallHandler>();
 
     specimenImageInterceptor.intercept(mockContext, mockNext);
 
     const req = mockContext.switchToHttp().getRequest();
     expect(req).toEqual({method: 'POST', body: { id: 'tun:JA.123', gatherings: [] }, path: '/'});
-    expect(mockMediaFind).toHaveBeenCalledTimes(0)
+    expect(mockMediaFind).toHaveBeenCalledTimes(0);
     expect(mockNext.handle).toHaveBeenCalledTimes(1);
   });
 
@@ -78,16 +78,16 @@ describe('SpecimenImageIntereptor', () => {
       }
     )});
 
-    const mockMediaFind = jest.spyOn(mediaApiService, 'findMediaByDocumentId')
+    const mockMediaFind = jest.spyOn(mediaApiService, 'findMediaByDocumentId');
     const mockNext = createMock<CallHandler>();
 
     specimenImageInterceptor.intercept(mockContext, mockNext);
 
     const req = mockContext.switchToHttp().getRequest();
     expect(req).toEqual(mockRequest);
-    expect(mockMediaFind).toHaveBeenCalledTimes(0)
+    expect(mockMediaFind).toHaveBeenCalledTimes(0);
     expect(mockNext.handle).toHaveBeenCalledTimes(1);
-  })
+  });
 
     it('On PUT-request document images-field gets removed', async () => {
     const mockBody = {
@@ -108,14 +108,14 @@ describe('SpecimenImageIntereptor', () => {
       }
     )});
 
-    const mockMediaFind = jest.spyOn(mediaApiService, 'findMediaByDocumentId')
+    const mockMediaFind = jest.spyOn(mediaApiService, 'findMediaByDocumentId');
     const mockNext = createMock<CallHandler>();
 
     specimenImageInterceptor.intercept(mockContext, mockNext);
 
     const req = mockContext.switchToHttp().getRequest();
     expect(req).toEqual({method: 'PUT', body: { id: 'tun:JA.123', gatherings: [] }, path: '/tun:JA.123'});
-    expect(mockMediaFind).toHaveBeenCalledTimes(0)
+    expect(mockMediaFind).toHaveBeenCalledTimes(0);
     expect(mockNext.handle).toHaveBeenCalledTimes(1);
   });
 
@@ -132,7 +132,7 @@ describe('SpecimenImageIntereptor', () => {
       }
     )});
 
-    const mockMediaFind = jest.spyOn(mediaApiService, 'findMediaByDocumentId').mockImplementation(() => of([{id: 'MM.123'}, {id: 'MM.321'}] as Meta[]))
+    const mockMediaFind = jest.spyOn(mediaApiService, 'findMediaByDocumentId').mockImplementation(() => of([{id: 'MM.123'}, {id: 'MM.321'}] as Meta[]));
     const mockNext = createMock<CallHandler>({
       handle: () => of({id: 'tun:JA.123', gatherings: []})
     });
@@ -141,8 +141,8 @@ describe('SpecimenImageIntereptor', () => {
 
     const req = mockContext.switchToHttp().getRequest();
     expect(req).toEqual(mockRequest);
-    expect(interceptorRes).toEqual({ id: 'tun:JA.123', gatherings: [], images: ['MM.123', 'MM.321'] })
-    expect(mockMediaFind.mock.calls[0][0]).toEqual("http://tun.fi/JA.123")
+    expect(interceptorRes).toEqual({ id: 'tun:JA.123', gatherings: [], images: ['MM.123', 'MM.321'] });
+    expect(mockMediaFind.mock.calls[0][0]).toEqual('http://tun.fi/JA.123');
     expect(mockNext.handle).toHaveBeenCalledTimes(1);
-  })
+  });
 });
