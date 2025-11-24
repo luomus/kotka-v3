@@ -75,6 +75,41 @@ export interface StorePatch {
   value: any;
 }
 
+export interface CoordinateLocationResponse {
+  results: CoordinateResults[]
+}
+
+export interface CoordinateResults {
+  address_components: CoordinateResultAddress[]
+  geometry: CoordinateResultGeometry
+  formatted_address: string,
+  place_id: string,
+  types: string[],
+}
+
+export interface CoordinateResultAddress {
+  long_name: MultiLanguage,
+  short_name: MultiLanguage,
+  types: string[]
+}
+
+interface CoordinateResultGeometry {
+  bounds: CoordinateResultBox
+  location: CoordinateResultPoint
+  location_type: "string",
+  viewport: CoordinateResultBox
+}
+
+interface CoordinateResultPoint {
+  lat: number,
+  lng: number
+}
+
+interface CoordinateResultBox {
+  northeast: CoordinateResultPoint
+  southwest: CoordinateResultPoint
+}
+
 export interface KotkaVersionDifference<S extends KotkaDocumentObject = KotkaDocumentObject> {
   original: S;
   patch: StorePatch[];

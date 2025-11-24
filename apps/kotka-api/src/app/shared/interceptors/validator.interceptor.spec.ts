@@ -8,6 +8,57 @@ import { ValidationService } from '../services/validation.service';
 import { NamespaceService } from '../services/namespace.service';
 import { of } from 'rxjs';
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces';
+import { LajiApiService } from '../../../../../../libs/kotka-api/services/src/lib/laji-api.service';
+
+const mockLajiApiService = {
+  post: jest.fn().mockImplementation((path, body) => {
+    const coordinates = body.geometries[0].coordinates;
+
+    if (coordinates.toString() === [27, 62].toString()) {
+      return of({ data: {
+        'results': [
+          {
+            "address_components": [
+              {
+                "short_name": {
+                  "sv": "Kangasniemi",
+                  "fi": "Kangasniemi"
+                },
+                "types": [
+                  "municipality"
+                ]
+              }
+            ],
+            "place_id": "ML.425",
+            "types": [
+              "municipality"
+            ]
+          },
+          {
+            "address_components": [
+              {
+                "short_name": {
+                  "fi": "Etelä-Savo",
+                  "sv": "Södra Savolax"
+                },
+                "types": [
+                  "region"
+                ]
+              }
+            ],
+            "types": [
+              "region"
+            ]
+          }
+        ]
+      }});
+    } else {
+      return of({ data: {
+        'results': []
+      }});
+    }
+  })
+};
 
 const mockNamespaceService = {
   getNamespaces: jest.fn().mockImplementation(() => Promise.resolve([{
@@ -38,6 +89,7 @@ const mockNamespaceService = {
     }
   ]))
 };
+
 const mockForm = {
   'schema': {
     'type': 'object',
@@ -153,7 +205,7 @@ const mockForm = {
   'warnings': {},
 };
 
-const specimenRemoteValidatorSchema = {
+const specimenNamespaceValidatorSchema = {
   'schema': {
     'type': 'object',
     'properties': {
@@ -183,8 +235,79 @@ const specimenRemoteValidatorSchema = {
   },
 };
 
+const specimenMunicipalityCordinateValidatorSchema = {
+  'schema': {
+    'type': 'object',
+    'properties': {
+      'datatype': {
+        'type': 'string',
+        'title': 'Datatype'
+      },
+      'gatherings': {
+        'type': 'array',
+        'items': {
+          'type': 'object',
+          'properties': {
+            'latitude': {
+              'type': 'string',
+              'title': 'Latitude'
+            },
+            'longitude': {
+              'type': 'string',
+              'title': 'Longitude'
+            },
+            'coordinateSystem': {
+              'type': 'string',
+              'title': 'Coordinate system',
+              'oneOf': [
+                {
+                  'const': '',
+                  'title': ''
+                },
+                {
+                  'const': 'MY.coordinateSystemYkj',
+                  'title': 'YKJ'
+                },
+                {
+                  'const': 'MY.coordinateSystemWgs84',
+                  'title': 'WGS84'
+                },
+                {
+                  'const': 'MY.coordinateSystemEtrs-tm35fin',
+                  'title': 'ETRS-TM35FIN'
+                }
+              ]
+            },
+            'municipality': {
+              'type': 'string',
+              'title': 'Municipality'
+            }
+          }
+        }
+      }
+    },
+    'required': [
+      'datatype'
+    ]
+  },
+  'validators': {
+    'gatherings': {
+      'items': {
+        'properties': {
+          'municipality': {
+            'remote': {
+              'validator': 'kotkaMuncipalityCoordinates'
+            }
+          },
+        }
+      }
+    }
+  },
+}
+
 describe('ValidationInterceptor', () => {
   let validatorInterceptor: ValidatorInterceptor;
+  let lajiApiService: LajiApiService;
   let lajiStoreService: LajiStoreService;
   let formService: FormService;
   let namespaceService: NamespaceService;
@@ -194,10 +317,14 @@ describe('ValidationInterceptor', () => {
     const moduleRef = await Test.createTestingModule({
       imports: [ApiServicesModule],
       controllers: [],
-      providers: [ValidatorInterceptor, ValidationService, Reflector, { provide: NamespaceService, useValue: mockNamespaceService }],
+      providers: [ValidatorInterceptor, ValidationService, Reflector,
+        { provide: NamespaceService, useValue: mockNamespaceService },
+        { provide: LajiApiService, useValue: mockLajiApiService }
+      ],
     }).compile();
 
     validatorInterceptor = moduleRef.get<ValidatorInterceptor>(ValidatorInterceptor);
+    lajiApiService = moduleRef.get<LajiApiService>(LajiApiService);
     lajiStoreService = moduleRef.get<LajiStoreService>(LajiStoreService);
     formService = moduleRef.get<FormService>(FormService);
     reflector = moduleRef.get<Reflector>(Reflector);
@@ -367,7 +494,7 @@ describe('ValidationInterceptor', () => {
   describe('Specimen kotkaAllowedNamespace tests', () => {
     beforeEach(() => {
       jest.spyOn(reflector, 'get').mockImplementation(() => 'MY.document');
-      jest.spyOn(formService, 'getForm').mockImplementation(() => new Promise((resolve) => resolve(specimenRemoteValidatorSchema)));
+      jest.spyOn(formService, 'getForm').mockImplementation(() => new Promise((resolve) => resolve(specimenNamespaceValidatorSchema)));
     });
 
     afterEach(() => {
@@ -616,7 +743,7 @@ describe('ValidationInterceptor', () => {
       }
     });
 
-   it('If prefix not one of the known ones throw error', async () => {
+    it('If prefix not one of the known ones throw error', async () => {
       const mockBody = {
         namespaceID: 'test:AA',
         objectID: '123',
@@ -642,6 +769,139 @@ describe('ValidationInterceptor', () => {
         expect(e.options).toEqual({namespaceID:{errors:['Unknown prefix "test" not accepted.']}});
         expect(mockNext.handle).toBeCalledTimes(0);
       }
+    });
+  });
+
+  describe('Specimen municipality coordinates tests', () => {
+    beforeEach(() => {
+      jest.spyOn(reflector, 'get').mockImplementation(() => 'MY.document');
+      jest.spyOn(formService, 'getForm').mockImplementation(() => new Promise((resolve) => resolve(specimenMunicipalityCordinateValidatorSchema)));
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it('If municipality and coordinates do not match throw error', async () => {
+      const mockBody = {
+        datatype: 'botanyspecimen',
+        gatherings: [
+          {
+            latitude: '62',
+            longitude: '27',
+            municipality: 'Porvoo',
+            coordinateSystem: 'MY.coordinateSystemWgs84'
+          }
+        ]
+      }
+
+      const mockRequest = {
+        method: 'POST',
+        body: mockBody
+      };
+
+      const lajiApiBody = {
+        'type': 'GeometryCollection',
+        'geometries': [{
+          'type': 'Point',
+          'coordinates': [27, 62]
+        }]
+      }
+
+      const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+        getRequest: () => mockRequest
+      })});
+
+      const mockNext = createMock<CallHandler>();
+
+        expect.assertions(5);
+        try {
+          await validatorInterceptor.intercept(mockContext, mockNext);
+        } catch (e) {
+          expect(mockLajiApiService.post).toHaveBeenCalledTimes(1);
+          expect(mockLajiApiService.post.mock.calls[0][0]).toEqual('coordinates/location');
+          expect(mockLajiApiService.post.mock.calls[0][1]).toEqual(lajiApiBody);
+          expect(e.options).toEqual({gatherings:{"0":{municipality:{errors:['Coordinates do not match municipality, has Porvoo but coordinates correspond to Kangasniemi']}}}});
+          expect(mockNext.handle).toBeCalledTimes(0);
+        }
+    });
+
+    it('If municipality and coordinates match allow request to continue', async () => {
+      const mockBody = {
+        datatype: 'botanyspecimen',
+        gatherings: [
+          {
+            latitude: '62',
+            longitude: '27',
+            municipality: 'Kangasniemi',
+            coordinateSystem: 'MY.coordinateSystemWgs84'
+          }
+        ]
+      }
+
+      const mockRequest = {
+        method: 'POST',
+        body: mockBody
+      };
+
+      const lajiApiBody = {
+        'type': 'GeometryCollection',
+        'geometries': [{
+          'type': 'Point',
+          'coordinates': [27, 62]
+        }]
+      }
+
+      const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+        getRequest: () => mockRequest
+      })});
+
+      const mockNext = createMock<CallHandler>();
+
+      await validatorInterceptor.intercept(mockContext, mockNext);
+      expect(mockLajiApiService.post).toHaveBeenCalledTimes(1);
+      expect(mockLajiApiService.post.mock.calls[0][0]).toEqual('coordinates/location');
+      expect(mockLajiApiService.post.mock.calls[0][1]).toEqual(lajiApiBody);
+      expect(mockNext.handle).toBeCalledTimes(1);
+    });
+
+    it('If lajiapi returns no municipalities, for non-finnish coordinates, allow request to proceed', async () => {
+      const mockBody = {
+        datatype: 'botanyspecimen',
+        gatherings: [
+          {
+            latitude: '0',
+            longitude: '0',
+            municipality: 'Berlin',
+            coordinateSystem: 'MY.coordinateSystemWgs84'
+          }
+        ]
+      }
+
+      const mockRequest = {
+        method: 'POST',
+        body: mockBody
+      };
+
+      const lajiApiBody = {
+        'type': 'GeometryCollection',
+        'geometries': [{
+          'type': 'Point',
+          'coordinates': [0, 0]
+        }]
+      }
+
+      const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+        getRequest: () => mockRequest
+      })});
+
+      const mockNext = createMock<CallHandler>();
+
+      await validatorInterceptor.intercept(mockContext, mockNext);
+      expect(mockLajiApiService.post).toHaveBeenCalledTimes(1);
+      expect(mockLajiApiService.post.mock.calls[0][0]).toEqual('coordinates/location');
+      expect(mockLajiApiService.post.mock.calls[0][1]).toEqual(lajiApiBody);
+      expect(mockNext.handle).toBeCalledTimes(1);
     });
   });
 });

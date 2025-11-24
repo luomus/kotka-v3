@@ -3,14 +3,14 @@ https://docs.nestjs.com/providers#services
 */
 
 import { LajiApiService, LajiStoreService, AbschService } from '@kotka/api/services';
-import { KotkaDocumentObjectFullType, specimenDataTypeToNameMap } from '@kotka/shared/models';
-import { Dataset } from '@luomus/laji-schema';
+import { CoordinateLocationResponse, KotkaDocumentObjectFullType, specimenDataTypeToNameMap } from '@kotka/shared/models';
+import { Dataset, Document } from '@luomus/laji-schema';
 import { Injectable } from '@nestjs/common';
 import { get } from 'lodash';
 import { lastValueFrom, map } from 'rxjs';
 import { NamespaceData, NamespaceService } from './namespace.service';
-import { acceptedPrefixes, defaultPrefix } from '@kotka/shared/utils';
-
+import { acceptedPrefixes, convertCoordinatesToWGS84, defaultPrefix } from '@kotka/shared/utils';
+import { GeometryCollection } from 'geojson';
 @Injectable()
 export class ValidationService {
   constructor(
@@ -31,6 +31,9 @@ export class ValidationService {
         break;
       case 'kotkaAllowedNamespace':
         error = await this.validateAllowedNamespace(JSON.parse(options.body), query.field);
+        break;
+      case 'kotkaMuncipalityCoordinates':
+        error = await this.validateCoordinateMunicipality(JSON.parse(options.body), query.field);
         break;
       default:
         try {
@@ -138,6 +141,63 @@ export class ValidationService {
     }
 
     return {};
+  }
+
+  async validateCoordinateMunicipality(data: Document, field: string) {
+    const value: string = data.gatherings[0].municipality;
+    if (!value) {
+      return;
+    }
+
+    const coordinateSystem = data.gatherings[0].coordinateSystem;
+    const latitude = Number(data.gatherings[0].latitude);
+    const longitude = Number(data.gatherings[0].longitude);
+
+    const coordinates = convertCoordinatesToWGS84(latitude, longitude, coordinateSystem);
+    const geometry: GeometryCollection = {
+      type: 'GeometryCollection',
+      geometries: [{
+        type: 'Point',
+        coordinates: coordinates.reverse()
+      }]
+    }
+
+    const localities = await lastValueFrom(this.lajiApiService.post<CoordinateLocationResponse>('coordinates/location', geometry, { lang: 'multi' }).pipe(map(res => res.data)))
+
+    if (!localities.results.length) {
+      return {};
+    }
+
+    let matchFound = false;
+    const nonMatches = [];
+
+    localities.results.forEach(locality => {
+      if (!locality.types.includes('municipality')) {
+        return;
+      }
+
+      locality.address_components.forEach(component => {
+        if (!component.types.includes('municipality')) {
+          return;
+        }
+
+        Object.keys(component.short_name).forEach(lang => {
+          if(component.short_name[lang].toLowerCase() === value.toLowerCase()) {
+            matchFound = true;
+          }
+        })
+
+        if (!matchFound) {
+          nonMatches.push(component.short_name['fi']);
+        }
+      });
+    });
+
+    if (matchFound || !nonMatches) {
+      return {};
+    }
+
+    return this.getError(field, `Coordinates do not match municipality, has ${value} but coordinates correspond to ${nonMatches.join(', ')}`)
   }
 
   private getError(field: string, errorMsg: string, value?: any) {

@@ -20,7 +20,7 @@ export class LajiApiService {
   public post<T>(path: string, body: StoreObject, params = {}): Observable<AxiosResponse<T>> {
     return this.httpService.post(this.baseUrl + path, body, { params: { ...this.baseParams, ...params} });
   }
-  
+
   public delete<T>(path: string, params = {}): Observable<AxiosResponse<T>> {
     return this.httpService.delete(this.baseUrl + path, { params: {...this.baseParams, ...params} });
   }
