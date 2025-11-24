@@ -178,7 +178,7 @@ export class MediaApiService {
   }
 
   putMetadata(id: string, type: string, meta: Meta) {
-    return this.httpService.put(`${this.urlBase}api/${type}/${id}`, meta, this.baseConfig).pipe(
+    return this.httpService.put<Media>(`${this.urlBase}api/${type}/${id}`, meta, this.baseConfig).pipe(
       catchError(e => {
         console.error(e);
         throw new InternalServerErrorException('Error updating media metadata to Media-API', e.message);
@@ -218,7 +218,7 @@ export class MediaApiService {
       license: media.intellectualRights,
       caption: media.caption,
       tags: media.keyword,
-      uploadedBy: current?.uploadedBy || profile.id,
+      uploadedBy: current?.uploadedBy || media.uploadedBy || profile.id,
       secret: (media.publicityRestrictions && media.publicityRestrictions !== 'MZ.publicityRestrictionsPublic') || false
     };
   }

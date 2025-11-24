@@ -55,7 +55,14 @@ export class MediaController {
 
   @UseInterceptors(MediaAccessInterceptor)
   @Put(':type/:id')
-  putMedia(@Param('type') type: string, @Param('id') id: string, @Body() body) {
-    return this.mediaService.putMetadata(id, type, body);
+  @HttpCode(200)
+  putMedia(@Req() request, @Param('type') type: string, @Param('id') id: string, @Body() body) {
+    if (!body.intellectualOwner) {
+      throw new BadRequestException(ErrorMessages.missingIntellectualOwner);
+    }
+    const profile = request.user.profile;
+
+    const meta = this.mediaService.typeToMeta(type, profile, body);
+    return this.mediaService.putMetadata(id, type, meta).pipe(map(res => body));
   }
 }
