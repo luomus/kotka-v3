@@ -1,4 +1,16 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, TemplateRef, input, output, effect, Signal, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ViewChild,
+  TemplateRef,
+  input,
+  output,
+  effect,
+  Signal,
+  inject,
+  ElementRef
+} from '@angular/core';
 import { KotkaDocumentObjectType, KotkaDocumentObjectMap, LajiForm } from '@kotka/shared/models';
 import {
   Observable
@@ -85,6 +97,7 @@ export class FormViewComponent<
   copyData = output<Partial<S>>();
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
+  @ViewChild('formActionAlerts') formActionAlerts?: ElementRef<HTMLDivElement>;
 
   constructor() {
     this.formState = this.formViewFacade.state;
@@ -126,10 +139,8 @@ export class FormViewComponent<
         this.notifier.showSuccess('Save success!');
         this.saveSuccess.emit(formData);
       },
-      error: () => {
-        this.lajiForm?.unBlock();
-        this.notifier.showError('Save failed!');
-        this.cdr.markForCheck();
+      error: (err) => {
+        this.onSaveError(err);
       },
     });
   }
@@ -162,10 +173,8 @@ export class FormViewComponent<
         this.lajiForm?.unBlock();
         this.copyAsNew(data);
       },
-      error: () => {
-        this.lajiForm?.unBlock();
-        this.notifier.showError('Save failed!');
-        this.cdr.markForCheck();
+      error: (err) => {
+        this.onSaveError(err);
       },
     });
   }
@@ -181,6 +190,10 @@ export class FormViewComponent<
 
   dismissDisabledAlert() {
     this.formViewFacade.setDisabledAlertDismissed(true);
+  }
+
+  hideUniqueIDRequiredAlert() {
+    this.formViewFacade.setShowUniqueIDRequiredAlert(false);
   }
 
   hideDeleteTargetInUseAlert() {
@@ -205,6 +218,7 @@ export class FormViewComponent<
 
         if (err?.error?.message === ErrorMessages.deletionTargetInUse) {
           this.formViewFacade.setShowDeleteTargetInUseAlert(true);
+          this.formActionAlerts?.nativeElement.scrollIntoView();
         } else {
           this.notifier.showError('Delete failed!');
         }
@@ -236,5 +250,18 @@ export class FormViewComponent<
     );
 
     this.copyData.emit(newData);
+  }
+
+  private onSaveError(err: any) {
+    this.lajiForm?.unBlock();
+
+    if (err?.error?.message === ErrorMessages.uniqueIDRequired) {
+      this.formViewFacade.setShowUniqueIDRequiredAlert(true);
+      this.formActionAlerts?.nativeElement.scrollIntoView();
+    } else {
+      this.notifier.showError('Save failed!');
+    }
+
+    this.cdr.markForCheck();
   }
 }

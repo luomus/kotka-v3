@@ -160,7 +160,7 @@ export class ValidationService {
         type: 'Point',
         coordinates: coordinates.reverse()
       }]
-    }
+    };
 
     const localities = await lastValueFrom(this.lajiApiService.post<CoordinateLocationResponse>('coordinates/location', geometry, { lang: 'multi' }).pipe(map(res => res.data)));
 
@@ -185,7 +185,7 @@ export class ValidationService {
           if(component.short_name[lang].toLowerCase() === value.toLowerCase()) {
             matchFound = true;
           }
-        })
+        });
 
         if (!matchFound) {
           nonMatches.push(component.short_name['fi']);

@@ -96,7 +96,7 @@ export interface CoordinateResultAddress {
 interface CoordinateResultGeometry {
   bounds: CoordinateResultBox
   location: CoordinateResultPoint
-  location_type: "string",
+  location_type: 'string',
   viewport: CoordinateResultBox
 }
 

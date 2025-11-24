@@ -2,7 +2,7 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { StoreGetQuery } from '@kotka/shared/models';
+import { ErrorMessages, StoreGetQuery } from '@kotka/shared/models';
 import { lastValueFrom } from 'rxjs';
 import { LajiStoreService, TriplestoreService } from '@kotka/api/services';
 import { TriplestoreMapperService } from '@kotka/api/mappers';
@@ -73,12 +73,13 @@ export abstract class LajiStoreController<T extends StoreObject> {
 
       return res.data;
     } catch (err) {
-      console.error(err);
       const message = err.response?.data?.message;
 
       if (err.status === 400 && message && existingErrorRegex.test(message)) {
-        throw new BadRequestException(err.message);
+        throw new BadRequestException(ErrorMessages.uniqueIDRequired);
       }
+
+      console.error(err);
       throw new InternalServerErrorException(err.message);
     }
   }
