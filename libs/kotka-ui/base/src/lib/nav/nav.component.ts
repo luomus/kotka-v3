@@ -1,8 +1,4 @@
-import {
-  Component,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-} from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { UserService } from '@kotka/ui/services';
 import {
   NavigationEnd,
@@ -32,14 +28,15 @@ import { CommonModule } from '@angular/common';
   ],
 })
 export class NavComponent {
+  userService = inject(UserService);
+  private cdr = inject(ChangeDetectorRef);
+
   isCollapsed = true;
   currentPath = '';
 
-  constructor(
-    router: Router,
-    public userService: UserService,
-    private cdr: ChangeDetectorRef,
-  ) {
+  constructor() {
+    const router = inject(Router);
+
     router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.currentPath = event.url;

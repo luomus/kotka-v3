@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { formatDate } from '@angular/common';
 import { ApiLabelService } from './api-label.service';
@@ -9,7 +9,8 @@ export type LabelKey = string | number | boolean;
   providedIn: 'root',
 })
 export class LabelService {
-  constructor(private apiLabelService: ApiLabelService) {}
+  private apiLabelService = inject(ApiLabelService);
+
 
   getLabel(key: LabelKey): Observable<string> {
     const apiLabelType = this.apiLabelService.getApiLabelType(key);
@@ -49,11 +50,11 @@ export class LabelService {
     }
 
     if (/^\d{4}-\d{2}-\d{2}$/.test(key)) {
-      return formatDate(key, 'dd.MM.YYYY', 'en') || key;
+      return formatDate(key, 'dd.MM.yyyy', 'en') || key;
     }
 
     if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(key)) {
-      return formatDate(key, 'dd.MM.YYYY HH:mm', 'en') || key;
+      return formatDate(key, 'dd.MM.yyyy HH:mm', 'en') || key;
     }
 
     return key;

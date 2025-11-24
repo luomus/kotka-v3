@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { combineLatest, Observable, shareReplay } from 'rxjs';
 import { LajiForm } from '@kotka/shared/models';
 import { map, take } from 'rxjs/operators';
@@ -11,13 +11,11 @@ export type EnumOption = { const: string; title: string };
   providedIn: 'root',
 })
 export class FormService {
+  private apiClient = inject(ApiClient);
+  private userService = inject(UserService);
+
   private formById$: Record<string, Observable<LajiForm.SchemaForm>> = {};
   private countryOptions$?: Observable<EnumOption[]>;
-
-  constructor(
-    private apiClient: ApiClient,
-    private userService: UserService,
-  ) {}
 
   getForm(formId: string): Observable<LajiForm.SchemaForm> {
     if (!this.formById$[formId]) {

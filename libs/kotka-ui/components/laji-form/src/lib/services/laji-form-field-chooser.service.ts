@@ -1,10 +1,4 @@
-import {
-  ComponentRef,
-  effect,
-  Injectable,
-  OutputRefSubscription,
-  signal
-} from '@angular/core';
+import { ComponentRef, effect, Injectable, OutputRefSubscription, signal, inject } from '@angular/core';
 import { LajiFormComponent } from '../laji-form/laji-form.component';
 import { ComponentService } from '@kotka/ui/services';
 import {
@@ -28,6 +22,8 @@ export interface LajiFormFieldChooserOptions {
   providedIn: 'root',
 })
 export class LajiFormFieldChooserService {
+  private componentService = inject(ComponentService);
+
   private isActiveSignal = signal<boolean>(false);
   isActive = this.isActiveSignal.asReadonly();
 
@@ -45,9 +41,7 @@ export class LajiFormFieldChooserService {
 
   private lajiFormDestroySub?: OutputRefSubscription;
 
-  constructor(
-    private componentService: ComponentService
-  ) {
+  constructor() {
     effect(() => {
       this.fieldChooserComponentRef()?.setInput('form', this.form());
     });

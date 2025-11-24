@@ -1,10 +1,4 @@
-import {
-  Component,
-  Input,
-  OnChanges,
-  ViewChild,
-  SimpleChanges,
-} from '@angular/core';
+import { Component, Input, OnChanges, ViewChild, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   DatatableSource,
@@ -25,6 +19,9 @@ import { Observable, map } from 'rxjs';
   imports: [CommonModule, DatatableComponent],
 })
 export class DocumentDatatableComponent implements OnChanges {
+  private dataService = inject(DatatableDataService);
+  private userService = inject(UserService);
+
   @ViewChild(DatatableComponent, { static: true })
   datatableComponent!: DatatableComponent;
 
@@ -44,10 +41,7 @@ export class DocumentDatatableComponent implements OnChanges {
   datasource!: DatatableSource;
   settingsKey$!: Observable<string>;
 
-  constructor(
-    private dataService: DatatableDataService,
-    private userService: UserService,
-  ) {
+  constructor() {
     this.datasource = {
       getRows: (params: GetRowsParams) => {
         this.dataService

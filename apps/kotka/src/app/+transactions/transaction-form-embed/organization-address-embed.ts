@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { catchError, Observable, of, ReplaySubject, switchMap } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { ApiClient } from '@kotka/ui/services';
@@ -10,16 +10,26 @@ import { CommonModule } from '@angular/common';
   selector: 'kotka-organization-address-embed',
   template: `
     <div class="form-group">
-      <ng-container *ngIf="data$ | async as data">
+      @if (data$ | async; as data) {
         <label><strong>Organization address:</strong></label>
-        <div *ngIf="data.streetAddress">{{ data.streetAddress }}</div>
-        <div *ngIf="data.postalCode">{{ data.postalCode }}</div>
-        <div *ngIf="data.locality">{{ data.locality }}</div>
-        <div *ngIf="data.region">{{ data.region }}</div>
-        <div *ngIf="data.country">{{ data.country | uppercase }}</div>
-      </ng-container>
+        @if (data.streetAddress) {
+          <div>{{ data.streetAddress }}</div>
+        }
+        @if (data.postalCode) {
+          <div>{{ data.postalCode }}</div>
+        }
+        @if (data.locality) {
+          <div>{{ data.locality }}</div>
+        }
+        @if (data.region) {
+          <div>{{ data.region }}</div>
+        }
+        @if (data.country) {
+          <div>{{ data.country | uppercase }}</div>
+        }
+      }
     </div>
-  `,
+    `,
   imports: [CommonModule],
 })
 export class OrganizationAddressEmbedComponent {
@@ -34,7 +44,9 @@ export class OrganizationAddressEmbedComponent {
     .asObservable()
     .pipe(distinctUntilChanged());
 
-  constructor(private apiClient: ApiClient) {
+  private apiClient = inject(ApiClient);
+
+  constructor() {
     this.data$ = this.organization$.pipe(
       switchMap((organizationId) => this.getOrganization(organizationId)),
     );

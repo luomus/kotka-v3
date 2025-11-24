@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
-  imports: [CommonModule],
+  imports: [],
   selector: 'kui-confirm-modal',
   template: `
     <div class="modal-body">
@@ -15,25 +15,26 @@ import { CommonModule } from '@angular/common';
         class="btn btn-primary"
         (click)="modal.close(true)"
         data-cy="confirm-ok"
-      >
+        >
         {{ confirmLabel }}
       </button>
-      <button
-        type="button"
-        *ngIf="showCancel"
-        class="btn btn-default"
-        (click)="modal.dismiss()"
-      >
-        {{ cancelLabel }}
-      </button>
+      @if (showCancel) {
+        <button
+          type="button"
+          class="btn btn-default"
+          (click)="modal.dismiss()"
+          >
+          {{ cancelLabel }}
+        </button>
+      }
     </div>
-  `,
+    `,
 })
 export class ConfirmModalComponent {
+  modal = inject(NgbActiveModal);
+
   message!: string;
   confirmLabel = 'OK';
   cancelLabel = 'cancel';
   showCancel = true;
-
-  constructor(public modal: NgbActiveModal) {}
 }

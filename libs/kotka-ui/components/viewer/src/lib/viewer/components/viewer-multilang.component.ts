@@ -6,20 +6,18 @@ import {
   LajiForm,
 } from '@kotka/shared/models';
 import { ViewerFieldComponent } from './viewer-field.component';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'kui-viewer-multilang',
   template: `
-    <ng-container *ngIf="field">
-      <ng-container *ngFor="let lang of ['en', 'fi', 'sv']">
-        <ng-container
-          *ngIf="
-            data?.[lang] ||
-            differenceDataObject?.[lang] ||
-            differenceDataPatch?.value?.[lang]
-          "
-        >
+    @if (field) {
+      @for (lang of ['en', 'fi', 'sv']; track lang) {
+        @if (
+          data?.[lang] ||
+          differenceDataObject?.[lang] ||
+          differenceDataPatch?.value?.[lang]
+          ) {
           <kui-viewer-field
             [label]="field.label + ' (' + lang + ')'"
             [field]="field"
@@ -32,14 +30,14 @@ import { CommonModule } from '@angular/common';
                   }
                 : $any(differenceDataObject?.[lang])
             "
-          ></kui-viewer-field>
-        </ng-container>
-      </ng-container>
-    </ng-container>
-  `,
+        ></kui-viewer-field>
+      }
+    }
+    }
+    `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ViewerFieldComponent],
+  imports: [ViewerFieldComponent],
 })
 export class ViewerMultilangComponent {
   @Input() field?: LajiForm.Field;

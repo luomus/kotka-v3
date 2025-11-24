@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Directive, HostListener, OnDestroy, signal, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Directive, HostListener, inject, OnDestroy, signal, ViewChild } from '@angular/core';
 import { ComponentCanDeactivate, DialogService, navigationEnd$ } from '@kotka/ui/services';
 import { from, Observable, of, Subscription } from 'rxjs';
 import { FormViewComponent } from './form-view.component';
@@ -20,12 +20,12 @@ export class FormViewContainerComponent<
 
   private routeParamUpdateSub: Subscription;
 
-  constructor(
-    protected dialogService: DialogService,
-    protected activeRoute: ActivatedRoute,
-    protected router: Router,
-    protected cdr: ChangeDetectorRef
-  ) {
+  protected dialogService = inject(DialogService);
+  protected activeRoute = inject(ActivatedRoute);
+  protected router = inject(Router);
+  protected cdr = inject(ChangeDetectorRef);
+
+  constructor() {
     this.setRouteParams();
 
     this.routeParamUpdateSub = navigationEnd$(this.router).subscribe(() => {

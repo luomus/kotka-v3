@@ -1,9 +1,4 @@
-import {
-  ChangeDetectorRef,
-  OnDestroy,
-  Pipe,
-  PipeTransform,
-} from '@angular/core';
+import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform, inject } from '@angular/core';
 import { forkJoin, Observable, Subscription } from 'rxjs';
 import { LabelKey, LabelService } from '@kotka/ui/services';
 
@@ -12,15 +7,13 @@ import { LabelKey, LabelService } from '@kotka/ui/services';
   pure: false,
 })
 export class LabelPipe implements PipeTransform, OnDestroy {
+  private labelService = inject(LabelService);
+  private cdr = inject(ChangeDetectorRef);
+
   value: string | string[] = '';
   lastId?: LabelKey | LabelKey[];
 
   private labelSub?: Subscription;
-
-  constructor(
-    private labelService: LabelService,
-    private cdr: ChangeDetectorRef,
-  ) {}
 
   ngOnDestroy() {
     this.labelSub?.unsubscribe();

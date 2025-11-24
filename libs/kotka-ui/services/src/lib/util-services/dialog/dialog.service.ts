@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, of, from, catchError } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmModalComponent } from './confirm-modal.component';
@@ -19,7 +19,8 @@ interface ConfirmConfig extends Pick<DialogConfig, 'message' | 'confirmLabel'> {
 
 @Injectable({ providedIn: 'root' })
 export class DialogService {
-  constructor(private modalService: NgbModal) {}
+  private modalService = inject(NgbModal);
+
 
   alert(message: string): Observable<boolean> {
     return this.createDialog<AlertConfig>({ message, showCancel: false });

@@ -5,6 +5,7 @@ import {
   Input,
   OnChanges,
   Type,
+  inject
 } from '@angular/core';
 import { TransactionDispatchSheetComponent } from './transaction-dispatch-sheet/transaction-dispatch-sheet';
 import { SpecimenTransaction } from '@luomus/laji-schema';
@@ -99,13 +100,11 @@ export class TransactionPdfSheetsComponent implements OnChanges {
 
   loading = false;
 
-  constructor(
-    private transactionPdfSheetsContext: TransactionPdfSheetsContextService,
-    private pdfService: PdfService,
-    private dialogService: DialogService,
-    private logger: Logger,
-    private cdr: ChangeDetectorRef,
-  ) {}
+  private transactionPdfSheetsContext = inject(TransactionPdfSheetsContextService);
+  private pdfService = inject(PdfService);
+  private dialogService = inject(DialogService);
+  private logger = inject(Logger);
+  private cdr = inject(ChangeDetectorRef);
 
   ngOnChanges() {
     const specimenIds = (this.data?.awayIDs || [])

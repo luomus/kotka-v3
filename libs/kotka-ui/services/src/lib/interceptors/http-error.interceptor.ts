@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
   HttpContextToken,
   HttpErrorResponse,
@@ -23,12 +23,12 @@ export const LOGIN_REDIRECT_ENABLED = new HttpContextToken<boolean>(() => true);
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
+  private userService = inject(UserService);
+  private router = inject(Router);
+
   private needsRedirect$ = new Subject<void>();
 
-  constructor(
-    private userService: UserService,
-    private router: Router,
-  ) {
+  constructor() {
     this.needsRedirect$.pipe(throttleTime(5000)).subscribe(() => {
       this.userService.redirectToLogin(this.router.url);
     });

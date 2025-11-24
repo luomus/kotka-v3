@@ -1,19 +1,19 @@
 import {
-  ChangeDetectionStrategy, ChangeDetectorRef,
-  Component, computed, effect, Inject,
-  signal, Signal, untracked, ViewChild
+  ChangeDetectionStrategy,
+  Component, computed, effect,
+  signal, Signal, untracked, ViewChild,
+  DOCUMENT, inject
 } from '@angular/core';
 import { KotkaDocumentObjectType, Document as KotkaDocument, Gathering} from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
 import { FormViewContainerComponent } from '@kotka/ui/form-view';
 import { FormViewComponent } from '@kotka/ui/form-view';
 import {
-  DialogService,
   UserService
 } from '@kotka/ui/services';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { ParamMap } from '@angular/router';
 import { map } from 'rxjs/operators';
-import { DOCUMENT, NgClass, NgTemplateOutlet } from '@angular/common';
+import { NgClass, NgTemplateOutlet } from '@angular/common';
 import {
   getRequiredFields,
   formDataItemsAreEqual,
@@ -105,17 +105,13 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
   private showOnlyBasicFieldsStorageKey = signal<string | undefined>(undefined);
   private advancedFieldsStorageKey = signal<string | undefined>(undefined);
 
-  constructor(
-    dialogService: DialogService,
-    activeRoute: ActivatedRoute,
-    router: Router,
-    cdr: ChangeDetectorRef,
-    @Inject(DOCUMENT) private document: Document,
-    private userService: UserService,
-    private lajiFormFieldChooserService: LajiFormFieldChooserService,
-    private storage: LocalStorageService
-  ) {
-    super(dialogService, activeRoute, router, cdr);
+  private document = inject(DOCUMENT);
+  private userService = inject(UserService);
+  private lajiFormFieldChooserService = inject(LajiFormFieldChooserService);
+  private storage = inject(LocalStorageService);
+
+  constructor() {
+    super();
 
     this.dataType = toSignal(
       this.activeRoute.paramMap.pipe(

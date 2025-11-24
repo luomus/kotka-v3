@@ -1,14 +1,15 @@
 <kui-main-content title="Transactions" containerClass="container-fluid">
   <kui-spinner [spinning]="!columns">
-    <kui-document-datatable
-      *ngIf="columns"
-      style="height: calc(100vh - 200px)"
-      [dataType]="dataType"
-      [columns]="columns"
-      [enableFileExport]="true"
-      [enableColumnSelection]="true"
-      [dataTypeName]="'transaction'"
-    >
-    </kui-document-datatable>
+    @if (columns) {
+      <kui-document-datatable
+        style="height: calc(100vh - 200px)"
+        [dataType]="dataType"
+        [columns]="columns"
+        [enableFileExport]="true"
+        [enableColumnSelection]="true"
+        [dataTypeName]="'transaction'"
+        >
+      </kui-document-datatable>
+    }
   </kui-spinner>
 </kui-main-content>

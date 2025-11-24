@@ -1,30 +1,20 @@
-import {
-  ApplicationRef,
-  ComponentRef,
-  createComponent,
-  EnvironmentInjector,
-  Inject,
-  Injectable,
-  Injector,
-  Renderer2,
-  RendererFactory2,
-  Type
-} from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { ApplicationRef, ComponentRef, createComponent, EnvironmentInjector, Injectable, Injector, Renderer2, RendererFactory2, Type, DOCUMENT, inject } from '@angular/core';
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class ComponentService {
+  private document = inject<Document>(DOCUMENT);
+  private injector = inject(Injector);
+  private environmentInjector = inject(EnvironmentInjector);
+  private appRef = inject(ApplicationRef);
+
   private renderer: Renderer2;
 
-  constructor(
-    @Inject(DOCUMENT) private document: Document,
-    rendererFactory: RendererFactory2,
-    private injector: Injector,
-    private environmentInjector: EnvironmentInjector,
-    private appRef: ApplicationRef,
-  ) {
+  constructor() {
+    const rendererFactory = inject(RendererFactory2);
+
     this.renderer = rendererFactory.createRenderer(null, null);
   }
 

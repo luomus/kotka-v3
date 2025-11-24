@@ -4,14 +4,16 @@
       <a class="navbar-brand" [href]="'/' | oldKotkaUrl">Kotka</a>
     </div>
 
-    <ng-container *ngIf="currentPath && !currentPath.startsWith('/user/login?token=')">
+    @if (currentPath && !currentPath.startsWith('/user/login?token=')) {
+
       <button class="navbar-toggler" type="button" (click)="isCollapsed = !isCollapsed" aria-expanded="true">
         <span class="navbar-toggler-icon"></span>
       </button>
 
       <div class="collapse navbar-collapse" id="collapsibleNavbar" [ngbCollapse]="isCollapsed">
         <ul class="navbar-nav me-auto">
-          <ng-container *ngIf="userService.isLoggedIn$ | async">
+          @if (userService.isLoggedIn$ | async) {
+
             <li ngbDropdown class="nav-item me-3 dropdown" routerLinkActive="active">
               <a class="nav-link" ngbDropdownToggle id="specimen-menu">Specimens <i class="fa fa-caret-down"></i></a>
               <ul class="dropdown-menu" ngbDropdownMenu role="menu" aria-labelledby="specimen-menu">
@@ -95,23 +97,31 @@
                 <li><a class="dropdown-item" [href]="'/reports/annual' | oldKotkaUrl"><i class="fa fa-bar-charts"></i> Annual reports</a></li>
               </ul>
             </li>
-          </ng-container>
+          
+}
         </ul>
 
         <ul class="nav navbar-nav" routerLinkActive="active">
-          <ng-container *ngIf="userService.isLoggedIn$ | async else userLogin">
-            <li ngbDropdown class="nav-item dropdown" placement="bottom right" *ngIf="userService.user$ | async as user;">
+          @if (userService.isLoggedIn$ | async) {
+
+            @if (userService.user$ | async; as user;) {
+<li ngbDropdown class="nav-item dropdown" placement="bottom right">
               <a class="nav-link" ngbDropdownToggle id="user-menu"><i class="fa fa-user"></i>&nbsp; {{ user.fullName }}</a>
               <ul class="dropdown-menu dropdown-menu-right" ngbDropdownMenu>
                 <li><a class="dropdown-item" id="user-logout" routerLink="/user/logout"><i class="fa fa-power-off"></i> Logout</a></li>
               </ul>
             </li>
-          </ng-container>
-          <ng-template #userLogin>
+}
+          
+} @else {
+
             <a class="nav-link" href="/api/auth/login?next={{ currentPath }}">Login</a>
-          </ng-template>
+          
+}
+          
         </ul>
       </div>
-    </ng-container>
+    
+}
   </div>
 </nav>

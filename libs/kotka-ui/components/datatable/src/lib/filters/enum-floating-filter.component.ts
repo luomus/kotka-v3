@@ -6,7 +6,7 @@ import {
 } from '@ag-grid-community/core';
 import { IFloatingFilterAngularComp } from '@ag-grid-community/angular';
 import { LajiForm } from '@kotka/shared/models';
-import { KeyValuePipe, NgForOf } from '@angular/common';
+import { KeyValuePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 interface FilterExtraParams {
@@ -14,7 +14,7 @@ interface FilterExtraParams {
 }
 
 @Component({
-  imports: [KeyValuePipe, NgForOf, FormsModule],
+  imports: [KeyValuePipe, FormsModule],
   template: `
     <div class="ag-floating-filter-input">
       <div class="ag-select ag-filter-select">
@@ -22,17 +22,18 @@ interface FilterExtraParams {
           class="ag-picker-field-wrapper"
           [ngModel]="currentFilter"
           (ngModelChange)="changeFilterValue($event)"
-        >
-          <option
-            *ngFor="let item of valueOptions | keyvalue"
-            [value]="item.key"
           >
-            {{ item.value }}
-          </option>
+          @for (item of valueOptions | keyvalue; track item) {
+            <option
+              [value]="item.key"
+              >
+              {{ item.value }}
+            </option>
+          }
         </select>
       </div>
     </div>
-  `,
+    `,
   styles: [
     `
       .ag-select {

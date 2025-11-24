@@ -7,48 +7,43 @@ import {
 import { ViewerCollectionComponent } from './viewer-collection.component';
 import { ViewerMultilangComponent } from './viewer-multilang.component';
 import { ViewerFieldComponent } from './viewer-field.component';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'kui-viewer-fieldset-field',
   template: `
-    <ng-container *ngIf="field">
-      <kui-viewer-collection
-        *ngIf="
-          field.type === 'collection' && field.fields;
-          else nonCollectionField
-        "
-        [field]="field"
-        [data]="data"
-        [differenceData]="$any(differenceData)"
-      ></kui-viewer-collection>
-
-      <ng-template #nonCollectionField>
-        <kui-viewer-multilang
-          *ngIf="isMultiLangField(field); else basicField"
+    @if (field) {
+      @if (
+        field.type === 'collection' && field.fields) {
+        <kui-viewer-collection
           [field]="field"
           [data]="data"
           [differenceData]="$any(differenceData)"
-        ></kui-viewer-multilang>
-      </ng-template>
-
-      <ng-template #basicField>
-        <kui-viewer-field
-          [field]="field"
-          [data]="data"
-          [differenceData]="$any(differenceData)"
-        ></kui-viewer-field>
-      </ng-template>
-    </ng-container>
-  `,
+        ></kui-viewer-collection>
+      } @else {
+        @if (isMultiLangField(field)) {
+          <kui-viewer-multilang
+            [field]="field"
+            [data]="data"
+            [differenceData]="$any(differenceData)"
+          ></kui-viewer-multilang>
+        } @else {
+          <kui-viewer-field
+            [field]="field"
+            [data]="data"
+            [differenceData]="$any(differenceData)"
+          ></kui-viewer-field>
+        }
+      }
+    }
+    `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     ViewerCollectionComponent,
     ViewerMultilangComponent,
-    ViewerFieldComponent,
-  ],
+    ViewerFieldComponent
+],
 })
 export class ViewerFieldsetFieldComponent {
   @Input() field?: LajiForm.Field;

@@ -15,14 +15,15 @@ import {
   BasicFilterModel,
   CombinedFilterModel,
 } from '@kotka/ui/datatable';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { ApiClient } from '@kotka/ui/services';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DatatableDataService {
-  constructor(private apiClient: ApiClient) {}
+  private apiClient = inject(ApiClient);
+
 
   getData(
     dataType: KotkaDocumentObjectType,

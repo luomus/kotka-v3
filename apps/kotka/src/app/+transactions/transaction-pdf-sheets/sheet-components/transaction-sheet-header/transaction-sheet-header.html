@@ -1,33 +1,59 @@
-<div class="transaction-header" *ngIf="ownerOrganization">
-  <div class="transaction-header-left">
-    <div class="content-block multi-line font-bold">
-      <span *ngIf="ownerOrganization.organizationLevel2">{{ ownerOrganization.organizationLevel2.en }}</span>
-      <span *ngIf="ownerOrganization.organizationLevel3 || ownerOrganization.abbreviation">{{ ownerOrganization.organizationLevel3?.en }}<ng-container *ngIf="ownerOrganization.abbreviation"> ({{ ownerOrganization.abbreviation }})</ng-container></span>
-      <span *ngIf="ownerOrganization.organizationLevel4">{{ ownerOrganization.organizationLevel4.en }}</span>
+@if (ownerOrganization) {
+  <div class="transaction-header">
+    <div class="transaction-header-left">
+      <div class="content-block multi-line font-bold">
+        @if (ownerOrganization.organizationLevel2) {
+          <span>{{ ownerOrganization.organizationLevel2.en }}</span>
+        }
+        @if (ownerOrganization.organizationLevel3 || ownerOrganization.abbreviation) {
+          <span>{{ ownerOrganization.organizationLevel3?.en }}@if (ownerOrganization.abbreviation) {
+            ({{ ownerOrganization.abbreviation }})
+          }</span>
+        }
+        @if (ownerOrganization.organizationLevel4) {
+          <span>{{ ownerOrganization.organizationLevel4.en }}</span>
+        }
+      </div>
+      <div class="content-block">
+        @if (ownerOrganization.EORINumber) {
+          <div class="sub-content-block">
+            EORI: {{ ownerOrganization.EORINumber }}
+          </div>
+        }
+        <div class="sub-content-block multi-line">
+          @if (ownerOrganization.postOfficeBox) {
+            <span>P.O. Box {{ ownerOrganization.postOfficeBox }}</span>
+          }
+          @if (ownerOrganization.postalCode || ownerOrganization.locality) {
+            <span>{{ ownerOrganization.postalCode }} {{ ownerOrganization.locality }}</span>
+          }
+          @if (ownerOrganization.country) {
+            <span>{{ ownerOrganization.country }}</span>
+          }
+        </div>
+        @if (ownerOrganization.courierAddress) {
+          <div class="sub-content-block">
+            Street address for couriers:
+          </div>
+        }
+        @if (ownerOrganization.courierAddress) {
+          <div class="sub-content-block text-with-line-breaks">{{ ownerOrganization.courierAddress }}</div>
+        }
+        @if (ownerOrganization.phone) {
+          <div class="sub-content-block">
+            Tel. {{ ownerOrganization.phone }}
+          </div>
+        }
+      </div>
     </div>
-    <div class="content-block">
-      <div class="sub-content-block" *ngIf="ownerOrganization.EORINumber">
-        EORI: {{ ownerOrganization.EORINumber }}
-      </div>
-      <div class="sub-content-block multi-line">
-        <span *ngIf="ownerOrganization.postOfficeBox">P.O. Box {{ ownerOrganization.postOfficeBox }}</span>
-        <span *ngIf="ownerOrganization.postalCode || ownerOrganization.locality">{{ ownerOrganization.postalCode }} {{ ownerOrganization.locality }}</span>
-        <span *ngIf="ownerOrganization.country">{{ ownerOrganization.country }}</span>
-      </div>
-      <div class="sub-content-block" *ngIf="ownerOrganization.courierAddress">
-        Street address for couriers:
-      </div>
-      <div class="sub-content-block text-with-line-breaks" *ngIf="ownerOrganization.courierAddress">{{ ownerOrganization.courierAddress }}</div>
-      <div class="sub-content-block" *ngIf="ownerOrganization.phone">
-        Tel. {{ ownerOrganization.phone }}
-      </div>
+    <div class="transaction-header-middle">
+      @if (ownerOrganization.logo) {
+        <img height="80" [src]="ownerOrganization.logo" />
+      }
     </div>
-  </div>
-  <div class="transaction-header-middle">
-    <img *ngIf="ownerOrganization.logo" height="80" [src]="ownerOrganization.logo" />
-  </div>
-  <div class="transaction-header-right multi-line">
+    <div class="transaction-header-right multi-line">
     <img [src]="'https://koivu.luomus.fi/projects/qrcode/?code=' + (data.id | toFullUri)" width="50" height="50">
     <span>{{ data.id | toFullUri }}</span>
   </div>
 </div>
+}

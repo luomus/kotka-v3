@@ -16,39 +16,43 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'kui-viewer-field',
   template: `
-    <div class="row mb-1" *ngIf="field && hasData">
-      <div class="col-sm-3">
-        <label
-          ><strong>{{ label || field.label }}:</strong></label
-        ><br />
-      </div>
-      <div class="col-sm-9">
-        <div
-          *ngIf="isArray"
+    @if (field && hasData) {
+      <div class="row mb-1">
+        <div class="col-sm-3">
+          <label
+            ><strong>{{ label || field.label }}:</strong></label
+            ><br />
+          </div>
+          <div class="col-sm-9">
+            @if (isArray) {
+              <div
           [ngClass]="{
             'viewer-array-field-removed': differenceDataPatch?.op === 'remove',
             'viewer-array-field-added': differenceDataPatch?.op === 'add',
           }"
-        >
-          <kui-viewer-field-value-array
-            [field]="field"
+                >
+                <kui-viewer-field-value-array
+                  [field]="field"
             [data]="
               differenceDataPatch?.op === 'add'
                 ? differenceDataPatch?.value
                 : data
             "
-            [differenceData]="differenceDataPatchArray"
-          ></kui-viewer-field-value-array>
+                  [differenceData]="differenceDataPatchArray"
+                ></kui-viewer-field-value-array>
+              </div>
+            }
+            @if (!isArray) {
+              <kui-viewer-field-value
+                [field]="field"
+                [data]="data"
+                [differenceData]="differenceDataPatch"
+              ></kui-viewer-field-value>
+            }
+          </div>
         </div>
-        <kui-viewer-field-value
-          *ngIf="!isArray"
-          [field]="field"
-          [data]="data"
-          [differenceData]="differenceDataPatch"
-        ></kui-viewer-field-value>
-      </div>
-    </div>
-  `,
+      }
+    `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, ViewerFieldValueArrayComponent, ViewerFieldValueComponent],

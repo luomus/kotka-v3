@@ -1,21 +1,9 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  HostListener,
-  Inject,
-  input,
-  OnDestroy,
-  output,
-  signal,
-  Signal
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, HostListener, input, OnDestroy, output, signal, Signal, DOCUMENT, inject } from '@angular/core';
 import {
   FieldChooserColorTheme,
   LajiFormFieldChooserHighlightComponent
 } from './laji-form-field-chooser-highlight.component';
-import { DOCUMENT } from '@angular/common';
+
 import { DialogService } from '@kotka/ui/services';
 import { LajiForm } from '@kotka/shared/models';
 import { parseSchemaFromFormDataPointer } from '@luomus/laji-form/lib/utils';
@@ -76,6 +64,10 @@ const getHighlightElemIdFromSchemaElemId = (schemaElemId: string): string => {
   imports: [LajiFormFieldChooserHighlightComponent],
 })
 export class LajiFormFieldChooserComponent implements OnDestroy {
+  private document = inject<Document>(DOCUMENT);
+  private window = inject<Window>('Window' as any);
+  private dialogService = inject(DialogService);
+
   form = input<LajiForm.SchemaForm|undefined>(undefined);
   formElem = input<HTMLElement|undefined>(undefined);
 
@@ -96,11 +88,7 @@ export class LajiFormFieldChooserComponent implements OnDestroy {
   private highlightIndexesBySelectedProp: Signal<Record<string, number[]>>;
   private mutationObserver: MutationObserver;
 
-  constructor(
-    @Inject(DOCUMENT) private document: Document,
-    @Inject('Window') private window: Window,
-    private dialogService: DialogService
-  ) {
+  constructor() {
     this.mutationObserver = new MutationObserver(() => {
       if (!this.form()) {
         return;

@@ -1,4 +1,4 @@
-import { ErrorHandler, Injectable, Injector } from '@angular/core';
+import { ErrorHandler, Injectable, Injector, inject } from '@angular/core';
 import { ToastService } from '../util-services';
 import { Logger } from '../logger';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
@@ -7,12 +7,10 @@ let errorSent = false;
 
 @Injectable()
 export class ErrorHandlerService extends ErrorHandler {
+  private injector = inject(Injector);
+
   private toastService?: ToastService;
   private logger?: Logger;
-
-  constructor(private injector: Injector) {
-    super();
-  }
 
   override handleError(error: any) {
     if (

@@ -1,5 +1,5 @@
 import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
   Area,
   KotkaDocumentObject,
@@ -35,7 +35,8 @@ const lajiApiPath = lajiApiBase + '/';
   providedIn: 'root',
 })
 export class ApiClient {
-  constructor(private httpClient: HttpClient) {}
+  private httpClient = inject(HttpClient);
+
 
   getDocumentById<
     T extends KotkaDocumentObjectType,

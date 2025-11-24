@@ -1,14 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ViewChild,
-  TemplateRef,
-  input,
-  output,
-  effect,
-  Signal
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, TemplateRef, input, output, effect, Signal, inject } from '@angular/core';
 import { KotkaDocumentObjectType, KotkaDocumentObjectMap, LajiForm } from '@kotka/shared/models';
 import {
   Observable
@@ -51,6 +41,12 @@ export class FormViewComponent<
   S extends KotkaDocumentObjectMap[T] = KotkaDocumentObjectMap[T],
 >
 {
+  private notifier = inject(ToastService);
+  private apiClient = inject(ApiClient);
+  private dialogService = inject(DialogService);
+  private formViewFacade = inject<FormViewFacade<T, S>>(FormViewFacade);
+  private cdr = inject(ChangeDetectorRef);
+
   formId = input.required<string>();
   dataType = input.required<T>();
   dataTypeName = input('');
@@ -90,13 +86,7 @@ export class FormViewComponent<
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
 
-  constructor(
-    private notifier: ToastService,
-    private apiClient: ApiClient,
-    private dialogService: DialogService,
-    private formViewFacade: FormViewFacade<T, S>,
-    private cdr: ChangeDetectorRef,
-  ) {
+  constructor() {
     this.formState = this.formViewFacade.state;
 
     effect(() => {

@@ -1,7 +1,7 @@
 import {
   ChangeDetectionStrategy,
-  Component,
-  ViewEncapsulation,
+  Component, inject,
+  ViewEncapsulation
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { map, switchMap } from 'rxjs/operators';
@@ -49,11 +49,11 @@ export class PdfDemoComponent {
 
   typeEnum = TypeEnum;
 
-  constructor(
-    private route: ActivatedRoute,
-    private apiClient: ApiClient,
-    private transactionPdfSheetsContextService: TransactionPdfSheetsContextService,
-  ) {
+  private route = inject(ActivatedRoute);
+  private apiClient = inject(ApiClient);
+  private transactionPdfSheetsContextService = inject(TransactionPdfSheetsContextService);
+
+  constructor() {
     const params$ = this.route.queryParams.pipe(
       map(({ uri, type }) => ({
         id: getId(uri),

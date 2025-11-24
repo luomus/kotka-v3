@@ -1,14 +1,4 @@
-import {
-  Component,
-  Injector,
-  OnDestroy,
-  input,
-  computed,
-  signal,
-  Signal,
-  effect,
-  WritableSignal
-} from '@angular/core';
+import { Component, Injector, OnDestroy, input, computed, signal, Signal, effect, WritableSignal, inject } from '@angular/core';
 import {
   ColDef as AgGridColDef,
   DragStoppedEvent,
@@ -67,6 +57,13 @@ interface GridReadyEvent {
   imports: [TotalCountComponent, SpinnerComponent, AgGridAngular]
 })
 export class DatatableComponent implements OnDestroy {
+  private modalService = inject(NgbModal);
+  private datatableExportService = inject(DatatableExportService);
+  private settingsStoreService = inject(DatatableSettingsStoreService);
+  private injector = inject(Injector);
+  private logger = inject(Logger);
+  private dialogService = inject(DialogService);
+
   columns = input<DatatableColumn[]>([]);
   datasource = input<DatatableSource>();
 
@@ -115,14 +112,7 @@ export class DatatableComponent implements OnDestroy {
   private isDestroyed = false;
   private unsubscribe$ = new Subject<void>();
 
-  constructor(
-    private modalService: NgbModal,
-    private datatableExportService: DatatableExportService,
-    private settingsStoreService: DatatableSettingsStoreService,
-    private injector: Injector,
-    private logger: Logger,
-    private dialogService: DialogService,
-  ) {
+  constructor() {
     this.colDefs = computed(() => (
       getVisibleColDefs(this.allColumns(), this.columnSettings()))
     );

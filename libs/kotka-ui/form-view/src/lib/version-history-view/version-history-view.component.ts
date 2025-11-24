@@ -1,12 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges, OnDestroy,
-  Output,
-  SimpleChanges,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, inject } from '@angular/core';
 import {
   VersionHistoryErrorEnum,
   VersionHistoryViewFacade,
@@ -52,6 +44,10 @@ export class VersionHistoryViewComponent<
   >
   implements OnChanges, OnDestroy
 {
+  private versionHistoryFacade = inject<VersionHistoryViewFacade<T, S>>(VersionHistoryViewFacade);
+  private router = inject(Router);
+  private activeRoute = inject(ActivatedRoute);
+
   @Input() formId?: string;
   @Input() dataType?: T;
   @Input() dataTypeName = '';
@@ -76,11 +72,7 @@ export class VersionHistoryViewComponent<
 
   private routeSub: Subscription;
 
-  constructor(
-    private versionHistoryFacade: VersionHistoryViewFacade<T, S>,
-    private router: Router,
-    private activeRoute: ActivatedRoute,
-  ) {
+  constructor() {
     this.setRouteParamsIfChanged();
 
     this.routeSub = navigationEnd$(this.router).subscribe(() => {

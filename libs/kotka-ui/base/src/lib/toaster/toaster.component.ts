@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  TemplateRef,
-  HostBinding,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, TemplateRef, HostBinding, inject } from '@angular/core';
 import { ToastService } from '@kotka/ui/services';
 import { NgbToast } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
@@ -16,10 +11,10 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule, NgbToast],
 })
 export class ToasterComponent {
+  toastService = inject(ToastService);
+
   @HostBinding('class') classes =
     'toast-container position-fixed top-0 end-0 p-3';
-
-  constructor(public toastService: ToastService) {}
 
   asTemplate(
     tpl: TemplateRef<unknown> | string,

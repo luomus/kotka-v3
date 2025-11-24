@@ -1,8 +1,8 @@
 import {
-  ChangeDetectionStrategy, ChangeDetectorRef,
+  ChangeDetectionStrategy,
   Component, computed,
   OnDestroy, signal, Signal,
-  ViewChild
+  ViewChild, inject
 } from '@angular/core';
 import {
   KotkaDocumentObjectType,
@@ -11,7 +11,7 @@ import {
   isSpecimenTransaction,
 } from '@kotka/shared/models';
 import { Observable, of, Subscription, switchMap } from 'rxjs';
-import { DialogService, Logger, UserService } from '@kotka/ui/services';
+import { Logger, UserService } from '@kotka/ui/services';
 import { FormViewComponent } from '@kotka/ui/form-view';
 import { FormMediaMetadata, LajiFormComponent } from '@kotka/ui/laji-form';
 import { ApiClient, FormService } from '@kotka/ui/services';
@@ -20,7 +20,6 @@ import { globals } from '../../../environments/globals';
 import { FormViewContainerComponent } from '@kotka/ui/form-view';
 import { TransactionPdfSheetsComponent } from '../transaction-pdf-sheets/transaction-pdf-sheets.component';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
 
@@ -56,18 +55,14 @@ export class TransactionFormComponent
 
   private disabled = false;
 
-  constructor(
-    private apiClient: ApiClient,
-    private formService: FormService,
-    dialogService: DialogService,
-    activeRoute: ActivatedRoute,
-    router: Router,
-    cdr: ChangeDetectorRef,
-    private logger: Logger,
-    private transactionFormEmbedService: TransactionFormEmbedService,
-    private userService: UserService,
-  ) {
-    super(dialogService, activeRoute, router, cdr);
+  private apiClient = inject(ApiClient);
+  private formService = inject(FormService);
+  private logger = inject(Logger);
+  private transactionFormEmbedService = inject(TransactionFormEmbedService);
+  private userService = inject(UserService);
+
+  constructor() {
+    super();
 
     this.userName = toSignal(
       this.userService.getCurrentLoggedInUser().pipe(

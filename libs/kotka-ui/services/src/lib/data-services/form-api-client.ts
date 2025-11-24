@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -39,11 +39,10 @@ const pathStartsWith: Record<string, ResourceType> = {
   providedIn: 'root',
 })
 export class FormApiClient {
-  constructor(
-    private httpClient: HttpClient,
-    private toastService: ToastService,
-    private dialogService: DialogService,
-  ) {}
+  private httpClient = inject(HttpClient);
+  private toastService = inject(ToastService);
+  private dialogService = inject(DialogService);
+
 
   public fetch(
     resource: string,

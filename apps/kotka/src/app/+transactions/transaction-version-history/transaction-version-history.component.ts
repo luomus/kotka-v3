@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  inject
 } from '@angular/core';
 import { KotkaDocumentObjectType, SpecimenTransaction } from '@kotka/shared/models';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
@@ -30,9 +31,7 @@ export class TransactionVersionHistoryComponent {
   dataType: KotkaDocumentObjectType.transaction =
     KotkaDocumentObjectType.transaction;
 
-  constructor(
-    private transactionFormEmbedService: TransactionFormEmbedService,
-  ) {}
+  private transactionFormEmbedService = inject(TransactionFormEmbedService);
 
   onFormInit(lajiForm: LajiFormComponent, formData: SpecimenTransaction) {
     this.transactionFormEmbedService.initEmbeddedComponents(lajiForm, formData);

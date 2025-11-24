@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   IFloatingFilterParams,
   TextFilter,
@@ -35,12 +35,14 @@ interface FilterExtraParams {
 export class AutocompleteFloatingFilterComponent
   implements IFloatingFilterAngularComp<TextFilter>
 {
+  private apiClient = inject(ApiClient);
+
   params!: IFloatingFilterParams & FilterExtraParams;
 
   currentFilter?: string;
   fetchResultsFunc: FetchAutocompleteResultsFunc;
 
-  constructor(private apiClient: ApiClient) {
+  constructor() {
     this.fetchResultsFunc = this.getAutocompleteResults.bind(this);
   }
 

@@ -1,4 +1,4 @@
-import { Injectable, NgZone, TemplateRef } from '@angular/core';
+import { Injectable, NgZone, TemplateRef, inject } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { take } from 'rxjs/operators';
 
@@ -17,12 +17,14 @@ export interface ToastInfo extends ToastOptions {
   providedIn: 'root',
 })
 export class ToastService {
+  private ngZone = inject(NgZone);
+
   toasts$: Observable<ToastInfo[]>;
   private toastsSubject = new BehaviorSubject<ToastInfo[]>([]);
 
   private pausedToasts: (string | TemplateRef<unknown>)[] = [];
 
-  constructor(private ngZone: NgZone) {
+  constructor() {
     this.toasts$ = this.toastsSubject.asObservable();
   }
 

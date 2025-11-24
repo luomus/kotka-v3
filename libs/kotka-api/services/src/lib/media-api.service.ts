@@ -164,7 +164,7 @@ export class MediaApiService {
         console.error(e);
         throw new InternalServerErrorException('Error deleting media from Media-API', e.message);
       })
-    )
+    );
   }
 
   postMetadata(type: string, meta: NewMediaFile[]) {
@@ -189,9 +189,9 @@ export class MediaApiService {
   typeToMeta(type: string, profile: Person, media: Image | Pdf): Meta {
     switch (type) {
       case 'pdf':
-        return this.pdfToMeta(profile, media as Pdf)
+        return this.pdfToMeta(profile, media as Pdf);
       case 'images':
-        return this.imageToMeta(profile, media as Image)
+        return this.imageToMeta(profile, media as Image);
       default:
         return;
     }
@@ -265,7 +265,7 @@ export class MediaApiService {
       captureDateTime: meta.captureDateTime ? new Date(meta.captureDateTime * 1000).toISOString() : undefined,
       taxonDescriptionCaption: meta.taxonDescriptionCaption,
       sortOrder: meta.sortOrder,
-    }
+    };
   }
 
 

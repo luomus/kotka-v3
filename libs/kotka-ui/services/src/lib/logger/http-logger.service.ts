@@ -1,12 +1,12 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { ILogger } from './logger.interface';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable()
 export class HttpLogger implements ILogger {
-  private loggerPath = '/api/laji/logger/';
+  private httpClient = inject(HttpClient);
 
-  constructor(private httpClient: HttpClient) {}
+  private loggerPath = '/api/laji/logger/';
 
   public error(message: string, meta?: unknown): void {
     this._log('error', message, meta);

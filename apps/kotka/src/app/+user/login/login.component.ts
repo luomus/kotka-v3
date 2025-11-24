@@ -3,28 +3,27 @@ import {
   ChangeDetectorRef,
   Component,
   OnInit,
+  inject
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '@kotka/ui/services';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'kotka-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, NgbAlert],
+  imports: [NgbAlert],
 })
 export class LoginComponent implements OnInit {
   errorMsg?: string;
 
-  constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private userService: UserService,
-    private cdr: ChangeDetectorRef,
-  ) {}
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private userService = inject(UserService);
+  private cdr = inject(ChangeDetectorRef);
 
   ngOnInit() {
     this.route.queryParams.subscribe((params) => {

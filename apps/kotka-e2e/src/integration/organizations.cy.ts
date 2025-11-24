@@ -37,6 +37,8 @@ describe('organizations', () => {
         // remove the test organization if it already exists
         cy.getChangedCountFromText('[data-cy=total-count]', totalCount).then(count => {
           if (count > 0) {
+            // eslint-disable-next-line cypress/no-unnecessary-waiting
+            cy.wait(1000); // ag-grid throws an error without the wait
             cy.get('.edit-button').first().click();
             cy.get('[data-cy=form-delete]').click();
             cy.get('[data-cy=confirm-ok]').click();
@@ -67,14 +69,14 @@ describe('organizations', () => {
       cy.get('.laji-form-warning-list .error-panel').should('not.exist');
       cy.get('.laji-form-warning-list .warning-panel .btn-success').click();
 
-      cy.get('[data-cy=toast]', { timeout: 40000 }).should('have.text', 'Save success!');
+      cy.get('[data-cy=toast]', { timeout: 40000 }).should('be.visible').should('contain.text', 'Save success!');
       cy.get('[data-cy=toast-close]').click();
       cy.get('[data-cy=main-header]').should('contain', 'Edit organization');
 
       cy.get('[data-cy=form-delete]').click();
       cy.get('[data-cy=confirm-ok]').click();
 
-      cy.get('[data-cy=toast]', { timeout: 10000 }).should('have.text', 'Success!');
+      cy.get('[data-cy=toast]', { timeout: 10000 }).should('be.visible').should('contain.text', 'Success!');
       cy.get('[data-cy=toast-close]').click();
       cy.url().should('equal', Cypress.config('baseUrl') + '/organizations');
     });

@@ -50,7 +50,7 @@ export class MediaController {
   @Delete(':type/:id')
   @HttpCode(204)
   deleteMedia(@Param('type') type: string, @Param('id') id: string) {
-    return this.mediaService.deleteMedia(id, type)
+    return this.mediaService.deleteMedia(id, type);
   }
 
   @UseInterceptors(MediaAccessInterceptor)

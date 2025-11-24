@@ -9,7 +9,7 @@ interface RendererExtraParams {
 
 type RendererParams = ICellRendererParams & RendererExtraParams;
 
-const DEFAULT_FORMAT = 'dd.MM.YYYY';
+const DEFAULT_FORMAT = 'dd.MM.yyyy';
 
 @Component({
   selector: 'kui-date-cell-renderer',
