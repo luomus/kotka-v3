@@ -160,9 +160,9 @@ export class ValidationService {
         type: 'Point',
         coordinates: coordinates.reverse()
       }]
-    }
+    };
 
-    const localities = await lastValueFrom(this.lajiApiService.post<CoordinateLocationResponse>('coordinates/location', geometry, { lang: 'multi' }).pipe(map(res => res.data)))
+    const localities = await lastValueFrom(this.lajiApiService.post<CoordinateLocationResponse>('coordinates/location', geometry, { lang: 'multi' }).pipe(map(res => res.data)));
 
     if (!localities.results.length) {
       return {};
@@ -185,7 +185,7 @@ export class ValidationService {
           if(component.short_name[lang].toLowerCase() === value.toLowerCase()) {
             matchFound = true;
           }
-        })
+        });
 
         if (!matchFound) {
           nonMatches.push(component.short_name['fi']);
@@ -197,7 +197,7 @@ export class ValidationService {
       return {};
     }
 
-    return this.getError(field, `Coordinates do not match municipality, has ${value} but coordinates correspond to ${nonMatches.join(', ')}`)
+    return this.getError(field, `Coordinates do not match municipality, has ${value} but coordinates correspond to ${nonMatches.join(', ')}`);
   }
 
   private getError(field: string, errorMsg: string, value?: any) {

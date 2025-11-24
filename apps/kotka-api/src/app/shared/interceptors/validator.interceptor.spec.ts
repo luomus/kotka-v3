@@ -8,7 +8,7 @@ import { ValidationService } from '../services/validation.service';
 import { NamespaceService } from '../services/namespace.service';
 import { of } from 'rxjs';
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces';
-import { LajiApiService } from '../../../../../../libs/kotka-api/services/src/lib/laji-api.service';
+import { LajiApiService } from '@kotka/api/services';
 
 const mockLajiApiService = {
   post: jest.fn().mockImplementation((path, body) => {
@@ -18,36 +18,36 @@ const mockLajiApiService = {
       return of({ data: {
         'results': [
           {
-            "address_components": [
+            'address_components': [
               {
-                "short_name": {
-                  "sv": "Kangasniemi",
-                  "fi": "Kangasniemi"
+                'short_name': {
+                  'sv': 'Kangasniemi',
+                  'fi': 'Kangasniemi'
                 },
-                "types": [
-                  "municipality"
+                'types': [
+                  'municipality'
                 ]
               }
             ],
-            "place_id": "ML.425",
-            "types": [
-              "municipality"
+            'place_id': 'ML.425',
+            'types': [
+              'municipality'
             ]
           },
           {
-            "address_components": [
+            'address_components': [
               {
-                "short_name": {
-                  "fi": "Etelä-Savo",
-                  "sv": "Södra Savolax"
+                'short_name': {
+                  'fi': 'Etelä-Savo',
+                  'sv': 'Södra Savolax'
                 },
-                "types": [
-                  "region"
+                'types': [
+                  'region'
                 ]
               }
             ],
-            "types": [
-              "region"
+            'types': [
+              'region'
             ]
           }
         ]
@@ -303,11 +303,10 @@ const specimenMunicipalityCordinateValidatorSchema = {
       }
     }
   },
-}
+};
 
 describe('ValidationInterceptor', () => {
   let validatorInterceptor: ValidatorInterceptor;
-  let lajiApiService: LajiApiService;
   let lajiStoreService: LajiStoreService;
   let formService: FormService;
   let namespaceService: NamespaceService;
@@ -324,7 +323,6 @@ describe('ValidationInterceptor', () => {
     }).compile();
 
     validatorInterceptor = moduleRef.get<ValidatorInterceptor>(ValidatorInterceptor);
-    lajiApiService = moduleRef.get<LajiApiService>(LajiApiService);
     lajiStoreService = moduleRef.get<LajiStoreService>(LajiStoreService);
     formService = moduleRef.get<FormService>(FormService);
     reflector = moduleRef.get<Reflector>(Reflector);
@@ -793,7 +791,7 @@ describe('ValidationInterceptor', () => {
             coordinateSystem: 'MY.coordinateSystemWgs84'
           }
         ]
-      }
+      };
 
       const mockRequest = {
         method: 'POST',
@@ -806,7 +804,7 @@ describe('ValidationInterceptor', () => {
           'type': 'Point',
           'coordinates': [27, 62]
         }]
-      }
+      };
 
       const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
         getRequest: () => mockRequest
@@ -821,7 +819,7 @@ describe('ValidationInterceptor', () => {
           expect(mockLajiApiService.post).toHaveBeenCalledTimes(1);
           expect(mockLajiApiService.post.mock.calls[0][0]).toEqual('coordinates/location');
           expect(mockLajiApiService.post.mock.calls[0][1]).toEqual(lajiApiBody);
-          expect(e.options).toEqual({gatherings:{"0":{municipality:{errors:['Coordinates do not match municipality, has Porvoo but coordinates correspond to Kangasniemi']}}}});
+          expect(e.options).toEqual({gatherings:{'0':{municipality:{errors:['Coordinates do not match municipality, has Porvoo but coordinates correspond to Kangasniemi']}}}});
           expect(mockNext.handle).toBeCalledTimes(0);
         }
     });
@@ -837,7 +835,7 @@ describe('ValidationInterceptor', () => {
             coordinateSystem: 'MY.coordinateSystemWgs84'
           }
         ]
-      }
+      };
 
       const mockRequest = {
         method: 'POST',
@@ -850,7 +848,7 @@ describe('ValidationInterceptor', () => {
           'type': 'Point',
           'coordinates': [27, 62]
         }]
-      }
+      };
 
       const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
         getRequest: () => mockRequest
@@ -876,7 +874,7 @@ describe('ValidationInterceptor', () => {
             coordinateSystem: 'MY.coordinateSystemWgs84'
           }
         ]
-      }
+      };
 
       const mockRequest = {
         method: 'POST',
@@ -889,7 +887,7 @@ describe('ValidationInterceptor', () => {
           'type': 'Point',
           'coordinates': [0, 0]
         }]
-      }
+      };
 
       const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
         getRequest: () => mockRequest
