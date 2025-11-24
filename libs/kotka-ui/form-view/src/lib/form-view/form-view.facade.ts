@@ -52,6 +52,7 @@ export interface FormState<S extends KotkaDocumentObject> {
   showCopyButton?: boolean;
   formHasChanges?: boolean;
   disabledAlertDismissed?: boolean;
+  showUniqueIDRequiredAlert?: boolean;
   showDeleteTargetInUseAlert?: boolean;
 }
 
@@ -101,6 +102,10 @@ export class FormViewFacade<
 
   setDisabledAlertDismissed(disabledAlertDismissed: boolean) {
     this.setState({ ...this.state(), disabledAlertDismissed });
+  }
+
+  setShowUniqueIDRequiredAlert(showUniqueIDRequiredAlert: boolean) {
+    this.setState({ ...this.state(), showUniqueIDRequiredAlert });
   }
 
   setShowDeleteTargetInUseAlert(showDeleteTargetInUseAlert: boolean) {

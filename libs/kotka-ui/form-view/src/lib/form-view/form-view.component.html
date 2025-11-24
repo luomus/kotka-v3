@@ -22,12 +22,20 @@
         }
       </ngb-alert>
     } @else if (vm.form && vm.formData && vm.formDataLastForceUpdatedVersion) {
-      @if (vm.showDeleteTargetInUseAlert) {
-        <ngb-alert [type]="'danger'" (closed)="hideDeleteTargetInUseAlert()">
-          <strong>Delete failed:</strong>
-          This {{ dataTypeName() }} can't be deleted because there are resources that are attached to it.
-        </ngb-alert>
-      }
+      <div #formActionAlerts>
+        @if (vm.showUniqueIDRequiredAlert) {
+          <ngb-alert [type]="'danger'" (closed)="hideUniqueIDRequiredAlert()">
+            <strong>Unique ID required:</strong>
+            {{ dataTypeName() | titlecase }} with the given ID exists already.
+          </ngb-alert>
+        }
+        @if (vm.showDeleteTargetInUseAlert) {
+          <ngb-alert [type]="'danger'" (closed)="hideDeleteTargetInUseAlert()">
+            <strong>Delete failed:</strong>
+            This {{ dataTypeName() }} can't be deleted because there are resources that are attached to it.
+          </ngb-alert>
+        }
+      </div>
       @if (vm.disabled && !vm.disabledAlertDismissed) {
         <ngb-alert [type]="'warning'" (closed)="dismissDisabledAlert()">
           <strong>Note:</strong>
