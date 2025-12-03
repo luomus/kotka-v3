@@ -63,6 +63,6 @@ export class MediaController {
     const profile = request.user.profile;
 
     const meta = this.mediaService.typeToMeta(type, profile, body);
-    return this.mediaService.putMetadata(id, type, meta).pipe(map(res => body));
+    return this.mediaService.putMetadata(id, type, meta).pipe(map(() => body));
   }
 }
