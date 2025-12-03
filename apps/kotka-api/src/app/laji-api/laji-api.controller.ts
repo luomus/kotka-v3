@@ -1,4 +1,4 @@
-import { Controller, Get, Put, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthenticationService } from '../authentication/authentication.service';
 import { createProxyMiddleware, RequestHandler, fixRequestBody } from 'http-proxy-middleware';
 import { Request, Response } from 'express';
@@ -25,17 +25,12 @@ export class LajiApiController {
     this.lajiApiProxy = this.getLajiApiProxy();
   }
 
-  @Get(['forms{*all}', 'person{*all}', 'areas{*all}', 'images{*all}'])
+  @Get(['forms{*all}', 'person{*all}', 'areas{*all}'])
   proxyGetRequest(@Req() req: Request, @Res() res: Response) {
     void this.lajiApiProxy(req, res);
   }
 
-  @Put(['images{*all}'])
-  proxyPutRequest(@Req() req: Request, @Res() res: Response) {
-    void this.lajiApiProxy(req, res);
-  }
-
-  @Post(['logger{*all}', 'html-to-pdf{*all}', 'images{*all}'])
+  @Post(['logger{*all}', 'html-to-pdf{*all}'])
   proxyPostRequest(@Req() req: Request, @Res() res: Response) {
     void this.lajiApiProxy(req, res);
   }
