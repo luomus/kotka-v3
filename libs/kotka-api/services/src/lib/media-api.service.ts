@@ -196,29 +196,32 @@ export class MediaApiService {
         return;
     }
   }
-  imageToMeta(profile: Person, media: Image, current?: Meta): Meta {
+  imageToMeta(profile: Person, media: Image): Meta {
     return {
-      ...this.mediaToMeta(profile, media, current),
+      ...this.mediaToMeta(profile, media),
       capturers: media.capturerVerbatim,
       captureDateTime: media.captureDateTime ? new Date(media.captureDateTime).getTime() : undefined,
       taxonDescriptionCaption: media.taxonDescriptionCaption,
-      sortOrder: media.sortOrder || current?.sortOrder,
+      sortOrder: media.sortOrder,
+      identifications: {
+        verbatim: media.taxonVerbatim || undefined,
+        taxonIds: media.taxonURI || undefined
+      }
     };
   }
 
-  pdfToMeta(profile: Person, media: Pdf, current?: Meta): Meta {
-    return this.mediaToMeta(profile, media, current);
+  pdfToMeta(profile: Person, media: Pdf): Meta {
+    return this.mediaToMeta(profile, media);
   }
 
-  mediaToMeta(profile: Person, media: Image | Pdf, current?: Meta): Meta {
+  mediaToMeta(profile: Person, media: Image | Pdf): Meta {
     return {
-      ...(current || {}),
       documentIds: media.documentURI,
       rightsOwner: media.intellectualOwner,
       license: media.intellectualRights,
       caption: media.caption,
       tags: media.keyword,
-      uploadedBy: current?.uploadedBy || media.uploadedBy || profile.id,
+      uploadedBy: media.uploadedBy || profile.id,
       secret: (media.publicityRestrictions && media.publicityRestrictions !== 'MZ.publicityRestrictionsPublic') || false
     };
   }
@@ -265,6 +268,8 @@ export class MediaApiService {
       captureDateTime: meta.captureDateTime ? new Date(meta.captureDateTime * 1000).toISOString() : undefined,
       taxonDescriptionCaption: meta.taxonDescriptionCaption,
       sortOrder: meta.sortOrder,
+      taxonURI: meta.identifications?.taxonIds,
+      taxonVerbatim: meta.identifications?.verbatim
     };
   }
 
