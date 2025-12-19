@@ -233,7 +233,7 @@ export class ApiClient {
 
   getCountryList(page = 1, pageSize = 1000): Observable<PagedResult<Area>> {
     const params = new HttpParams()
-      .set('type', 'country')
+      .set('areaType', 'country')
       .set('page', page)
       .set('pageSize', pageSize)
       .set('lang', 'en');
