@@ -11,7 +11,7 @@ import { FormViewComponent } from '@kotka/ui/form-view';
 import {
   UserService
 } from '@kotka/ui/services';
-import { ParamMap } from '@angular/router';
+import { ParamMap, RouterLink } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
 import {
@@ -63,6 +63,7 @@ const defaultAdvancedFields = [
     NgTemplateOutlet,
     NgClass,
     SpecimenFormNavComponent,
+    RouterLink,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -134,7 +135,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
       documentURI: this.dataURI() ? [this.dataURI()] : undefined,
       intellectualRights: 'MZ.intellectualRightsCC-BY-SA-4.0',
       intellectualOwner: 'Luomus',
-      publicityRestrictions: 'MZ.publicityRestrictionsPublic'
+      publicityRestrictions: 'MZ.publicityRestrictionsPublic',
     }));
 
     this.markAdvancedFieldsActive = computed(
@@ -155,22 +156,35 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
         : [],
     );
 
-    this.additionalClassNames = computed(() => (
+    this.additionalClassNames = computed(() =>
       this.markUnreliableFieldsActive()
         ? {}
-        : this.unreliableFields().reduce((result, field) => {
-          result[field] = 'unreliable-field';
-          return result;
-        }, {} as Record<string, string>)
-    ));
+        : this.unreliableFields().reduce(
+            (result, field) => {
+              result[field] = 'unreliable-field';
+              return result;
+            },
+            {} as Record<string, string>,
+          ),
+    );
 
     this.formDataDataType = computed(() => this.formData()?.datatype);
     // @ts-ignore TODO remove after specimen schema changes (remove ts-ignore)
-    this.unreliableFields = computed(() => this.formData()?.unreliableFields || [], {equal: isEqual});
-    this.coordinates = computed(() => this.getCoordinates(this.formData()), {equal: isEqual});
-    this.mapCoordinates = computed(() => this.getMapCoordinates(this.formData()), {equal: isEqual});
+    this.unreliableFields = computed(
+      () => this.formData()?.unreliableFields || [],
+      { equal: isEqual },
+    );
+    this.coordinates = computed(() => this.getCoordinates(this.formData()), {
+      equal: isEqual,
+    });
+    this.mapCoordinates = computed(
+      () => this.getMapCoordinates(this.formData()),
+      { equal: isEqual },
+    );
 
-    this.arrayFieldsToMonitorForDeletions = computed(() => this.getArrayFieldsToMonitorForDeletions(this.unreliableFields()));
+    this.arrayFieldsToMonitorForDeletions = computed(() =>
+      this.getArrayFieldsToMonitorForDeletions(this.unreliableFields()),
+    );
 
     this.initEffects();
   }
@@ -206,8 +220,13 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     });
 
     effect(() => {
-      if (this.formDataDataType() && this.dataType() !== this.formDataDataType()) {
-        const urlDataType = this.getUrlDataTypeFromDataType(this.formDataDataType()!);
+      if (
+        this.formDataDataType() &&
+        this.dataType() !== this.formDataDataType()
+      ) {
+        const urlDataType = this.getUrlDataTypeFromDataType(
+          this.formDataDataType()!,
+        );
         this.router.navigate(
           [urlDataType, 'specimens', this.editMode() ? 'edit' : 'add'],
           { replaceUrl: true, queryParamsHandling: 'preserve' },
@@ -216,11 +235,19 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     });
 
     effect(() => {
-      this.onCoordinatesChange(this.coordinates(), untracked(this.mapCoordinates), untracked(this.formData));
+      this.onCoordinatesChange(
+        this.coordinates(),
+        untracked(this.mapCoordinates),
+        untracked(this.formData),
+      );
     });
 
     effect(() => {
-      this.onMapCoordinatesChange(this.mapCoordinates(), untracked(this.coordinates), untracked(this.formData));
+      this.onMapCoordinatesChange(
+        this.mapCoordinates(),
+        untracked(this.coordinates),
+        untracked(this.formData),
+      );
     });
 
     effect(() => {
@@ -231,7 +258,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
         untracked(this.unreliableFields),
         this.arrayFieldsToMonitorForDeletions(),
         this.formData(),
-        untracked(this.prevFormData)
+        untracked(this.prevFormData),
       );
     });
   }
@@ -282,7 +309,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     if (this.markUnreliableFieldsActive()) {
       const unreliableFields = this.lajiFormFieldChooserService.stopFieldChooser();
       // @ts-ignore TODO remove after specimen schema changes (remove ts-ignore)
-      this.formView.setFormData({...this.formData(), unreliableFields});
+      this.formView.setFormData({ ...this.formData(), unreliableFields });
     } else {
       const schema = this.lajiForm.form()?.schema;
       if (!schema) {
@@ -373,14 +400,16 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     }
   }
 
-  private getCoordinates(formData: FormData): PointCoordinatesWithSystem | undefined {
+  private getCoordinates(
+    formData: FormData,
+  ): PointCoordinatesWithSystem | undefined {
     const gathering = formData?.gatherings?.[0];
     if (
       gathering?.latitude !== undefined &&
       gathering?.longitude !== undefined &&
       gathering?.coordinateSystem
     ) {
-      return  {
+      return {
         latitude: gathering.latitude,
         longitude: gathering.longitude,
         coordinateSystem: gathering.coordinateSystem,
@@ -396,7 +425,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
       gathering?.wgs84Latitude !== undefined &&
       gathering?.wgs84Longitude !== undefined
     ) {
-      return  {
+      return {
         latitude: gathering.wgs84Latitude,
         longitude: gathering.wgs84Longitude,
       };
@@ -405,10 +434,12 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     return undefined;
   }
 
-  private getArrayFieldsToMonitorForDeletions(unreliableFields: string[]): string[] {
+  private getArrayFieldsToMonitorForDeletions(
+    unreliableFields: string[],
+  ): string[] {
     const result: string[] = [];
 
-    unreliableFields.forEach(field => {
+    unreliableFields.forEach((field) => {
       let path: string | undefined = field;
       const re = /(.*)\/\d+.*/;
 
@@ -423,7 +454,11 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     return result;
   }
 
-  private onCoordinatesChange(coordinates: PointCoordinatesWithSystem | undefined, currentMapCoordinates: PointCoordinates | undefined, formData: FormData) {
+  private onCoordinatesChange(
+    coordinates: PointCoordinatesWithSystem | undefined,
+    currentMapCoordinates: PointCoordinates | undefined,
+    formData: FormData,
+  ) {
     if (coordinates) {
       const { latitude, longitude, coordinateSystem } = coordinates;
       const result = convertCoordinatesToWGS84(
@@ -449,7 +484,11 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     }
   }
 
-  private onMapCoordinatesChange(mapCoordinates: PointCoordinates | undefined, currentCoordinates: PointCoordinatesWithSystem | undefined, formData: FormData) {
+  private onMapCoordinatesChange(
+    mapCoordinates: PointCoordinates | undefined,
+    currentCoordinates: PointCoordinatesWithSystem | undefined,
+    formData: FormData,
+  ) {
     if (mapCoordinates) {
       const coordinates: PointCoordinatesWithSystem = {
         latitude: mapCoordinates.latitude,
@@ -457,27 +496,52 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
         coordinateSystem: 'MY.coordinateSystemWgs84',
       };
 
-      const converted = currentCoordinates ? convertCoordinatesToWGS84(currentCoordinates.latitude, currentCoordinates.longitude, currentCoordinates.coordinateSystem) : undefined;
+      const converted = currentCoordinates
+        ? convertCoordinatesToWGS84(
+            currentCoordinates.latitude,
+            currentCoordinates.longitude,
+            currentCoordinates.coordinateSystem,
+          )
+        : undefined;
 
-      if (coordinates.latitude !== '' + converted?.[0] || coordinates.longitude !== '' + converted?.[1]) {
+      if (
+        coordinates.latitude !== '' + converted?.[0] ||
+        coordinates.longitude !== '' + converted?.[1]
+      ) {
         this.updateGatheringData(formData, coordinates);
       }
     }
   }
 
-  private updateUnreliableFieldsAfterFormDataChange(unreliableFields: string[], arrayFieldsToMonitor: string[], formData: FormData, prevFormData: FormData) {
+  private updateUnreliableFieldsAfterFormDataChange(
+    unreliableFields: string[],
+    arrayFieldsToMonitor: string[],
+    formData: FormData,
+    prevFormData: FormData,
+  ) {
     let newUnreliableFields = unreliableFields;
     let hasChanges = false;
 
-    arrayFieldsToMonitor.forEach(field => {
+    arrayFieldsToMonitor.forEach((field) => {
       const array: any[] | undefined = parseJSONPointer(formData || {}, field);
       if (!array?.length) {
-        newUnreliableFields = this.getUnreliableFieldsAfterArrayDeletion(newUnreliableFields, field);
+        newUnreliableFields = this.getUnreliableFieldsAfterArrayDeletion(
+          newUnreliableFields,
+          field,
+        );
         hasChanges = true;
       } else {
-        const prevArray: any[] | undefined = parseJSONPointer(prevFormData || {}, field);
-        if (prevArray && (array.length < prevArray.length)) {
-          newUnreliableFields = this.getUnreliableFieldsAfterArrayItemDeletion(newUnreliableFields, field, array, prevArray);
+        const prevArray: any[] | undefined = parseJSONPointer(
+          prevFormData || {},
+          field,
+        );
+        if (prevArray && array.length < prevArray.length) {
+          newUnreliableFields = this.getUnreliableFieldsAfterArrayItemDeletion(
+            newUnreliableFields,
+            field,
+            array,
+            prevArray,
+          );
           hasChanges = true;
         }
       }
@@ -485,15 +549,23 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
 
     if (hasChanges) {
       // @ts-ignore TODO remove after specimen schema changes (remove ts-ignore)
-      this.formView.setFormData({...formData, unreliableFields: newUnreliableFields});
+      this.formView.setFormData({ ...formData, unreliableFields: newUnreliableFields });
     }
   }
 
-  private getUnreliableFieldsAfterArrayDeletion(unreliableFields: string[], arrayField: string): string[] {
-    return unreliableFields.filter(f => !f.startsWith(arrayField + '/'));
+  private getUnreliableFieldsAfterArrayDeletion(
+    unreliableFields: string[],
+    arrayField: string,
+  ): string[] {
+    return unreliableFields.filter((f) => !f.startsWith(arrayField + '/'));
   }
 
-  private getUnreliableFieldsAfterArrayItemDeletion(unreliableFields: string[], arrayField: string, array: any[], prevArray: any[]): string[] {
+  private getUnreliableFieldsAfterArrayItemDeletion(
+    unreliableFields: string[],
+    arrayField: string,
+    array: any[],
+    prevArray: any[],
+  ): string[] {
     const result: string[] = [];
 
     // it is not always possible to determine which field has been removed (with string arrays for example), in that case remove all possible fields from unreliable fields
@@ -507,19 +579,24 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
 
     const otherPossibleDeletedIndexes: number[] = [];
     for (let i = possibleDeletedIndex - 1; i >= 0; i--) {
-      if (formDataItemsAreEqual(prevArray[i], prevArray[possibleDeletedIndex])) {
+      if (
+        formDataItemsAreEqual(prevArray[i], prevArray[possibleDeletedIndex])
+      ) {
         otherPossibleDeletedIndexes.push(i);
       } else {
         break;
       }
     }
 
-    unreliableFields.forEach(field => {
+    unreliableFields.forEach((field) => {
       const startPath = arrayField + '/';
       if (field.startsWith(startPath)) {
         const [idxString, ...parts] = field.replace(startPath, '').split('/');
         const idx = parseInt(idxString, 10);
-        if (idx === possibleDeletedIndex || otherPossibleDeletedIndexes.includes(idx)) {
+        if (
+          idx === possibleDeletedIndex ||
+          otherPossibleDeletedIndexes.includes(idx)
+        ) {
           return;
         } else if (idx > possibleDeletedIndex) {
           field = startPath + (idx - 1) + parts.join('/');
@@ -531,7 +608,10 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     return result;
   }
 
-  private updateGatheringData(formData: FormData, updateObject: Partial<Gathering>) {
+  private updateGatheringData(
+    formData: FormData,
+    updateObject: Partial<Gathering>,
+  ) {
     const [first, ...rest] = formData?.gatherings || [];
     const gathering = { ...(first || {}), ...updateObject };
     const gatherings: [Gathering, ...Gathering[]] = [gathering, ...rest];

@@ -6,6 +6,7 @@
     [hasOnlyWarnings]="hasOnlyWarnings"
     [showDeleteButton]="showDeleteButton()"
     [showCopyButton]="showCopyButton()"
+    [customButtonsTpl]="customFooterButtonsTpl()"
     (saveForm)="saveFormClicked()"
     (highlightErrors)="highlightErrors()"
     (delete)="delete.emit(formData())"

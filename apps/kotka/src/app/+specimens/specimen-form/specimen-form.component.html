@@ -15,12 +15,13 @@
   [title]="title()"
   [historyPageLink]="'/specimens/history'"
   [formContainerTpl]="formContainer"
+  [customFooterButtonsTpl]="customFooterButtons"
   (formInit)="onFormInit($event)"
   (formDataChange)="onFormDataChange($event)"
   (saveSuccess)="onSaveSuccess($event)"
   (deleteSuccess)="onDeleteSuccess()"
   (copyData)="onCopyData($event)"
->
+></kotka-form-view>
 
 <ng-template #formContainer let-formContentTpl>
   <div class="row">
@@ -89,4 +90,16 @@
     </div>
   </div>
 </ng-template>
-</kotka-form-view>
+
+<ng-template #customFooterButtons>
+  <div class="d-grid gap-2 d-sm-flex flex-sm-grow-1 justify-content-sm-end">
+    @if (editMode() && dataType() === 'accession') {
+      <a
+        class="btn btn-light col-lg-2 col-sm-3 col-xs-12"
+        routerLink="/accessions?uri={{ dataURI() }}"
+      >
+        Branches
+      </a>
+    }
+  </div>
+</ng-template>

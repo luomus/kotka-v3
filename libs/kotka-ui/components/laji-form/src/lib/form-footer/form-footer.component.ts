@@ -1,10 +1,11 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Input,
-  Output,
-  EventEmitter,
+  input,
+  output,
+  TemplateRef,
 } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 
 
 @Component({
@@ -12,18 +13,19 @@ import {
   templateUrl: './form-footer.component.html',
   styleUrls: ['./form-footer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: []
+  imports: [NgTemplateOutlet],
 })
 export class FormFooterComponent {
-  @Input() hasChanges? = false;
-  @Input() disabled? = false;
-  @Input() hasOnlyWarnings? = false;
-  @Input() showDeleteButton? = false;
-  @Input() showCopyButton? = false;
+  hasChanges = input<boolean>();
+  disabled = input<boolean>();
+  hasOnlyWarnings = input<boolean>();
+  showDeleteButton = input<boolean>();
+  showCopyButton = input<boolean>();
+  customButtonsTpl = input<TemplateRef<unknown>>();
 
-  @Output() saveForm: EventEmitter<void> = new EventEmitter<void>();
-  @Output() highlightErrors: EventEmitter<void> = new EventEmitter<void>();
-  @Output() delete: EventEmitter<void> = new EventEmitter<void>();
-  @Output() copyForm: EventEmitter<void> = new EventEmitter<void>();
-  @Output() saveAndCopyForm: EventEmitter<void> = new EventEmitter<void>();
+  saveForm = output<void>();
+  highlightErrors = output<void>();
+  delete = output<void>();
+  copyForm = output<void>();
+  saveAndCopyForm = output<void>();
 }

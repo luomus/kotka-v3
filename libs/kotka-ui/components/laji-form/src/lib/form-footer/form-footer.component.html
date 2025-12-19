@@ -4,12 +4,12 @@
       class="btn btn-success col-lg-2 col-sm-3 col-xs-12"
       type="submit"
       (click)="saveForm.emit()"
-      [disabled]="disabled || hasOnlyWarnings"
+      [disabled]="disabled() || hasOnlyWarnings()"
       data-cy="form-submit"
       >
       Save & keep editing
     </button>
-    @if (hasOnlyWarnings) {
+    @if (hasOnlyWarnings()) {
       <button
         type="button"
         class="btn btn-light col-lg-2 col-sm-3 col-xs-12"
@@ -18,8 +18,8 @@
         Check the warnings
       </button>
     }
-    @if (showCopyButton) {
-      @if (hasChanges && !disabled) {
+    @if (showCopyButton()) {
+      @if (hasChanges() && !disabled()) {
         <button
           class="btn btn-light col-lg-2 col-sm-3 col-xs-12"
           type="submit"
@@ -37,16 +37,19 @@
         </button>
       }
     }
-    @if (showDeleteButton) {
+    @if (showDeleteButton()) {
       <button
         class="btn btn-danger col-lg-1 col-sm-2 col-xs-12"
         type="submit"
         (click)="delete.emit()"
-        [disabled]="disabled"
+        [disabled]="disabled()"
         data-cy="form-delete"
         >
         Delete
       </button>
+    }
+    @if (customButtonsTpl(); as tpl) {
+      <ng-container *ngTemplateOutlet="tpl"></ng-container>
     }
   </div>
 </div>

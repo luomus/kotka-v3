@@ -1,4 +1,18 @@
-import { Component, ViewChild, ElementRef, AfterViewInit, OnDestroy, NgZone, ChangeDetectorRef, input, output, effect, DOCUMENT, inject } from '@angular/core';
+import {
+  Component,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+  OnDestroy,
+  NgZone,
+  ChangeDetectorRef,
+  input,
+  output,
+  effect,
+  DOCUMENT,
+  inject,
+  TemplateRef
+} from '@angular/core';
 import LajiForm from '@luomus/laji-form/lib/index';
 import { Theme as LajiFormTheme } from '@luomus/laji-form/lib/themes/theme';
 import { scrollIntoViewIfNeeded, uiSchemaJSONPointer, updateSafelyWithJSONPointer } from '@luomus/laji-form/lib/utils';
@@ -44,6 +58,7 @@ export class LajiFormComponent<T extends FormData = FormData>
   showFooter = input(true);
   showDeleteButton = input<boolean>();
   showCopyButton = input<boolean>();
+  customFooterButtonsTpl = input<TemplateRef<unknown>>();
 
   hasOnlyWarnings = false;
 

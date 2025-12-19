@@ -83,6 +83,7 @@ export class FormViewComponent<
   headerTpl = input<TemplateRef<unknown>>();
   formContainerTpl = input<TemplateRef<unknown>>();
   metaFieldsContainerTpl = input<TemplateRef<unknown>>();
+  customFooterButtonsTpl = input<TemplateRef<unknown>>();
 
   formState: Signal<FormState<S>>;
 
