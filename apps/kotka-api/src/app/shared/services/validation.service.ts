@@ -39,7 +39,7 @@ export class ValidationService {
         try {
           await lastValueFrom(this.lajiApiService.post('documents/validate', JSON.parse(options.body), query));
         } catch (e) {
-          if (e.response.status === 422) {
+          if (e.response?.data?.errorCode === 'VALIDATION_EXCEPTION') {
             error = e.response.data;
           } else {
             throw e;

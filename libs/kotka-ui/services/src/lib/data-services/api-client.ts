@@ -233,10 +233,9 @@ export class ApiClient {
 
   getCountryList(page = 1, pageSize = 1000): Observable<PagedResult<Area>> {
     const params = new HttpParams()
-      .set('areaType', 'country')
+      .set('areaType', 'ML.country')
       .set('page', page)
-      .set('pageSize', pageSize)
-      .set('lang', 'en');
+      .set('pageSize', pageSize);
     return this.httpClient.get<PagedResult<Area>>(`${lajiApiPath}areas`, {
       params,
     });
