@@ -18,6 +18,7 @@ enum ResourceType {
   validateResource,
   pdfResource,
   imageResource,
+  sequenceResource,
   other,
 }
 
@@ -32,7 +33,8 @@ const pathStartsWith: Record<string, ResourceType> = {
   '/organization/by-id': ResourceType.getOrganizationResource,
   '/collection/by-id': ResourceType.getCollectionResource,
   '/pdf': ResourceType.pdfResource,
-  '/images': ResourceType.imageResource
+  '/images': ResourceType.imageResource,
+  '/sequence': ResourceType.sequenceResource,
 };
 
 @Injectable({
@@ -81,6 +83,9 @@ export class FormApiClient {
       case ResourceType.pdfResource:
       case ResourceType.imageResource:
         path = apiBase + `/media${resource}`;
+        break;
+      case ResourceType.sequenceResource:
+        path = apiBase + resource;
         break;
       default:
         path = lajiApiBase + resource;
