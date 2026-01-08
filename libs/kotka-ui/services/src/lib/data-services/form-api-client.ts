@@ -98,12 +98,22 @@ export class FormApiClient {
         params: query,
         body: options['body'] || undefined,
         observe: 'response',
+        responseType: resourceType === ResourceType.sequenceResource ? 'text' : 'json'
       })
       .pipe(
-        map((response) => ({
-          ...response,
-          json: () => this.processResult(resourceType, response.body),
-        })),
+        map((response) => {
+          if ((response.headers.get('Content-Type') || '').includes('text/html')) {
+            return {
+              ...response,
+              text: () => response.body,
+            };
+          }
+
+          return {
+            ...response,
+            json: () => this.processResult(resourceType, response.body),
+          };
+        }),
         catchError((err) => {
           if (
             resourceType === ResourceType.pdfResource &&

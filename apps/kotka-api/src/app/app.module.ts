@@ -19,7 +19,7 @@ import { REDIS } from './shared-modules/redis/redis.constants';
 import Redis from 'ioredis';
 import { ScheduleModule } from '@nestjs/schedule';
 import { LajiApiModule } from './laji-api/laji-api.module';
-
+import { SequenceModule } from './sequence/sequence.module';
 @Module({
   imports: [
     CacheModule.registerAsync({
@@ -47,7 +47,8 @@ import { LajiApiModule } from './laji-api/laji-api.module';
     OldKotkaModule,
     OrganizationModule,
     CollectionModule,
-    LajiApiModule
+    SequenceModule,
+    LajiApiModule,
   ],
   controllers: [],
   providers: []

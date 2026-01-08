@@ -47,4 +47,12 @@ export class LajiStoreService {
   getVersion<T>(type: string, id: string, ver: string) {
     return this.httpService.get<T>(`${this.urlBase}${type}/${id}/_ver/${ver}`, this.baseConfig);
   }
+
+  postSequence(key: string, next?: number) {
+    return this.httpService.post<{ key: string, next: number }>(`${this.urlBase}sequence`, { key, next },  this.baseConfig);
+  }
+
+  getSeqNext(seq: string, createIfMissing = false) {
+    return this.httpService.get<number>(`${this.urlBase}sequence/${seq}/next`, Object.assign({ params: { createIfMissing: createIfMissing }}, this.baseConfig));
+  }
 }
