@@ -8,7 +8,7 @@ ENV CYPRESS_INSTALL_BINARY 0
 
 COPY --chown=node:node ./package*.json ./
 
-RUN npm ci && npm cache clean --force
+RUN npm install --force && npm cache clean --force # TODO fix label-designer dependencies
 
 COPY --chown=node:node . .
 

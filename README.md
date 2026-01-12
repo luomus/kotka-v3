@@ -46,3 +46,9 @@ npx nx g lib --directory <folder> --name <lib name> // create lib
 npx nx g rm <lib name> // remove lib
 npx nx g mv --projectName <lib name> --newProjectName <new name> --destination <folder> --importPath <ts import path> // move or rename lib
 ```
+### Examples
+
+Generate angular library
+```
+npx nx g @nx/angular:library --directory libs/kotka-ui/components/label-designer --name ui-label-designer --prefix kui --importPath @kotka/ui/label-designer
+```
