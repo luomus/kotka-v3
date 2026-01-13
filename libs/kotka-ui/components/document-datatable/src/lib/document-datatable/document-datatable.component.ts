@@ -1,16 +1,26 @@
-import { Component, Input, OnChanges, ViewChild, SimpleChanges, inject } from '@angular/core';
+import { Component, ViewChild, inject, output, input, effect, Signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   DatatableSource,
   GetRowsParams,
   DatatableColumn,
   DatatableComponent,
-  DatatableFilter,
+  DatatableFilter, DatatableSort
 } from '@kotka/ui/datatable';
 import { DatatableDataService } from '../datatable-data.service';
-import { KotkaDocumentObjectType } from '@kotka/shared/models';
-import { UserService } from '@kotka/ui/services';
-import { Observable, map } from 'rxjs';
+import {
+  KotkaDocumentObjectMap,
+  KotkaDocumentObjectType,
+  ListResponse
+} from '@kotka/shared/models';
+import { ApiClient, DocumentListSearchParams, UserService } from '@kotka/ui/services';
+import { map, switchMap } from 'rxjs';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+
+export interface DatatableLoadedData<T extends KotkaDocumentObjectType = KotkaDocumentObjectType, S extends KotkaDocumentObjectMap[T] = KotkaDocumentObjectMap[T]> {
+  searchParams: DocumentListSearchParams<T>;
+  result: ListResponse<S>;
+}
 
 @Component({
   selector: 'kui-document-datatable',
@@ -18,62 +28,76 @@ import { Observable, map } from 'rxjs';
   styleUrls: ['./document-datatable.component.scss'],
   imports: [CommonModule, DatatableComponent],
 })
-export class DocumentDatatableComponent implements OnChanges {
+export class DocumentDatatableComponent<T extends KotkaDocumentObjectType = KotkaDocumentObjectType, S extends KotkaDocumentObjectMap[T] = KotkaDocumentObjectMap[T]> {
+  private apiClient = inject(ApiClient);
   private dataService = inject(DatatableDataService);
   private userService = inject(UserService);
 
   @ViewChild(DatatableComponent, { static: true })
   datatableComponent!: DatatableComponent;
 
-  @Input({ required: true }) dataType!: KotkaDocumentObjectType;
-  @Input() columns: DatatableColumn[] = [];
+  dataType = input.required<T>();
+  columns = input<DatatableColumn[]>([]);
 
-  @Input() enableFileExport? = false;
-  @Input() enableColumnSelection? = false;
+  enableFileExport = input<boolean>();
+  enableColumnSelection = input<boolean>();
 
-  @Input() dataTypeName = 'item';
-  @Input() dataTypeNamePlural?: string;
+  dataTypeName = input<string>('item');
+  dataTypeNamePlural = input<string>();
 
-  @Input() defaultFilterModel: DatatableFilter = {};
+  defaultFilterModel = input<DatatableFilter>({});
 
-  @Input() extraSearchQuery?: string;
+  extraSortModel = input<DatatableSort>([]);
+  extraSearchQuery = input<string>();
 
-  datasource!: DatatableSource;
-  settingsKey$!: Observable<string>;
+  datasource: DatatableSource;
+  settingsKey: Signal<string | undefined>;
+
+  loadData = output<DatatableLoadedData<T, S>>();
 
   constructor() {
     this.datasource = {
       getRows: (params: GetRowsParams) => {
-        this.dataService
-          .getData(
-            this.dataType,
-            this.columns,
-            params.startRow,
-            params.endRow,
-            params.sortModel,
-            params.filterModel,
-            this.extraSearchQuery,
+        const searchParams = this.dataService.getSearchParams(
+          this.dataType(),
+          this.columns(),
+          params.startRow,
+          params.endRow,
+          params.sortModel.concat(this.extraSortModel()),
+          params.filterModel,
+          this.extraSearchQuery(),
+        );
+
+        this.apiClient
+          .getDocumentList<T, S>(
+            searchParams.type,
+            searchParams.page,
+            searchParams.pageSize,
+            searchParams.sort,
+            searchParams.searchQueryString
           )
           .subscribe((result) => {
             params.successCallback(result.member, result.totalItems);
+            this.loadData.emit({ searchParams, result });
           });
       },
     };
-  }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['dataType']) {
-      this.settingsKey$ = this.userService
-        .getCurrentLoggedInUser()
-        .pipe(map((user) => `${this.dataType}-table-${user.id}`));
-    }
+    this.settingsKey = toSignal(
+      toObservable(this.dataType).pipe(
+        switchMap(dataType => this.userService.getCurrentLoggedInUser().pipe(
+          map(user => `${dataType}-table-${user.id}`)
+        ))
+      )
+    );
 
-    if (
-      changes['dataType'] ||
-      changes['columns'] ||
-      changes['extraSearchQuery']
-    ) {
+    effect(() => {
+      this.dataType(); // trigger refresh when any of these inputs change
+      this.columns();
+      this.extraSortModel();
+      this.extraSearchQuery();
+
       this.datatableComponent.refresh();
-    }
+    });
   }
 }

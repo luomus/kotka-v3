@@ -6,6 +6,14 @@
     [dataTypeName]="'specimen'"
     [enableFileExport]="true"
     [enableColumnSelection]="true"
+    [extraSortModel]="[{
+      colId: 'dateCreated',
+      sort:  'desc'
+    }, {
+      colId: 'id',
+      sort:  'desc'
+    }]"
+    (loadData)="onDataLoad($event)"
   >
   </kui-document-datatable>
 </kui-main-content>

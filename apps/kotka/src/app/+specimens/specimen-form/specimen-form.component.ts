@@ -9,6 +9,7 @@ import { globals } from '../../../environments/globals';
 import { FormViewContainerComponent } from '@kotka/ui/form-view';
 import { FormViewComponent } from '@kotka/ui/form-view';
 import {
+  SearchResultIteratorService,
   UserService
 } from '@kotka/ui/services';
 import { ParamMap, RouterLink } from '@angular/router';
@@ -23,9 +24,9 @@ import {
 import { LocalStorageService } from 'ngx-webstorage';
 import { isEqual, invert } from 'lodash';
 import { convertCoordinatesToWGS84, parseJSONPointer } from '@kotka/shared/utils';
-import { MYCoordinateSystems } from '@luomus/laji-schema';
+import { isDocument, MYCoordinateSystems } from '@luomus/laji-schema';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { from } from 'rxjs';
+import { forkJoin, from, Subscription } from 'rxjs';
 import { SpecimenFormNavComponent } from '../specimen-form-nav/specimen-form-nav';
 import {
 SpecimenDataType as DataType,
@@ -33,6 +34,8 @@ SpecimenUrlDataType as UrlDataType,
 specimenDataTypeToNameMap as dataTypeToNameMap,
 specimenUrlToDataTypeMap as urlToDataTypeMap,
 } from '@kotka/shared/models';
+import { ToFullUriPipe } from '@kotka/ui/pipes';
+import { SpinnerComponent } from '@kotka/ui/spinner';
 
 interface PointCoordinates {
   latitude: string;
@@ -44,6 +47,12 @@ interface PointCoordinatesWithSystem extends PointCoordinates {
 }
 
 type FormData = KotkaDocument | Partial<KotkaDocument> | undefined;
+
+interface NavigatorState {
+  loading: boolean;
+  previousId?: string;
+  nextId?: string;
+}
 
 const defaultAdvancedFields = [
   '/publicityRestrictions','/legID','/additionalIDs','/dataSource','/publication','/separatedFrom','/separatedTo','/duplicatesIn','/acquiredFrom','/acquisitionDate','/exsiccatum','/preservation','/URL','/language',
@@ -64,6 +73,8 @@ const defaultAdvancedFields = [
     NgClass,
     SpecimenFormNavComponent,
     RouterLink,
+    ToFullUriPipe,
+    SpinnerComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -92,6 +103,9 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
   lajiForm?: LajiFormComponent;
   formData = signal<FormData>(undefined);
   prevFormData = signal<FormData>(undefined);
+  initialFormData = signal<FormData>(undefined);
+
+  navigatorState = signal<NavigatorState>({ loading: false });
 
   @ViewChild(FormViewComponent, { static: true })
   formView!: FormViewComponent<KotkaDocumentObjectType.specimen>;
@@ -106,10 +120,13 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
   private showOnlyBasicFieldsStorageKey = signal<string | undefined>(undefined);
   private advancedFieldsStorageKey = signal<string | undefined>(undefined);
 
+  private navigatorDataSub?: Subscription;
+
   private document = inject(DOCUMENT);
   private userService = inject(UserService);
   private lajiFormFieldChooserService = inject(LajiFormFieldChooserService);
   private storage = inject(LocalStorageService);
+  private searchResultIteratorService = inject(SearchResultIteratorService);
 
   constructor() {
     super();
@@ -189,6 +206,11 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     this.initEffects();
   }
 
+  override ngOnDestroy() {
+    super.ngOnDestroy();
+    this.navigatorDataSub?.unsubscribe();
+  }
+
   initEffects() {
     this.userService.getCurrentLoggedInUser().subscribe((user) => {
       const showOnlyBasicFieldsKey = `specimen-form-${user.id}-show-only-basic-fields`;
@@ -261,6 +283,28 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
         untracked(this.prevFormData),
       );
     });
+
+    effect(() => {
+      const doc = this.initialFormData();
+
+      if (doc && isDocument(doc)) {
+        this.navigatorDataSub?.unsubscribe();
+
+        this.navigatorState.set({ loading: true });
+
+        forkJoin([
+          this.searchResultIteratorService.getPrevious(this.formDataType, doc),
+          this.searchResultIteratorService.getNext(this.formDataType, doc),
+        ]).subscribe({
+          next: ([previousId, nextId]) => {
+            this.navigatorState.set({ loading: false, previousId, nextId });
+          },
+          error: () => {
+            this.navigatorState.set({ loading: false });
+          },
+        });
+      }
+    });
   }
 
   onFormInit(lajiForm: LajiFormComponent) {
@@ -270,6 +314,9 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
   onFormDataChange(formData: FormData) {
     this.prevFormData.set(this.formData());
     this.formData.set(formData);
+    if (this.formData() && !this.prevFormData()) {
+      this.initialFormData.set(this.formData());
+    }
   }
 
   toggleMarkAdvancedFields() {
