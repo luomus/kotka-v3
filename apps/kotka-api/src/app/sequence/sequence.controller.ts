@@ -5,9 +5,9 @@ https://docs.nestjs.com/controllers#controllers
 import {
   Controller,
   Get,
-  InternalServerErrorException,
+  InternalServerErrorException, NotFoundException,
   Query,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
 import { LajiStoreService } from '@kotka/api/services';
@@ -51,6 +51,10 @@ export class SequenceController {
       const seq = (await lastValueFrom(this.lajiStoreService.getSeqNext(parts[0]))).data;
       return `${parts[0]}:${seq}`;
     } catch (err) {
+      if (err.status === 404) {
+        throw new NotFoundException(err.response?.data?.message || err.message);
+      }
+
       console.error(err);
       throw new InternalServerErrorException(err.response?.data?.message || err.message);
     }

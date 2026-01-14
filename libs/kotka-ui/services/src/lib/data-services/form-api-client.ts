@@ -98,31 +98,45 @@ export class FormApiClient {
         params: query,
         body: options['body'] || undefined,
         observe: 'response',
-        responseType: resourceType === ResourceType.sequenceResource ? 'text' : 'json'
+        responseType: 'text'
       })
       .pipe(
         map((response) => {
-          if ((response.headers.get('Content-Type') || '').includes('text/html')) {
+          if (response.headers.get('Content-Type')?.includes('application/json')) {
+            const json = JSON.parse(response.body!);
             return {
               ...response,
-              text: () => response.body,
+              json: () => this.processResult(resourceType, json),
             };
           }
 
           return {
             ...response,
-            json: () => this.processResult(resourceType, response.body),
+            text: () => response.body
           };
         }),
         catchError((err) => {
+          let error: any;
+          try {
+            error = JSON.parse(err.error);
+          } catch (e) {
+            error = {};
+          }
+
           if (
             resourceType === ResourceType.pdfResource &&
             err.status === 400 &&
-            err.error?.message === ErrorMessages.missingIntellectualOwner
+            error?.message === ErrorMessages.missingIntellectualOwner
           ) {
             this.dialogService.alert(
               'Please fill the "Owner of record" field before attaching any files.',
             );
+          } else if (
+            resourceType === ResourceType.sequenceResource &&
+            err.status === 404 &&
+            error?.message
+          ) {
+            this.dialogService.alert(error.message);
           } else if (
             !(
               err.status === 404 ||
@@ -132,7 +146,7 @@ export class FormApiClient {
           ) {
             this.toastService.showGenericError({ pause: true });
           }
-          return of({ ...err, json: () => err.error });
+          return of({ ...err, json: () => error });
         }),
       )
       .toPromise(Promise);
