@@ -4,7 +4,10 @@ WORKDIR /app
 RUN chown -Rh node:node /app
 # USER node
 
-ENV CYPRESS_INSTALL_BINARY 0
+ENV CYPRESS_INSTALL_BINARY=0
+ENV NX_ISOLATE_PLUGINS=false
+ENV NX_CACHE_DIRECTORY=/tmp/.nx/cache
+ENV NX_WORKSPACE_DATA_DIRECTORY=/tmp/.nx/workspace-data
 
 COPY --chown=node:node ./package*.json ./
 
@@ -14,4 +17,4 @@ COPY --chown=node:node . .
 
 EXPOSE 4200
 
-CMD npm run start -- kotka --host 0.0.0.0
+CMD rm -rf /tmp/.nx/workspace-data && npm run start -- kotka --host 0.0.0.0
