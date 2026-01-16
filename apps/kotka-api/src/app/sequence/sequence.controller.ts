@@ -3,15 +3,18 @@ https://docs.nestjs.com/controllers#controllers
 */
 
 import {
+  BadRequestException,
   Controller,
   Get,
-  InternalServerErrorException, NotFoundException,
+  InternalServerErrorException,
+  NotFoundException,
   Query,
   UseGuards
 } from '@nestjs/common';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
 import { LajiStoreService } from '@kotka/api/services';
 import { lastValueFrom } from 'rxjs';
+import { ErrorMessages } from '@kotka/shared/models';
 
 @Controller('sequence')
 @UseGuards(
@@ -37,14 +40,14 @@ export class SequenceController {
 
   @Get('generate/next')
   async getSequenceNext(
-    @Query('value') value: string
+    @Query('value') value = ''
   ) {
     value = value.trim();
 
     const parts = value.split(':');
 
     if (parts.length === 1 || !parts[0] || (parts.length > 1 && !!parts[1])) {
-      return value;
+      throw new BadRequestException(ErrorMessages.invalidSequenceValueFormat);
     }
 
     try {

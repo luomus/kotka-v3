@@ -123,20 +123,10 @@ export class FormApiClient {
             error = {};
           }
 
-          if (
-            resourceType === ResourceType.pdfResource &&
-            err.status === 400 &&
-            error?.message === ErrorMessages.missingIntellectualOwner
-          ) {
-            this.dialogService.alert(
-              'Please fill the "Owner of record" field before attaching any files.',
-            );
-          } else if (
-            resourceType === ResourceType.sequenceResource &&
-            err.status === 404 &&
-            error?.message
-          ) {
-            this.dialogService.alert(error.message);
+          const customMsg = this.getCustomErrorMessage(resourceType, err, error);
+
+          if (customMsg) {
+            this.dialogService.alert(customMsg);
           } else if (
             !(
               err.status === 404 ||
@@ -198,5 +188,26 @@ export class FormApiClient {
     }
 
     return object;
+  }
+
+  private getCustomErrorMessage(resourceType: ResourceType, err: any, error: any): string | undefined {
+    if (
+      resourceType === ResourceType.pdfResource &&
+      error?.message === ErrorMessages.missingIntellectualOwner
+    ) {
+      return 'Please fill the "Owner of record" field before attaching any files.';
+    }
+
+    if (resourceType === ResourceType.sequenceResource) {
+      if (error?.message === ErrorMessages.invalidSequenceValueFormat) {
+        return 'Please fill a value with ":"-character at the end.';
+      }
+
+      if (err.status === 404 && error?.message) {
+        return error.message;
+      }
+    }
+
+    return undefined;
   }
 }
