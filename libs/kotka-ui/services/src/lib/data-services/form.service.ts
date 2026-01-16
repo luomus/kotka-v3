@@ -4,6 +4,7 @@ import { LajiForm } from '@kotka/shared/models';
 import { map, take } from 'rxjs/operators';
 import { UserService } from './user.service';
 import { ApiClient } from './api-client';
+import { allowAllImageDeleteForUser } from '@kotka/shared/utils';
 
 export type EnumOption = { const: string; title: string };
 
@@ -38,6 +39,7 @@ export class FormService {
           userName: this.userService.formatUserName(user?.fullName),
           userEmail: user?.emailAddress,
           isAdmin: user?.role?.includes('MA.admin'),
+          imageDeletionAllowed: user && allowAllImageDeleteForUser(user),
           ...form.uiSchemaContext,
         },
       })),
