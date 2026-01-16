@@ -6,7 +6,8 @@ import { MARoleKotkaEnum } from '@luomus/laji-schema';
 const deleteAllowedForTypes = [
   KotkaDocumentObjectFullType.dataset,
   KotkaDocumentObjectFullType.transaction,
-  KotkaDocumentObjectFullType.organization
+  KotkaDocumentObjectFullType.organization,
+  KotkaDocumentObjectFullType.document
 ];
 
 export function allowEditForUser(document: Partial<KotkaDocumentObject>, user: Person): boolean {
