@@ -78,6 +78,12 @@ export type Urls = {
   highDetailModel: string,
 }
 
+export enum MediasEnum {
+  pdf = 'pdf',
+  images = 'images'
+}
+
+export type MediaTypes =  'pdf' | 'images'
 @Injectable()
 export class MediaApiService {
   constructor(
@@ -92,7 +98,7 @@ export class MediaApiService {
   private urlBase = process.env['MEDIA_API_URL'];
   private baseConfig = { headers: { Authorization: 'Basic ' + process.env['MEDIA_API_AUTH'] }};
 
-  postMediaStreaming(type: 'pdf' | 'images', req: Request, res: Response) {
+  postMediaStreaming(type: MediaTypes, req: Request, res: Response) {
     const proxy = https.request(`${this.urlBase}api/fileUpload`, merge({
       method: 'post',
       params: {
@@ -113,7 +119,7 @@ export class MediaApiService {
     req.pipe(proxy);
   }
 
-  postMedia(type: 'pdf' | 'images', files: Express.Multer.File[]) {
+  postMedia(type: MediaTypes, files: Express.Multer.File[]) {
     const formData = new FormData();
 
     files.forEach((file) => {
@@ -137,7 +143,7 @@ export class MediaApiService {
     );
   }
 
-  getMedia(id: string, type: string) {
+  getMedia(id: string, type: MediaTypes) {
     return this.httpService.get<Media>(`${this.urlBase}api/${type}/${id}`, this.baseConfig).pipe(
       map(res => res.data),
       catchError(e => {
@@ -147,7 +153,7 @@ export class MediaApiService {
     );
   }
 
-  findMediaByDocumentId(id: string, type: string) {
+  findMediaByDocumentId(id: string, type: MediaTypes) {
     return this.httpService.get<Meta[]>(`${this.urlBase}api/${type}`, {...this.baseConfig, params: { documentIds: id }}).pipe(
       map(res => res.data),
       catchError(e => {
@@ -157,7 +163,7 @@ export class MediaApiService {
     );
   }
 
-  deleteMedia(id: string, type: string) {
+  deleteMedia(id: string, type: MediaTypes) {
     return this.httpService.delete(`${this.urlBase}api/${type}/${id}`, this.baseConfig).pipe(
       map(res => res.data),
       catchError(e => {
@@ -167,7 +173,7 @@ export class MediaApiService {
     );
   }
 
-  postMetadata(type: string, meta: NewMediaFile[]) {
+  postMetadata(type: MediaTypes, meta: NewMediaFile[]) {
     return this.httpService.post<Media[]>(`${this.urlBase}api/${type}`, meta, this.baseConfig).pipe(
       map(res => res.data),
       catchError(e => {
@@ -177,7 +183,7 @@ export class MediaApiService {
     );
   }
 
-  putMetadata(id: string, type: string, meta: Meta) {
+  putMetadata(id: string, type: MediaTypes, meta: Meta) {
     return this.httpService.put<Media>(`${this.urlBase}api/${type}/${id}`, meta, this.baseConfig).pipe(
       catchError(e => {
         console.error(e);
@@ -186,7 +192,7 @@ export class MediaApiService {
     );
   }
 
-  typeToMeta(type: string, profile: Person, media: Image | Pdf): Meta {
+  typeToMeta(type: MediaTypes, profile: Person, media: Image | Pdf): Meta {
     switch (type) {
       case 'pdf':
         return this.pdfToMeta(profile, media as Pdf);
@@ -226,7 +232,7 @@ export class MediaApiService {
     };
   }
 
-  metaToType(type: string, media: Media) {
+  metaToType(type: MediaTypes, media: Media) {
     switch (type) {
       case 'pdf':
         return this.metaToPDF(media);

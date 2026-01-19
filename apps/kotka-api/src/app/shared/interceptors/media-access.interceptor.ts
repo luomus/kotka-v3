@@ -5,7 +5,7 @@ https://docs.nestjs.com/interceptors#interceptors
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, HttpException, HttpStatus } from '@nestjs/common';
 import { Observable, lastValueFrom, map } from 'rxjs';
 import { Pdf, Image, Person } from '@kotka/shared/models';
-import { MediaApiService } from '@kotka/api/services';
+import { MediaApiService, MediasEnum } from '@kotka/api/services';
 
 @Injectable()
 export class MediaAccessInterceptor implements NestInterceptor {
@@ -21,10 +21,11 @@ export class MediaAccessInterceptor implements NestInterceptor {
       throw new HttpException('Missing user data', HttpStatus.FORBIDDEN);
     }
 
-    if (req.method === 'PUT') {
-      const type = req.params['type'];
-      const id = req.params['id'];
+    let type;
 
+    if (req.method === 'PUT') {
+      const id = req.params['id'];
+      type = req.params['type'];
 
       if (!type) {
         throw new HttpException('Missing type parameter', HttpStatus.BAD_REQUEST);
@@ -47,6 +48,7 @@ export class MediaAccessInterceptor implements NestInterceptor {
         map((data: Pdf | Image) => {
           if (req.method !== 'GET') return data;
           if (profile.role?.includes('MA.admin')) return data;
+          if (type === MediasEnum.images) return data;
           if (profile.organisation.includes(data.intellectualOwner)) return data;
 
           throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
