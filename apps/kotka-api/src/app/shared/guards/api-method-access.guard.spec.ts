@@ -194,7 +194,7 @@ describe('ApiMethodAccessGuard', () => {
     const mockContext = createMock<ExecutionContext>();
 
     mockContext.switchToHttp().getRequest.mockReturnValue({ params: { id: 'GX.1' }, method: 'DELETE',  user: { profile: { role: ['MA.admin'] }}, body: { owner: 'MOS.1' }});
-    const mockLajistoreGet = jest.spyOn(lajiStoreService, 'get').mockImplementation(() => of({ data: { '@type': 'MY.document', id: 'GX.1', owner: 'MOS.1' }, status: 200, statusText: '', headers: {}, config: {}} as AxiosResponse));
+    const mockLajistoreGet = jest.spyOn(lajiStoreService, 'get').mockImplementation(() => of({ data: { '@type': 'MY.unit', id: 'GX.1', owner: 'MOS.1' }, status: 200, statusText: '', headers: {}, config: {}} as AxiosResponse));
 
     await expect(apiMethodAccessGuard.canActivate(mockContext)).rejects.toThrow(ForbiddenException);
     expect(mockLajistoreGet).toBeCalledTimes(1);
