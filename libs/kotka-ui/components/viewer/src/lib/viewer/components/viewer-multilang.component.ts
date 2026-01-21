@@ -41,10 +41,12 @@ export class ViewerMultilangComponent {
       console.warn('Difference data is in a wrong format for a multi lang field');
     } else if (isPatch(data)) {
       this.languages.forEach(lang => {
-        result[lang] = {
-          op: data.op,
-          value: data.value[lang],
-        };
+        if (data.value[lang]) {
+          result[lang] = {
+            op: data.op,
+            value: data.value[lang],
+          };
+        }
       });
     } else {
       this.languages.forEach(lang => {
