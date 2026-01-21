@@ -28,7 +28,7 @@ import { EnumPipe, LabelPipe } from '@kotka/ui/pipes';
         </span>
       }
       <ng-template #fieldValue let-value="value">
-        @if (field.type === 'select') {
+        @if (field.options?.value_options) {
           @if (typeof value === 'string') {
             <span>{{ value | enum: field }}</span>
           }
