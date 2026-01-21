@@ -1,33 +1,36 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { DifferenceObjectPatch, LajiForm } from '@kotka/shared/models';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Patch, LajiForm } from '@kotka/shared/models';
 import { ViewerFieldValueComponent } from './viewer-field-value.component';
-
-import { ArrayIndexRangePipe } from '../../pipes/array-index-range.pipe';
+import {
+  alignArrayWithPatchArray,
+  alignPatchArrayWithArray,
+} from '../../services/utils';
 
 @Component({
   selector: 'kui-viewer-field-value-array',
   template: `
-    @if (field) {
-      <div class="array-field">
-        @for (i of data | arrayIndexRange: differenceData; track i; let last = $last) {
-          <kui-viewer-field-value
-            [field]="field"
-            [data]="data?.[i]"
-            [differenceData]="differenceData?.[i]"
-          ></kui-viewer-field-value>
-          @if (!last) {
-            <span>, </span>
-          }
+    <div class="array-field">
+      @for (dataItem of alignedData(); track $index; let i = $index; let last = $last) {
+        <kui-viewer-field-value
+          [field]="field()"
+          [data]="dataItem"
+          [patch]="alignedPatches()[i]"
+        ></kui-viewer-field-value>
+        @if (!last) {
+          <span>, </span>
         }
-      </div>
-    }
-    `,
+      }
+    </div>
+  `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ViewerFieldValueComponent, ArrayIndexRangePipe],
+  imports: [ViewerFieldValueComponent],
 })
 export class ViewerFieldValueArrayComponent {
-  @Input() field?: LajiForm.Field;
-  @Input() data?: any[];
-  @Input() differenceData?: DifferenceObjectPatch[];
+  field = input.required<LajiForm.Field>();
+  data = input<any[]>();
+  patches = input<Patch[]>();
+
+  alignedData = computed(() => alignArrayWithPatchArray(this.data(), this.patches()));
+  alignedPatches = computed(() => alignPatchArrayWithArray(this.patches(), this.data()));
 }

@@ -1,13 +1,10 @@
 import {
   ChangeDetectionStrategy,
-  Component,
-  Input,
-  OnChanges,
+  Component, computed, input, Signal
 } from '@angular/core';
 import {
-  DifferenceObjectPatch,
-  isDifferenceObjectPatch,
-  LajiForm,
+  Patch, DifferenceObjectValue, isPatch,
+  LajiForm, isPatchArray
 } from '@kotka/shared/models';
 import { ViewerFieldValueArrayComponent } from './viewer-field-value-array.component';
 import { ViewerFieldValueComponent } from './viewer-field-value.component';
@@ -16,80 +13,72 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'kui-viewer-field',
   template: `
-    @if (field && hasData) {
+    @if (hasData()) {
       <div class="row mb-1">
         <div class="col-sm-3">
           <label
-            ><strong>{{ label || field.label }}:</strong></label
-            ><br />
-          </div>
-          <div class="col-sm-9">
-            @if (isArray) {
-              <div
-          [ngClass]="{
-            'viewer-array-field-removed': differenceDataPatch?.op === 'remove',
-            'viewer-array-field-added': differenceDataPatch?.op === 'add',
-          }"
-                >
-                <kui-viewer-field-value-array
-                  [field]="field"
-            [data]="
-              differenceDataPatch?.op === 'add'
-                ? differenceDataPatch?.value
-                : data
-            "
-                  [differenceData]="differenceDataPatchArray"
-                ></kui-viewer-field-value-array>
-              </div>
-            }
-            @if (!isArray) {
-              <kui-viewer-field-value
-                [field]="field"
-                [data]="data"
-                [differenceData]="differenceDataPatch"
-              ></kui-viewer-field-value>
-            }
-          </div>
+          ><strong>{{ label() || field().label }}:</strong></label
+          ><br />
         </div>
-      }
-    `,
+        <div
+          class="col-sm-9"
+          [ngClass]="{
+            'viewer-field-removed': patch()?.op === 'remove',
+            'viewer-field-added': patch()?.op === 'add',
+          }"
+        >
+          @if (isArrayField()) {
+            <kui-viewer-field-value-array
+              [field]="field()"
+              [data]="patch()?.op === 'add' ? patch()?.value : data()"
+              [patches]="patches()"
+            ></kui-viewer-field-value-array>
+          } @else {
+            <kui-viewer-field-value
+              [field]="field()"
+              [data]="data()"
+              [patch]="patch()"
+            ></kui-viewer-field-value>
+          }
+        </div>
+      </div>
+    }
+  `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ViewerFieldValueArrayComponent, ViewerFieldValueComponent],
+  imports: [
+    CommonModule,
+    ViewerFieldValueArrayComponent,
+    ViewerFieldValueComponent,
+  ],
 })
-export class ViewerFieldComponent implements OnChanges {
-  @Input() label?: string;
-  @Input() field?: LajiForm.Field;
-  @Input() data?: any;
-  @Input() differenceData?: DifferenceObjectPatch | DifferenceObjectPatch[];
+export class ViewerFieldComponent {
+  label = input<string>();
+  field = input.required<LajiForm.Field>();
+  data = input<any>();
+  differenceData = input<DifferenceObjectValue>();
 
-  isArray = false;
-  hasData = false;
+  isArrayField: Signal<boolean> = computed(() => this.field()?.type === 'collection');
 
-  differenceDataPatch?: DifferenceObjectPatch;
-  differenceDataPatchArray?: DifferenceObjectPatch[];
+  patch: Signal<Patch | undefined> = computed(() => {
+    const data = this.differenceData();
+    return isPatch(data) ? data : undefined;
+  });
+  patches: Signal<Patch[] | undefined> = computed(() => {
+    const data = this.differenceData();
+    return isPatchArray(data) ? data : undefined;
+  });
 
-  ngOnChanges() {
-    this.isArray = this.field?.type === 'collection';
-
-    if (isDifferenceObjectPatch(this.differenceData)) {
-      this.differenceDataPatch = this.differenceData;
-      this.differenceDataPatchArray = undefined;
-    } else {
-      this.differenceDataPatch = undefined;
-      this.differenceDataPatchArray = this.differenceData;
-    }
-
+  hasData: Signal<boolean> = computed(() => {
     const hasData =
-      this.data != null &&
-      this.data !== '' &&
-      (!this.isArray || this.data?.length > 0);
-    const hasDiffData =
-      this.differenceData != null &&
-      (!this.isArray ||
-        !['add', 'remove'].includes(this.differenceDataPatch?.op || '') ||
-        this.differenceDataPatch?.value?.length > 0);
+      this.data() != null &&
+      this.data() !== '' &&
+      (!this.isArrayField() || this.data().length > 0);
 
-    this.hasData = hasData || hasDiffData;
-  }
+    const hasDiffData =
+      this.differenceData() != null &&
+      (!this.isArrayField() || this.patch()?.value?.length > 0);
+
+    return hasData || hasDiffData;
+  });
 }

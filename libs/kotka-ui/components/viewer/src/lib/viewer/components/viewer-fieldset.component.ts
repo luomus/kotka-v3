@@ -1,25 +1,62 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { DifferenceObject, LajiForm } from '@kotka/shared/models';
-import { ViewerFieldsetFieldComponent } from './viewer-fieldset-field.component';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed, forwardRef,
+  input,
+  Signal,
+} from '@angular/core';
+import {
+  Patch,
+  DifferenceObjectValue,
+  isPatch,
+  LajiForm,
+  DifferenceObject,
+} from '@kotka/shared/models';
+import { CommonModule } from '@angular/common';
+import { ViewerFieldsetFieldsComponent } from './viewer-fieldset-fields.component';
 
 
 @Component({
   selector: 'kui-viewer-fieldset',
   template: `
-    @for (field of fields; track field) {
-      <kui-viewer-fieldset-field
-        [field]="field"
-        [data]="data[field.name || '']"
-        [differenceData]="differenceData?.[field.name || '']"
-      ></kui-viewer-fieldset-field>
+    @if (hasData()) {
+      <div
+        class="my-3"
+        [ngClass]="{
+          'viewer-fieldset-removed': patch()?.op === 'remove',
+          'viewer-fieldset-added': patch()?.op === 'add',
+        }"
+      >
+        <h4 class="border-bottom">{{ field().label }}</h4>
+        <kui-viewer-fieldset-fields
+          [fields]="field().fields || []"
+          [data]="patch()?.op === 'add' ? patch()?.value : data()"
+          [differenceData]="differenceObject()"
+        ></kui-viewer-fieldset-fields>
+      </div>
     }
-    `,
+  `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ViewerFieldsetFieldComponent],
+  imports: [CommonModule, forwardRef(() => ViewerFieldsetFieldsComponent)],
 })
 export class ViewerFieldsetComponent {
-  @Input() fields: LajiForm.Field[] = [];
-  @Input() data: any = {};
-  @Input() differenceData?: DifferenceObject;
+  field = input.required<LajiForm.Field>();
+  data = input<any>();
+  differenceData = input<DifferenceObjectValue>();
+
+  patch: Signal<Patch | undefined> = computed(() => {
+    const data = this.differenceData();
+    return isPatch(data) ? data : undefined;
+  });
+  differenceObject: Signal<DifferenceObject | undefined> = computed(() => {
+    const data = this.differenceData();
+    return Array.isArray(data) || isPatch(data) ? undefined : data;
+  });
+
+  hasData = computed(() => {
+    const hasData = Object.keys(this.data() || {}).length > 0;
+    const hasDiffData = Object.keys(this.patch()?.value || {}).length > 0;
+    return hasData || hasDiffData;
+  });
 }

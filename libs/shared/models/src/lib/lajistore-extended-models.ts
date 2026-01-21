@@ -118,16 +118,19 @@ export interface KotkaVersionDifference<S extends KotkaDocumentObject = KotkaDoc
 export interface DifferenceObject {
   [key: string]: DifferenceObjectValue;
 }
-export type DifferenceObjectPatch = Omit<StorePatch, 'path'>;
-export type DifferenceObjectValue = DifferenceObject|DifferenceObject[]|DifferenceObjectPatch|DifferenceObjectPatch[];
+export type Patch = Omit<StorePatch, 'path'>;
+export type DifferenceObjectValue = DifferenceObject|DifferenceObject[]|Patch|Patch[];
 
 export interface KotkaVersionDifferenceObject<S extends KotkaDocumentObject = KotkaDocumentObject> {
   original: S;
   diff: DifferenceObject;
 }
 
-export function isDifferenceObjectPatch(value: DifferenceObjectValue|undefined|null): value is DifferenceObjectPatch {
+export function isPatch(value: DifferenceObjectValue|undefined|null): value is Patch {
   return value !== undefined && value !== null && 'op' in value;
+}
+export function isPatchArray(value: DifferenceObjectValue|undefined|null): value is Patch[] {
+  return Array.isArray(value) && value.some((val: Patch | DifferenceObject) => isPatch(val));
 }
 
 export function isMultiLanguageObject(value: any): value is MultiLanguage {

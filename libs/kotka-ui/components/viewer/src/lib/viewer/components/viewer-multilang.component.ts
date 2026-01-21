@@ -1,9 +1,8 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import {
-  DifferenceObject,
-  DifferenceObjectPatch,
-  isDifferenceObjectPatch,
-  LajiForm,
+  DifferenceObjectValue,
+  isPatch,
+  LajiForm
 } from '@kotka/shared/models';
 import { ViewerFieldComponent } from './viewer-field.component';
 
@@ -11,28 +10,15 @@ import { ViewerFieldComponent } from './viewer-field.component';
 @Component({
   selector: 'kui-viewer-multilang',
   template: `
-    @if (field) {
-      @for (lang of ['en', 'fi', 'sv']; track lang) {
-        @if (
-          data?.[lang] ||
-          differenceDataObject?.[lang] ||
-          differenceDataPatch?.value?.[lang]
-          ) {
-          <kui-viewer-field
-            [label]="field.label + ' (' + lang + ')'"
-            [field]="field"
-            [data]="data?.[lang]"
-            [differenceData]="
-              differenceDataPatch
-                ? {
-                    op: differenceDataPatch.op,
-                    value: differenceDataPatch.value[lang],
-                  }
-                : $any(differenceDataObject?.[lang])
-            "
+    @for (lang of languages; track lang) {
+      @if (data()?.[lang] || differenceDataByLang()[lang]) {
+        <kui-viewer-field
+          [label]="field().label + ' (' + lang + ')'"
+          [field]="field()"
+          [data]="data()?.[lang]"
+          [differenceData]="differenceDataByLang()[lang]"
         ></kui-viewer-field>
       }
-    }
     }
     `,
   styles: [],
@@ -40,21 +26,32 @@ import { ViewerFieldComponent } from './viewer-field.component';
   imports: [ViewerFieldComponent],
 })
 export class ViewerMultilangComponent {
-  @Input() field?: LajiForm.Field;
-  @Input() data?: any;
-  @Input() set differenceData(
-    differenceData: DifferenceObject | DifferenceObjectPatch | undefined,
-  ) {
-    this.differenceDataObject = undefined;
-    this.differenceDataPatch = undefined;
+  languages = ['en', 'fi', 'sv'];
 
-    if (isDifferenceObjectPatch(differenceData)) {
-      this.differenceDataPatch = differenceData;
+  field = input.required<LajiForm.Field>();
+  data = input<any>();
+  differenceData = input<DifferenceObjectValue | undefined>();
+
+  differenceDataByLang = computed(() => {
+    const result: Record<string, DifferenceObjectValue | undefined> = {};
+
+    const data = this.differenceData();
+
+    if (Array.isArray(data)) {
+      console.warn('Difference data is in a wrong format for a multi lang field');
+    } else if (isPatch(data)) {
+      this.languages.forEach(lang => {
+        result[lang] = {
+          op: data.op,
+          value: data.value[lang],
+        };
+      });
     } else {
-      this.differenceDataObject = differenceData;
+      this.languages.forEach(lang => {
+        result[lang] = data?.[lang];
+      });
     }
-  }
 
-  differenceDataObject?: DifferenceObject;
-  differenceDataPatch?: DifferenceObjectPatch;
+    return result;
+  });
 }
