@@ -19,13 +19,11 @@ export class LajiApiController {
   private readonly lajiApiBase = '/api/laji';
   private readonly lajiApiProxy: RequestHandler;
 
-  constructor(
-    private authService: AuthenticationService
-  ) {
+  constructor(private authService: AuthenticationService) {
     this.lajiApiProxy = this.getLajiApiProxy();
   }
 
-  @Get(['forms{*all}', 'person{*all}', 'areas{*all}'])
+  @Get(['forms{*all}', 'person{*all}', 'areas{*all}', 'autocomplete{*all}'])
   proxyGetRequest(@Req() req: Request, @Res() res: Response) {
     void this.lajiApiProxy(req, res);
   }
@@ -43,8 +41,8 @@ export class LajiApiController {
       pathRewrite: this.pathRewrite.bind(this),
       on: {
         proxyReq: this.proxyReq.bind(this),
-        proxyRes: this.proxyRes.bind(this)
-      }
+        proxyRes: this.proxyRes.bind(this),
+      },
     });
   }
 
@@ -85,7 +83,13 @@ export class LajiApiController {
         let body = Buffer.concat(data);
         if (body.toString().includes('INVALID TOKEN')) {
           this.authService.invalidateSession(req);
-          res.status(401).json({ message: ErrorMessages.loginRequired, error: 'Unauthorized', statusCode: 401 });
+          res
+            .status(401)
+            .json({
+              message: ErrorMessages.loginRequired,
+              error: 'Unauthorized',
+              statusCode: 401,
+            });
         } else {
           this.forwardAllHeaders(proxyRes, res);
           body = this.patchSpecimenForm(req.path, body);
@@ -109,8 +113,8 @@ export class LajiApiController {
 
   // TODO remove after specimen schema changes
   private patchSpecimenForm(path: string, body: any) {
-    const findFieldIdx = (fields: {name: string}[], field: string) => {
-      return fields.findIndex(f => f.name === field);
+    const findFieldIdx = (fields: { name: string }[], field: string) => {
+      return fields.findIndex((f) => f.name === field);
     };
 
     if (path === '/forms/MHL.1158') {
@@ -124,46 +128,73 @@ export class LajiApiController {
       if (data.schema) {
         data.schema.properties.unreliableFields = {
           ...data.schema.properties.unreliableFields,
-          'type': 'array',
-          'items': {
-            'type': 'string'
-          }
+          type: 'array',
+          items: {
+            type: 'string',
+          },
         };
-        data.schema.properties.gatherings.items.properties.samplingAreaSizeInSquareMeters = {
-          ...data.schema.properties.gatherings.items.properties.samplingAreaSizeInSquareMeters,
-          'type': 'string'
-        };
+        data.schema.properties.gatherings.items.properties.samplingAreaSizeInSquareMeters =
+          {
+            ...data.schema.properties.gatherings.items.properties
+              .samplingAreaSizeInSquareMeters,
+            type: 'string',
+          };
 
-        data.schema.properties.gatherings.items.properties.units.items.properties.identifications.items.properties.preferredIdentification = {
-          ...data.schema.properties.gatherings.items.properties.units.items.properties.identifications.items.properties.preferredIdentification,
-          'type': 'boolean'
-        };
+        data.schema.properties.gatherings.items.properties.units.items.properties.identifications.items.properties.preferredIdentification =
+          {
+            ...data.schema.properties.gatherings.items.properties.units.items
+              .properties.identifications.items.properties
+              .preferredIdentification,
+            type: 'boolean',
+          };
       } else if (data.fields) {
-        const unreliableFieldsIdx = findFieldIdx(data.fields, 'unreliableFields');
+        const unreliableFieldsIdx = findFieldIdx(
+          data.fields,
+          'unreliableFields',
+        );
         const gatheringsIdx = findFieldIdx(data.fields, 'gatherings');
-        const samplingAreaSizeInSquareMetersIdx = findFieldIdx(data.fields[gatheringsIdx].fields, 'samplingAreaSizeInSquareMeters');
-        const unitsIdx = findFieldIdx(data.fields[gatheringsIdx].fields, 'units');
-        const identificationsIdx = findFieldIdx(data.fields[gatheringsIdx].fields[unitsIdx].fields, 'identifications');
-        const preferredIdentificationIdx = findFieldIdx(data.fields[gatheringsIdx].fields[unitsIdx].fields[identificationsIdx].fields, 'preferredIdentification');
+        const samplingAreaSizeInSquareMetersIdx = findFieldIdx(
+          data.fields[gatheringsIdx].fields,
+          'samplingAreaSizeInSquareMeters',
+        );
+        const unitsIdx = findFieldIdx(
+          data.fields[gatheringsIdx].fields,
+          'units',
+        );
+        const identificationsIdx = findFieldIdx(
+          data.fields[gatheringsIdx].fields[unitsIdx].fields,
+          'identifications',
+        );
+        const preferredIdentificationIdx = findFieldIdx(
+          data.fields[gatheringsIdx].fields[unitsIdx].fields[identificationsIdx]
+            .fields,
+          'preferredIdentification',
+        );
 
         data.fields[unreliableFieldsIdx] = {
           ...data.fields[unreliableFieldsIdx],
-          'type': 'collection',
-          'options': {
-            'target_element': {
-              'type': 'text'
-            }
-          }
+          type: 'collection',
+          options: {
+            target_element: {
+              type: 'text',
+            },
+          },
         };
 
         data.fields[gatheringsIdx].fields[samplingAreaSizeInSquareMetersIdx] = {
-          ...data.fields[gatheringsIdx].fields[samplingAreaSizeInSquareMetersIdx],
-          'type': 'text'
+          ...data.fields[gatheringsIdx].fields[
+            samplingAreaSizeInSquareMetersIdx
+          ],
+          type: 'text',
         };
 
-        data.fields[gatheringsIdx].fields[unitsIdx].fields[identificationsIdx].fields[preferredIdentificationIdx] = {
-          ...data.fields[gatheringsIdx].fields[unitsIdx].fields[identificationsIdx].fields[preferredIdentificationIdx],
-          'type': 'checkbox'
+        data.fields[gatheringsIdx].fields[unitsIdx].fields[
+          identificationsIdx
+        ].fields[preferredIdentificationIdx] = {
+          ...data.fields[gatheringsIdx].fields[unitsIdx].fields[
+            identificationsIdx
+          ].fields[preferredIdentificationIdx],
+          type: 'checkbox',
         };
       }
 
