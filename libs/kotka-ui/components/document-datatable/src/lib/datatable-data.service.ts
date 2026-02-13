@@ -1,9 +1,3 @@
-import { Observable } from 'rxjs';
-import {
-  KotkaDocumentObject,
-  ListResponse,
-  KotkaDocumentObjectType,
-} from '@kotka/shared/models';
 import {
   DatatableColumn,
   FilterModel,
@@ -15,25 +9,23 @@ import {
   BasicFilterModel,
   CombinedFilterModel,
 } from '@kotka/ui/datatable';
-import { Injectable, inject } from '@angular/core';
-import { ApiClient } from '@kotka/ui/services';
+import { Injectable } from '@angular/core';
+import { DocumentListSearchParams } from '@kotka/ui/services';
+import { KotkaDocumentObjectType } from '@kotka/shared/models';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DatatableDataService {
-  private apiClient = inject(ApiClient);
-
-
-  getData(
-    dataType: KotkaDocumentObjectType,
+  getSearchParams<T extends KotkaDocumentObjectType>(
+    type: T,
     columns: DatatableColumn[],
     startRow: number,
     endRow: number,
     sortModel: DatatableSort,
     filterModel: DatatableFilter,
     extraSearchQuery?: string,
-  ): Observable<ListResponse<KotkaDocumentObject>> {
+  ): DocumentListSearchParams<T> {
     const pageSize = endRow - startRow;
     const page = startRow / pageSize + 1;
 
@@ -48,13 +40,13 @@ export class DatatableDataService {
       .map((query) => `(${query})`)
       .join(' AND ');
 
-    return this.apiClient.getDocumentList(
-      dataType,
+    return {
+      type,
       page,
       pageSize,
       sort,
-      searchQuery,
-    );
+      searchQueryString: searchQuery,
+    };
   }
 
   getSearchQueryForMultiColumnTextSearch(
@@ -85,7 +77,7 @@ export class DatatableDataService {
     colIdFieldMap: Record<string, string>,
   ): string {
     return sortModel
-      .map((sort) => colIdFieldMap[sort.colId] + ' ' + sort.sort)
+      .map((sort) => (colIdFieldMap[sort.colId] || sort.colId) + ' ' + sort.sort)
       .join(',');
   }
 

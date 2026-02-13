@@ -36,5 +36,6 @@ interface BooleanQuery {
 type Query = TermQuery|TermsQuery|WildcardQuery|BooleanQuery;
 
 export interface ElasticsearchQuery {
-  query: Query;
+  query?: Query;
+  search_after?: (Value|null)[];
 }

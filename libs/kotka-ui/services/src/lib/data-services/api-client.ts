@@ -31,12 +31,21 @@ const path = apiBase + '/';
 const authPath = apiBase + '/auth/';
 const lajiApiPath = lajiApiBase + '/';
 
+export interface DocumentListSearchParams<T extends KotkaDocumentObjectType = KotkaDocumentObjectType> {
+  type: T,
+  page?: number,
+  pageSize?: number,
+  sort?: string,
+  searchQueryString?: string,
+  fields?: string[],
+  searchQueryObject?: ElasticsearchQuery,
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class ApiClient {
   private httpClient = inject(HttpClient);
-
 
   getDocumentById<
     T extends KotkaDocumentObjectType,

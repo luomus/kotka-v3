@@ -23,6 +23,10 @@ export function startWithUndefined<T>(observable: Observable<T>): Observable<T|u
   return concat(of(undefined), observable);
 }
 
+export function isKeyOfObject<T extends object>(key: string | number | symbol, obj: T): key is keyof T {
+  return key in obj;
+}
+
 export function getEnumValue(value: string | undefined, field: any, fieldType: 'json'|'schema' = 'json'): string {
   const valueOptions = fieldType === 'schema' ? getValueOptionsFromSchemaField(field) : field.options?.value_options;
   return valueOptions?.[value || ''] || '';

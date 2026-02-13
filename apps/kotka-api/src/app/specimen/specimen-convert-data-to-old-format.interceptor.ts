@@ -40,6 +40,10 @@ export class SpecimenConvertDataToOldFormatInterceptor implements NestIntercepto
       .handle()
       .pipe(
         map((response) => {
+          if (!response) {
+            return;
+          }
+
           if (Array.isArray(response)) {
             return response;
           }

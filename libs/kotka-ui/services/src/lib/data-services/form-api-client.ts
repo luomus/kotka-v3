@@ -98,21 +98,35 @@ export class FormApiClient {
         params: query,
         body: options['body'] || undefined,
         observe: 'response',
+        responseType: 'text'
       })
       .pipe(
-        map((response) => ({
-          ...response,
-          json: () => this.processResult(resourceType, response.body),
-        })),
+        map((response) => {
+          if (response.headers.get('Content-Type')?.includes('application/json')) {
+            const json = JSON.parse(response.body!);
+            return {
+              ...response,
+              json: () => this.processResult(resourceType, json),
+            };
+          }
+
+          return {
+            ...response,
+            text: () => response.body
+          };
+        }),
         catchError((err) => {
-          if (
-            resourceType === ResourceType.pdfResource &&
-            err.status === 400 &&
-            err.error?.message === ErrorMessages.missingIntellectualOwner
-          ) {
-            this.dialogService.alert(
-              'Please fill the "Owner of record" field before attaching any files.',
-            );
+          let error: any;
+          try {
+            error = JSON.parse(err.error);
+          } catch (e) {
+            error = {};
+          }
+
+          const customMsg = this.getCustomErrorMessage(resourceType, err, error);
+
+          if (customMsg) {
+            this.dialogService.alert(customMsg);
           } else if (
             !(
               err.status === 404 ||
@@ -122,7 +136,7 @@ export class FormApiClient {
           ) {
             this.toastService.showGenericError({ pause: true });
           }
-          return of({ ...err, json: () => err.error });
+          return of({ ...err, json: () => error });
         }),
       )
       .toPromise(Promise);
@@ -174,5 +188,26 @@ export class FormApiClient {
     }
 
     return object;
+  }
+
+  private getCustomErrorMessage(resourceType: ResourceType, err: any, error: any): string | undefined {
+    if (
+      resourceType === ResourceType.pdfResource &&
+      error?.message === ErrorMessages.missingIntellectualOwner
+    ) {
+      return 'Please fill the "Owner of record" field before attaching any files.';
+    }
+
+    if (resourceType === ResourceType.sequenceResource) {
+      if (error?.message === ErrorMessages.invalidSequenceValueFormat) {
+        return 'Please fill a value with ":"-character at the end.';
+      }
+
+      if (err.status === 404 && error?.message) {
+        return error.message;
+      }
+    }
+
+    return undefined;
   }
 }

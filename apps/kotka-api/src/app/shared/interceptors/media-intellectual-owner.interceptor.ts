@@ -2,7 +2,7 @@
 https://docs.nestjs.com/interceptors#interceptors
 */
 
-import { LajiStoreService, MediaApiService } from '@kotka/api/services';
+import { LajiStoreService, MediaApiService, MediaTypes } from '@kotka/api/services';
 import { Concept, KeyOfUnion, StoreObject } from '@luomus/laji-schema/models';
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
@@ -56,10 +56,10 @@ export class MediaIntellectualOwnerInterceptor implements NestInterceptor {
 
   updateMediaIntellectualOwner(mediaIDs: MediaOutput, owner: string, doc: string) {
     for (const key in mediaIDs) {
-      const images: string[] = mediaIDs[key];
+      const medias: string[] = mediaIDs[key];
 
-      images.forEach(image => {
-        this.mediaApiService.getMedia(image, key).pipe(
+      medias.forEach(image => {
+        this.mediaApiService.getMedia(image, key as MediaTypes).pipe(
           mergeMap(media => {
             const meta = media.meta;
 
@@ -69,7 +69,7 @@ export class MediaIntellectualOwnerInterceptor implements NestInterceptor {
 
             meta.rightsOwner = owner;
 
-            return this.mediaApiService.putMetadata(image, key, meta);
+            return this.mediaApiService.putMetadata(image, key as MediaTypes, meta);
           }),
           retry({ count: 5, delay: 10000, resetOnSuccess: true }),
           catchError(err => {
