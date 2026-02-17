@@ -11,9 +11,9 @@
   [fileColumnMap]="fileColumnMap"
   (fileColumnMapChange)="fileColumnMap = $event"
   [availableFields]="availableFields()"
-  (availableFieldsChange)="changeAvailableFields($event)"
+  (availableFieldsChange)="onAvailableFieldsChange($event)"
   [defaultAvailableFields]="defaultAvailableFields()"
   [presets]="templates()"
-  (setupChange)="setup.set($event)"
+  (setupChange)="onSetupChange($event)"
   (html)="htmlToPdf($event)"
 ></ll-label-designer>

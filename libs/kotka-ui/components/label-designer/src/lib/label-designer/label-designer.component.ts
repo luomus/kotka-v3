@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   effect,
   inject,
@@ -17,6 +18,8 @@ import {
 } from '@luomus/label-designer';
 import { LocalStorageService } from 'ngx-webstorage';
 import { cloneDeep } from 'lodash';
+import { ApiClient, DialogService } from '@kotka/ui/services';
+import * as FileSaver from 'file-saver';
 
 
 @Component({
@@ -26,7 +29,10 @@ import { cloneDeep } from 'lodash';
   imports: [LabelDesignerModule],
 })
 export class LabelDesignerComponent {
+  private apiClient = inject(ApiClient);
   private storage = inject(LocalStorageService);
+  private dialogService = inject(DialogService);
+  private cd = inject(ChangeDetectorRef);
 
   defaultAvailableFields = input<ILabelField[]>([]);
   setupStorageKey = input<string>();
@@ -123,10 +129,33 @@ export class LabelDesignerComponent {
   }
 
   htmlToPdf(data: ILabelPdf) {
-    console.log(data);
+    this.apiClient.htmlToPdf(data.html).subscribe({
+      next: (response) => {
+        this.downloading = false;
+        FileSaver.saveAs(response, data.filename || 'labels.pdf');
+        this.cd.markForCheck();
+      },
+      error: (err) => {
+        if (err.status === 413) {
+          this.dialogService.alert(
+            'There were too many labels to print. Try making labels in a smaller batches and try again.',
+          );
+        } else {
+          this.dialogService.alert(
+            'Failed to create labels. Please try again in a few moments. If the error doesn\'t go away, please contact support.',
+          );
+        }
+        this.downloading = false;
+        this.cd.markForCheck();
+      },
+    });
   }
 
-  changeAvailableFields(event: ILabelField[]) {
-    console.log(event);
+  onAvailableFieldsChange(event: ILabelField[]) {
+    this.availableFields.set(event);
+  }
+
+  onSetupChange(event: ISetup) {
+    this.setup.set(event);
   }
 }
