@@ -1,10 +1,10 @@
 import { Routes } from '@angular/router';
-import { LabelDesignerComponent } from '@kotka/ui/label-designer';
+import { GenericLabelDesignerComponent } from './generic-label-designer/generic-label-designer.component';
 
 export const toolsRoutes: Routes = [
   {
     path: 'generic-label',
     pathMatch: 'full',
-    component: LabelDesignerComponent
+    component: GenericLabelDesignerComponent
   }
 ];

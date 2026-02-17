@@ -1,4 +1,10 @@
-import { Component, computed, input, Signal } from '@angular/core';
+import {
+  Component,
+  effect,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import {
   FieldType,
   ILabelField,
@@ -9,7 +15,9 @@ import {
   Presets,
   PresetSetup,
 } from '@luomus/label-designer';
-import { botanical, fungi, genericLabel, insectaDet, vertebrate } from './label-templates';
+import { LocalStorageService } from 'ngx-webstorage';
+import { cloneDeep } from 'lodash';
+
 
 @Component({
   selector: 'kui-label-designer',
@@ -18,9 +26,13 @@ import { botanical, fungi, genericLabel, insectaDet, vertebrate } from './label-
   imports: [LabelDesignerModule],
 })
 export class LabelDesignerComponent {
-  generic = input<boolean>(true);
+  private storage = inject(LocalStorageService);
 
-  data?: any[];
+  defaultAvailableFields = input<ILabelField[]>([]);
+  setupStorageKey = input<string>();
+  data = input<any[]>();
+  templates = input<PresetSetup[]>();
+
   downloading = false;
   viewSettings: IViewSettings = { magnification: 2 };
   fileColumnMap = {};
@@ -81,19 +93,33 @@ export class LabelDesignerComponent {
       },
     ],
   };
-  setup = JSON.parse(JSON.stringify(this.defaultSetup));
+  setup = signal<ISetup>(cloneDeep(this.defaultSetup));
+
+  availableFields = signal<ILabelField[]>([]);
 
   allowLabelItemsRepeat = true;
 
-  defaultAvailableFields = [];
-  availableFields = [];
-
-  templates: Signal<PresetSetup[]>;
-
   constructor() {
-    this.templates = computed(() => (
-      [...(this.generic() ? [genericLabel] : []), fungi, insectaDet, vertebrate, botanical]
-    ));
+    effect(() => {
+      this.availableFields.set(this.defaultAvailableFields());
+    });
+
+    effect(() => {
+      const key = this.setupStorageKey();
+      if (key) {
+        const setup = this.storage.retrieve(key);
+        if (setup) {
+          this.setup.set(setup);
+        }
+      }
+    });
+
+    effect(() => {
+      const key = this.setupStorageKey();
+      if (key) {
+        this.storage.store(key, this.setup());
+      }
+    });
   }
 
   htmlToPdf(data: ILabelPdf) {
