@@ -92,7 +92,7 @@ function prepareCoordinates(
     case 'wgs84':
     case 'wgs84dms':
       return {...addSuffixToWGS84(lat, lon), wgsN, wgsE};
-    case 'ykj':
+    case 'ykj': {
       const accuracy = getYkjAccuracy(lat, radius);
       const result = convertYkjToWGS84(lat, lon);
       if (result) {
@@ -100,6 +100,7 @@ function prepareCoordinates(
         wgsE = degreesToDms(result[1]);
       }
       return { lat, lon, wgsN, wgsE, accuracy: '' + accuracy };
+    }
     default:
       return { lat, lon, wgsN, wgsE };
   }

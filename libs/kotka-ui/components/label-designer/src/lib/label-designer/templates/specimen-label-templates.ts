@@ -307,7 +307,7 @@ export const fungi: PresetSetup = {
           },
           {
             field: 'legID',
-            label: "Collector's ID",
+            label: 'Collector\'s ID',
             prefix: '(',
             _menuOpen: true,
             suffix: ')',
