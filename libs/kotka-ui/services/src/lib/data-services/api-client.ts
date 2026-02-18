@@ -290,6 +290,14 @@ export class ApiClient {
     });
   }
 
+  searchTaxon(query: string, matchType?: string): Observable<PagedResult<any>> {
+    let params = new HttpParams().set('query', query);
+    if (matchType) {
+      params = params.set('matchType', matchType);
+    }
+    return this.httpClient.get<PagedResult<any>>(`${lajiApiPath}autocomplete/taxa`, { params });
+  }
+
   private convertVersionDifferenceFormat<S extends KotkaDocumentObject>(
     data: KotkaVersionDifference<S>,
   ): KotkaVersionDifferenceObject<S> {

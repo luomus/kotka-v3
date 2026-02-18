@@ -1,4 +1,4 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import {
   botanical,
   fungi,
@@ -8,23 +8,39 @@ import {
   vertebrate,
 } from '@kotka/ui/label-designer';
 import { globals } from '../../../environments/globals';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { UserService } from '@kotka/ui/services';
-import { map } from 'rxjs/operators';
+import { map, shareReplay, startWith, switchMap } from 'rxjs/operators';
 import { SpinnerComponent } from '@kotka/ui/spinner';
+import { combineLatest, Observable, of } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
+import { ILabelData, ILabelField } from '@luomus/label-designer';
+
+interface LabelDataResult {
+  value?: ILabelData[];
+  loading: boolean;
+}
+
+interface ViewModel {
+  fields?: ILabelField[];
+  data?: ILabelData[];
+  dataLoading: boolean;
+}
 
 @Component({
   selector: 'kotka-specimen-label-designer',
   template: `
-    @if (allFields(); as allFields) {
-      <kui-label-designer
-        [defaultAvailableFields]="allFields"
-        [data]="labelData()"
-        [setupStorageKey]="setupStorageKey()"
-        [templates]="templates"
-      />
-    } @else {
-      <kui-spinner></kui-spinner>
+    @if (vm$ | async; as vm) {
+      @if (vm.fields && !vm.dataLoading) {
+        <kui-label-designer
+          [defaultAvailableFields]="vm.fields"
+          [data]="vm.data"
+          [setupStorageKey]="setupStorageKey()"
+          [templates]="templates"
+        />
+      } @else {
+        <kui-spinner></kui-spinner>
+      }
     }
   `,
   styles: `
@@ -35,7 +51,7 @@ import { SpinnerComponent } from '@kotka/ui/spinner';
       min-height: 0;
     }
   `,
-  imports: [LabelDesignerComponent, SpinnerComponent],
+  imports: [LabelDesignerComponent, SpinnerComponent, AsyncPipe],
   standalone: true,
 })
 export class SpecimenLabelDesignerComponent {
@@ -44,13 +60,9 @@ export class SpecimenLabelDesignerComponent {
 
   documents = input<any[]>();
 
-  allFields = toSignal(this.labelDesignerService.getAllFields(globals.specimenFormId));
-
-  labelData = computed(() => {
-    const fields = this.allFields();
-    const docs = this.documents();
-    return fields && docs ? this.labelDesignerService.getData(fields, docs) : undefined;
-  });
+  allFields$: Observable<ILabelField[]>;
+  labelData$: Observable<LabelDataResult>;
+  vm$: Observable<ViewModel>;
 
   setupStorageKey = toSignal(
     this.userService
@@ -59,4 +71,37 @@ export class SpecimenLabelDesignerComponent {
   );
 
   templates = [fungi, insectaDet, vertebrate, botanical];
+
+  constructor() {
+    this.allFields$ = this.labelDesignerService
+      .getAllFields(globals.specimenFormId)
+      .pipe(shareReplay(1));
+
+    this.labelData$ = combineLatest([
+      this.allFields$,
+      toObservable(this.documents),
+    ]).pipe(
+      switchMap(([fields, docs]) => {
+        if (fields && docs) {
+          return this.labelDesignerService.getData(fields, docs).pipe(
+            map((data) => ({ value: data, loading: false })),
+            startWith({ loading: true }),
+          );
+        }
+        return of({ loading: false });
+      }),
+    );
+
+    this.vm$ = combineLatest([
+      this.allFields$,
+      this.labelData$,
+    ]).pipe(
+      map(([fields, data]) => ({
+        fields,
+        data: data?.value,
+        dataLoading: data?.loading,
+      })),
+      startWith({ dataLoading: false }),
+    );
+  }
 }

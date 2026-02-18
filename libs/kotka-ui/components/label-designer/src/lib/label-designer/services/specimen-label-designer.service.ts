@@ -1,15 +1,18 @@
 import { inject, Injectable } from '@angular/core';
 import {
   FieldType,
+  ILabelData,
   ILabelField,
   SchemaService,
 } from '@luomus/label-designer';
 import { Document, Gathering, Identification, Unit } from '@luomus/laji-schema';
-import { map, Observable } from 'rxjs';
+import { forkJoin, map, Observable, of } from 'rxjs';
 import { ApiClient } from '@kotka/ui/services';
 import { convertYkjToWGS84, getUri } from '@kotka/shared/utils';
 import { formatCoordinates } from './coordinate-labels';
 import { formatDate } from './date-labels';
+
+type TaxonData = Record<string, any>;
 
 interface AugmentedIdentification extends Identification {
   taxon_accepted?: string;
@@ -88,7 +91,7 @@ export class SpecimenLabelDesignerService {
     },
     {
       field: 'gatherings.units.identifications.taxon_accepted',
-      label: 'Species (accepted)',
+      label: 'Taxon (accepted)',
       afterField: 'gatherings.units.identifications.taxon',
     },
     {
@@ -203,22 +206,28 @@ export class SpecimenLabelDesignerService {
     );
   }
 
-  getData(fields: ILabelField[], documents: Document[]): any {
-    const data = this.augmentDocuments(documents);
-
-    return this.schemaService.convertDataToLabelData(
-      fields,
-      data,
-      'gatherings.units',
-      {},
+  getData(fields: ILabelField[], documents: Document[]): Observable<ILabelData[]> {
+    return this.augmentDocuments(documents).pipe(
+      map((data) =>
+        this.schemaService.convertDataToLabelData(
+          fields,
+          data,
+          'gatherings.units',
+          {},
+        ),
+      ),
     );
   }
 
-  private augmentDocuments(documents: Document[]): AugmentedDocument[] {
-    return documents.map((document) => this.augmentDocument(document));
+  private augmentDocuments(documents: Document[]): Observable<AugmentedDocument[]> {
+    return this.fetchTaxonDataForDocuments(documents).pipe(
+      map((taxonData) =>
+        documents.map((document) => this.augmentDocument(document, taxonData)),
+      ),
+    );
   }
 
-  private augmentDocument(document: Document): AugmentedDocument {
+  private augmentDocument(document: Document, taxonData: TaxonData): AugmentedDocument {
     const result: AugmentedDocument = { ...document };
 
     if (result.id) {
@@ -233,22 +242,22 @@ export class SpecimenLabelDesignerService {
       }
     }
 
-    result.gatherings = this.augmentGatherings(result.gatherings);
+    result.gatherings = this.augmentGatherings(result.gatherings, taxonData);
 
     return result;
   }
 
   private augmentGatherings(
-    gatherings: [Gathering, ...Gathering[]],
+    gatherings: [Gathering, ...Gathering[]], taxonData: TaxonData
   ): [AugmentedGathering, ...AugmentedGathering[]] {
     const [first, ...rest] = gatherings;
     return [
-      this.augmentGathering(first),
-      ...rest.map((g) => this.augmentGathering(g)),
+      this.augmentGathering(first, taxonData),
+      ...rest.map((g) => this.augmentGathering(g, taxonData)),
     ];
   }
 
-  private augmentGathering(gathering: Gathering): AugmentedGathering {
+  private augmentGathering(gathering: Gathering, taxonData: TaxonData): AugmentedGathering {
     const result: AugmentedGathering = { ...gathering };
 
     result.coordinates_short = formatCoordinates(
@@ -338,30 +347,65 @@ export class SpecimenLabelDesignerService {
     result.date_roman = formatDate(result.dateBegin, result.dateEnd);
     result.date_month = formatDate(result.dateBegin, result.dateEnd, 'abbr');
 
-    result.units = this.augmentUnits(result.units);
+    result.units = this.augmentUnits(result.units, taxonData);
 
     return result;
   }
 
-  private augmentUnits(units: Unit[] | undefined): AugmentedUnit[] | undefined {
-    return units?.map(unit => this.augmentUnit(unit));
+  private augmentUnits(units: Unit[] | undefined, taxonData: TaxonData): AugmentedUnit[] | undefined {
+    return units?.map(unit => this.augmentUnit(unit, taxonData));
   }
 
-  private augmentUnit(unit: Unit): AugmentedUnit {
+  private augmentUnit(unit: Unit, taxonData: TaxonData): AugmentedUnit {
     const result: AugmentedUnit = { ...unit };
-    result.identifications = this.augmentIdentifications(result.identifications);
+    result.identifications = this.augmentIdentifications(result.identifications, taxonData);
     return result;
   }
 
-  private augmentIdentifications(identifications: Identification[] | undefined): AugmentedIdentification[] | undefined {
-    return identifications?.map(identification => this.augmentIdentification(identification));
+  private augmentIdentifications(identifications: Identification[] | undefined, taxonData: TaxonData): AugmentedIdentification[] | undefined {
+    return identifications?.map(identification => this.augmentIdentification(identification, taxonData));
   }
 
-  private augmentIdentification(identification: Identification): AugmentedIdentification {
+  private augmentIdentification(identification: Identification, taxonData: TaxonData): AugmentedIdentification {
     const result: AugmentedIdentification = { ...identification };
-    // result.taxon_accepted = identification.taxon; TODO
-    // result.author_accepted = identification.author; TODO
+
+    if (identification.taxon && taxonData[identification.taxon]) {
+      const acceptedTaxon = taxonData[identification.taxon];
+      result.taxon_accepted = acceptedTaxon.scientificName;
+      result.author_accepted = acceptedTaxon.scientificNameAuthorship;
+    }
+
     return result;
+  }
+
+  // TODO investigate if all taxa could be fetched in one request instead of one by one and add caching
+  private fetchTaxonDataForDocuments(documents: Document[]): Observable<TaxonData> {
+    const result: Record<string, any> = {};
+
+    const taxonNames: string[] = [];
+
+    documents.forEach((document) => {
+      document.gatherings.forEach((gathering) => {
+        gathering.units?.forEach((unit) => {
+          unit.identifications?.forEach((identification) => {
+            if (identification.taxon && !taxonNames.includes(identification.taxon)) {
+              taxonNames.push(identification.taxon);
+            }
+          });
+        });
+      });
+    });
+
+    if (taxonNames.length === 0) {
+      return of(result);
+    }
+
+    return forkJoin(taxonNames.map(taxonName => this.apiClient.searchTaxon(taxonName, 'exact'))).pipe(map(taxaResults => {
+      taxonNames.forEach((taxonName, idx) => {
+        result[taxonName] = taxaResults[idx]?.results?.[0];
+      });
+      return result;
+    }));
   }
 
   private roundToDecimals(
