@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import {
   FieldType,
+  IColumnMap,
   ILabelField,
   ILabelPdf,
   ISetup,
@@ -36,12 +37,13 @@ export class LabelDesignerComponent {
 
   defaultAvailableFields = input<ILabelField[]>([]);
   setupStorageKey = input<string>();
+  columnMapStorageKey = input<string>();
   data = input<any[]>();
   templates = input<PresetSetup[]>();
 
   downloading = false;
   viewSettings: IViewSettings = { magnification: 2 };
-  fileColumnMap = {};
+  fileColumnMap = signal<IColumnMap>({});
 
   defaultSetup: ISetup = {
     page: {
@@ -126,6 +128,23 @@ export class LabelDesignerComponent {
         this.storage.store(key, this.setup());
       }
     });
+
+    effect(() => {
+      const key = this.columnMapStorageKey();
+      if (key) {
+        const colMap = this.storage.retrieve(key);
+        if (colMap) {
+          this.fileColumnMap.set(colMap);
+        }
+      }
+    });
+
+    effect(() => {
+      const key = this.columnMapStorageKey();
+      if (key) {
+        this.storage.store(key, this.fileColumnMap());
+      }
+    });
   }
 
   htmlToPdf(data: ILabelPdf) {
@@ -149,6 +168,10 @@ export class LabelDesignerComponent {
         this.cd.markForCheck();
       },
     });
+  }
+
+  onFileColumnMapChange(event: IColumnMap) {
+    this.fileColumnMap.set(event);
   }
 
   onAvailableFieldsChange(event: ILabelField[]) {

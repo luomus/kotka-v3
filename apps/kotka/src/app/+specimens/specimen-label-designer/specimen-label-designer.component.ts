@@ -36,6 +36,7 @@ interface ViewModel {
           [defaultAvailableFields]="vm.fields"
           [data]="vm.data"
           [setupStorageKey]="setupStorageKey()"
+          [columnMapStorageKey]="colMapStorageKey()"
           [templates]="templates"
         />
       } @else {
@@ -68,6 +69,11 @@ export class SpecimenLabelDesignerComponent {
     this.userService
       .getCurrentLoggedInUser()
       .pipe(map((user) => `ld-setup-${user.id}`)),
+  );
+  colMapStorageKey = toSignal(
+    this.userService
+      .getCurrentLoggedInUser()
+      .pipe(map((user) => `ld-col-map-${user.id}`)),
   );
 
   templates = [fungi, insectaDet, vertebrate, botanical];

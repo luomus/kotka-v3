@@ -22,6 +22,7 @@ import { SpinnerComponent } from '@kotka/ui/spinner';
       <kui-label-designer
         [defaultAvailableFields]="allFields"
         [setupStorageKey]="setupStorageKey()"
+        [columnMapStorageKey]="colMapStorageKey()"
         [templates]="templates"
       />
     } @else {
@@ -49,6 +50,11 @@ export class GenericLabelDesignerComponent {
     this.userService
       .getCurrentLoggedInUser()
       .pipe(map((user) => `ld-generic-setup-${user.id}`)),
+  );
+  colMapStorageKey = toSignal(
+    this.userService
+      .getCurrentLoggedInUser()
+      .pipe(map((user) => `ld-col-map-${user.id}`)),
   );
 
   templates = [genericLabel, fungi, insectaDet, vertebrate, botanical];
