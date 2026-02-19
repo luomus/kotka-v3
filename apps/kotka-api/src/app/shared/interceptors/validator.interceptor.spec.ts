@@ -235,6 +235,88 @@ const specimenNamespaceValidatorSchema = {
   },
 };
 
+const specimenOriginalSpecimenIDValidatorSchema = {
+  'schema': {
+    'type': 'object',
+    'properties': {
+      'originalSpecimenID': {
+        'type': 'string',
+        'title': 'Original catalogue number'
+      }
+    }
+  },
+  'validators': {
+    'originalSpecimenID': {
+      'remote': {
+        'validator': 'kotkaSequenceUnique'
+      }
+    }
+  }
+};
+
+const sampleAdditionalIDsValidatorsSchema = {
+  'schema': {
+    'type': 'object',
+    'properties': {
+      'gatherings': {
+        'type': 'array',
+        'items': {
+          'type': 'object',
+          'properties': {
+            'units': {
+              'type': 'array',
+              'items': {
+                'type': 'object',
+                'properties': {
+                  'samples': {
+                    'type': 'array',
+                    'items': {
+                      'type': 'object',
+                      'properties': {
+                        'additionalIDs': {
+                          'type': 'array',
+                          'items': {
+                            'type': 'string'
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  'validators': {
+    'gatherings': {
+      'items': {
+        'properties': {
+          'units': {
+            'items': {
+              'properties': {
+                'samples': {
+                  'items': {
+                    'properties': {
+                      'additionalIDs': {
+                        'remote': {
+                          'validator': 'kotkaSequenceUnique'
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+};
+
 const specimenMunicipalityCordinateValidatorSchema = {
   'schema': {
     'type': 'object',
@@ -900,6 +982,243 @@ describe('ValidationInterceptor', () => {
       expect(mockLajiApiService.post.mock.calls[0][0]).toEqual('coordinates/location');
       expect(mockLajiApiService.post.mock.calls[0][1]).toEqual(lajiApiBody);
       expect(mockNext.handle).toBeCalledTimes(1);
+    });
+  });
+
+  describe('Specimen sequence uniqueness tests', () => {
+    describe('OriginalSpecimenID', () => {
+      beforeEach(() => {
+        jest.spyOn(formService, 'getForm').mockImplementation(() => new Promise((resolve) => resolve(specimenOriginalSpecimenIDValidatorSchema)));
+      });
+      it('If no other specimen with originalSPecimenID is found no error is produced', async () => {
+        const mockRequest = {
+          method: 'POST',
+          params: {
+            validator: 'kotkaSequenceUnique',
+            field: '.originalSpecimenID',
+          },
+          body: {
+            originalSpecimenID: '2025:1'
+          }
+        };
+
+        const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+          getRequest: () => (mockRequest)
+        })});
+
+        const mockNext = createMock<CallHandler>();
+        jest.spyOn(lajiStoreService, 'search').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [] }} as AxiosResponse));
+
+        await validatorInterceptor.intercept(mockContext, mockNext);
+
+        const req = mockContext.switchToHttp().getRequest();
+        expect(req).toEqual(mockRequest);
+        expect(mockNext.handle).toHaveBeenCalledTimes(1);
+        expect(lajiStoreService.search).toHaveBeenCalledTimes(1);
+      });
+
+      it('If another specimen with originalSPecimenID is found throw an error', async () => {
+        const mockRequest = {
+          method: 'POST',
+          params: {
+            validator: 'kotkaSequenceUnique',
+            field: '.originalSpecimenID',
+          },
+          body: {
+            originalSpecimenID: '2025:1'
+          }
+        };
+
+        const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+          getRequest: () => (mockRequest)
+        })});
+
+        const mockNext = createMock<CallHandler>();
+        jest.spyOn(lajiStoreService, 'search').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [{ id: 'JA.1', originalSpecimenID: '2025:1' }] }} as AxiosResponse));
+
+        expect.assertions(4);
+        try {
+          await validatorInterceptor.intercept(mockContext, mockNext);
+        } catch (e) {
+          const req = mockContext.switchToHttp().getRequest();
+          expect(req).toEqual(mockRequest);
+          expect(lajiStoreService.search).toHaveBeenCalledTimes(1);
+          expect(mockNext.handle).toHaveBeenCalledTimes(0);
+          expect(e.options).toEqual({originalSpecimenID:{errors:['Found duplicates in other documents, found in JA.1: 2025:1']}});
+        }
+      });
+    });
+    describe('Specimen addtionalIDs', () => {
+      beforeEach(() => {
+        jest.spyOn(formService, 'getForm').mockImplementation(() => new Promise((resolve) => resolve(sampleAdditionalIDsValidatorsSchema)));
+      });
+
+      it('No duplicates of additionalIDs within document or in store wont cause an error', async () => {
+        const mockRequest = {
+          method: 'POST',
+          params: {
+            validator: 'kotkaSequenceUnique',
+            field: '.additionalIDs',
+          },
+          body: {
+            gatherings: [{
+              units: [{
+                samples: [{
+                  additionalIDs: ['test:1111', 'test:2222']
+                },{
+                  additionalIDs: ['test:3333']
+                }]
+              }]
+            }]
+          }
+        };
+
+        const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+          getRequest: () => (mockRequest)
+        })});
+
+        const mockNext = createMock<CallHandler>();
+        jest.spyOn(lajiStoreService, 'search').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [] }} as AxiosResponse));
+
+        await validatorInterceptor.intercept(mockContext, mockNext);
+
+        const req = mockContext.switchToHttp().getRequest();
+        expect(req).toEqual(mockRequest);
+        expect(lajiStoreService.search).toHaveBeenCalledTimes(2);
+        expect(mockNext.handle).toHaveBeenCalledTimes(1);
+      });
+
+      it('No duplicates of additionalIDs within document or in store other than self wont cause an error', async () => {
+        const mockRequest = {
+          method: 'POST',
+          params: {
+            validator: 'kotkaSequenceUnique',
+            field: '.additionalIDs',
+          },
+          body: {
+            id: 'JA.1',
+            gatherings: [{
+              units: [{
+                samples: [{
+                  additionalIDs: ['test:1111', 'test:2222']
+                },{
+                  additionalIDs: ['test:3333']
+                }]
+              }]
+            }]
+          }
+        };
+
+        const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+          getRequest: () => (mockRequest)
+        })});
+
+        const mockNext = createMock<CallHandler>();
+        jest.spyOn(lajiStoreService, 'search').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [{
+          id: 'JA.1',
+          gatherings: [{
+            units: [{
+              samples: [{
+                additionalIDs: ['test:1111', 'test:2222']
+              },{
+                additionalIDs: ['test:3333']
+              }]
+            }]
+          }]
+        }]}} as AxiosResponse));
+
+        await validatorInterceptor.intercept(mockContext, mockNext);
+
+        const req = mockContext.switchToHttp().getRequest();
+        expect(req).toEqual(mockRequest);
+        expect(lajiStoreService.search).toHaveBeenCalledTimes(2);
+        expect(mockNext.handle).toHaveBeenCalledTimes(1);
+      });
+
+      it('Duplicate additionalIDs within document causes error', async () => {
+        const mockRequest = {
+          method: 'POST',
+          params: {
+            validator: 'kotkaSequenceUnique',
+            field: '.additionalIDs',
+          },
+          body: {
+            gatherings: [{
+              units: [{
+                samples: [{
+                  additionalIDs: ['test:1111', 'test:2222']
+                },{
+                  additionalIDs: ['test:1111']
+                }]
+              }]
+            }]
+          }
+        };
+
+        const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+          getRequest: () => (mockRequest)
+        })});
+
+        const mockNext = createMock<CallHandler>();
+        jest.spyOn(lajiStoreService, 'search').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [] }} as AxiosResponse));
+
+        try {
+          await validatorInterceptor.intercept(mockContext, mockNext);
+        } catch (e) {
+          const req = mockContext.switchToHttp().getRequest();
+          expect(req).toEqual(mockRequest);
+          expect(lajiStoreService.search).toHaveBeenCalledTimes(0);
+          expect(mockNext.handle).toHaveBeenCalledTimes(0);
+          expect(e.options.gatherings[0].units[0].samples[1].additionalIDs.errors).toEqual(['Duplicate values found within submitted document, found multiple of test:1111']);
+        }
+      });
+
+      it('Duplicate additionalIDs in store causes error', async () => {
+        const mockRequest = {
+          method: 'POST',
+          params: {
+            validator: 'kotkaSequenceUnique',
+            field: '.additionalIDs',
+          },
+          body: {
+            gatherings: [{
+              units: [{
+                samples: [{
+                  additionalIDs: ['test:1111', 'test:2222']
+                },{
+                  additionalIDs: ['test:3333']
+                }]
+              }]
+            }]
+          }
+        };
+
+        const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+          getRequest: () => (mockRequest)
+        })});
+
+        const mockNext = createMock<CallHandler>();
+        jest.spyOn(lajiStoreService, 'search').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [{
+          id: 'JA.2',
+          gatherings: [{
+            units: [{
+              samples: [{
+                additionalIDs: ['test:3333', 'test:4444']
+              }]
+            }]
+          }]
+        }]}} as AxiosResponse));
+
+        try {
+          await validatorInterceptor.intercept(mockContext, mockNext);
+        } catch (e) {
+          const req = mockContext.switchToHttp().getRequest();
+          expect(req).toEqual(mockRequest);
+          expect(lajiStoreService.search).toHaveBeenCalledTimes(2);
+          expect(mockNext.handle).toHaveBeenCalledTimes(0);
+          expect(e.options.gatherings[0].units[0].samples[1].additionalIDs.errors).toEqual(['Found duplicates in other documents, found in JA.2: test:3333']);
+        }
+      });
     });
   });
 });
