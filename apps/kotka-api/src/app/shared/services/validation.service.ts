@@ -113,7 +113,7 @@ export class ValidationService {
       }
 
       if (!namespace) {
-        return `Unkonwn namespace ${namespaceID}`
+        return `Unkonwn namespace ${namespaceID}`;
       }
 
       if (
@@ -171,7 +171,7 @@ export class ValidationService {
     const coordinates = convertCoordinatesToWGS84(latitude, longitude, coordinateSystem);
 
     if (!coordinates) {
-      return 'Error converting coordinates to WGS84 for validation.'
+      return 'Error converting coordinates to WGS84 for validation.';
     }
 
     const geometry: GeometryCollection = {
@@ -285,7 +285,7 @@ export class ValidationService {
             }
           });
         } else if(value.includes(result)) {
-          duplicateIDs[id].push(result)
+          duplicateIDs[id].push(result);
         }
       });
     });
