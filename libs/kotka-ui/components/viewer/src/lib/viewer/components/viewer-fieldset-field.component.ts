@@ -1,70 +1,73 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
 import {
   DifferenceObjectValue,
-  isDifferenceObjectPatch,
+  isMultiLanguageObject,
+  isPatch,
   LajiForm,
 } from '@kotka/shared/models';
 import { ViewerCollectionComponent } from './viewer-collection.component';
 import { ViewerMultilangComponent } from './viewer-multilang.component';
 import { ViewerFieldComponent } from './viewer-field.component';
+import { ViewerFieldsetComponent } from './viewer-fieldset.component';
 
 
 @Component({
   selector: 'kui-viewer-fieldset-field',
   template: `
-    @if (field) {
-      @if (
-        field.type === 'collection' && field.fields) {
-        <kui-viewer-collection
-          [field]="field"
-          [data]="data"
-          [differenceData]="$any(differenceData)"
-        ></kui-viewer-collection>
-      } @else {
-        @if (isMultiLangField(field)) {
-          <kui-viewer-multilang
-            [field]="field"
-            [data]="data"
-            [differenceData]="$any(differenceData)"
-          ></kui-viewer-multilang>
-        } @else {
-          <kui-viewer-field
-            [field]="field"
-            [data]="data"
-            [differenceData]="$any(differenceData)"
-          ></kui-viewer-field>
-        }
-      }
+    @if (field().type === 'collection' && field().fields) {
+      <kui-viewer-collection
+        [field]="field()"
+        [data]="data()"
+        [differenceData]="differenceData()"
+      ></kui-viewer-collection>
+    } @else if (field().type === 'fieldset') {
+      <kui-viewer-fieldset
+        [field]="field()"
+        [data]="data()"
+        [differenceData]="differenceData()"
+      ></kui-viewer-fieldset>
+    } @else if (isMultiLangField()) {
+      <kui-viewer-multilang
+        [field]="field()"
+        [data]="data()"
+        [differenceData]="differenceData()"
+      ></kui-viewer-multilang>
+    } @else {
+      <kui-viewer-field
+        [field]="field()"
+        [data]="data()"
+        [differenceData]="differenceData()"
+      ></kui-viewer-field>
     }
-    `,
+  `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ViewerCollectionComponent,
     ViewerMultilangComponent,
-    ViewerFieldComponent
-],
+    ViewerFieldsetComponent,
+    ViewerFieldComponent,
+  ],
 })
 export class ViewerFieldsetFieldComponent {
-  @Input() field?: LajiForm.Field;
-  @Input() data?: any;
-  @Input() differenceData?: DifferenceObjectValue;
+  field = input.required<LajiForm.Field>();
+  data = input<any>();
+  differenceData = input<DifferenceObjectValue>();
 
-  isMultiLangField(field: LajiForm.Field): boolean {
-    const differenceValue = isDifferenceObjectPatch(this.differenceData)
-      ? this.differenceData.value
+  isMultiLangField = computed(() => {
+    const differenceData = this.differenceData();
+    const differenceValue = isPatch(differenceData)
+      ? differenceData.value
       : undefined;
 
     return (
-      field.type === 'text' &&
-      (this.isNotString(this.data) || this.isNotString(differenceValue))
+      this.field().type === 'text' &&
+      (isMultiLanguageObject(this.data()) || isMultiLanguageObject(differenceValue))
     );
-  }
-
-  private isNotString(value?: any): boolean {
-    if (value === undefined || value === null) {
-      return false;
-    }
-    return typeof value !== 'string';
-  }
+  });
 }

@@ -9,7 +9,7 @@ import {
   KotkaDocumentObject,
   LajiForm,
 } from '@kotka/shared/models';
-import { ViewerFieldsetComponent } from './components/viewer-fieldset.component';
+import { ViewerFieldsetFieldsComponent } from './components/viewer-fieldset-fields.component';
 
 
 @Component({
@@ -18,7 +18,7 @@ import { ViewerFieldsetComponent } from './components/viewer-fieldset.component'
   styleUrls: ['./viewer.component.scss'],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ViewerFieldsetComponent],
+  imports: [ViewerFieldsetFieldsComponent],
 })
 export class ViewerComponent {
   @Input() set form(form: LajiForm.JsonForm | undefined) {

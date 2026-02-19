@@ -1,19 +1,35 @@
-<kui-main-content title="Search specimens" containerClass="container-fluid">
-  <kui-document-datatable
-    style="height: calc(100vh - 255px)"
-    [dataType]="dataType"
-    [columns]="columns"
-    [dataTypeName]="'specimen'"
-    [enableFileExport]="true"
-    [enableColumnSelection]="true"
-    [extraSortModel]="[{
-      colId: 'dateCreated',
-      sort:  'desc'
-    }, {
-      colId: 'id',
-      sort:  'desc'
-    }]"
-    (loadData)="onDataLoad($event)"
-  >
-  </kui-document-datatable>
-</kui-main-content>
+@if (!showLabelDesigner()) {
+  <kui-main-content title="Search specimens" containerClass="container-fluid">
+    <button
+      class="btn btn-light"
+      (click)="showLabelDesigner.set(true)"
+    >
+      Print labels
+    </button>
+    <kui-document-datatable
+      style="height: calc(100vh - 255px)"
+      [dataType]="dataType"
+      [columns]="columns"
+      [dataTypeName]="'specimen'"
+      [enableFileExport]="true"
+      [enableColumnSelection]="true"
+      [extraSortModel]="[{
+        colId: 'dateCreated',
+        sort:  'desc'
+      }, {
+        colId: 'id',
+        sort:  'desc'
+      }]"
+      (loadData)="onDataLoad($event)"
+    >
+    </kui-document-datatable>
+  </kui-main-content>
+} @else {
+  @if (labelDesignerData$ | async; as labelDesignerData) {
+    <kotka-specimen-label-designer
+      [documents]="labelDesignerData"
+    ></kotka-specimen-label-designer>
+  } @else {
+    <kui-spinner></kui-spinner>
+  }
+}

@@ -14,7 +14,9 @@ import { ToasterComponent } from '../toaster/toaster.component';
   styles: [
     `
       :host {
-        display: block;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
       }
     `,
   ],

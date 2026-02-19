@@ -12,7 +12,7 @@ ENV NX_WORKSPACE_DATA_DIRECTORY=/tmp/.nx/workspace-data
 
 COPY --chown=node:node ./package*.json ./
 
-RUN npm ci && npm cache clean --force
+RUN npm install --force && npm cache clean --force # TODO fix label-designer dependencies
 
 COPY --chown=node:node . .
 

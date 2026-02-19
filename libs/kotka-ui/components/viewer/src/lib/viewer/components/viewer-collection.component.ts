@@ -1,82 +1,90 @@
-import { ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import {
-  DifferenceObject,
-  DifferenceObjectPatch,
-  isDifferenceObjectPatch,
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  forwardRef,
+  input,
+  Signal,
+} from '@angular/core';
+import {
+  isPatch,
+  isPatchArray,
   LajiForm,
+  DifferenceObjectValue,
+  DifferenceObject,
+  Patch,
 } from '@kotka/shared/models';
 import { CommonModule } from '@angular/common';
-import { ViewerFieldsetComponent } from './viewer-fieldset.component';
-import { ArrayIndexRangePipe } from '../../pipes/array-index-range.pipe';
+import { ViewerFieldsetFieldsComponent } from './viewer-fieldset-fields.component';
+import {
+  alignArrayWithPatchArray,
+  alignPatchArrayWithArray,
+} from '../../services/utils';
 
 @Component({
   selector: 'kui-viewer-collection',
   template: `
-    @if (field && (data?.length || differenceDataPatchArray?.length)) {
-      <div
-        class="row mt-3 mb-1"
-        >
+    @if (alignedData().length || alignedPatches().length) {
+      <div class="row mt-3 mb-1">
         <div class="col-12">
-          <h2>{{ field.label }}</h2>
-          @for (i of data | arrayIndexRange: differenceDataPatchArray; track i) {
+          <h2>{{ field().label }}</h2>
+          @for (dataItem of alignedData(); track $index; let i = $index) {
             <div
               class="card card-body bg-light mb-2"
-          [ngClass]="{
-            'viewer-fieldset-removed':
-              differenceDataPatchArray?.[i]?.op === 'remove',
-            'viewer-fieldset-added':
-              differenceDataPatchArray?.[i]?.op === 'add',
-          }"
-              >
-              <kui-viewer-fieldset
-                [fields]="field.fields || []"
-            [data]="
-              differenceDataPatchArray?.[i]?.op === 'add'
-                ? differenceDataPatchArray?.[i]?.value
-                : data?.[i]
-            "
-                [differenceData]="differenceDataObjectArray?.[i]"
-              ></kui-viewer-fieldset>
+              [ngClass]="{
+                'viewer-collection-removed': alignedPatches()[i]?.op === 'remove',
+                'viewer-collection-added': alignedPatches()[i]?.op === 'add',
+              }"
+            >
+              <kui-viewer-fieldset-fields
+                [fields]="field().fields || []"
+                [data]="
+                  alignedPatches()[i]?.op === 'add'
+                    ? alignedPatches()[i]?.value
+                    : dataItem
+                "
+                [differenceData]="differenceObjects()?.[i]"
+              ></kui-viewer-fieldset-fields>
             </div>
           }
         </div>
       </div>
     }
-    `,
+  `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, forwardRef(() => ViewerFieldsetComponent), ArrayIndexRangePipe],
+  imports: [
+    CommonModule,
+    forwardRef(() => ViewerFieldsetFieldsComponent),
+  ],
 })
 export class ViewerCollectionComponent {
-  @Input() field?: LajiForm.Field;
-  @Input() data?: any[];
-  @Input() set differenceData(
-    differenceData:
-      | DifferenceObject[]
-      | DifferenceObjectPatch
-      | DifferenceObjectPatch[]
-      | undefined,
-  ) {
-    this.differenceDataObjectArray = undefined;
-    this.differenceDataPatchArray = undefined;
+  field = input.required<LajiForm.Field>();
+  data = input<any[]>();
+  differenceData = input<DifferenceObjectValue>();
 
-    if (isDifferenceObjectPatch(differenceData)) {
-      this.differenceDataPatchArray = (differenceData.value as any[]).map(
-        (value) => ({
-          op: differenceData.op,
-          value,
-        }),
-      );
-    } else if (Array.isArray(differenceData)) {
-      if (isDifferenceObjectPatch(differenceData[0])) {
-        this.differenceDataPatchArray =
-          differenceData as DifferenceObjectPatch[];
-      } else {
-        this.differenceDataObjectArray = differenceData as DifferenceObject[];
-      }
+  patches = computed(() => {
+    const data = this.differenceData();
+
+    if (isPatch(data) && Array.isArray(data.value)) {
+      return data.value.map((value) => ({ op: data.op, value }));
+    } else if (isPatchArray(data)) {
+      return data;
     }
-  }
 
-  differenceDataObjectArray?: DifferenceObject[];
-  differenceDataPatchArray?: DifferenceObjectPatch[];
+    return undefined;
+  });
+
+  differenceObjects: Signal<DifferenceObject[] | undefined> = computed(() => {
+    const data = this.differenceData();
+
+    if (Array.isArray(data) && !isPatchArray(data)) {
+      return data;
+    }
+
+    return undefined;
+  });
+
+  alignedData: Signal<any[]> = computed(() => alignArrayWithPatchArray(this.data(), this.patches()));
+  alignedPatches: Signal<Patch[]> = computed(() => alignPatchArrayWithArray(this.patches(), this.data()));
 }

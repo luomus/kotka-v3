@@ -40,7 +40,10 @@
       "@kotka/ui/pipes": ["libs/kotka-ui/pipes/src/index.ts"],
       "@kotka/ui/services": ["libs/kotka-ui/services/src/index.ts"],
       "@kotka/ui/spinner": ["libs/kotka-ui/components/spinner/src/index.ts"],
-      "@kotka/ui/viewer": ["libs/kotka-ui/components/viewer/src/index.ts"]
+      "@kotka/ui/viewer": ["libs/kotka-ui/components/viewer/src/index.ts"],
+      "@kotka/ui/label-designer": [
+        "libs/kotka-ui/components/label-designer/src/index.ts"
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]

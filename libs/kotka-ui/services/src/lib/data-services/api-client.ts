@@ -97,7 +97,11 @@ export class ApiClient {
       params = params.set('fields', fields.join(','));
     }
     if (searchQueryObject) {
-      return this.httpClient.post<ListResponse<Y>>(path + type + '/_search', searchQueryObject, { params });
+      return this.httpClient.post<ListResponse<Y>>(
+        path + type + '/_search',
+        searchQueryObject,
+        { params },
+      );
     } else {
       return this.httpClient.get<ListResponse<Y>>(path + type, { params });
     }
@@ -121,11 +125,11 @@ export class ApiClient {
     const idsPart = ids.slice(startIdx, endIdx);
 
     const searchQueryObject: ElasticsearchQuery = {
-      'query': {
-        'terms': {
-          'id': idsPart
-        }
-      }
+      query: {
+        terms: {
+          id: idsPart,
+        },
+      },
     };
 
     return this.getDocumentList<T, S, X, Y>(
@@ -152,6 +156,22 @@ export class ApiClient {
         return of(results);
       }),
     );
+  }
+
+  getAllDocuments<
+    T extends KotkaDocumentObjectType,
+    S extends KotkaDocumentObjectMap[T],
+    X extends string[] | undefined = undefined,
+    Y extends X extends string[] ? Partial<S> : S = S,
+  >(
+    type: T,
+    pageSize = 100,
+    sort?: string,
+    searchQueryString?: string,
+    fields?: X,
+    searchQueryObject?: ElasticsearchQuery,
+  ): Observable<Y[]> {
+    return this.getAllDocumentsRecursively(type, 1, pageSize, [], sort, searchQueryString, fields, searchQueryObject);
   }
 
   getDocumentVersionList(
@@ -270,6 +290,14 @@ export class ApiClient {
     });
   }
 
+  searchTaxon(query: string, matchType?: string): Observable<PagedResult<any>> {
+    let params = new HttpParams().set('query', query);
+    if (matchType) {
+      params = params.set('matchType', matchType);
+    }
+    return this.httpClient.get<PagedResult<any>>(`${lajiApiPath}autocomplete/taxa`, { params });
+  }
+
   private convertVersionDifferenceFormat<S extends KotkaDocumentObject>(
     data: KotkaVersionDifference<S>,
   ): KotkaVersionDifferenceObject<S> {
@@ -337,5 +365,50 @@ export class ApiClient {
       original: data.original,
       diff,
     };
+  }
+
+  private getAllDocumentsRecursively<
+    T extends KotkaDocumentObjectType,
+    S extends KotkaDocumentObjectMap[T],
+    X extends string[] | undefined = undefined,
+    Y extends X extends string[] ? Partial<S> : S = S,
+  >(
+    type: T,
+    page = 1,
+    pageSize = 100,
+    results: Y[] = [],
+    sort?: string,
+    searchQueryString?: string,
+    fields?: X,
+    searchQueryObject?: ElasticsearchQuery
+  ): Observable<Y[]> {
+    return this.getDocumentList<T, S, X, Y>(
+      type,
+      page,
+      pageSize,
+      sort,
+      searchQueryString,
+      fields,
+      searchQueryObject,
+    ).pipe(
+      switchMap((result) => {
+        results = results.concat(result.member);
+
+        if (page < result.lastPage) {
+          return this.getAllDocumentsRecursively(
+            type,
+            page + 1,
+            pageSize,
+            results,
+            sort,
+            searchQueryString,
+            fields,
+            searchQueryObject
+          );
+        }
+
+        return of(results);
+      }),
+    );
   }
 }
