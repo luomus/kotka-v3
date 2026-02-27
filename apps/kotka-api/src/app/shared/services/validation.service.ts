@@ -6,12 +6,12 @@ import { LajiApiService, LajiStoreService, AbschService } from '@kotka/api/servi
 import { CoordinateLocationResponse, KotkaDocumentObjectFullType, SpecimenDataType, specimenDataTypeToNameMap } from '@kotka/shared/models';
 import { Dataset, Document } from '@luomus/laji-schema';
 import { Injectable } from '@nestjs/common';
-import { get } from 'lodash';
 import { lastValueFrom, map } from 'rxjs';
 import { NamespaceData, NamespaceService } from './namespace.service';
-import { acceptedPrefixes, convertCoordinatesToWGS84, defaultPrefix } from '@kotka/shared/utils';
+import { acceptedPrefixes, convertCoordinatesToWGS84, defaultPrefix, JSONPathAllResponse, parseJSONPointer, parseStoreSearchPath } from '@kotka/shared/utils';
 import { GeometryCollection } from 'geojson';
 import { JSONPath } from 'jsonpath-plus';
+
 @Injectable()
 export class ValidationService {
   constructor(
@@ -37,7 +37,7 @@ export class ValidationService {
         error = await this.validateCoordinateMunicipality(JSON.parse(options.body), query.field);
         break;
       case 'kotkaSequenceUnique':
-        error = await this.validateDocumentSequenceIdUnique(JSON.parse(options.body), query);
+        error = await this.validateDocumentSequenceIdUnique(JSON.parse(options.body), query.field);
         break;
       default:
         try {
@@ -54,19 +54,8 @@ export class ValidationService {
     return error;
   }
 
-  private clearField(field: string) {
-    if (field[0] === '.') {
-      return field.slice(1);
-    }
-
-    return field;
-  }
-
   async validateAllowedNamespace(data: Record<string, any>, field: string) {
-    const fieldName = this.clearField(field);
-
-    const namespaces = await this.namespaceService.getNamespaces();
-    let namespaceID = get(data, fieldName);
+    let namespaceID: string = parseJSONPointer(data, field);
     let prefix;
 
     if (namespaceID.includes(':')) {
@@ -74,6 +63,8 @@ export class ValidationService {
     }
 
     const datatype = data.datatype;
+
+    const namespaces = await this.namespaceService.getNamespaces();
 
     const namespaceError = this.validateNamespaceForType(namespaceID, datatype, namespaces);
     if (namespaceError) {
@@ -126,22 +117,21 @@ export class ValidationService {
   }
 
   async validateDatasetNameUnique(data: Document, field: string) {
-    const datasetNameField = 'datasetName' + field;
-    const datasetName = get(data, datasetNameField);
+    const datasetName: string | undefined = parseJSONPointer(data, field);
+    const datasetNameField: string = parseStoreSearchPath(field);
+
     const members: Dataset[] = await lastValueFrom(this.lajiStoreService.search<Dataset>(KotkaDocumentObjectFullType.dataset, { query: { match: { [datasetNameField]: datasetName }}}).pipe(map(res => res.data?.member)));
 
     if (members.length !== 0 && !(members.length === 1 && members[0].id && members[0].id === data.id)) {
-      return this.getError(datasetNameField, 'Dataset name must be unique.');
+      return this.getError(field, 'Dataset name must be unique.');
     }
 
     return {};
   }
 
   async validateIRCCNumber(data: Record<string, any>, field: string) {
-    if (field[0] === '.') {
-      field = field.slice(1);
-    }
-    const value = get(data, field);
+    const value: string | undefined = parseJSONPointer(data, field);
+
     if (!value) {
       return {};
     }
@@ -159,7 +149,7 @@ export class ValidationService {
   }
 
   async validateCoordinateMunicipality(data: Document, field: string) {
-    const value: string | undefined = data.gatherings[0].municipality;
+    const value: string | undefined = parseJSONPointer(data, field);
     if (!value) {
       return {};
     }
@@ -220,52 +210,41 @@ export class ValidationService {
     return this.getError(field, `Coordinates do not match municipality, has ${value} but coordinates correspond to ${nonMatches.join(', ')}`);
   }
 
-  async validateDocumentSequenceIdUnique(data: any, query: any) {
-    const field = query.fullField || query.field;
-    const fieldPath = this.clearField(query.field);
-    const fullFieldPath = this.clearField(field);
-    const fullFieldName = '.' + field.split('.').at(-1);
-    const storePath = this.getStoreSearchPath(field);
+  async validateDocumentSequenceIdUnique(data: any, field: any) {
+    let value: string = parseJSONPointer(data, field);
+    const storePath = parseStoreSearchPath(field);
+    const documentInternalSearchPath = this.getValueSiblingsPath(field);
 
-    const parent = JSONPath({ path: fullFieldPath, json: data, resultType: 'parent' })[0];
-    let value = parent[fieldPath];
-    delete parent[fieldPath];
+    const siblings: JSONPathAllResponse[] = JSONPath({ json: data, path: documentInternalSearchPath, resultType: 'all', wrap: true })
+    let duplicates = false;
 
-    if (!Array.isArray(value)) {
-      value = [ value ];
-    }
+    siblings.forEach((sibling) => {
+      if (sibling.pointer === field) return;
 
-    const results = JSONPath({ path: this.getDocumentInternalSearchPath(field), json: data });
+      const siblingValue = sibling.value;
 
-    const selfDuplicateIDs: string[] = [];
-
-    results.forEach((result: string | string[]) => {
-      if (Array.isArray(result)) {
-        result.forEach(val => {
-          if (value.includes(val)) {
-            selfDuplicateIDs.push(val);
-          }
-        });
+      if (Array.isArray(siblingValue) && siblingValue.includes(value)) {
+        duplicates = true;
       } else {
-        if (value.includes(result)) {
-          selfDuplicateIDs.push(result);
+        if (value === siblingValue) {
+          duplicates = true;
         }
       }
     });
 
-    if (selfDuplicateIDs.length) {
-      return this.getError(fullFieldName, `Duplicate values found within submitted document, found multiple of ${selfDuplicateIDs.join(', ')}`);
+    if (duplicates) {
+      return this.getError(field, `Duplicate values found within submitted document.`);
     }
 
-    const searchBody = { query: { bool: { should: [{ terms: { [storePath]: value }}]}}};
+    const searchBody = `${storePath}: "${value}"`;
 
-    const docs = (await lastValueFrom(this.lajiStoreService.search<Document>(KotkaDocumentObjectFullType.document, searchBody))).data;
+    const docs = (await lastValueFrom(this.lajiStoreService.getAll<Document>(KotkaDocumentObjectFullType.document, { q: searchBody }))).data;
 
     if (!docs.member.length || (data.id && docs.member.length === 1 && docs.member[0].id === data.id)) {
       return {};
     }
 
-    const duplicateIDs: Record<string, string[]> = {};
+    const duplicateIDs: string[] = [];
 
     docs.member.forEach(document => {
       if (document.id === data.id) {
@@ -274,43 +253,28 @@ export class ValidationService {
 
       const id = document.id!;
 
-      const results = JSONPath({ path: this.getDocumentInternalSearchPath(fullFieldPath), json: document });
-      duplicateIDs[id] = [];
+      const results: Array<string | string[]> = JSONPath({ json: document, path: documentInternalSearchPath, wrap: true });
 
-      results.forEach((result: string | string[]) => {
-        if (Array.isArray(result)) {
-          result.forEach(val => {
-            if (value.includes(val)) {
-              duplicateIDs[id].push(val);
-            }
-          });
-        } else if(value.includes(result)) {
-          duplicateIDs[id].push(result);
+      results.forEach(result => {
+        if (Array.isArray(result) && result.includes(value)) {
+            duplicateIDs.push(id);
+        } else if(value === result) {
+          duplicateIDs.push(id);
         }
       });
     });
+    if (!duplicateIDs.length) return {};
 
-    return this.getError(fullFieldName, `Found duplicates in other documents, found in ${this.getUniqueIdSequenceError(duplicateIDs).join(', ')}`);
+    return this.getError(field, `Found duplicates in other documents, found in ${duplicateIDs.join(', ')}.`);
   }
-
-  private getUniqueIdSequenceError(values: Record<string, string[]>) {
-    return Object.keys(values).map(value => {
-      return `${value}: ${values[value].join(', ')}`;
-    });
-  }
-
 
   private getError(field: string, errorMsg: string, value?: any) {
     return { errorCode: 'VALIDATION_EXCEPTION', details: { [field]: [errorMsg.replace('%{value}', value)] }};
   }
 
-  private getStoreSearchPath(path: string) {
-    path = this.clearField(path);
-    return path.replace(/\[\d+\]/g, '');
-  }
-
-  private getDocumentInternalSearchPath(path: string) {
-    path = this.clearField(path);
-    return path.replace(/\[\d+\]/g, '[*]');
+  private getValueSiblingsPath(path: string) {
+    return path.split('/').map(part => {
+      return /^\d+$/g.test(part) ? '*' : part;
+    })
   }
 }

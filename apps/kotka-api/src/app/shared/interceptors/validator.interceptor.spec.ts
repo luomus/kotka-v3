@@ -301,8 +301,10 @@ const sampleAdditionalIDsValidatorsSchema = {
                   'items': {
                     'properties': {
                       'additionalIDs': {
-                        'remote': {
-                          'validator': 'kotkaSequenceUnique'
+                        'items': {
+                          'remote': {
+                            'validator': 'kotkaSequenceUnique'
+                          }
                         }
                       }
                     }
@@ -990,12 +992,11 @@ describe('ValidationInterceptor', () => {
       beforeEach(() => {
         jest.spyOn(formService, 'getForm').mockImplementation(() => new Promise((resolve) => resolve(specimenOriginalSpecimenIDValidatorSchema)));
       });
-      it('If no other specimen with originalSPecimenID is found no error is produced', async () => {
+      it('If no other specimen with originalSpecimenID is found no error is produced', async () => {
         const mockRequest = {
           method: 'POST',
           params: {
             validator: 'kotkaSequenceUnique',
-            field: '.originalSpecimenID',
           },
           body: {
             originalSpecimenID: '2025:1'
@@ -1007,22 +1008,21 @@ describe('ValidationInterceptor', () => {
         })});
 
         const mockNext = createMock<CallHandler>();
-        jest.spyOn(lajiStoreService, 'search').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [] }} as AxiosResponse));
+        jest.spyOn(lajiStoreService, 'getAll').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [] }} as AxiosResponse));
 
         await validatorInterceptor.intercept(mockContext, mockNext);
 
         const req = mockContext.switchToHttp().getRequest();
         expect(req).toEqual(mockRequest);
         expect(mockNext.handle).toHaveBeenCalledTimes(1);
-        expect(lajiStoreService.search).toHaveBeenCalledTimes(1);
+        expect(lajiStoreService.getAll).toHaveBeenCalledTimes(1);
       });
 
-      it('If another specimen with originalSPecimenID is found throw an error', async () => {
+      it('If another specimen with originalSpecimenID is found throw an error', async () => {
         const mockRequest = {
           method: 'POST',
           params: {
             validator: 'kotkaSequenceUnique',
-            field: '.originalSpecimenID',
           },
           body: {
             originalSpecimenID: '2025:1'
@@ -1034,7 +1034,7 @@ describe('ValidationInterceptor', () => {
         })});
 
         const mockNext = createMock<CallHandler>();
-        jest.spyOn(lajiStoreService, 'search').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [{ id: 'JA.1', originalSpecimenID: '2025:1' }] }} as AxiosResponse));
+        jest.spyOn(lajiStoreService, 'getAll').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [{ id: 'JA.1', originalSpecimenID: '2025:1' }] }} as AxiosResponse));
 
         expect.assertions(4);
         try {
@@ -1042,9 +1042,9 @@ describe('ValidationInterceptor', () => {
         } catch (e) {
           const req = mockContext.switchToHttp().getRequest();
           expect(req).toEqual(mockRequest);
-          expect(lajiStoreService.search).toHaveBeenCalledTimes(1);
+          expect(lajiStoreService.getAll).toHaveBeenCalledTimes(1);
           expect(mockNext.handle).toHaveBeenCalledTimes(0);
-          expect(e.options).toEqual({originalSpecimenID:{errors:['Found duplicates in other documents, found in JA.1: 2025:1']}});
+          expect(e.options).toEqual({originalSpecimenID:{errors:['Found duplicates in other documents, found in JA.1.']}});
         }
       });
     });
@@ -1058,7 +1058,6 @@ describe('ValidationInterceptor', () => {
           method: 'POST',
           params: {
             validator: 'kotkaSequenceUnique',
-            field: '.additionalIDs',
           },
           body: {
             gatherings: [{
@@ -1078,13 +1077,13 @@ describe('ValidationInterceptor', () => {
         })});
 
         const mockNext = createMock<CallHandler>();
-        jest.spyOn(lajiStoreService, 'search').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [] }} as AxiosResponse));
+        jest.spyOn(lajiStoreService, 'getAll').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [] }} as AxiosResponse));
 
         await validatorInterceptor.intercept(mockContext, mockNext);
 
         const req = mockContext.switchToHttp().getRequest();
         expect(req).toEqual(mockRequest);
-        expect(lajiStoreService.search).toHaveBeenCalledTimes(2);
+        expect(lajiStoreService.getAll).toHaveBeenCalledTimes(3);
         expect(mockNext.handle).toHaveBeenCalledTimes(1);
       });
 
@@ -1093,7 +1092,6 @@ describe('ValidationInterceptor', () => {
           method: 'POST',
           params: {
             validator: 'kotkaSequenceUnique',
-            field: '.additionalIDs',
           },
           body: {
             id: 'JA.1',
@@ -1114,7 +1112,7 @@ describe('ValidationInterceptor', () => {
         })});
 
         const mockNext = createMock<CallHandler>();
-        jest.spyOn(lajiStoreService, 'search').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [{
+        jest.spyOn(lajiStoreService, 'getAll').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [{
           id: 'JA.1',
           gatherings: [{
             units: [{
@@ -1131,7 +1129,7 @@ describe('ValidationInterceptor', () => {
 
         const req = mockContext.switchToHttp().getRequest();
         expect(req).toEqual(mockRequest);
-        expect(lajiStoreService.search).toHaveBeenCalledTimes(2);
+        expect(lajiStoreService.getAll).toHaveBeenCalledTimes(3);
         expect(mockNext.handle).toHaveBeenCalledTimes(1);
       });
 
@@ -1140,7 +1138,6 @@ describe('ValidationInterceptor', () => {
           method: 'POST',
           params: {
             validator: 'kotkaSequenceUnique',
-            field: '.additionalIDs',
           },
           body: {
             gatherings: [{
@@ -1160,16 +1157,18 @@ describe('ValidationInterceptor', () => {
         })});
 
         const mockNext = createMock<CallHandler>();
-        jest.spyOn(lajiStoreService, 'search').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [] }} as AxiosResponse));
+        jest.spyOn(lajiStoreService, 'getAll').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [] }} as AxiosResponse));
 
         try {
           await validatorInterceptor.intercept(mockContext, mockNext);
         } catch (e) {
           const req = mockContext.switchToHttp().getRequest();
           expect(req).toEqual(mockRequest);
-          expect(lajiStoreService.search).toHaveBeenCalledTimes(0);
+          expect(lajiStoreService.getAll).toHaveBeenCalledTimes(1);
           expect(mockNext.handle).toHaveBeenCalledTimes(0);
-          expect(e.options.gatherings[0].units[0].samples[1].additionalIDs.errors).toEqual(['Duplicate values found within submitted document, found multiple of test:1111']);
+          expect(e.options.gatherings[0].units[0].samples[1].additionalIDs[0].errors).toEqual(['Duplicate values found within submitted document.']);
+          expect(e.options.gatherings[0].units[0].samples[0].additionalIDs[0].errors).toEqual(['Duplicate values found within submitted document.']);
+
         }
       });
 
@@ -1178,7 +1177,6 @@ describe('ValidationInterceptor', () => {
           method: 'POST',
           params: {
             validator: 'kotkaSequenceUnique',
-            field: '.additionalIDs',
           },
           body: {
             gatherings: [{
@@ -1198,7 +1196,7 @@ describe('ValidationInterceptor', () => {
         })});
 
         const mockNext = createMock<CallHandler>();
-        jest.spyOn(lajiStoreService, 'search').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [{
+        jest.spyOn(lajiStoreService, 'getAll').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [{
           id: 'JA.2',
           gatherings: [{
             units: [{
@@ -1214,9 +1212,9 @@ describe('ValidationInterceptor', () => {
         } catch (e) {
           const req = mockContext.switchToHttp().getRequest();
           expect(req).toEqual(mockRequest);
-          expect(lajiStoreService.search).toHaveBeenCalledTimes(2);
+          expect(lajiStoreService.getAll).toHaveBeenCalledTimes(3);
           expect(mockNext.handle).toHaveBeenCalledTimes(0);
-          expect(e.options.gatherings[0].units[0].samples[1].additionalIDs.errors).toEqual(['Found duplicates in other documents, found in JA.2: test:3333']);
+          expect(e.options.gatherings[0].units[0].samples[1].additionalIDs[0].errors).toEqual(['Found duplicates in other documents, found in JA.2.']);
         }
       });
     });

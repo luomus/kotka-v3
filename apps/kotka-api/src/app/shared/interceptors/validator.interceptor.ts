@@ -57,8 +57,8 @@ export class ValidatorInterceptor implements NestInterceptor {
           message += ` '${error.params.allowedValues.join('\', \'')}.`;
         }
         errors[error.instancePath].push(message);
-
       });
+
       throw new UnprocessableEntityException('Unprocessable Entity', this.formatErrorDetails(errors, undefined));
     }
 
