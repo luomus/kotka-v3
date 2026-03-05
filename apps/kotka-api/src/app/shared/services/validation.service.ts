@@ -2,24 +2,93 @@
 https://docs.nestjs.com/providers#services
 */
 
-import { LajiApiService, LajiStoreService, AbschService } from '@kotka/api/services';
+import { LajiApiService, LajiStoreService, AbschService, FormService } from '@kotka/api/services';
 import { CoordinateLocationResponse, KotkaDocumentObjectFullType, SpecimenDataType, specimenDataTypeToNameMap } from '@kotka/shared/models';
-import { Dataset, Document } from '@luomus/laji-schema';
+import { Dataset, Document, Form, StoreObject } from '@luomus/laji-schema';
 import { Injectable } from '@nestjs/common';
 import { lastValueFrom, map } from 'rxjs';
 import { NamespaceData, NamespaceService } from './namespace.service';
 import { acceptedPrefixes, convertCoordinatesToWGS84, defaultPrefix, JSONPathAllResponse, parseJSONPointer, parseStoreSearchPath } from '@kotka/shared/utils';
 import { GeometryCollection } from 'geojson';
 import { JSONPath } from 'jsonpath-plus';
+import * as lajiValidate from '@luomus/laji-validate';
+import Ajv from 'ajv'
 
 @Injectable()
 export class ValidationService {
+  //@ts-ignore
+  private readonly ajv: Ajv;
+
   constructor(
     private readonly lajiApiService: LajiApiService,
     private readonly lajiStoreService: LajiStoreService,
     private readonly abschService: AbschService,
     private readonly namespaceService: NamespaceService,
-  ) { }
+    private readonly formService: FormService
+  ) {
+    this.ajv = new Ajv({
+      allErrors: true,
+    });
+
+    lajiValidate.extend(lajiValidate.validators.remote, {
+      fetch: (path: any, query: any, options: any) => {
+        return this.remoteValidate(query, options);
+      }
+    });
+  }
+
+  async validate(data: StoreObject, type: KotkaDocumentObjectFullType) {
+    const form = await this.formService.getForm(type);
+
+    const errors = {};
+
+    if (form.schema && !this.ajv.validate(form.schema, data)) {
+      this.ajv.errors!.map(error => {
+        if (!errors[error.instancePath]) {
+          errors[error.instancePath] = [];
+        }
+        let message = error.message;
+        if (error.keyword === 'enum' && error.params && error.params.allowedValues) {
+          message += ` '${error.params.allowedValues.join('\', \'')}.`;
+        }
+        errors[error.instancePath].push(message);
+      });
+
+      return errors;
+    }
+
+    if (form.validators) {
+      try {
+        await lajiValidate.async(data, form.validators);
+      } catch (err) {
+        Object.keys(err).map(key => {
+          if (Array.isArray(err[key])) {
+            if (typeof err[key][0] === 'string') {
+              const path1 = key.startsWith('.')? key : '.' + key;
+              if (!errors[path1]) {
+                errors[path1] = [];
+              }
+              errors[path1].push(...err[key]);
+            } else if (typeof err[key][0] === 'object') {
+              err[key].map(obj => {
+                Object.keys(obj).map((path) => {
+                  const path1 = path.startsWith('.')? path : '.' + path;
+                  if (!errors[path1]) {
+                    errors[path1] = [];
+                  }
+                  errors[path1].push(...obj[path]);
+                });
+              });
+            } else {
+              console.error('Could not interpret the error message');
+            }
+          }
+        });
+
+        return errors;
+      }
+    }
+  }
 
   async remoteValidate(query: any, options: any) {
     let error = {};
