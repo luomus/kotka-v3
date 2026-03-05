@@ -2,7 +2,7 @@
 https://docs.nestjs.com/interceptors#interceptors
 */
 
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler, HttpException, HttpStatus, InternalServerErrorException } from '@nestjs/common';
 import { Document } from '@kotka/shared/models';
 import { NamespaceService } from '../shared/services/namespace.service';
 import { defaultPrefix } from '@kotka/shared/utils';
@@ -35,13 +35,27 @@ export class SpecimenIdJoinerInterceptor implements NestInterceptor {
 
     if (namespaceID.includes(':')) {
       finalNamespaceID = namespaceID;
+
+      if (namespaceID.startsWith(defaultPrefix)) {
+        finalNamespaceID = namespaceID.split(':')[1];
+      } else {
+        finalNamespaceID = namespaceID;
+      }
     } else {
       const namespace = namespaces.find(namespace => namespace.namespace_id === namespaceID);
 
-      if (namespace.qname_prefix !== '' && namespace.qname_prefix !== 'all') {
+      if (!namespace) {
+        throw new InternalServerErrorException('Given namespace unknown.');
+      }
+
+      if (
+        namespace.qname_prefix !== '' &&
+        namespace.qname_prefix !== 'tun' &&
+        namespace.qname_prefix !== 'all'
+      ) {
         finalNamespaceID = `${namespace.qname_prefix}:${namespaceID}`;
       } else {
-        finalNamespaceID = `${defaultPrefix}:${namespaceID}`;
+        finalNamespaceID = namespaceID;
       }
     }
 

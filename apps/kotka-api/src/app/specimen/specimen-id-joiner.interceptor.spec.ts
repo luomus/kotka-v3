@@ -34,6 +34,13 @@ const mockNamespaceService = {
       purpose: '',
       namespace_type: 'all',
       qname_prefix: 'all'
+    },
+    {
+      namespace_id: 'AE',
+      person_in_charge: '',
+      purpose: '',
+      namespace_type: 'all',
+      qname_prefix: 'tun'
     }
   ]))
 };
@@ -64,6 +71,31 @@ describe('SpecimenIdJoinerIntereptor', () => {
 
   it('Both namespaceID- and objectID-parts being present results in combined document id, and removal of namespaceID and objectID', async () => {
     const mockBody = {
+      namespaceID: 'utu:AB',
+      objectID: '123',
+      gatherings: []
+    };
+    const mockRequest = {
+      method: 'POST',
+      body: mockBody
+    };
+
+    const mockContext = createMock<ExecutionContext>({switchToHttp: () => ({
+      getRequest: () => (mockRequest)
+    })});
+
+    const mockNext = createMock<CallHandler>();
+
+    await specimenIdJoinerInterceptor.intercept(mockContext, mockNext);
+
+    const req = mockContext.switchToHttp().getRequest();
+    expect(req).toEqual({method: 'POST', body: { id: 'utu:AB.123', gatherings: [] }});
+    expect(mockNext.handle).toHaveBeenCalledTimes(1);
+    expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(1);
+  });
+
+  it('tun-prefix gets removed from id', async () => {
+    const mockBody = {
       namespaceID: 'tun:AA',
       objectID: '123',
       gatherings: []
@@ -82,13 +114,12 @@ describe('SpecimenIdJoinerIntereptor', () => {
     await specimenIdJoinerInterceptor.intercept(mockContext, mockNext);
 
     const req = mockContext.switchToHttp().getRequest();
-    expect(req).toEqual({method: 'POST', body: { id: 'tun:AA.123', gatherings: [] }});
+    expect(req).toEqual({method: 'POST', body: { id: 'AA.123', gatherings: [] }});
     expect(mockNext.handle).toHaveBeenCalledTimes(1);
     expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(1);
   });
 
-
-    it('If namespaces has no default namespace add the default tun: to final id if it is not in namespaceID already', async () => {
+  it('If namespaces has no default namespace add nothing to final id', async () => {
     const mockBody = {
       namespaceID: 'AA',
       objectID: '123',
@@ -110,12 +141,39 @@ describe('SpecimenIdJoinerIntereptor', () => {
 
     const req = mockContext.switchToHttp().getRequest();
 
-    expect(req).toEqual({method: 'POST', body: { id: 'tun:AA.123', gatherings: [] }});
+    expect(req).toEqual({method: 'POST', body: { id: 'AA.123', gatherings: [] }});
     expect(mockNext.handle).toHaveBeenCalledTimes(1);
     expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(1);
   });
 
-  it('If namespaces has "all" add the default tun: to final id if it is not in namespaceID already', async () => {
+      it('If namespaces has default tun-prefix add nothing to final id', async () => {
+    const mockBody = {
+      namespaceID: 'AE',
+      objectID: '123',
+      gatherings: []
+    };
+
+    const mockRequest = {
+      method: 'POST',
+      body: mockBody
+    };
+
+    const mockContext = createMock<ExecutionContext>({switchToHttp: () => ({
+      getRequest: () => (mockRequest)
+    })});
+
+    const mockNext = createMock<CallHandler>();
+
+    await specimenIdJoinerInterceptor.intercept(mockContext, mockNext);
+
+    const req = mockContext.switchToHttp().getRequest();
+
+    expect(req).toEqual({method: 'POST', body: { id: 'AE.123', gatherings: [] }});
+    expect(mockNext.handle).toHaveBeenCalledTimes(1);
+    expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(1);
+  });
+
+  it('If namespaces has "all" and no prefix dont add the default prefix', async () => {
     const mockBody = {
       namespaceID: 'AD',
       objectID: '123',
@@ -137,12 +195,12 @@ describe('SpecimenIdJoinerIntereptor', () => {
 
     const req = mockContext.switchToHttp().getRequest();
 
-    expect(req).toEqual({method: 'POST', body: { id: 'tun:AD.123', gatherings: [] }});
+    expect(req).toEqual({method: 'POST', body: { id: 'AD.123', gatherings: [] }});
     expect(mockNext.handle).toHaveBeenCalledTimes(1);
     expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(1);
   });
 
-  it('If namespaceID has a default prefix other than "all" but none in namespaceID expect it to be added', async () => {
+  it('If namespaceID has a default prefix other than "all" or "tun" but none in namespaceID expect it to be added', async () => {
     const mockBody = {
       namespaceID: 'AB',
       objectID: '123',
