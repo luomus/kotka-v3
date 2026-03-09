@@ -2,7 +2,7 @@
   <kui-main-content
     class="mb-5"
     [containerClass]="'container'"
-    [title]="(dataTypeName | titlecase) + (dataURI ? (' ' + dataURI) : '')"
+    [pageTitle]="(dataTypeName | titlecase) + (dataURI ? (' ' + dataURI) : '')"
     >
     @if (isErrorViewModel(vm)) {
       <ngb-alert [type]="'danger'" [dismissible]="false">

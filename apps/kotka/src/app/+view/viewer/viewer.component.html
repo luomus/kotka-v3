@@ -15,7 +15,7 @@
     </div>
   </ng-template>
 
-  <kui-main-content [title]="vm.uri || ''" [headerTpl]="headerTemplate" containerClass="container">
+  <kui-main-content [pageTitle]="vm.uri || ''" [headerTpl]="headerTemplate" containerClass="container">
     @if (vm.loading) {
       <kui-spinner></kui-spinner>
     } @else if (vm.error) {

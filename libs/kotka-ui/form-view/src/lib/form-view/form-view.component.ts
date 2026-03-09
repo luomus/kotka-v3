@@ -75,7 +75,7 @@ export class FormViewComponent<
   additionalClassNames = input<Record<string, string>>();
   confirmFieldDelete = input<boolean>();
 
-  title = input<string>();
+  pageTitle = input<string>();
   allowCopy = input<boolean>();
   footerDisabled = input<boolean>();
   historyPageLink = input<string[]|string>(['..', 'history']);

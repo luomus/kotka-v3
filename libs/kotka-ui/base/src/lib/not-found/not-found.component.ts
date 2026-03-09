@@ -4,7 +4,7 @@ import { MainContentComponent } from '@kotka/ui/main-content';
 @Component({
   selector: 'kotka-not-found',
   template: `
-    <kui-main-content [title]="'Page not found'">
+    <kui-main-content [pageTitle]="'Page not found'">
       <p>Please check that you have entered the correct URL.</p>
     </kui-main-content>
   `,
