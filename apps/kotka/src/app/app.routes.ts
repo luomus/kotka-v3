@@ -21,6 +21,7 @@ const baseRoutes: Routes = [
       { path: 'organizations', loadChildren: () => import('./+organizations/organizations.routes').then(m => m.organizationsRoutes), data: {preload: false} },
       { path: 'transactions', loadChildren: () => import('./+transactions/transactions.routes').then(m => m.transactionsRoutes), data: {preload: false} },
       { path: 'tools', loadChildren: () => import('./+tools/tools.routes').then(m => m.toolsRoutes), data: {preload: false} },
+      { path: 'view', loadChildren: () => import('./+view/view.routes').then(m => m.viewRoutes), data: {preload: false} },
       { matcher: specimenMatcher, loadChildren: () => import('./+specimens/specimens.routes').then(m => m.specimensRoutes), data: {preload: false} },
       { path: '**', pathMatch: 'full', component: NotFoundComponent }
     ]

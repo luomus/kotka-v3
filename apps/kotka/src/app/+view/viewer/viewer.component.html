@@ -1,0 +1,34 @@
+@if (vm$ | async; as vm) {
+  <ng-template #headerTemplate>
+    <div class="header-layout">
+      <h1 data-cy="main-header">{{ vm.uri }}</h1>
+      @if (vm.showEditButton) {
+        <a
+          type="button"
+          class="btn btn-info edit-button"
+          routerLink="/specimens/edit"
+          [queryParams]="{ uri: vm.uri }"
+        >
+          <i class="fa fa-pen-to-square"></i>
+        </a>
+      }
+    </div>
+  </ng-template>
+
+  <kui-main-content [title]="vm.uri || ''" [headerTpl]="headerTemplate" containerClass="container">
+    @if (vm.loading) {
+      <kui-spinner></kui-spinner>
+    } @else if (vm.error) {
+      <ngb-alert type="danger" [dismissible]="false">
+        {{ vm.error }}
+      </ngb-alert>
+    } @else if (vm.form && vm.document) {
+      <kui-viewer [form]="vm.form" [data]="vm.document"></kui-viewer>
+      <kotka-document-navigator
+        [dataType]="dataType"
+        [data]="$any(vm.document)"
+        routerLink="/view"
+      ></kotka-document-navigator>
+    }
+  </kui-main-content>
+}

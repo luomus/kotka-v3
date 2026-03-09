@@ -102,37 +102,10 @@
         Branches
       </a>
     }
-    @if (navigatorState().loading || navigatorState().previousId || navigatorState().nextId) {
-      <kui-spinner [spinning]="navigatorState().loading" [hideContentWhileLoading]="true">
-        <div class="d-flex gap-0 d-sm-block">
-          @if (navigatorState().previousId) {
-            <a
-              class="btn btn-light flex-grow-1 me-1"
-              routerLink="/specimens/edit"
-              [queryParams]="{ uri: navigatorState().previousId }"
-            >
-              <i class="fa fa-angle-left"></i>
-            </a>
-          } @else {
-            <button class="btn btn-light flex-grow-1 me-1" disabled>
-              <i class="fa fa-angle-left"></i>
-            </button>
-          }
-          @if (navigatorState().nextId) {
-            <a
-              class="btn btn-light flex-grow-1 ms-1"
-              routerLink="/specimens/edit"
-              [queryParams]="{ uri: navigatorState().nextId | toFullUri }"
-            >
-              <i class="fa fa-angle-right"></i>
-            </a>
-          } @else {
-            <button class="btn btn-light flex-grow-1 ms-1" disabled>
-              <i class="fa fa-angle-right"></i>
-            </button>
-          }
-        </div>
-      </kui-spinner>
-    }
+    <kotka-document-navigator
+      [dataType]="formDataType"
+      [data]="initialDocument()"
+      routerLink="/specimens/edit"
+    ></kotka-document-navigator>
   </div>
 </ng-template>
