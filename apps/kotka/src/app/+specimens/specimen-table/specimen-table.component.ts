@@ -49,7 +49,8 @@ export class SpecimenTableComponent {
       field: 'id',
       cellRenderer: URICellRendererComponent,
       cellRendererParams: {
-        routerLink: ['..', 'edit'],
+        editRouterLink: ['..', 'edit'],
+        showViewLink: true,
       },
       width: 145,
       flex: 0,
