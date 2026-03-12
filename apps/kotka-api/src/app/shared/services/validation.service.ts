@@ -4,7 +4,7 @@ https://docs.nestjs.com/providers#services
 
 import { LajiApiService, LajiStoreService, AbschService, FormService } from '@kotka/api/services';
 import { CoordinateLocationResponse, KotkaDocumentObjectFullType, SpecimenDataType, specimenDataTypeToNameMap } from '@kotka/shared/models';
-import { Dataset, Document, Form, StoreObject } from '@luomus/laji-schema';
+import { Dataset, Document, StoreObject } from '@luomus/laji-schema';
 import { Injectable } from '@nestjs/common';
 import { lastValueFrom, map } from 'rxjs';
 import { NamespaceData, NamespaceService } from './namespace.service';
@@ -12,7 +12,7 @@ import { acceptedPrefixes, convertCoordinatesToWGS84, defaultPrefix, JSONPathAll
 import { GeometryCollection } from 'geojson';
 import { JSONPath } from 'jsonpath-plus';
 import * as lajiValidate from '@luomus/laji-validate';
-import Ajv from 'ajv'
+import Ajv from 'ajv';
 
 @Injectable()
 export class ValidationService {
@@ -280,11 +280,11 @@ export class ValidationService {
   }
 
   async validateDocumentSequenceIdUnique(data: any, field: any) {
-    let value: string = parseJSONPointer(data, field);
+    const value: string = parseJSONPointer(data, field);
     const storePath = parseStoreSearchPath(field);
     const documentInternalSearchPath = this.getValueSiblingsPath(field);
 
-    const siblings: JSONPathAllResponse[] = JSONPath({ json: data, path: documentInternalSearchPath, resultType: 'all', wrap: true })
+    const siblings: JSONPathAllResponse[] = JSONPath({ json: data, path: documentInternalSearchPath, resultType: 'all', wrap: true });
     let duplicates = false;
 
     siblings.forEach((sibling) => {
@@ -302,10 +302,10 @@ export class ValidationService {
     });
 
     if (duplicates) {
-      return this.getError(field, `Duplicate values found within submitted document.`);
+      return this.getError(field, 'Duplicate values found within submitted document.');
     }
 
-    const searchBody = `${storePath}: "${value}"`;
+    const searchBody = `${storePath}: '${value}'`;
 
     const docs = (await lastValueFrom(this.lajiStoreService.getAll<Document>(KotkaDocumentObjectFullType.document, { q: searchBody }))).data;
 
@@ -344,6 +344,6 @@ export class ValidationService {
   private getValueSiblingsPath(path: string) {
     return path.split('/').map(part => {
       return /^\d+$/g.test(part) ? '*' : part;
-    })
+    });
   }
 }

@@ -53,7 +53,7 @@ export class MediaAccessInterceptor implements NestInterceptor {
         .handle()
         .pipe(
           map((data: Pdf | Image) => {
-            this.canGetMedia(type, profile, data)
+            this.canGetMedia(type, profile, data);
 
             return data;
           }),
@@ -95,9 +95,9 @@ export class MediaAccessInterceptor implements NestInterceptor {
 
     const oldMeta = await this.getOldMetadata(type, id);
 
-    if (type === MediasEnum.pdf && this.canAccessByOrganization(profile, oldMeta.intellectualOwner)) { return }
+    if (type === MediasEnum.pdf && this.canAccessByOrganization(profile, oldMeta.intellectualOwner)) { return; }
     else if (type === MediasEnum.images) {
-      const { all, removed, added } = this.getDiffOfSpecimenIDs((oldMeta as Image).documentURI?.map(uri => getId(uri)), (newMeta as Image).documentURI?.map(uri => getId(uri)))
+      const { all, removed, added } = this.getDiffOfSpecimenIDs((oldMeta as Image).documentURI?.map(uri => getId(uri)), (newMeta as Image).documentURI?.map(uri => getId(uri)));
 
       let docs: Partial<Document>[];
       if (all.length === 1) {
@@ -110,7 +110,7 @@ export class MediaAccessInterceptor implements NestInterceptor {
       } else {
         docs = await lastValueFrom(this.lajiStoreService.getAll<Document>(
           KotkaDocumentObjectFullType.document,
-          {q: `id: ${all.map(id => `"${id}"`).join(',')}`, fields: "id,owner"}
+          {q: `id: ${all.map(id => `"${id}"`).join(',')}`, fields: 'id,owner'}
         ).pipe(map(res => res.data.member)));
       }
 
@@ -166,12 +166,12 @@ export class MediaAccessInterceptor implements NestInterceptor {
     } else if(ids.length > 1) {
       const docs = await lastValueFrom(this.lajiStoreService.getAll<Document>(
         KotkaDocumentObjectFullType.document,
-        {q: `id: ${ids.map(id => `"${id}"`).join(',')}`, fields: "id,owner"}
+        {q: `id: ${ids.map(id => `"${id}"`).join(',')}`, fields: 'id,owner'}
       ).pipe(map(res => res.data.member)));
 
       if(docs.every(doc => doc.owner ? profile.organisation?.includes(doc.owner) : false)) return;
 
-      throw new HttpException('Forbidden, no rights to document/s associated with the image', HttpStatus.FORBIDDEN)
+      throw new HttpException('Forbidden, no rights to document/s associated with the image', HttpStatus.FORBIDDEN);
     }
   }
 
@@ -207,6 +207,6 @@ export class MediaAccessInterceptor implements NestInterceptor {
       all: [...common, ...removed, ...added],
       removed,
       added
-    }
+    };
   }
 }

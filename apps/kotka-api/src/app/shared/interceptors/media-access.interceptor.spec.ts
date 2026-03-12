@@ -1,9 +1,9 @@
 import { Test } from '@nestjs/testing';
 import { createMock } from '@golevelup/ts-jest';
-import { CallHandler, ExecutionContext, InternalServerErrorException } from '@nestjs/common';
+import { CallHandler, ExecutionContext, } from '@nestjs/common';
 import { ApiServicesModule, LajiStoreService, Media, MediaApiService, MediasEnum } from '@kotka/api/services';
 import { Reflector } from '@nestjs/core';
-import { of, lastValueFrom, Observable } from 'rxjs';
+import { of, lastValueFrom } from 'rxjs';
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces';
 import { MediaAccessInterceptor } from './media-access.interceptor';
 import { KotkaDocumentObjectFullType } from '@kotka/shared/models';
@@ -12,74 +12,68 @@ const kotkaAdminUser = {
   role: [''],
   roleKotka: 'MA.admin',
   organisation: ['MOS.3']
-}
+};
 
 const adminUser = {
   role: ['MA.admin'],
   roleKotka: 'MA.guest',
   organisation: ['MOS.3']
-}
+};
 
 const MOS1User = {
   role: [''],
   roleKotka: 'MA.member',
   organisation: ['MOS.1']
-}
+};
 
 const MOS2User = {
   role: [''],
   roleKotka: 'MA.member',
   organisation: ['MOS.2']
-}
+};
 
 const MOS4User = {
   role: [''],
   roleKotka: 'MA.member',
   organisation: ['MOS.4']
-}
+};
 
 const multiOrgUser = {
   role: [''],
   roleKotka: 'MA.member',
   organisation: ['MOS.1', 'MOS.2', 'MOS.3']
-}
+};
 
 const advancedUser = {
   role: [''],
   roleKotka: 'MA.advanced',
   organisation: ['MOS.1']
-}
-
-const guestUser = {
-  role: [''],
-  roleKotka: 'MA.guest',
-  organisation: []
-}
+};
 
 const MOS1Doc = {
   id: 'JX.1',
   owner: 'MOS.1',
-}
+};
 
 const MOS1Doc2 = {
   id: 'JX.4',
   owner: 'MOS.1',
-}
+};
 
 const MOS2Doc = {
   id: 'JX.2',
   owner: 'MOS.2',
-}
+};
 
 const MOS3Doc = {
   id: 'JX.3',
   owner: 'MOS.3',
-}
+};
 
 const imgMetadata1 = {
   id: 'MM.1',
-  documentURI: ["http://tun.fi/JX.1"],
-}
+  documentURI: ['http://tun.fi/JX.1'],
+};
 
 const imgTripleMeta1 = {
   id: 'MM.1',
@@ -87,12 +81,12 @@ const imgTripleMeta1 = {
   meta: {
     documentIds: ['http://tun.fi/JX.1']
   }
-}
+};
 
 const imgMetadata2 = {
   id: 'MM.2',
-  documentURI: ["http://tun.fi/JX.2"],
-}
+  documentURI: ['http://tun.fi/JX.2'],
+};
 
 const imgTripleMeta2 = {
   id: 'MM.2',
@@ -100,16 +94,16 @@ const imgTripleMeta2 = {
   meta: {
     documentIds: ['http://tun.fi/JX.2']
   }
-}
+};
 
 const imgMetadata3 = {
   id: 'MM.3',
   documentURI: [
-    "http://tun.fi/JX.1",
-    "http://tun.fi/JX.2",
-    "http://id.luomus.fi/JX.3"
+    'http://tun.fi/JX.1',
+    'http://tun.fi/JX.2',
+    'http://id.luomus.fi/JX.3'
   ],
-}
+};
 
 const imgTripleMeta3 = {
   id: 'MM.3',
@@ -121,30 +115,30 @@ const imgTripleMeta3 = {
       'http://id.luomus.fi/JX.3'
     ]
   }
-}
+};
 
 const imgMetadata4 = {
   id: 'MM.4',
   documentURI: [
-    "http://tun.fi/JX.1",
-    "http://tun.fi/JX.4"
+    'http://tun.fi/JX.1',
+    'http://tun.fi/JX.4'
   ]
-}
+};
 
 const imgTripleMeta4 = {
   id: 'MM.4',
   urls: {},
   meta: {
     documentIds: [
-      "http://tun.fi/JX.1",
-      "http://tun.fi/JX.4"
+      'http://tun.fi/JX.1',
+      'http://tun.fi/JX.4'
     ]
   }
-}
+};
 
 const pdfMetadata = {
   intellectualOwner: 'MOS.2'
-}
+};
 
 const pdfTriplesMeta = {
   id: 'MM.1',
@@ -152,13 +146,12 @@ const pdfTriplesMeta = {
   meta: {
     rightsOwner: 'MOS.2'
   }
-}
+};
 
 describe('MediaAccessInterceptor', () => {
   let mediaAccessInterceptor: MediaAccessInterceptor;
   let lajiStoreService: LajiStoreService;
   let mediaApiService: MediaApiService;
-  let reflector: Reflector;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -170,8 +163,6 @@ describe('MediaAccessInterceptor', () => {
     mediaAccessInterceptor = moduleRef.get<MediaAccessInterceptor>(MediaAccessInterceptor);
     lajiStoreService = moduleRef.get<LajiStoreService>(LajiStoreService);
     mediaApiService = moduleRef.get<MediaApiService>(MediaApiService);
-    reflector = moduleRef.get<Reflector>(Reflector);
-
   });
 
   describe('General tests', () => {
@@ -320,7 +311,7 @@ describe('MediaAccessInterceptor', () => {
           expect(mockNext.handle).toHaveBeenCalledTimes(0);
         }
       });
-    })
+    });
 
     describe('GET', () => {
       it('Admin can get', async () => {
@@ -423,7 +414,7 @@ describe('MediaAccessInterceptor', () => {
         expect.assertions(4);
 
         try {
-        const res = await lastValueFrom(await mediaAccessInterceptor.intercept(mockContext, mockNext));
+          await lastValueFrom(await mediaAccessInterceptor.intercept(mockContext, mockNext));
         } catch (e) {
           expect(e.status).toBe(403);
           expect(e.message).toBe('Forbidden');
@@ -431,7 +422,7 @@ describe('MediaAccessInterceptor', () => {
           expect(mockNext.handle).toHaveBeenCalledTimes(1);
         }
       });
-    })
+    });
 
     describe('PUT', () => {
       it('Admin can edit', async () => {
@@ -545,7 +536,7 @@ describe('MediaAccessInterceptor', () => {
           expect(mockNext.handle).toHaveBeenCalledTimes(0);
         }
       });
-    })
+    });
 
     describe('DELETE', () => {
       it('Admin can delete', async () => {
@@ -655,8 +646,8 @@ describe('MediaAccessInterceptor', () => {
           expect(mockNext.handle).toHaveBeenCalledTimes(0);
         }
       });
-    })
-  })
+    });
+  });
 
   describe('Images', () => {
     describe('POST', () => {
@@ -854,7 +845,7 @@ describe('MediaAccessInterceptor', () => {
 
         const mockNext = createMock<CallHandler>();
 
-        const mockGet = jest.spyOn(lajiStoreService, 'get')
+        const mockGet = jest.spyOn(lajiStoreService, 'get');
         const mockGetAll = jest.spyOn(lajiStoreService, 'getAll').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data: { member: [ MOS1Doc, MOS2Doc, MOS3Doc ]}} as AxiosResponse));
         const mockGetMedia = jest.spyOn(mediaApiService, 'getMedia');
 
@@ -957,7 +948,7 @@ describe('MediaAccessInterceptor', () => {
         })});
 
         const mockNext = createMock<CallHandler>();
-        jest.spyOn(mockNext, 'handle').mockImplementation(() => of(imgMetadata1))
+        jest.spyOn(mockNext, 'handle').mockImplementation(() => of(imgMetadata1));
 
         const mockGet = jest.spyOn(lajiStoreService, 'get');
         const mockGetAll = jest.spyOn(lajiStoreService, 'getAll');
@@ -1210,7 +1201,6 @@ describe('MediaAccessInterceptor', () => {
 
         await mediaAccessInterceptor.intercept(mockContext, mockNext);
 
-        console.log(mockGet)
         expect(mockGet).toHaveBeenCalledTimes(1);
         expect(mockGet.mock.calls[0][0]).toBe(KotkaDocumentObjectFullType.document);
         expect(mockGet.mock.calls[0][1]).toBe('JX.1');
@@ -1361,7 +1351,7 @@ describe('MediaAccessInterceptor', () => {
         expect(mockGetAll.mock.calls[0][1]).toStrictEqual({'fields': 'id,owner', 'q': 'id: "JX.1","JX.4"'});
         expect(mockGetMedia).toHaveBeenCalledTimes(1);
         expect(mockNext.handle).toHaveBeenCalledTimes(1);
-      })
+      });
 
       it('Owner of document can remove it from documentURI-field', async () => {
         const mockContext = createMock<ExecutionContext>({switchToHttp: () => ({
@@ -1393,7 +1383,7 @@ describe('MediaAccessInterceptor', () => {
         expect(mockGetAll.mock.calls[0][1]).toStrictEqual({'fields': 'id,owner', 'q': 'id: "JX.1","JX.4"'});
         expect(mockGetMedia).toHaveBeenCalledTimes(1);
         expect(mockNext.handle).toHaveBeenCalledTimes(1);
-      })
+      });
 
       it('Non-owner cant add a document to documentURI-field', async () => {
         const mockContext = createMock<ExecutionContext>({switchToHttp: () => ({
@@ -1433,7 +1423,7 @@ describe('MediaAccessInterceptor', () => {
           expect(mockGetMedia.mock.calls[0][1]).toBe(MediasEnum.images);
           expect(mockNext.handle).toHaveBeenCalledTimes(0);
         }
-      })
+      });
 
       it('Non-owner cant remove a document from documentURI-field', async () => {
         const mockContext = createMock<ExecutionContext>({switchToHttp: () => ({
@@ -1473,8 +1463,8 @@ describe('MediaAccessInterceptor', () => {
           expect(mockGetMedia.mock.calls[0][1]).toBe(MediasEnum.images);
           expect(mockNext.handle).toHaveBeenCalledTimes(0);
         }
-      })
-    })
+      });
+    });
 
     describe('DELETE', () => {
       it('Admin can edit with single documentURI', async () => {
