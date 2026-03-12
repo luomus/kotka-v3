@@ -18,10 +18,11 @@ export class MediaController {
   ) {}
 
   @Post(':type')
-  postMedia(@Req() req, @Res() res, @Param('type') type) {
+  postMedia(@Req() req, @Res() res, @Param('type') type: MediaTypes) {
     return this.mediaService.postMediaStreaming(type, req, res);
   }
 
+  @UseInterceptors(MediaAccessInterceptor)
   @Post(':type/:tempId')
   postMetadata(@Req() request, @Param('type') type: MediaTypes, @Param('tempId') tempId: string, @Body() body: Image | Pdf) {
     if (!body.intellectualOwner) {
@@ -56,7 +57,7 @@ export class MediaController {
   @UseInterceptors(MediaAccessInterceptor)
   @Put(':type/:id')
   @HttpCode(200)
-  putMedia(@Req() request, @Param('type') type: MediaTypes, @Param('id') id: string, @Body() body) {
+  putMedia(@Req() request, @Param('type') type: MediaTypes, @Param('id') id: string, @Body() body: Image | Pdf) {
     if (!body.intellectualOwner) {
       throw new BadRequestException(ErrorMessages.missingIntellectualOwner);
     }

@@ -26,11 +26,11 @@ export class SpecimenImageInterceptor implements NestInterceptor {
     } else if (req.method === 'GET' && context.getHandler().name === 'get') {
       return next.handle().pipe(
         mergeMap((data: Document) => {
-          const id = getUri(data.id);
+          const id = getUri(data.id!);
 
           return this.mediaApiService.findMediaByDocumentId(id, 'images').pipe(
             map((meta: Meta[]) => {
-              const images = meta.map(meta => meta.id).sort();
+              const images = meta.map(meta => meta.id!).sort();
 
               if (images) data.images = images;
 
