@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { Patch, LajiForm } from '@kotka/shared/models';
 import { CommonModule } from '@angular/common';
-import { EnumPipe, LabelPipe } from '@kotka/ui/pipes';
+import { EnumPipe } from '@kotka/ui/pipes';
+import { LabelValueComponent } from './label-value.component';
 
 @Component({
   selector: 'kui-viewer-field-value',
@@ -33,14 +34,14 @@ import { EnumPipe, LabelPipe } from '@kotka/ui/pipes';
             <span>{{ value | enum: field }}</span>
           }
         } @else {
-          <span>{{ value | label }}</span>
+          <kui-label-value [value]="value"></kui-label-value>
         }
       </ng-template>
     }
     `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, EnumPipe, LabelPipe],
+  imports: [CommonModule, EnumPipe, LabelValueComponent],
 })
 export class ViewerFieldValueComponent {
   field = input<LajiForm.Field>();

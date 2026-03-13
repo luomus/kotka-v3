@@ -29,7 +29,7 @@ export class DocumentNavigatorComponent<
 
   dataType = input.required<T>();
   data = input<S>();
-  routerLink = input.required<string>();
+  buttonRouterLink = input.required<string>();
 
   navigatorState = signal<NavigatorState>({ loading: false });
 

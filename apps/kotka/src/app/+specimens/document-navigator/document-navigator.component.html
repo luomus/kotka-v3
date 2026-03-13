@@ -4,8 +4,8 @@
       @if (navigatorState().previousId) {
         <a
           class="btn btn-light flex-grow-1 me-1"
-          routerLink="/specimens/edit"
-          [queryParams]="{ uri: navigatorState().previousId }"
+          [routerLink]="buttonRouterLink()"
+          [queryParams]="{ uri: navigatorState().previousId | toFullUri }"
         >
           <i class="fa fa-angle-left"></i>
         </a>
@@ -17,7 +17,7 @@
       @if (navigatorState().nextId) {
         <a
           class="btn btn-light flex-grow-1 ms-1"
-          [routerLink]="routerLink()"
+          [routerLink]="buttonRouterLink()"
           [queryParams]="{ uri: navigatorState().nextId | toFullUri }"
         >
           <i class="fa fa-angle-right"></i>

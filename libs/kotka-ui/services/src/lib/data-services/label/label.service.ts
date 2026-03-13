@@ -11,7 +11,6 @@ export type LabelKey = string | number | boolean;
 export class LabelService {
   private apiLabelService = inject(ApiLabelService);
 
-
   getLabel(key: LabelKey): Observable<string> {
     const apiLabelType = this.apiLabelService.getApiLabelType(key);
     if (apiLabelType) {

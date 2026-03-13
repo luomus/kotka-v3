@@ -1,16 +1,35 @@
 @if (vm$ | async; as vm) {
   <ng-template #headerTemplate>
     <div class="header-layout">
+      <div class="header-left-group">
       <h1 data-cy="main-header">{{ vm.uri }}</h1>
-      @if (vm.showEditButton) {
-        <a
+        @if (vm.showEditButton) {
+          <a
+            type="button"
+            class="btn btn-info edit-button"
+            routerLink="/specimens/edit"
+            [queryParams]="{ uri: vm.uri }"
+          >
+            <i class="fa fa-pen-to-square"></i>
+          </a>
+        }
+      </div>
+      @if (vm.document) {
+        <button
           type="button"
-          class="btn btn-info edit-button"
-          routerLink="/specimens/edit"
-          [queryParams]="{ uri: vm.uri }"
+          class="btn btn-light user-info-button"
+          [ngbPopover]="popoverTemplate"
+          placement="bottom"
         >
-          <i class="fa fa-pen-to-square"></i>
-        </a>
+          <i class="fa fa-user"></i>
+        </button>
+        <ng-template #popoverTemplate>
+          <div>
+            <strong>Created by</strong> {{ vm.document.creator | label }} {{ vm.document.dateCreated | date:'dd.MM.yyyy HH:mm' }}<br>
+            <strong>Edited by</strong> {{ vm.document.editor | label }} {{ vm.document.dateEdited | date:'dd.MM.yyyy HH:mm' }}<br>
+            <strong>Current owner is</strong> {{ vm.document.owner | label }}
+          </div>
+        </ng-template>
       }
     </div>
   </ng-template>
@@ -23,11 +42,15 @@
         {{ vm.error }}
       </ngb-alert>
     } @else if (vm.form && vm.document) {
-      <kui-viewer [form]="vm.form" [data]="vm.document"></kui-viewer>
+      <kui-viewer
+        [form]="vm.form"
+        [data]="vm.document"
+        [ignoreFields]="ignoreFields"
+      ></kui-viewer>
       <kotka-document-navigator
         [dataType]="dataType"
         [data]="$any(vm.document)"
-        routerLink="/view"
+        buttonRouterLink="/view"
       ></kotka-document-navigator>
     }
   </kui-main-content>

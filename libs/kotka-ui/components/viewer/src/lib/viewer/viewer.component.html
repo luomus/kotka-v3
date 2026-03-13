@@ -1,7 +1,7 @@
-@if (fields && data) {
+@if (fields && data()) {
   <kui-viewer-fieldset-fields
     [fields]="fields"
-    [data]="data"
-    [differenceData]="differenceData"
+    [data]="data()"
+    [differenceData]="differenceData()"
   ></kui-viewer-fieldset-fields>
 }

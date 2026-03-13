@@ -1,8 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Input,
   ViewEncapsulation,
+  effect,
+  input,
 } from '@angular/core';
 import {
   DifferenceObject,
@@ -21,15 +22,10 @@ import { ViewerFieldsetFieldsComponent } from './components/viewer-fieldset-fiel
   imports: [ViewerFieldsetFieldsComponent],
 })
 export class ViewerComponent {
-  @Input() set form(form: LajiForm.JsonForm | undefined) {
-    if (form) {
-      this.fields = [...this.metaFields, ...form.fields];
-    } else {
-      this.fields = undefined;
-    }
-  }
-  @Input() data?: KotkaDocumentObject;
-  @Input() differenceData: DifferenceObject = {};
+  form = input<LajiForm.JsonForm | undefined>();
+  data = input<KotkaDocumentObject | undefined>();
+  differenceData = input<DifferenceObject>();
+  ignoreFields = input<string[]>([]);
 
   fields?: LajiForm.Field[];
 
@@ -55,4 +51,15 @@ export class ViewerComponent {
       type: 'text',
     },
   ];
+
+  constructor() {
+    effect(() => {
+      const formValue = this.form();
+      if (formValue) {
+        this.fields = [...this.metaFields, ...formValue.fields].filter(field => !this.ignoreFields().includes(field.name));
+      } else {
+        this.fields = undefined;
+      }
+    });
+  }
 }

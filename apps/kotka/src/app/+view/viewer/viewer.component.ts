@@ -4,9 +4,9 @@ import { map, switchMap, startWith, catchError, shareReplay } from 'rxjs/operato
 import { ApiClient, FormService, UserService } from '@kotka/ui/services';
 import { getId, allowEditForUser } from '@kotka/shared/utils';
 import { ViewerComponent as UiViewerComponent } from '@kotka/ui/viewer';
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, DatePipe } from '@angular/common';
 import { SpinnerComponent } from '@kotka/ui/spinner';
-import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
+import { NgbAlert, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { combineLatest, Observable, of } from 'rxjs';
 import {
   KotkaDocumentObjectType,
@@ -16,6 +16,7 @@ import {
 import { globals } from '../../../environments/globals';
 import { MainContentComponent } from '@kotka/ui/main-content';
 import { DocumentNavigatorComponent } from '../../+specimens/document-navigator/document-navigator.component';
+import { LabelPipe } from '@kotka/ui/pipes';
 
 interface FormDataResult {
   value?: LajiForm.JsonForm;
@@ -49,6 +50,9 @@ interface ViewModel {
     MainContentComponent,
     RouterLink,
     DocumentNavigatorComponent,
+    NgbPopover,
+    LabelPipe,
+    DatePipe,
   ],
   styleUrls: ['./viewer.component.scss'],
 })
@@ -60,6 +64,8 @@ export class ViewerComponent {
 
   dataType = KotkaDocumentObjectType.specimen;
   uri$ = this.route.queryParams.pipe(map((params) => params['uri']));
+
+  ignoreFields: string[] = ['datatype', 'editor', 'dateEdited', 'creator', 'dateCreated', 'owner'];
 
   formData$: Observable<FormDataResult> = this.formService
     .getFormInJsonFormat(globals.specimenFormId)
@@ -81,21 +87,19 @@ export class ViewerComponent {
         return of({ loading: false, error: 'Resource not found' });
       }
       const id = getId(uri);
-      return this.apiClient
-        .getDocumentById(this.dataType, id)
-        .pipe(
-          map((value) => ({
-            value,
+      return this.apiClient.getDocumentById(this.dataType, id).pipe(
+        map((value) => ({
+          value,
+          loading: false,
+        })),
+        startWith({ loading: true }),
+        catchError(() => {
+          return of({
             loading: false,
-          })),
-          startWith({ loading: true }),
-          catchError(() => {
-            return of({
-              loading: false,
-              error: `Resource with URI ${uri} not found`,
-            });
-          }),
-        );
+            error: `Resource with URI ${uri} not found`,
+          });
+        }),
+      );
     }),
     shareReplay(1),
   );
@@ -123,5 +127,3 @@ export class ViewerComponent {
     startWith({ loading: true }),
   );
 }
-
-

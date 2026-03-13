@@ -1,0 +1,22 @@
+@use "sass:map";
+@import "../../../styles/variables";
+@import "node_modules/bootstrap/scss/functions";
+@import "node_modules/bootstrap/scss/variables";
+@import "node_modules/bootstrap/scss/mixins";
+
+.header-layout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: map.get($spacers, 2);
+
+  .header-left-group {
+    display: flex;
+    align-items: center;
+    gap: map.get($spacers, 2);
+  }
+
+  h1 {
+    margin-bottom: 0;
+  }
+}

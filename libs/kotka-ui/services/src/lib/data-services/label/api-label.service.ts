@@ -18,6 +18,7 @@ import {
   KotkaDocumentObjectType,
 } from '@kotka/shared/models';
 import { JSONPath } from 'jsonpath-plus';
+import { getIdWithoutPrefix } from '@kotka/shared/utils';
 
 export type ApiLabelType = 'person' | 'organization' | 'collection' | 'dataset';
 
@@ -42,13 +43,15 @@ export class ApiLabelService {
       if (typeof key !== 'string') {
         return;
       }
-      if (key.startsWith('MA.')) {
+
+      const keyWithoutPrefix = getIdWithoutPrefix(key);
+      if (keyWithoutPrefix.startsWith('MA.')) {
         return 'person';
-      } else if (key.startsWith('MOS.')) {
+      } else if (keyWithoutPrefix.startsWith('MOS.')) {
         return 'organization';
-      } else if (key.startsWith('HR.')) {
+      } else if (keyWithoutPrefix.startsWith('HR.')) {
         return 'collection';
-      } else if (key.startsWith('GX.')) {
+      } else if (keyWithoutPrefix.startsWith('GX.')) {
         return 'dataset';
       }
     }
