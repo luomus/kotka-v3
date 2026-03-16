@@ -1,6 +1,6 @@
 import { Routes, UrlMatchResult, UrlSegment } from '@angular/router';
 import { NotFoundComponent } from '@kotka/ui/base';
-import { OnlyLoggedInGuard } from '@kotka/ui/services';
+import { OnlyLoggedInGuard } from '@kotka/ui/core';
 import { BaseComponent } from '@kotka/ui/base';
 import { environment } from '../environments/environment';
 

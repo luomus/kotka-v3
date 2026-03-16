@@ -7,10 +7,10 @@ import {
   Output,
 } from '@angular/core';
 import { StoreVersion } from '@kotka/shared/models';
-import { SpinnerComponent } from '@kotka/ui/spinner';
+import { SpinnerComponent } from '@kotka/ui/components';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ReversePipe } from '@kotka/ui/pipes';
+import { ReversePipe } from '@kotka/ui/core';
 
 @Component({
   selector: 'kotka-version-list',

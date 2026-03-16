@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { Organization, SpecimenTransaction } from '@luomus/laji-schema';
 
-import { ToFullUriPipe } from '@kotka/ui/pipes';
+import { ToFullUriPipe } from '@kotka/ui/core';
 
 @Component({
   imports: [ToFullUriPipe],

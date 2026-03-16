@@ -1,6 +1,6 @@
 import { Routes, UrlMatchResult, UrlSegment } from '@angular/router';
 import { SpecimenFormComponent } from './specimen-form/specimen-form.component';
-import { ComponentCanDeactivateGuard, formMatcher, RouteReuseStrategyEnum } from '@kotka/ui/services';
+import { ComponentCanDeactivateGuard, formMatcher, RouteReuseStrategyEnum } from '@kotka/ui/core';
 import { SpecimenTableComponent } from './specimen-table/specimen-table.component';
 import { SpecimenVersionHistoryComponent } from './specimen-version-history/specimen-version-history.component';
 import { NotFoundComponent } from '@kotka/ui/base';

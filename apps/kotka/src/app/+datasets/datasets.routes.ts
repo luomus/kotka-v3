@@ -1,8 +1,7 @@
 import { Routes } from '@angular/router';
 import { DatasetTableComponent } from './dataset-table/dataset-table.component';
 import { DatasetFormComponent } from './dataset-form/dataset-form.component';
-import { formMatcher } from '@kotka/ui/services';
-import { ComponentCanDeactivateGuard } from '@kotka/ui/services';
+import { formMatcher, ComponentCanDeactivateGuard } from '@kotka/ui/core';
 import { DatasetVersionHistoryComponent } from './dataset-version-history/dataset-version-history.component';
 
 export const datasetsRoutes: Routes = [

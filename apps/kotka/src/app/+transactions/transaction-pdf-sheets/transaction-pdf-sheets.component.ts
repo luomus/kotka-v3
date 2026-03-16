@@ -10,15 +10,14 @@ import {
 import { TransactionDispatchSheetComponent } from './transaction-dispatch-sheet/transaction-dispatch-sheet';
 import { SpecimenTransaction } from '@luomus/laji-schema';
 import { TransactionPdfSheetsContextService } from './services/transaction-pdf-sheets-context-service';
-import { PdfTemplateComponent, PdfService, DialogService, Logger } from '@kotka/ui/services';
+import { PdfTemplateComponent, PdfService, DialogService, Logger, OldKotkaUrlPipe } from '@kotka/ui/core';
 import { TransactionIncomingSheetComponent } from './transaction-incoming-sheet/transaction-incoming-sheet';
 import { TransactionInquirySheetComponent } from './transaction-inquiry-sheet/transaction-inquiry-sheet';
 import { TransactionReturnSheetComponent } from './transaction-return-sheet/transaction-return-sheet';
 import { TransactionInsectLabelsComponent } from './transaction-insect-labels/transaction-insect-labels';
 import { Observable, switchMap } from 'rxjs';
 import { TransactionBotanyLabelsComponent } from './transaction-botany-labels/transaction-botany-labels';
-import { SpinnerComponent } from '@kotka/ui/spinner';
-import { OldKotkaUrlPipe } from '@kotka/ui/pipes';
+import { SpinnerComponent } from '@kotka/ui/components';
 
 @Component({
   selector: 'kotka-transaction-pdf-sheets',

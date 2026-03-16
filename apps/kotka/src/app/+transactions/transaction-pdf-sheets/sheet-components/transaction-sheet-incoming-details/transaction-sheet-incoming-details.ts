@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { Organization, SpecimenTransaction } from '@luomus/laji-schema';
 import { CommonModule } from '@angular/common';
 import { TransactionTypeLabelPipe } from '../../pipes/transaction-type-label.pipe';
-import { CapitalizeFirstLetterPipe, ToFullUriPipe } from '@kotka/ui/pipes';
+import { CapitalizeFirstLetterPipe, ToFullUriPipe } from '@kotka/ui/core';
 
 @Component({
   imports: [CommonModule, TransactionTypeLabelPipe, ToFullUriPipe, CapitalizeFirstLetterPipe],

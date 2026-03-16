@@ -13,13 +13,14 @@ import {
   BooleanFloatingFilterComponent,
   AutocompleteFloatingFilterComponent,
   DatatableColumn,
-  DatatableFilter
+  DatatableFilter,
+  DatatableDataService,
+  DocumentDatatableComponent,
 } from '@kotka/ui/datatable';
 import { Organization } from '@luomus/laji-schema';
 import { debounceTime, Subject, Subscription } from 'rxjs';
-import { DatatableDataService, DocumentDatatableComponent } from '@kotka/ui/document-datatable';
 import { KotkaDocumentObjectType } from '@kotka/shared/models';
-import { MainContentComponent } from '@kotka/ui/main-content';
+import { MainContentComponent } from '@kotka/ui/components';
 import { FormsModule } from '@angular/forms';
 
 @Component({

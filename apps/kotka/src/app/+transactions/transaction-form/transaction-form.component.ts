@@ -11,10 +11,9 @@ import {
   isSpecimenTransaction,
 } from '@kotka/shared/models';
 import { Observable, of, Subscription, switchMap } from 'rxjs';
-import { Logger, UserService } from '@kotka/ui/services';
+import { Logger, UserService, ApiClient, FormService } from '@kotka/ui/core';
 import { FormViewComponent } from '@kotka/ui/form-view';
 import { FormMediaMetadata, LajiFormComponent } from '@kotka/ui/laji-form';
-import { ApiClient, FormService } from '@kotka/ui/services';
 import { TransactionFormEmbedService } from '../transaction-form-embed/transaction-form-embed.service';
 import { globals } from '../../../environments/globals';
 import { FormViewContainerComponent } from '@kotka/ui/form-view';

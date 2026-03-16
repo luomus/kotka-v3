@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { ApiClient, FormService } from '@kotka/ui/services';
+import { ApiClient, FormService } from '@kotka/ui/core';
 import { Organization, SpecimenTransaction } from '@luomus/laji-schema';
 import { KotkaDocumentObjectType, LajiForm } from '@kotka/shared/models';
 import { forkJoin, Observable, of } from 'rxjs';

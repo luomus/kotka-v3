@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Directive, HostListener, inject, OnDestroy, signal, ViewChild } from '@angular/core';
-import { ComponentCanDeactivate, DialogService, navigationEnd$ } from '@kotka/ui/services';
+import { ComponentCanDeactivate, DialogService, navigationEnd$ } from '@kotka/ui/core';
 import { from, Observable, of, Subscription } from 'rxjs';
 import { FormViewComponent } from './form-view.component';
 import { ActivatedRoute, Router } from '@angular/router';

@@ -23,13 +23,11 @@ import {
   FormViewFacade
 } from './form-view.facade';
 import { FormViewUtils } from './form-view-utils';
-import { ToastService, DialogService, ApiClient } from '@kotka/ui/services';
-import { MainContentComponent } from '@kotka/ui/main-content';
+import { ToastService, DialogService, ApiClient, LabelPipe } from '@kotka/ui/core';
+import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 import { MetaFieldsComponent } from '../meta-fields/meta-fields.component';
-import { SpinnerComponent } from '@kotka/ui/spinner';
 import { NgTemplateOutlet, TitleCasePipe } from '@angular/common';
-import { LabelPipe } from '@kotka/ui/pipes';
 
 @Component({
   selector: 'kotka-form-view',

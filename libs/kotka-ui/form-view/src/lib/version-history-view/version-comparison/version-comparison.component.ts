@@ -5,7 +5,7 @@ import {
   OnChanges
 } from '@angular/core';
 import { KotkaVersionDifferenceObject, LajiForm, StoreVersion } from '@kotka/shared/models';
-import { SpinnerComponent } from '@kotka/ui/spinner';
+import { SpinnerComponent } from '@kotka/ui/components';
 import { ViewerComponent } from '@kotka/ui/viewer';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';

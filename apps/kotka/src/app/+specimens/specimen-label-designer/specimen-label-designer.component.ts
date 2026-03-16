@@ -9,9 +9,9 @@ import {
 } from '@kotka/ui/label-designer';
 import { globals } from '../../../environments/globals';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { UserService } from '@kotka/ui/services';
+import { UserService } from '@kotka/ui/core';
 import { map, shareReplay, startWith, switchMap } from 'rxjs/operators';
-import { SpinnerComponent } from '@kotka/ui/spinner';
+import { SpinnerComponent } from '@kotka/ui/components';
 import { combineLatest, Observable, of } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { ILabelData, ILabelField } from '@luomus/label-designer';

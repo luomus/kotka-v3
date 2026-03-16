@@ -12,7 +12,7 @@ import { routes } from './app/app.routes';
 import { QuicklinkStrategy } from 'ngx-quicklink';
 import { provideNgxWebstorage, withLocalStorage, withNgxWebstorageConfig } from 'ngx-webstorage';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
-import { ErrorHandlerService, ConsoleLogger, HttpLogger, ILogger, Logger, HttpErrorInterceptor } from '@kotka/ui/services';
+import { ErrorHandlerService, ConsoleLogger, HttpLogger, ILogger, Logger, HttpErrorInterceptor, KotkaRouteReuseStrategy } from '@kotka/ui/core';
 import {
   HTTP_INTERCEPTORS,
   HttpClient,
@@ -20,7 +20,6 @@ import {
   withInterceptorsFromDi
 } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { KotkaRouteReuseStrategy } from '@kotka/ui/services';
 
 if (environment.production) {
   enableProdMode();

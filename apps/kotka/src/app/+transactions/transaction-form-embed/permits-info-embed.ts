@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Observable, of, ReplaySubject, switchMap } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
-import { AbschService, LinkData } from '@kotka/ui/services';
+import { AbschService, LinkData } from '@kotka/ui/core';
 import { CommonModule } from '@angular/common';
 
 @Component({

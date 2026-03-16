@@ -4,10 +4,9 @@ import {
   KotkaDocumentObjectType,
 } from '@kotka/shared/models';
 import { RouterLink } from '@angular/router';
-import { SpinnerComponent } from '@kotka/ui/spinner';
-import { ToFullUriPipe } from '@kotka/ui/pipes';
+import { SpinnerComponent } from '@kotka/ui/components';
+import { ToFullUriPipe, SearchResultIteratorService } from '@kotka/ui/core';
 import { forkJoin, Subscription } from 'rxjs';
-import { SearchResultIteratorService } from '@kotka/ui/services';
 
 interface NavigatorState {
   loading: boolean;

@@ -13,14 +13,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { KotkaDocumentObjectType, KotkaDocumentObjectMap } from '@kotka/shared/models';
 import { isEqual } from 'lodash';
-import { navigationEnd$ } from '@kotka/ui/services';
-import { MainContentComponent } from '@kotka/ui/main-content';
+import { navigationEnd$ } from '@kotka/ui/core';
+import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 import { VersionListComponent } from './version-list/version-list.component';
 import { VersionComponent } from './version/version.component';
 import { VersionComparisonComponent } from './version-comparison/version-comparison.component';
 import { CommonModule } from '@angular/common';
-import { SpinnerComponent } from '@kotka/ui/spinner';
 
 @Component({
   selector: 'kotka-version-history-view',

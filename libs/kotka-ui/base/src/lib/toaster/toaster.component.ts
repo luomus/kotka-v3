@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, TemplateRef, HostBinding, inject } from '@angular/core';
-import { ToastService } from '@kotka/ui/services';
+import { ToastService } from '@kotka/ui/core';
 import { NgbToast } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
 

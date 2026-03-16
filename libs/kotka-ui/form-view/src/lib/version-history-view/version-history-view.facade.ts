@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { ApiClient, FormService, startWithUndefined } from '@kotka/ui/services';
+import { ApiClient, FormService, startWithUndefined } from '@kotka/ui/core';
 import {
   catchError,
   combineLatest,

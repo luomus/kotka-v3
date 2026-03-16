@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Input, TemplateRef } from '@angular
 import { KotkaDocumentObject } from '@kotka/shared/models';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { LabelPipe } from '@kotka/ui/pipes';
+import { LabelPipe } from '@kotka/ui/core';
 
 @Component({
   selector: 'kotka-meta-fields',

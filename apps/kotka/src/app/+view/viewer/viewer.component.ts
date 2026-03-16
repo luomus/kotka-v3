@@ -1,11 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { map, switchMap, startWith, catchError, shareReplay } from 'rxjs/operators';
-import { ApiClient, FormService, UserService } from '@kotka/ui/services';
+import { ApiClient, FormService, UserService, LabelPipe } from '@kotka/ui/core';
 import { getId, allowEditForUser } from '@kotka/shared/utils';
 import { ViewerComponent as UiViewerComponent } from '@kotka/ui/viewer';
 import { AsyncPipe, DatePipe } from '@angular/common';
-import { SpinnerComponent } from '@kotka/ui/spinner';
+import { SpinnerComponent, MainContentComponent } from '@kotka/ui/components';
 import { NgbAlert, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { combineLatest, Observable, of } from 'rxjs';
 import {
@@ -14,9 +14,7 @@ import {
   KotkaDocumentObject,
 } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
-import { MainContentComponent } from '@kotka/ui/main-content';
 import { DocumentNavigatorComponent } from '../../+specimens/document-navigator/document-navigator.component';
-import { LabelPipe } from '@kotka/ui/pipes';
 
 interface FormDataResult {
   value?: LajiForm.JsonForm;

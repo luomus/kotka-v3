@@ -10,10 +10,10 @@ import {
 } from '@kotka/ui/label-designer';
 import { globals } from '../../../environments/globals';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { UserService } from '@kotka/ui/services';
+import { UserService } from '@kotka/ui/core';
 import { map } from 'rxjs/operators';
 import { AsyncPipe } from '@angular/common';
-import { SpinnerComponent } from '@kotka/ui/spinner';
+import { SpinnerComponent } from '@kotka/ui/components';
 
 @Component({
   selector: 'kotka-generic-label-designer',

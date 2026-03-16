@@ -10,7 +10,7 @@ import { FormViewContainerComponent } from '@kotka/ui/form-view';
 import { FormViewComponent } from '@kotka/ui/form-view';
 import {
   UserService
-} from '@kotka/ui/services';
+} from '@kotka/ui/core';
 import { ParamMap, RouterLink } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { NgClass, NgTemplateOutlet } from '@angular/common';

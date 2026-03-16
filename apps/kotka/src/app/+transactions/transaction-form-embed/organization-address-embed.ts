@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { catchError, Observable, of, ReplaySubject, switchMap } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
-import { ApiClient } from '@kotka/ui/services';
+import { ApiClient } from '@kotka/ui/core';
 import { Organization } from '@luomus/laji-schema';
 import { KotkaDocumentObjectType } from '@kotka/shared/models';
 import { CommonModule } from '@angular/common';

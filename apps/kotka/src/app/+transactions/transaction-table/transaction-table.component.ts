@@ -17,13 +17,12 @@ import {
   URICellRendererComponent,
   EnumCellRendererComponent,
   AutocompleteFloatingFilterComponent,
+  DocumentDatatableComponent,
 } from '@kotka/ui/datatable';
-import { FormService } from '@kotka/ui/services';
+import { FormService } from '@kotka/ui/core';
 import { KotkaDocumentObjectType, LajiForm } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
-import { MainContentComponent } from '@kotka/ui/main-content';
-import { SpinnerComponent } from '@kotka/ui/spinner';
-import { DocumentDatatableComponent } from '@kotka/ui/document-datatable';
+import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
 
 
 @Component({

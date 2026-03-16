@@ -5,7 +5,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { map, switchMap } from 'rxjs/operators';
-import { ApiClient } from '@kotka/ui/services';
+import { ApiClient } from '@kotka/ui/core';
 import { KotkaDocumentObjectType } from '@kotka/shared/models';
 import { Observable, combineLatest } from 'rxjs';
 import { TransactionPdfSheetsContextService } from '../+transactions/transaction-pdf-sheets/services/transaction-pdf-sheets-context-service';

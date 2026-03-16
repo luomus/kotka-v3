@@ -2,9 +2,8 @@ import { Component, Input } from '@angular/core';
 import { SpecimenTransaction } from '@luomus/laji-schema';
 import { CommonModule } from '@angular/common';
 import { TransactionInsectShelfSlipContext } from '../services/transaction-pdf-sheets-context-service';
-import { PdfTemplateComponent } from '@kotka/ui/services';
+import { PdfTemplateComponent, CapitalizeFirstLetterPipe, ToFullUriPipe } from '@kotka/ui/core';
 import { TransactionTypeLabelPipe } from '../pipes/transaction-type-label.pipe';
-import { CapitalizeFirstLetterPipe, ToFullUriPipe } from '@kotka/ui/pipes';
 
 interface SpecimenWithinPage {
   id: string;

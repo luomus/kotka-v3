@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { MainContentComponent } from '@kotka/ui/main-content';
+import { MainContentComponent } from '@kotka/ui/components';
 
 @Component({
   selector: 'kotka-not-found',

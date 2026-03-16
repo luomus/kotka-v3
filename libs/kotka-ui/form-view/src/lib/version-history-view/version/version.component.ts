@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { LajiForm, StoreVersion, KotkaDocumentObject } from '@kotka/shared/models';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
-import { SpinnerComponent } from '@kotka/ui/spinner';
+import { SpinnerComponent } from '@kotka/ui/components';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 import { MetaFieldsComponent } from '../../meta-fields/meta-fields.component';
 import { RouterLink } from '@angular/router';

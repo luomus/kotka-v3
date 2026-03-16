@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
-import { UserService } from '@kotka/ui/services';
+import { UserService, OldKotkaUrlPipe } from '@kotka/ui/core';
 import {
   NavigationEnd,
   Router,
@@ -10,7 +10,6 @@ import {
   NgbCollapseModule,
   NgbDropdownModule,
 } from '@ng-bootstrap/ng-bootstrap';
-import { OldKotkaUrlPipe } from '@kotka/ui/pipes';
 import { CommonModule } from '@angular/common';
 
 @Component({

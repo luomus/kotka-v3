@@ -7,21 +7,21 @@ import {
 } from '@angular/core';
 import {
   URICellRendererComponent,
-  DatatableColumn
+  DatatableColumn,
+  DatatableLoadedData,
+  DocumentDatatableComponent,
 } from '@kotka/ui/datatable';
-import { DatatableLoadedData, DocumentDatatableComponent } from '@kotka/ui/document-datatable';
 import { KotkaDocumentObjectType, Document } from '@kotka/shared/models';
-import { MainContentComponent } from '@kotka/ui/main-content';
+import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
 import { FormsModule } from '@angular/forms';
 import {
   ApiClient,
   SearchParams,
   SearchResultIteratorService,
-} from '@kotka/ui/services';
+} from '@kotka/ui/core';
 import { SpecimenLabelDesignerComponent } from '../specimen-label-designer/specimen-label-designer.component';
 import { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
-import { SpinnerComponent } from '@kotka/ui/spinner';
 
 @Component({
   selector: 'kotka-specimen-table',

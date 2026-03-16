@@ -1,5 +1,5 @@
 import { computed, Injectable, OnDestroy, signal, inject } from '@angular/core';
-import { ApiClient, FormService, UserService } from '@kotka/ui/services';
+import { ApiClient, FormService, UserService } from '@kotka/ui/core';
 import {
   catchError,
   concat,

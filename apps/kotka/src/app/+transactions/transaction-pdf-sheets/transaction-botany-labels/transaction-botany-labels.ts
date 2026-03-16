@@ -2,10 +2,9 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { SpecimenTransaction } from '@luomus/laji-schema';
 import { CommonModule } from '@angular/common';
 import { TransactionBotanyShelfSlipContext } from '../services/transaction-pdf-sheets-context-service';
-import { PdfTemplateComponent } from '@kotka/ui/services';
+import { PdfTemplateComponent, ToFullUriPipe } from '@kotka/ui/core';
 import { TransactionTypeLabelPipe } from '../pipes/transaction-type-label.pipe';
 import { QRCodeComponent } from 'angularx-qrcode';
-import { ToFullUriPipe } from '@kotka/ui/pipes';
 
 @Component({
   imports: [

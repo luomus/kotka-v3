@@ -6,7 +6,7 @@ import {
   inject
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { UserService } from '@kotka/ui/services';
+import { UserService } from '@kotka/ui/core';
 import { environment } from '../../../environments/environment';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 

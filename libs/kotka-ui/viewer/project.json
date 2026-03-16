@@ -1,0 +1,21 @@
+{
+  "name": "ui-viewer",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/kotka-ui/viewer/src",
+  "prefix": "kui",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/kotka-ui/viewer/jest.config.ts",
+        "tsConfig": "libs/kotka-ui/viewer/tsconfig.spec.json"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}
