@@ -14,32 +14,34 @@ import { CommonModule } from '@angular/common';
   selector: 'kui-viewer-field',
   template: `
     @if (hasData()) {
-      <div class="row mb-1">
-        <div class="col-sm-3">
-          <label
-          ><strong>{{ label() || field().label }}:</strong></label
-          ><br />
-        </div>
-        <div
-          class="col-sm-9"
-          [ngClass]="{
-            'viewer-field-removed': patch()?.op === 'remove',
-            'viewer-field-added': patch()?.op === 'add',
-          }"
-        >
-          @if (isArrayField()) {
-            <kui-viewer-field-value-array
-              [field]="field()"
-              [data]="patch()?.op === 'add' ? patch()?.value : data()"
-              [patches]="patches()"
-            ></kui-viewer-field-value-array>
-          } @else {
-            <kui-viewer-field-value
-              [field]="field()"
-              [data]="data()"
-              [patch]="patch()"
-            ></kui-viewer-field-value>
-          }
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-3">
+            <label
+              ><strong>{{ label() || field().label }}:</strong></label
+            ><br />
+          </div>
+          <div
+            class="col-sm-9"
+            [ngClass]="{
+              'viewer-field-removed': patch()?.op === 'remove',
+              'viewer-field-added': patch()?.op === 'add',
+            }"
+          >
+            @if (isArrayField()) {
+              <kui-viewer-field-value-array
+                [field]="field()"
+                [data]="patch()?.op === 'add' ? patch()?.value : data()"
+                [patches]="patches()"
+              ></kui-viewer-field-value-array>
+            } @else {
+              <kui-viewer-field-value
+                [field]="field()"
+                [data]="data()"
+                [patch]="patch()"
+              ></kui-viewer-field-value>
+            }
+          </div>
         </div>
       </div>
     }
@@ -58,7 +60,9 @@ export class ViewerFieldComponent {
   data = input<any>();
   differenceData = input<DifferenceObjectValue>();
 
-  isArrayField: Signal<boolean> = computed(() => this.field()?.type === 'collection');
+  isArrayField: Signal<boolean> = computed(
+    () => this.field()?.type === 'collection',
+  );
 
   patch: Signal<Patch | undefined> = computed(() => {
     const data = this.differenceData();

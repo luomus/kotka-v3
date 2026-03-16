@@ -1,16 +1,74 @@
-.viewer-collection-removed, .viewer-fieldset-removed {
-  background-color: rgb(231, 118, 129, 0.2) !important;
-}
-.viewer-collection-added, .viewer-fieldset-added {
-  background-color: rgb(37, 200, 124, 0.2) !important;
-}
+@use "sass:map";
+@import "../../../../../../node_modules/bootstrap/scss/functions";
+@import "../../../../../../node_modules/bootstrap/scss/variables";
+@import "../../../../../../node_modules/bootstrap/scss/mixins";
 
-.viewer-field-removed .viewer-field-value,
-.viewer-field-value.viewer-field-value-removed {
-  background-color: rgb(231, 118, 129, 0.2);
-  text-decoration: line-through;
-}
-.viewer-field-added .viewer-field-value,
-.viewer-field-value.viewer-field-value-added {
-  background-color: rgb(37, 200, 124, 0.2);
+$viewer-diff-removed-bg: rgba(231, 118, 129, 0.2);
+$viewer-diff-added-bg: rgba(37, 200, 124, 0.2);
+
+kui-viewer {
+  kui-viewer-field {
+    .row {
+      border-bottom: 1px solid $gray-100;
+      padding-top: map.get($spacers, 1);
+      padding-bottom: map.get($spacers, 1);
+
+      &:hover {
+        background-color: $gray-100;
+      }
+    }
+  }
+
+  .viewer-collection-item {
+    margin-top: map.get($spacers, 4);
+    margin-bottom: map.get($spacers, 3);
+  }
+
+  .viewer-collection-item-title {
+    border-bottom: 1px solid $border-color;
+    padding-bottom: map.get($spacers, 1);
+    margin-bottom: map.get($spacers, 1);
+    color: $body-secondary-color;
+  }
+
+  .viewer-collection-item-index {
+    font-weight: normal;
+    font-size: $font-size-sm;
+    color: $gray-500;
+  }
+
+  .viewer-fieldset {
+    margin-top: map.get($spacers, 3);
+    margin-bottom: map.get($spacers, 3);
+  }
+
+  .viewer-fieldset-title {
+    border-bottom: 1px solid $gray-200;
+    padding-bottom: map.get($spacers, 1);
+    margin-bottom: map.get($spacers, 1);
+    color: $body-tertiary-color;
+  }
+
+  .viewer-collection-removed, .viewer-fieldset-removed {
+    background-color: $viewer-diff-removed-bg !important;
+    .row:hover {
+      background-color: $viewer-diff-removed-bg !important;
+    }
+  }
+  .viewer-collection-added, .viewer-fieldset-added {
+    background-color: $viewer-diff-added-bg !important;
+    .row:hover {
+      background-color: $viewer-diff-added-bg !important;
+    }
+  }
+
+  .viewer-field-removed .viewer-field-value,
+  .viewer-field-value.viewer-field-value-removed {
+    background-color: $viewer-diff-removed-bg;
+    text-decoration: line-through;
+  }
+  .viewer-field-added .viewer-field-value,
+  .viewer-field-value.viewer-field-value-added {
+    background-color: $viewer-diff-added-bg;
+  }
 }

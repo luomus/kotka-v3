@@ -21,13 +21,13 @@ import { ViewerFieldsetFieldsComponent } from './viewer-fieldset-fields.componen
   template: `
     @if (hasData()) {
       <div
-        class="my-3"
+        class="viewer-fieldset"
         [ngClass]="{
           'viewer-fieldset-removed': patch()?.op === 'remove',
           'viewer-fieldset-added': patch()?.op === 'add',
         }"
       >
-        <h4 class="border-bottom">{{ field().label }}</h4>
+        <h4 class="viewer-fieldset-title">{{ field().label }}</h4>
         <kui-viewer-fieldset-fields
           [fields]="field().fields || []"
           [data]="patch()?.op === 'add' ? patch()?.value : data()"
