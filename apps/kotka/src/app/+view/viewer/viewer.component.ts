@@ -5,7 +5,7 @@ import { ApiClient, FormService, UserService, LabelPipe } from '@kotka/ui/core';
 import { getId, allowEditForUser } from '@kotka/shared/utils';
 import { ViewerComponent as UiViewerComponent } from '@kotka/ui/viewer';
 import { AsyncPipe, DatePipe } from '@angular/common';
-import { SpinnerComponent, MainContentComponent } from '@kotka/ui/components';
+import { SpinnerComponent, MainContentComponent, DocumentNavigatorComponent } from '@kotka/ui/components';
 import { NgbAlert, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { combineLatest, Observable, of } from 'rxjs';
 import {
@@ -14,7 +14,6 @@ import {
   KotkaDocumentObject,
 } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
-import { DocumentNavigatorComponent } from '../../+specimens/document-navigator/document-navigator.component';
 
 interface FormDataResult {
   value?: LajiForm.JsonForm;

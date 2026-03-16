@@ -4,7 +4,7 @@ import {
   KotkaDocumentObjectType,
 } from '@kotka/shared/models';
 import { RouterLink } from '@angular/router';
-import { SpinnerComponent } from '@kotka/ui/components';
+import { SpinnerComponent } from '../spinner/spinner.component';
 import { ToFullUriPipe, SearchResultIteratorService } from '@kotka/ui/core';
 import { forkJoin, Subscription } from 'rxjs';
 
@@ -15,10 +15,42 @@ interface NavigatorState {
 }
 
 @Component({
-  selector: 'kotka-document-navigator',
-  templateUrl: './document-navigator.component.html',
+  selector: 'kui-document-navigator',
+  template: `
+    @if (navigatorState().loading || navigatorState().previousId || navigatorState().nextId) {
+      <kui-spinner [spinning]="navigatorState().loading" [hideContentWhileLoading]="true">
+        <div class="d-flex gap-0 d-sm-block">
+          @if (navigatorState().previousId) {
+            <a
+              class="btn btn-light flex-grow-1 me-1"
+              [routerLink]="buttonRouterLink()"
+              [queryParams]="{ uri: navigatorState().previousId | toFullUri }"
+            >
+              <i class="fa fa-angle-left"></i>
+            </a>
+          } @else {
+            <button class="btn btn-light flex-grow-1 me-1" disabled>
+              <i class="fa fa-angle-left"></i>
+            </button>
+          }
+          @if (navigatorState().nextId) {
+            <a
+              class="btn btn-light flex-grow-1 ms-1"
+              [routerLink]="buttonRouterLink()"
+              [queryParams]="{ uri: navigatorState().nextId | toFullUri }"
+            >
+              <i class="fa fa-angle-right"></i>
+            </a>
+          } @else {
+            <button class="btn btn-light flex-grow-1 ms-1" disabled>
+              <i class="fa fa-angle-right"></i>
+            </button>
+          }
+        </div>
+      </kui-spinner>
+    }
+  `,
   imports: [RouterLink, SpinnerComponent, ToFullUriPipe],
-  styleUrls: ['./document-navigator.component.scss'],
 })
 export class DocumentNavigatorComponent<
   T extends KotkaDocumentObjectType = KotkaDocumentObjectType,
@@ -63,3 +95,4 @@ export class DocumentNavigatorComponent<
     this.navigatorDataSub?.unsubscribe();
   }
 }
+

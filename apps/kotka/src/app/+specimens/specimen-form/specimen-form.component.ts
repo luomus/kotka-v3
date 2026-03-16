@@ -34,7 +34,7 @@ import {
   specimenDataTypeToNameMap as dataTypeToNameMap,
   specimenUrlToDataTypeMap as urlToDataTypeMap,
 } from '@kotka/shared/models';
-import { DocumentNavigatorComponent } from '../document-navigator/document-navigator.component';
+import { DocumentNavigatorComponent } from '@kotka/ui/components';
 
 interface PointCoordinates {
   latitude: string;
