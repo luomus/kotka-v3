@@ -305,7 +305,7 @@ export class ValidationService {
       return this.getError(field, 'Duplicate values found within submitted document.');
     }
 
-    const searchBody = `${storePath}: '${value}'`;
+    const searchBody = `${storePath}: "${value}"`;
 
     const docs = (await lastValueFrom(this.lajiStoreService.getAll<Document>(KotkaDocumentObjectFullType.document, { q: searchBody }))).data;
 
