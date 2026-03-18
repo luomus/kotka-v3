@@ -13,7 +13,7 @@ import { DataOptions, Options } from '@luomus/laji-map';
 @Component({
   selector: 'kui-laji-map',
   imports: [],
-  template: ` <div #lajiMap class="laji-map"></div> `,
+  template: '<div #lajiMap class="laji-map"></div>',
   styleUrls: ['./laji-map.component.scss'],
 })
 export class LajiMapComponent {
