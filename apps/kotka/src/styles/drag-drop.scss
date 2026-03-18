@@ -1,5 +1,4 @@
-@import "variables";
-@import "node_modules/bootstrap/scss/variables";
+@import "../../../../styles/bootstrap";
 
 .cdk-drag-preview {
   z-index: $zindex-modal + 1 !important;

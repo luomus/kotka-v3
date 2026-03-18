@@ -50,5 +50,5 @@ npx nx g mv --projectName <lib name> --newProjectName <new name> --destination <
 
 Generate angular library
 ```
-npx nx g @nx/angular:library --directory libs/kotka-ui/components/label-designer --name ui-label-designer --prefix kui --importPath @kotka/ui/label-designer
+npx nx g @nx/angular:library --directory libs/kotka-ui/label-designer --name ui-label-designer --prefix kui --importPath @kotka/ui/label-designer
 ```

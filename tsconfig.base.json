@@ -27,7 +27,8 @@
       "@kotka/ui/laji-form": ["libs/kotka-ui/laji-form/src/index.ts"],
       "@kotka/ui/core": ["libs/kotka-ui/core/src/index.ts"],
       "@kotka/ui/viewer": ["libs/kotka-ui/viewer/src/index.ts"],
-      "@kotka/ui/label-designer": ["libs/kotka-ui/label-designer/src/index.ts"]
+      "@kotka/ui/label-designer": ["libs/kotka-ui/label-designer/src/index.ts"],
+      "@kotka/ui/laji-map": ["libs/kotka-ui/laji-map/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

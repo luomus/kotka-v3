@@ -1,7 +1,5 @@
 @use "sass:map";
-@import "../../../styles/variables";
-@import "node_modules/bootstrap/scss/functions";
-@import "node_modules/bootstrap/scss/variables";
+@import "../../../../../../styles/bootstrap";
 
 .btn-group-nav {
   .btn {

@@ -1,14 +1,13 @@
 @use "sass:map";
-@import "../../../../../../node_modules/bootstrap/scss/functions";
-@import "../../../../../../node_modules/bootstrap/scss/variables";
-@import "../../../../../../node_modules/bootstrap/scss/mixins";
+@import "../../../../../../styles/bootstrap";
 
 $viewer-diff-removed-bg: rgba(231, 118, 129, 0.2);
 $viewer-diff-added-bg: rgba(37, 200, 124, 0.2);
 
 kui-viewer {
   kui-viewer-field {
-    .row {
+    .viewer-field-row {
+      display: flex;
       border-bottom: 1px solid $gray-100;
       padding-top: map.get($spacers, 1);
       padding-bottom: map.get($spacers, 1);
@@ -17,6 +16,14 @@ kui-viewer {
         background-color: $gray-100;
       }
     }
+  }
+
+  kui-laji-map {
+    display: block;
+    width: 256px;
+    height: 256px;
+    float: right;
+    margin-left: map.get($spacers, 2);
   }
 
   .viewer-collection-item {
@@ -29,6 +36,7 @@ kui-viewer {
     padding-bottom: map.get($spacers, 1);
     margin-bottom: map.get($spacers, 1);
     color: $body-secondary-color;
+    overflow: hidden;
   }
 
   .viewer-collection-item-index {
@@ -47,17 +55,18 @@ kui-viewer {
     padding-bottom: map.get($spacers, 1);
     margin-bottom: map.get($spacers, 1);
     color: $body-tertiary-color;
+    overflow: hidden;
   }
 
   .viewer-collection-removed, .viewer-fieldset-removed {
     background-color: $viewer-diff-removed-bg !important;
-    .row:hover {
+    .viewer-field-row:hover {
       background-color: $viewer-diff-removed-bg !important;
     }
   }
   .viewer-collection-added, .viewer-fieldset-added {
     background-color: $viewer-diff-added-bg !important;
-    .row:hover {
+    .viewer-field-row:hover {
       background-color: $viewer-diff-added-bg !important;
     }
   }
@@ -70,5 +79,46 @@ kui-viewer {
   .viewer-field-added .viewer-field-value,
   .viewer-field-value.viewer-field-value-added {
     background-color: $viewer-diff-added-bg;
+  }
+}
+
+@each $breakpoint-name, $breakpoint-value in $grid-breakpoints {
+  @include media-breakpoint-up($breakpoint-name) {
+    @if $breakpoint-value == 0 {
+      kui-viewer kui-viewer-field .viewer-field-row {
+        flex-wrap: wrap;
+
+        .viewer-field-label, .viewer-field-value {
+          flex: 0 0 100%;
+          max-width: 100%;
+          margin: 0;
+        }
+      }
+    } @else {
+      kui-viewer kui-viewer-field .viewer-field-row {
+        flex-wrap: nowrap;
+
+        .viewer-field-label, .viewer-field-value {
+          margin-left: map.get($spacers, 1);
+          margin-right: map.get($spacers, 1);
+        }
+
+        .viewer-field-label {
+          flex: 0 0 $breakpoint-value * .25;
+          max-width: $breakpoint-value * .25;
+        }
+
+        .viewer-field-value {
+          flex: 1 1 0;
+          min-width: 0;
+        }
+      }
+    }
+  }
+}
+
+@include media-breakpoint-down(md) {
+  kui-viewer kui-laji-map {
+    float: none;
   }
 }
