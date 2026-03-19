@@ -18,6 +18,7 @@ RUN npm ci \
 COPY --chown=node:node ./tsconfig.base.json ./nx.json ./
 COPY --chown=node:node ./apps ./apps
 COPY --chown=node:node ./libs ./libs
+COPY --chown=node:node ./styles ./styles
 
 # Build kotka and kotka-api
 RUN npm run ng -- build kotka-api \
