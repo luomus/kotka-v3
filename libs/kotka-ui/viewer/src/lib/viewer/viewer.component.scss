@@ -88,7 +88,7 @@ kui-viewer {
       kui-viewer kui-viewer-field .viewer-field-row {
         flex-wrap: wrap;
 
-        .viewer-field-label, .viewer-field-value {
+        .viewer-field-label-col, .viewer-field-value-col {
           flex: 0 0 100%;
           max-width: 100%;
           margin: 0;
@@ -98,17 +98,17 @@ kui-viewer {
       kui-viewer kui-viewer-field .viewer-field-row {
         flex-wrap: nowrap;
 
-        .viewer-field-label, .viewer-field-value {
+        .viewer-field-label-col, .viewer-field-value-col {
           margin-left: map.get($spacers, 1);
           margin-right: map.get($spacers, 1);
         }
 
-        .viewer-field-label {
+        .viewer-field-label-col {
           flex: 0 0 $breakpoint-value * .25;
           max-width: $breakpoint-value * .25;
         }
 
-        .viewer-field-value {
+        .viewer-field-value-col {
           flex: 1 1 0;
           min-width: 0;
         }

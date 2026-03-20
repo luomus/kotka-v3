@@ -15,13 +15,13 @@ import { CommonModule } from '@angular/common';
   template: `
     @if (hasData()) {
       <div class="viewer-field-row">
-        <div class="viewer-field-label">
+        <div class="viewer-field-label-col">
           <label
             ><strong>{{ label() || field().label }}:</strong></label
           ><br />
         </div>
         <div
-          class="viewer-field-value"
+          class="viewer-field-value-col"
           [ngClass]="{
             'viewer-field-removed': patch()?.op === 'remove',
             'viewer-field-added': patch()?.op === 'add',
