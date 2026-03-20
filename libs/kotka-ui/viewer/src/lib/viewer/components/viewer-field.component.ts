@@ -14,7 +14,7 @@ import { CommonModule } from '@angular/common';
   selector: 'kui-viewer-field',
   template: `
     @if (hasData()) {
-      <div class="viewer-field-row">
+      <div class="viewer-field-row" [ngClass]="{ 'viewer-verbatim-field-row': isVerbatimField() }">
         <div class="viewer-field-label-col">
           <label
             ><strong>{{ label() || field().label }}:</strong></label
@@ -60,6 +60,9 @@ export class ViewerFieldComponent {
 
   isArrayField: Signal<boolean> = computed(
     () => this.field()?.type === 'collection',
+  );
+  isVerbatimField: Signal<boolean> = computed(
+    () => this.field()?.name.endsWith('Verbatim'),
   );
 
   patch: Signal<Patch | undefined> = computed(() => {
