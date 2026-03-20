@@ -5,7 +5,7 @@ import { Title } from '@angular/platform-browser';
 @Component({
   selector: 'kui-main-content',
   template: `
-    <main [class]="containerClass()">
+    <main [class]="containerClass()" [ngClass]="{ 'with-bottom-margin': hasBottomMargin() }">
       @if (headerTpl() || pageTitle()) {
         <div class="pb-2 mt-4 mb-2 border-bottom">
           @if (headerTpl()) {
@@ -23,10 +23,13 @@ import { Title } from '@angular/platform-browser';
       :host {
         display: block;
       }
+      .with-bottom-margin {
+        margin-bottom: 80px;
+      }
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule]
+  imports: [CommonModule],
 })
 export class MainContentComponent {
   private titleService = inject(Title);
@@ -34,6 +37,7 @@ export class MainContentComponent {
   pageTitle = input.required<string>();
   containerClass = input('container-xl');
   headerTpl = input<TemplateRef<unknown>>();
+  hasBottomMargin = input(false);
 
   constructor() {
     effect(() => {
