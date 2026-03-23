@@ -13,8 +13,10 @@ import {
   Person,
   StorePatch,
   StoreVersion,
+  MediaTypes,
+  MediaMap,
 } from '@kotka/shared/models';
-import { Observable, of, switchMap } from 'rxjs';
+import { Observable, of, switchMap, forkJoin } from 'rxjs';
 import { apiBase, lajiApiBase} from './constants';
 import {
   RangeResult,
@@ -258,6 +260,15 @@ export class ApiClient {
 
   getPerson(id: string): Observable<Person> {
     return this.httpClient.get<Person>(`${lajiApiPath}person/by-id/${id}`);
+  }
+
+  getMedia<T extends MediaTypes, S extends MediaMap[T]>(type: T, id: string): Observable<S> {
+    return this.httpClient.get<S>(`${path}media/${type}/${id}`);
+  }
+
+  getMediaByIds<T extends MediaTypes, S extends MediaMap[T]>(type: T, ids: string[]): Observable<S[]> {
+    if (!ids.length) return of([]);
+    return forkJoin(ids.map(id => this.getMedia<T, S>(type, id)));
   }
 
   getCountryList(page = 1, pageSize = 1000): Observable<PagedResult<Area>> {

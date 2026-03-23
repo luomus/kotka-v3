@@ -1,4 +1,4 @@
-import { Person } from '@luomus/laji-schema';
+import { Image, Pdf, Person } from '@luomus/laji-schema';
 import { HealthCheckResult } from '@nestjs/terminus';
 
 export interface StoreGetQuery {
@@ -26,6 +26,16 @@ export interface StoreQueryResult<T> {
   currentPage: number,
   lastPage: number,
   member: T[]
+}
+
+export enum MediaTypes {
+  pdf = 'pdf',
+  images = 'images'
+}
+
+export interface MediaMap {
+  [MediaTypes.pdf]: Pdf;
+  [MediaTypes.images]: Image;
 }
 
 export enum ErrorMessages {

@@ -8,7 +8,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import FormData from 'form-data';
 import { merge } from 'lodash';
 import { catchError, map } from 'rxjs';
-import { Person, Image, Pdf } from '@kotka/shared/models';
+import { Person, Image, Pdf, MediaTypes } from '@kotka/shared/models';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Multer } from 'multer';
 import { Request, Response } from 'express';
@@ -78,12 +78,6 @@ export type Urls = {
   highDetailModel: string,
 }
 
-export enum MediasEnum {
-  pdf = 'pdf',
-  images = 'images'
-}
-
-export type MediaTypes =  'pdf' | 'images'
 @Injectable()
 export class MediaApiService {
   constructor(
@@ -154,7 +148,7 @@ export class MediaApiService {
   }
 
   findMediaByDocumentId(id: string, type: MediaTypes) {
-    return this.httpService.get<Meta[]>(`${this.urlBase}api/${type}`, {...this.baseConfig, params: { documentIds: id }}).pipe(
+    return this.httpService.get<Media[]>(`${this.urlBase}api/${type}`, {...this.baseConfig, params: { documentIds: id }}).pipe(
       map(res => res.data),
       catchError(e => {
         console.error(e);
@@ -243,7 +237,7 @@ export class MediaApiService {
     }
   }
 
-  metaToMedia<T extends Image | Pdf>(meta: Meta, urls: Urls): T{
+  metaToMedia<T extends Image | Pdf>(meta: Meta, urls: Urls): T {
     return {
       caption: meta.caption,
       documentURI: meta.documentIds,

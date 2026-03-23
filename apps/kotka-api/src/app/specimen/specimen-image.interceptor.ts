@@ -2,12 +2,11 @@
 https://docs.nestjs.com/interceptors#interceptors
 */
 
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
-import { Document } from '@kotka/shared/models';
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import { Document, MediaTypes } from '@kotka/shared/models';
 import { getUri } from '@kotka/shared/utils';
 import { map, mergeMap, Observable } from 'rxjs';
-import { MediaApiService } from '@kotka/api/services';
-import { Meta } from '@kotka/api/services';
+import { Media, MediaApiService } from '@kotka/api/services';
 
 @Injectable()
 export class SpecimenImageInterceptor implements NestInterceptor {
@@ -28,9 +27,9 @@ export class SpecimenImageInterceptor implements NestInterceptor {
         mergeMap((data: Document) => {
           const id = getUri(data.id!);
 
-          return this.mediaApiService.findMediaByDocumentId(id, 'images').pipe(
-            map((meta: Meta[]) => {
-              const images = meta.map(meta => meta.id!).sort();
+          return this.mediaApiService.findMediaByDocumentId(id, MediaTypes.images).pipe(
+            map((media: Media[]) => {
+              const images = media.map(media => media.id!).sort();
 
               if (images) data.images = images;
 

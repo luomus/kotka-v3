@@ -4,11 +4,11 @@ https://docs.nestjs.com/controllers#controllers
 
 import { BadRequestException, Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Req, Res, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
-import { MediaApiService, MediaTypes, NewMediaFile } from '@kotka/api/services';
+import { MediaApiService, NewMediaFile } from '@kotka/api/services';
 import { map } from 'rxjs';
 import { Image, Pdf } from '@luomus/laji-schema';
 import { MediaAccessInterceptor } from '../shared/interceptors/media-access.interceptor';
-import { ErrorMessages } from '@kotka/shared/models';
+import { ErrorMessages, MediaTypes } from '@kotka/shared/models';
 
 @Controller('media')
 @UseGuards(AuthenticateCookieGuard)

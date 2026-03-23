@@ -1,0 +1,10 @@
+@for (image of images(); track image.id; let i = $index) {
+  <div class="image-cell" (click)="openViewer(i)">
+    <img
+      [ngSrc]="image.thumbnailURL"
+      [alt]="image.originalFilename || image.id"
+      fill
+      priority
+    >
+  </div>
+}

@@ -2,12 +2,13 @@
 https://docs.nestjs.com/interceptors#interceptors
 */
 
-import { LajiStoreService, MediaApiService, MediaTypes } from '@kotka/api/services';
+import { LajiStoreService, MediaApiService } from '@kotka/api/services';
 import { Concept, KeyOfUnion, StoreObject } from '@luomus/laji-schema/models';
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable, of } from 'rxjs';
 import { catchError, map, mergeMap, retry } from 'rxjs/operators';
+import { MediaTypes } from '@kotka/shared/models';
 
 const endpointTypes = ['pdf', 'image'] as const;
 type MediaTarget = {[key in KeyOfUnion<StoreObject>]: 'pdf' | 'image'};

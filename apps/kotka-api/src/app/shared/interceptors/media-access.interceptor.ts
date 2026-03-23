@@ -4,8 +4,15 @@ https://docs.nestjs.com/interceptors#interceptors
 
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, HttpException, HttpStatus, InternalServerErrorException } from '@nestjs/common';
 import { Observable, lastValueFrom, map } from 'rxjs';
-import { Pdf, Image, Person, Document, KotkaDocumentObjectFullType } from '@kotka/shared/models';
-import { MediaApiService, MediasEnum, MediaTypes, LajiStoreService } from '@kotka/api/services';
+import {
+  Pdf,
+  Image,
+  Person,
+  Document,
+  KotkaDocumentObjectFullType,
+  MediaTypes,
+} from '@kotka/shared/models';
+import { MediaApiService, LajiStoreService } from '@kotka/api/services';
 import { getId } from '@kotka/shared/utils';
 
 @Injectable()
@@ -65,8 +72,8 @@ export class MediaAccessInterceptor implements NestInterceptor {
 
   canGetMedia(type: MediaTypes, profile: Person, data: Pdf | Image) {
     if (this.canAccessByAdmin(profile)) return;
-    if (type === MediasEnum.images) return;
-    if (type === MediasEnum.pdf && profile.organisation?.includes(data.intellectualOwner)) return;
+    if (type === MediaTypes.images) return;
+    if (type === MediaTypes.pdf && profile.organisation?.includes(data.intellectualOwner)) return;
 
     throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
@@ -74,14 +81,14 @@ export class MediaAccessInterceptor implements NestInterceptor {
   async canDeleteMedia(type: MediaTypes, id: string, profile: Person) {
     if (this.canAccessByAdmin(profile)) return;
 
-    if (type === MediasEnum.images && profile.roleKotka === 'MA.advanced') {
+    if (type === MediaTypes.images && profile.roleKotka === 'MA.advanced') {
       const meta = await this.getOldMetadata(type, id);
       const ids = meta.documentURI!.map(uri => getId(uri));
 
       return await this.canAccessAllDocumentsOrganization(profile, ids);
     }
 
-    if (type === MediasEnum.pdf) {
+    if (type === MediaTypes.pdf) {
       const meta = await this.getOldMetadata(type, id);
 
       if (this.canAccessByOrganization(profile, meta.intellectualOwner)) return;
@@ -95,8 +102,8 @@ export class MediaAccessInterceptor implements NestInterceptor {
 
     const oldMeta = await this.getOldMetadata(type, id);
 
-    if (type === MediasEnum.pdf && this.canAccessByOrganization(profile, oldMeta.intellectualOwner)) { return; }
-    else if (type === MediasEnum.images) {
+    if (type === MediaTypes.pdf && this.canAccessByOrganization(profile, oldMeta.intellectualOwner)) { return; }
+    else if (type === MediaTypes.images) {
       const { all, removed, added } = this.getDiffOfSpecimenIDs((oldMeta as Image).documentURI?.map(uri => getId(uri)), (newMeta as Image).documentURI?.map(uri => getId(uri)));
 
       let docs: Partial<Document>[];
@@ -131,9 +138,9 @@ export class MediaAccessInterceptor implements NestInterceptor {
   }
 
   async canPostMedia(type: MediaTypes, profile: Person, meta: Image | Pdf) {
-    if (type === MediasEnum.pdf && (this.canAccessByAdmin(profile) || this.canAccessByOrganization(profile, meta.intellectualOwner))) { return; }
-    if (type === MediasEnum.images && this.canAccessByAdmin(profile)) { return; }
-    else if (type === MediasEnum.images) {
+    if (type === MediaTypes.pdf && (this.canAccessByAdmin(profile) || this.canAccessByOrganization(profile, meta.intellectualOwner))) { return; }
+    if (type === MediaTypes.images && this.canAccessByAdmin(profile)) { return; }
+    else if (type === MediaTypes.images) {
       const ids = meta.documentURI?.map(id => getId(id));
 
       return await this.canAccessAllDocumentsOrganization(profile, ids);

@@ -30,6 +30,18 @@ kui-viewer {
     margin-left: map.get($spacers, 2);
   }
 
+  kui-image-gallery {
+    width: 256px;
+    float: right;
+    margin-left: map.get($spacers, 2);
+    --gallery-thumbnail-size: 122px;
+    --gallery-thumbnail-gap: 4px;
+  }
+
+  .viewer-collection {
+    clear: both;
+  }
+
   .viewer-collection-item {
     margin-top: map.get($spacers, 4);
     margin-bottom: map.get($spacers, 3);
@@ -122,7 +134,10 @@ kui-viewer {
 }
 
 @include media-breakpoint-down(md) {
-  kui-viewer kui-laji-map {
+  kui-viewer kui-laji-map,
+  kui-viewer kui-image-gallery {
     float: none;
+    width: 100%;
+    margin: 0;
   }
 }

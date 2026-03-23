@@ -42,7 +42,6 @@ export class LajiMapComponent {
   }
 
   initMap(elem: ElementRef, data?: DataOptions, options?: Options) {
-    console.log(options);
     import('@luomus/laji-map').then(({ LajiMap }) => {
       this.zone.runOutsideAngular(() => {
         if (this.map) {

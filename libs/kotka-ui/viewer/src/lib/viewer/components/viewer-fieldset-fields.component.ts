@@ -1,8 +1,16 @@
-import { ChangeDetectionStrategy, Component, computed, input, Signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+  Signal,
+} from '@angular/core';
 import {
   DifferenceObject,
   isPatch,
   LajiForm,
+  MediaTypes,
   Patch,
 } from '@kotka/shared/models';
 import { ViewerFieldsetFieldComponent } from './viewer-fieldset-field.component';
@@ -11,19 +19,28 @@ import { DataOptions, Options, TileLayerName } from '@luomus/laji-map';
 import { Feature } from 'geojson';
 import { GetFeatureStyleOptions } from '@luomus/laji-map/lib/map.defs';
 import { PathOptions } from 'leaflet';
+import { ImageGalleryComponent } from '@kotka/ui/components';
+import { ApiClient } from '@kotka/ui/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { of, switchMap } from 'rxjs';
+import { Image } from '@luomus/laji-schema';
 
 interface ViewModel {
   fields: LajiForm.Field[];
   data?: any;
   differenceData?: DifferenceObject;
   mapData?: DataOptions;
+  imageIds?: string[];
 }
 
-type FeatureDifferenceState = 'current'|'added'|'removed';
+type FeatureDifferenceState = 'current' | 'added' | 'removed';
 
 @Component({
   selector: 'kui-viewer-fieldset-fields',
   template: `
+    @if (images().length) {
+      <kui-image-gallery [images]="images()"></kui-image-gallery>
+    }
     @if (vm().mapData) {
       <kui-laji-map [data]="vm().mapData" [options]="mapOptions"></kui-laji-map>
     }
@@ -37,16 +54,24 @@ type FeatureDifferenceState = 'current'|'added'|'removed';
   `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ViewerFieldsetFieldComponent, LajiMapComponent, LajiMapComponent],
+  imports: [
+    ViewerFieldsetFieldComponent,
+    LajiMapComponent,
+    LajiMapComponent,
+    ImageGalleryComponent,
+  ],
 })
 export class ViewerFieldsetFieldsComponent {
+  private apiClient = inject(ApiClient);
+
   fields = input<LajiForm.Field[]>([]);
   data = input<any>();
   differenceData = input<DifferenceObject>();
 
   vm: Signal<ViewModel> = computed(() => {
     const fields = this.fields().filter(
-      (field) => !['wgs84Longitude', 'wgs84Latitude'].includes(field.name),
+      (field) =>
+        !['wgs84Longitude', 'wgs84Latitude', 'images'].includes(field.name),
     );
 
     return {
@@ -54,14 +79,26 @@ export class ViewerFieldsetFieldsComponent {
       data: this.data(),
       differenceData: this.differenceData(),
       mapData: this.getMapGeometry(this.data(), this.differenceData()),
+      imageIds: this.data()?.images,
     };
   });
+
+  images: Signal<Image[]> = toSignal(
+    toObservable(this.vm).pipe(
+      switchMap((vm) =>
+        vm.imageIds?.length
+          ? this.apiClient.getMediaByIds(MediaTypes.images, vm.imageIds)
+          : of([]),
+      ),
+    ),
+    { initialValue: [] },
+  );
 
   mapOptions: Options = {
     tileLayerName: TileLayerName.openStreetMap,
     zoom: -3,
     center: [0, 0],
-    viewLocked: true
+    viewLocked: true,
   };
 
   private getMapGeometry(
