@@ -1,12 +1,12 @@
 import { Test } from '@nestjs/testing';
 import { createMock } from '@golevelup/ts-jest';
 import { CallHandler, ExecutionContext, } from '@nestjs/common';
-import { ApiServicesModule, LajiStoreService, Media, MediaApiService, MediasEnum } from '@kotka/api/services';
+import { ApiServicesModule, LajiStoreService, Media, MediaApiService } from '@kotka/api/services';
 import { Reflector } from '@nestjs/core';
 import { of, lastValueFrom } from 'rxjs';
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces';
 import { MediaAccessInterceptor } from './media-access.interceptor';
-import { KotkaDocumentObjectFullType } from '@kotka/shared/models';
+import { KotkaDocumentObjectFullType, MediaTypes } from '@kotka/shared/models';
 
 const kotkaAdminUser = {
   role: [''],
@@ -215,7 +215,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'POST',
             params: {
-              type: MediasEnum.pdf,
+              type: MediaTypes.pdf,
             },
             user: {
               profile: adminUser
@@ -239,7 +239,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'POST',
             params: {
-              type: MediasEnum.pdf,
+              type: MediaTypes.pdf,
             },
             user: {
               profile: kotkaAdminUser
@@ -263,7 +263,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'POST',
             params: {
-              type: MediasEnum.pdf,
+              type: MediaTypes.pdf,
             },
             user: {
               profile: MOS2User
@@ -287,7 +287,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'POST',
             params: {
-              type: MediasEnum.pdf,
+              type: MediaTypes.pdf,
             },
             user: {
               profile: MOS1User
@@ -319,7 +319,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'GET',
             params: {
-              type: MediasEnum.pdf,
+              type: MediaTypes.pdf,
               id: 'MM.1'
             },
             user: {
@@ -345,7 +345,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'GET',
             params: {
-              type: MediasEnum.pdf,
+              type: MediaTypes.pdf,
               id: 'MM.1'
             },
             user: {
@@ -371,7 +371,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'GET',
             params: {
-              type: MediasEnum.pdf,
+              type: MediaTypes.pdf,
               id: 'MM.1'
             },
             user: {
@@ -397,7 +397,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'GET',
             params: {
-              type: MediasEnum.pdf,
+              type: MediaTypes.pdf,
               id: 'MM.1'
             },
             user: {
@@ -430,7 +430,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'PUT',
             params: {
-              type: MediasEnum.pdf,
+              type: MediaTypes.pdf,
               id: 'MM.1'
             },
             body: pdfMetadata,
@@ -456,7 +456,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'PUT',
             params: {
-              type: MediasEnum.pdf,
+              type: MediaTypes.pdf,
               id: 'MM.1'
             },
             body: pdfMetadata,
@@ -482,7 +482,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'PUT',
             params: {
-              type: MediasEnum.pdf,
+              type: MediaTypes.pdf,
               id: 'MM.1'
             },
             body: pdfMetadata,
@@ -501,7 +501,7 @@ describe('MediaAccessInterceptor', () => {
 
         expect(mockGetMedia).toHaveBeenCalledTimes(1);
         expect(mockGetMedia.mock.calls[0][0]).toBe('MM.1');
-        expect(mockGetMedia.mock.calls[0][1]).toBe(MediasEnum.pdf);
+        expect(mockGetMedia.mock.calls[0][1]).toBe(MediaTypes.pdf);
         expect(mockNext.handle).toHaveBeenCalledTimes(1);
       });
 
@@ -510,7 +510,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'PUT',
             params: {
-              type: MediasEnum.pdf,
+              type: MediaTypes.pdf,
               id: 'MM.1'
             },
             body: pdfMetadata,
@@ -532,7 +532,7 @@ describe('MediaAccessInterceptor', () => {
           expect(e.message).toBe('Forbidden');
           expect(mockGetMedia).toHaveBeenCalledTimes(1);
           expect(mockGetMedia.mock.calls[0][0]).toBe('MM.1');
-          expect(mockGetMedia.mock.calls[0][1]).toBe(MediasEnum.pdf);
+          expect(mockGetMedia.mock.calls[0][1]).toBe(MediaTypes.pdf);
           expect(mockNext.handle).toHaveBeenCalledTimes(0);
         }
       });
@@ -544,7 +544,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'DELETE',
             params: {
-              type: MediasEnum.pdf,
+              type: MediaTypes.pdf,
               id: 'MM.1'
             },
             user: {
@@ -569,7 +569,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'DELETE',
             params: {
-              type: MediasEnum.pdf,
+              type: MediaTypes.pdf,
               id: 'MM.1'
             },
             user: {
@@ -594,7 +594,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'DELETE',
             params: {
-              type: MediasEnum.pdf,
+              type: MediaTypes.pdf,
               id: 'MM.1'
             },
             user: {
@@ -612,7 +612,7 @@ describe('MediaAccessInterceptor', () => {
 
         expect(mockGetMedia).toHaveBeenCalledTimes(1);
         expect(mockGetMedia.mock.calls[0][0]).toBe('MM.1');
-        expect(mockGetMedia.mock.calls[0][1]).toBe(MediasEnum.pdf);
+        expect(mockGetMedia.mock.calls[0][1]).toBe(MediaTypes.pdf);
         expect(mockNext.handle).toHaveBeenCalledTimes(1);
       });
 
@@ -621,7 +621,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'DELETE',
             params: {
-              type: MediasEnum.pdf,
+              type: MediaTypes.pdf,
               id: 'MM.1'
             },
             user: {
@@ -642,7 +642,7 @@ describe('MediaAccessInterceptor', () => {
           expect(e.message).toBe('Forbidden');
           expect(mockGetMedia).toHaveBeenCalledTimes(1);
           expect(mockGetMedia.mock.calls[0][0]).toBe('MM.1');
-          expect(mockGetMedia.mock.calls[0][1]).toBe(MediasEnum.pdf);
+          expect(mockGetMedia.mock.calls[0][1]).toBe(MediaTypes.pdf);
           expect(mockNext.handle).toHaveBeenCalledTimes(0);
         }
       });
@@ -656,7 +656,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'POST',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
             },
             user: {
               profile: adminUser
@@ -684,7 +684,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'POST',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
             },
             user: {
               profile: adminUser
@@ -712,7 +712,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'POST',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
             },
             user: {
               profile: kotkaAdminUser
@@ -740,7 +740,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'POST',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
             },
             user: {
               profile: kotkaAdminUser
@@ -768,7 +768,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'POST',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
             },
             user: {
               profile: MOS1User
@@ -798,7 +798,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'POST',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
             },
             user: {
               profile: MOS1User
@@ -834,7 +834,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'POST',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
             },
             user: {
               profile: multiOrgUser
@@ -865,7 +865,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'POST',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
             },
             user: {
               profile: MOS1User
@@ -901,7 +901,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'POST',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
             },
             user: {
               profile: MOS4User
@@ -939,7 +939,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'GET',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
             },
             user: {
               profile: adminUser
@@ -969,7 +969,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'GET',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
             },
             user: {
               profile: kotkaAdminUser
@@ -1000,7 +1000,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'GET',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
             },
             user: {
               profile: MOS4User
@@ -1030,7 +1030,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'GET',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
             },
             user: {
               profile: MOS4User
@@ -1062,7 +1062,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'PUT',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
               id: 'MM.1'
             },
             user: {
@@ -1092,7 +1092,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'PUT',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
               id: 'MM.1'
             },
             user: {
@@ -1122,7 +1122,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'PUT',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
               id: 'MM.1'
             },
             user: {
@@ -1152,7 +1152,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'PUT',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
               id: 'MM.1'
             },
             user: {
@@ -1182,7 +1182,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'PUT',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
               id: 'MM.1'
             },
             user: {
@@ -1214,7 +1214,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'PUT',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
               id: 'MM.1'
             },
             user: {
@@ -1246,7 +1246,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'PUT',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
               id: 'MM.1'
             },
             user: {
@@ -1276,7 +1276,7 @@ describe('MediaAccessInterceptor', () => {
           expect(mockGetAll).toHaveBeenCalledTimes(0);
           expect(mockGetMedia).toHaveBeenCalledTimes(1);
           expect(mockGetMedia.mock.calls[0][0]).toBe('MM.1');
-          expect(mockGetMedia.mock.calls[0][1]).toBe(MediasEnum.images);
+          expect(mockGetMedia.mock.calls[0][1]).toBe(MediaTypes.images);
           expect(mockNext.handle).toHaveBeenCalledTimes(0);
         }
       });
@@ -1286,7 +1286,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'PUT',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
               id: 'MM.2'
             },
             user: {
@@ -1316,7 +1316,7 @@ describe('MediaAccessInterceptor', () => {
           expect(mockGetAll.mock.calls[0][1]).toStrictEqual({'fields': 'id,owner', 'q': 'id: "JX.1","JX.2","luomus:JX.3"'});
           expect(mockGetMedia).toHaveBeenCalledTimes(1);
           expect(mockGetMedia.mock.calls[0][0]).toBe('MM.2');
-          expect(mockGetMedia.mock.calls[0][1]).toBe(MediasEnum.images);
+          expect(mockGetMedia.mock.calls[0][1]).toBe(MediaTypes.images);
           expect(mockNext.handle).toHaveBeenCalledTimes(0);
         }
       });
@@ -1326,7 +1326,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'PUT',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
               id: 'MM.1'
             },
             user: {
@@ -1358,7 +1358,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'PUT',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
               id: 'MM.1'
             },
             user: {
@@ -1390,7 +1390,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'PUT',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
               id: 'MM.1'
             },
             user: {
@@ -1420,7 +1420,7 @@ describe('MediaAccessInterceptor', () => {
           expect(mockGetAll.mock.calls[0][1]).toStrictEqual({'fields': 'id,owner', 'q': 'id: "JX.1","JX.2","luomus:JX.3"'});
           expect(mockGetMedia).toHaveBeenCalledTimes(1);
           expect(mockGetMedia.mock.calls[0][0]).toBe('MM.1');
-          expect(mockGetMedia.mock.calls[0][1]).toBe(MediasEnum.images);
+          expect(mockGetMedia.mock.calls[0][1]).toBe(MediaTypes.images);
           expect(mockNext.handle).toHaveBeenCalledTimes(0);
         }
       });
@@ -1430,7 +1430,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'PUT',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
               id: 'MM.1'
             },
             user: {
@@ -1460,7 +1460,7 @@ describe('MediaAccessInterceptor', () => {
           expect(mockGetAll.mock.calls[0][1]).toStrictEqual({'fields': 'id,owner', 'q': 'id: "JX.1","JX.2","luomus:JX.3"'});
           expect(mockGetMedia).toHaveBeenCalledTimes(1);
           expect(mockGetMedia.mock.calls[0][0]).toBe('MM.1');
-          expect(mockGetMedia.mock.calls[0][1]).toBe(MediasEnum.images);
+          expect(mockGetMedia.mock.calls[0][1]).toBe(MediaTypes.images);
           expect(mockNext.handle).toHaveBeenCalledTimes(0);
         }
       });
@@ -1472,7 +1472,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'PUT',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
               id: 'MM.1'
             },
             user: {
@@ -1502,7 +1502,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'DELETE',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
               id: 'MM.1'
             },
             user: {
@@ -1531,7 +1531,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'DELETE',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
               id: 'MM.1'
             },
             user: {
@@ -1560,7 +1560,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'DELETE',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
               id: 'MM.1'
             },
             user: {
@@ -1583,7 +1583,7 @@ describe('MediaAccessInterceptor', () => {
         expect(mockGetAll).toHaveBeenCalledTimes(0);
         expect(mockGetMedia).toHaveBeenCalledTimes(1);
         expect(mockGetMedia.mock.calls[0][0]).toBe('MM.1');
-        expect(mockGetMedia.mock.calls[0][1]).toBe(MediasEnum.images);
+        expect(mockGetMedia.mock.calls[0][1]).toBe(MediaTypes.images);
         expect(mockNext.handle).toHaveBeenCalledTimes(1);
       });
 
@@ -1592,7 +1592,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'DELETE',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
               id: 'MM.1'
             },
             user: {
@@ -1615,7 +1615,7 @@ describe('MediaAccessInterceptor', () => {
         expect(mockGetAll.mock.calls[0][1]).toStrictEqual({'fields': 'id,owner', 'q': 'id: "JX.1","JX.4"'});
         expect(mockGetMedia).toHaveBeenCalledTimes(1);
         expect(mockGetMedia.mock.calls[0][0]).toBe('MM.1');
-        expect(mockGetMedia.mock.calls[0][1]).toBe(MediasEnum.images);
+        expect(mockGetMedia.mock.calls[0][1]).toBe(MediaTypes.images);
         expect(mockNext.handle).toHaveBeenCalledTimes(1);
       });
 
@@ -1624,7 +1624,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'DELETE',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
               id: 'MM.1'
             },
             user: {
@@ -1652,7 +1652,7 @@ describe('MediaAccessInterceptor', () => {
           expect(mockGetAll).toHaveBeenCalledTimes(0);
           expect(mockGetMedia).toHaveBeenCalledTimes(1);
           expect(mockGetMedia.mock.calls[0][0]).toBe('MM.1');
-          expect(mockGetMedia.mock.calls[0][1]).toBe(MediasEnum.images);
+          expect(mockGetMedia.mock.calls[0][1]).toBe(MediaTypes.images);
           expect(mockNext.handle).toHaveBeenCalledTimes(0);
         }
       });
@@ -1662,7 +1662,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'DELETE',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
               id: 'MM.1'
             },
             user: {
@@ -1690,7 +1690,7 @@ describe('MediaAccessInterceptor', () => {
           expect(mockGetAll.mock.calls[0][1]).toStrictEqual({'fields': 'id,owner', 'q': 'id: "JX.1","JX.2","luomus:JX.3"'});
           expect(mockGetMedia).toHaveBeenCalledTimes(1);
           expect(mockGetMedia.mock.calls[0][0]).toBe('MM.1');
-          expect(mockGetMedia.mock.calls[0][1]).toBe(MediasEnum.images);
+          expect(mockGetMedia.mock.calls[0][1]).toBe(MediaTypes.images);
           expect(mockNext.handle).toHaveBeenCalledTimes(0);
         }
       });
@@ -1700,7 +1700,7 @@ describe('MediaAccessInterceptor', () => {
           getRequest: () => ({
             method: 'DELETE',
             params: {
-              type: MediasEnum.images,
+              type: MediaTypes.images,
               id: 'MM.1'
             },
             user: {

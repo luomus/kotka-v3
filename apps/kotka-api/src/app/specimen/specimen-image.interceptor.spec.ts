@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { createMock } from '@golevelup/ts-jest';
 import { CallHandler, ExecutionContext } from '@nestjs/common';
-import { MediaApiService, Meta } from '@kotka/api/services';
+import { Media, MediaApiService } from '@kotka/api/services';
 import { SpecimenImageInterceptor } from './specimen-image.interceptor';
 import { lastValueFrom, of } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
@@ -132,7 +132,7 @@ describe('SpecimenImageIntereptor', () => {
       }
     )});
 
-    const mockMediaFind = jest.spyOn(mediaApiService, 'findMediaByDocumentId').mockImplementation(() => of([{id: 'MM.123'}, {id: 'MM.321'}] as Meta[]));
+    const mockMediaFind = jest.spyOn(mediaApiService, 'findMediaByDocumentId').mockImplementation(() => of([{id: 'MM.123'}, {id: 'MM.321'}] as Media[]));
     const mockNext = createMock<CallHandler>({
       handle: () => of({id: 'tun:JA.123', gatherings: []})
     });
