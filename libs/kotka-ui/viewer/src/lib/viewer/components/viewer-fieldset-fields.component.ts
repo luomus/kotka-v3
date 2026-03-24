@@ -20,7 +20,7 @@ import { Feature } from 'geojson';
 import { GetFeatureStyleOptions } from '@luomus/laji-map/lib/map.defs';
 import { PathOptions } from 'leaflet';
 import { ImageGalleryComponent } from '@kotka/ui/components';
-import { ApiClient } from '@kotka/ui/core';
+import { ApiClient, Logger } from '@kotka/ui/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { of, switchMap } from 'rxjs';
 import { Image } from '@luomus/laji-schema';
@@ -63,6 +63,7 @@ type FeatureDifferenceState = 'current' | 'added' | 'removed';
 })
 export class ViewerFieldsetFieldsComponent {
   private apiClient = inject(ApiClient);
+  private logger = inject(Logger);
 
   fields = input<LajiForm.Field[]>([]);
   data = input<any>();
@@ -73,6 +74,10 @@ export class ViewerFieldsetFieldsComponent {
       (field) =>
         !['wgs84Longitude', 'wgs84Latitude', 'images'].includes(field.name),
     );
+
+    if (this.differenceData()?.['images']) {
+      this.logger.error('Showing differences for images is not implemented');
+    }
 
     return {
       fields,
