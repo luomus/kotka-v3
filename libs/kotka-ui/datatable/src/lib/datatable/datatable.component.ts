@@ -20,7 +20,7 @@ import {
 } from '../models/models';
 import { forkJoin, from, Observable, Subject, takeUntil } from 'rxjs';
 import { ColumnSettingsModalComponent } from '../column-settings-modal/column-settings-modal.component';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DatatableExportService } from '../services/datatable-export.service';
 import { CustomDatepickerComponent } from '../components/custom-datepicker.component';
 import { CellRendererComponent } from '../renderers/cell-renderer';
@@ -109,6 +109,7 @@ export class DatatableComponent implements OnDestroy {
   private filterModel: WritableSignal<DatatableFilter> = signal({}, {equal: isEqual});
 
   private gridApi?: GridApi;
+  private modalRef?: NgbModalRef;
   private isDestroyed = false;
   private unsubscribe$ = new Subject<void>();
 
@@ -149,6 +150,7 @@ export class DatatableComponent implements OnDestroy {
     this.isDestroyed = true;
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+    this.modalRef?.close();
   }
 
   onGridReady(params: GridReadyEvent) {
@@ -175,17 +177,17 @@ export class DatatableComponent implements OnDestroy {
   }
 
   openColumnSettingsModal() {
-    const modalRef = this.modalService.open(ColumnSettingsModalComponent, {
+    this.modalRef = this.modalService.open(ColumnSettingsModalComponent, {
       backdrop: 'static',
       size: 'md',
       modalDialogClass: 'column-settings-modal',
     });
 
-    modalRef.componentInstance.columns = this.allColumns();
-    modalRef.componentInstance.settings = this.columnSettings();
-    modalRef.componentInstance.defaultSettings = this.defaultColumnSettings();
+    this.modalRef.componentInstance.columns = this.allColumns();
+    this.modalRef.componentInstance.settings = this.columnSettings();
+    this.modalRef.componentInstance.defaultSettings = this.defaultColumnSettings();
 
-    from(modalRef.result).subscribe({
+    from(this.modalRef.result).subscribe({
       next: (settings) => {
         this.columnSettings.set(settings);
       },
