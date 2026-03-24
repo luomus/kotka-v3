@@ -6,6 +6,7 @@ import {
   NgZone,
   viewChild,
   effect,
+  OnDestroy,
 } from '@angular/core';
 import { Logger } from '@kotka/ui/core';
 import { DataOptions, Options } from '@luomus/laji-map';
@@ -16,7 +17,7 @@ import { DataOptions, Options } from '@luomus/laji-map';
   template: '<div #lajiMap class="laji-map"></div>',
   styleUrls: ['./laji-map.component.scss'],
 })
-export class LajiMapComponent {
+export class LajiMapComponent implements OnDestroy {
   private zone = inject(NgZone);
   private logger = inject(Logger);
 
@@ -41,12 +42,17 @@ export class LajiMapComponent {
     });
   }
 
+  ngOnDestroy() {
+    this.zone.runOutsideAngular(() => {
+      this.map?.destroy();
+    });
+  }
+
   initMap(elem: ElementRef, data?: DataOptions, options?: Options) {
     import('@luomus/laji-map').then(({ LajiMap }) => {
       this.zone.runOutsideAngular(() => {
-        if (this.map) {
-          this.map.destroy();
-        }
+        this.map?.destroy();
+
         const mapOptions: any = {
           lang: 'en',
           rootElem: elem.nativeElement,
