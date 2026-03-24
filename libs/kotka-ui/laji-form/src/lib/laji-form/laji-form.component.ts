@@ -276,7 +276,7 @@ export class LajiFormComponent<T extends FormData = FormData>
     this.formDestroy.emit();
   }
 
-  private onSubmit(data: T) {
+  private onSubmit(data: { formData: T }) {
     this.ngZone.run(() => {
       this.hasOnlyWarnings = false;
 

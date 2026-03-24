@@ -1,5 +1,5 @@
-import { Component, inject, input } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, inject, input, OnDestroy } from '@angular/core';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ImageViewerModalComponent } from './image-viewer-modal/image-viewer-modal.component';
 import { Image } from '@luomus/laji-schema';
 import { NgOptimizedImage } from '@angular/common';
@@ -10,19 +10,24 @@ import { NgOptimizedImage } from '@angular/common';
   imports: [NgOptimizedImage],
   styleUrls: ['./image-gallery.component.scss'],
 })
-export class ImageGalleryComponent {
+export class ImageGalleryComponent implements OnDestroy {
   images = input<Image[]>([]);
 
   private modalService = inject(NgbModal);
+  private modalRef?: NgbModalRef;
+
+  ngOnDestroy() {
+    this.modalRef?.close();
+  }
 
   openViewer(index: number) {
-    const modalRef = this.modalService.open(ImageViewerModalComponent, {
+   this.modalRef = this.modalService.open(ImageViewerModalComponent, {
       fullscreen: true,
       windowClass: 'semi-transparent-modal',
       backdrop: false,
     });
 
-    modalRef.componentInstance.images.set(this.images());
-    modalRef.componentInstance.currentIndex.set(index);
+    this.modalRef.componentInstance.images.set(this.images());
+    this.modalRef.componentInstance.currentIndex.set(index);
   }
 }

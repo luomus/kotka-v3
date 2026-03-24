@@ -6,3 +6,4 @@ export * from './lib/interceptors';
 export * from './lib/logger';
 export * from './lib/route-reuse-strategy';
 export * from './lib/pipes';
+export * from './lib/variables';

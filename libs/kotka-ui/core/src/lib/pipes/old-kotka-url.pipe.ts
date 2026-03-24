@@ -1,17 +1,12 @@
-import { Pipe, PipeTransform, inject } from '@angular/core';
+import { inject, Pipe, PipeTransform } from '@angular/core';
+import { OLD_KOTKA_URL } from '../variables';
 
 @Pipe({
   name: 'oldKotkaUrl',
   pure: true
 })
 export class OldKotkaUrlPipe implements PipeTransform {
-  private readonly oldKotkaUrl: string;
-
-  constructor() {
-    const oldKotkaUrl = inject<string>('oldKotkaUrl' as any);
-
-    this.oldKotkaUrl = oldKotkaUrl;
-  }
+  private readonly oldKotkaUrl = inject(OLD_KOTKA_URL);
 
   transform(value: string|string[] = ''): string|string[] {
     return this.oldKotkaUrl + value;

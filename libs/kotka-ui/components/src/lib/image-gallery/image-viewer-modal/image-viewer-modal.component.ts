@@ -14,21 +14,31 @@ import {
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Image } from '@luomus/laji-schema';
 import OpenSeadragon from 'openseadragon';
+import { EnumPipe, FormService, GLOBALS, WINDOW } from '@kotka/ui/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'kui-image-viewer-modal',
   templateUrl: './image-viewer-modal.component.html',
   styleUrls: ['./image-viewer-modal.component.scss'],
-  imports: [],
+  imports: [EnumPipe],
 })
 export class ImageViewerModalComponent implements OnInit, OnDestroy {
+  private window = inject(WINDOW);
+  private globals = inject(GLOBALS);
+
   private modal = inject(NgbActiveModal);
   private zone = inject(NgZone);
+  private formService = inject(FormService);
 
   images = signal<Image[]>([]);
   currentIndex = signal(0);
 
   currentImage: Signal<Image | undefined>;
+
+  imageMetadataForm = toSignal(
+    this.formService.getFieldData(this.globals.imageMetadataFormId),
+  );
 
   private viewer: OpenSeadragon.Viewer | null = null;
   private osdContainer = viewChild<ElementRef<HTMLDivElement>>('osdContainer');
@@ -219,22 +229,27 @@ export class ImageViewerModalComponent implements OnInit, OnDestroy {
     });
   }
 
-  private getContentWidthAndHeight(element: HTMLElement | null): { width: number; height: number } {
+  private getContentWidthAndHeight(element: HTMLElement | null): {
+    width: number;
+    height: number;
+  } {
     if (!element) {
       return { width: 0, height: 0 };
     }
 
     const widthWithPaddings = element.clientWidth;
     const heightWithPaddings = element.clientHeight;
-    const elementComputedStyle = window.getComputedStyle(element, null);
+    const elementComputedStyle = this.window.getComputedStyle(element, null);
 
     return {
-      width: widthWithPaddings -
+      width:
+        widthWithPaddings -
         parseFloat(elementComputedStyle.paddingLeft) -
         parseFloat(elementComputedStyle.paddingRight),
-      height: heightWithPaddings -
+      height:
+        heightWithPaddings -
         parseFloat(elementComputedStyle.paddingTop) -
-        parseFloat(elementComputedStyle.paddingBottom)
+        parseFloat(elementComputedStyle.paddingBottom),
     };
   }
 }

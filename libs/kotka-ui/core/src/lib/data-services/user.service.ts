@@ -4,6 +4,7 @@ import { map, tap, distinctUntilChanged, share, take } from 'rxjs/operators';
 import { Person } from '@kotka/shared/models';
 import { apiBase } from './constants';
 import { ApiClient } from './api-client';
+import { WINDOW } from '../variables';
 
 export interface IUserServiceState {
   user: Person | null;
@@ -21,7 +22,7 @@ let _state: IUserServiceState = {
   providedIn: 'root',
 })
 export class UserService {
-  private window = inject<Window>('Window' as any);
+  private window = inject(WINDOW);
   private apiClient = inject(ApiClient);
 
   private store = new BehaviorSubject<IUserServiceState>(_state);

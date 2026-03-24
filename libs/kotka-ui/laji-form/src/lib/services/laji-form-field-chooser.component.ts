@@ -4,7 +4,7 @@ import {
   LajiFormFieldChooserHighlightComponent
 } from './laji-form-field-chooser-highlight.component';
 
-import { DialogService } from '@kotka/ui/core';
+import { DialogService, WINDOW } from '@kotka/ui/core';
 import { LajiForm } from '@kotka/shared/models';
 import { parseSchemaFromFormDataPointer } from '@luomus/laji-form/lib/utils';
 
@@ -65,7 +65,7 @@ const getHighlightElemIdFromSchemaElemId = (schemaElemId: string): string => {
 })
 export class LajiFormFieldChooserComponent implements OnDestroy {
   private document = inject<Document>(DOCUMENT);
-  private window = inject<Window>('Window' as any);
+  private window = inject<Window>(WINDOW);
   private dialogService = inject(DialogService);
 
   form = input<LajiForm.SchemaForm|undefined>(undefined);

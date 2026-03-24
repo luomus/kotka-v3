@@ -4,8 +4,13 @@
       @if (images().length > 1) {
         <span>{{ currentIndex() + 1 }} / {{ images().length }}</span>
       }
-      @if (currentImage()?.intellectualOwner) {
-        <span>&copy; {{ currentImage()?.intellectualOwner }}</span>
+      @if (currentImage(); as currentImage) {
+        <span>
+          <span>{{ currentImage.intellectualOwner }}</span>
+          @if (imageMetadataForm(); as imageMetadataForm) {
+            <span>, {{ currentImage?.intellectualRights | enum: imageMetadataForm['intellectualRights'] }}</span>
+          }
+        </span>
       }
     </div>
     <div class="viewer-controls">

@@ -12,7 +12,18 @@ import { routes } from './app/app.routes';
 import { QuicklinkStrategy } from 'ngx-quicklink';
 import { provideNgxWebstorage, withLocalStorage, withNgxWebstorageConfig } from 'ngx-webstorage';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
-import { ErrorHandlerService, ConsoleLogger, HttpLogger, ILogger, Logger, HttpErrorInterceptor, KotkaRouteReuseStrategy } from '@kotka/ui/core';
+import {
+  ErrorHandlerService,
+  ConsoleLogger,
+  HttpLogger,
+  ILogger,
+  Logger,
+  HttpErrorInterceptor,
+  KotkaRouteReuseStrategy,
+  WINDOW,
+  OLD_KOTKA_URL,
+  GLOBALS,
+} from '@kotka/ui/core';
 import {
   HTTP_INTERCEPTORS,
   HttpClient,
@@ -20,6 +31,7 @@ import {
   withInterceptorsFromDi
 } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { globals } from './environments/globals';
 
 if (environment.production) {
   enableProdMode();
@@ -54,7 +66,8 @@ bootstrapApplication(AppComponent, {
       useClass: HttpErrorInterceptor,
       multi: true
     },
-    { provide: 'Window', useValue: window },
-    { provide: 'oldKotkaUrl', useValue: environment.oldKotkaUrl }
+    { provide: WINDOW, useValue: window },
+    { provide: OLD_KOTKA_URL, useValue: environment.oldKotkaUrl },
+    { provide: GLOBALS, useValue: globals },
   ]
 }).catch(err => console.error(err));
