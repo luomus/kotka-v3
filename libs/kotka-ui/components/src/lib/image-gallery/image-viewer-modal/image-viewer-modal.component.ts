@@ -8,6 +8,8 @@ import {
   computed,
   Signal,
   OnInit,
+  NgZone,
+  HostListener,
 } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Image } from '@luomus/laji-schema';
@@ -21,6 +23,7 @@ import OpenSeadragon from 'openseadragon';
 })
 export class ImageViewerModalComponent implements OnInit, OnDestroy {
   private modal = inject(NgbActiveModal);
+  private zone = inject(NgZone);
 
   images = signal<Image[]>([]);
   currentIndex = signal(0);
@@ -39,7 +42,14 @@ export class ImageViewerModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.viewer?.destroy();
+    this.zone.runOutsideAngular(() => {
+      this.viewer?.destroy();
+    });
+  }
+
+  @HostListener('window:resize', [])
+  onResize() {
+    this.resizeContainer();
   }
 
   prev() {
@@ -61,21 +71,27 @@ export class ImageViewerModalComponent implements OnInit, OnDestroy {
   }
 
   zoomIn() {
-    if (this.viewer?.viewport) {
-      const zoom = this.viewer.viewport.getZoom();
-      this.viewer.viewport.zoomTo(zoom * 1.5);
-    }
+    this.zone.runOutsideAngular(() => {
+      if (this.viewer?.viewport) {
+        const zoom = this.viewer.viewport.getZoom();
+        this.viewer.viewport.zoomTo(zoom * 1.5);
+      }
+    });
   }
 
   zoomOut() {
-    if (this.viewer?.viewport) {
-      const zoom = this.viewer.viewport.getZoom();
-      this.viewer.viewport.zoomTo(zoom / 1.5);
-    }
+    this.zone.runOutsideAngular(() => {
+      if (this.viewer?.viewport) {
+        const zoom = this.viewer.viewport.getZoom();
+        this.viewer.viewport.zoomTo(zoom / 1.5);
+      }
+    });
   }
 
   resetZoom() {
-    this.viewer?.viewport?.goHome();
+    this.zone.runOutsideAngular(() => {
+      this.viewer?.viewport?.goHome();
+    });
   }
 
   close() {
@@ -90,7 +106,9 @@ export class ImageViewerModalComponent implements OnInit, OnDestroy {
 
   onKeydown(event: KeyboardEvent) {
     const activeElement = document.activeElement;
-    const osdCanvasActive = activeElement?.classList?.contains('openseadragon-canvas');
+    const osdCanvasActive = activeElement?.classList?.contains(
+      'openseadragon-canvas',
+    );
 
     switch (event.key) {
       case 'ArrowLeft':
@@ -118,45 +136,105 @@ export class ImageViewerModalComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.viewer = new OpenSeadragon.Viewer({
-      element: container,
-      prefixUrl: '',
-      drawer: 'canvas',
-      showNavigationControl: false,
-      showNavigator: true,
-      navigatorPosition: 'BOTTOM_RIGHT',
-      visibilityRatio: 1,
-      minZoomImageRatio: 0.8,
-      maxZoomPixelRatio: 4,
-      constrainDuringPan: true,
-      animationTime: 0.3,
-      gestureSettingsMouse: {
-        scrollToZoom: true,
-        clickToZoom: true,
-        dblClickToZoom: true,
-      },
-      gestureSettingsTouch: {
-        pinchToZoom: true,
-        clickToZoom: false,
-        dblClickToZoom: true,
-      },
-    });
+    this.zone.runOutsideAngular(() => {
+      this.viewer = new OpenSeadragon.Viewer({
+        element: container,
+        prefixUrl: '',
+        drawer: 'canvas',
+        showNavigationControl: false,
+        showNavigator: true,
+        navigatorPosition: 'BOTTOM_RIGHT',
+        visibilityRatio: 1,
+        minZoomImageRatio: 0.8,
+        maxZoomPixelRatio: 4,
+        constrainDuringPan: true,
+        animationTime: 0.3,
+        gestureSettingsMouse: {
+          scrollToZoom: true,
+          clickToZoom: true,
+          dblClickToZoom: true,
+        },
+        gestureSettingsTouch: {
+          pinchToZoom: true,
+          clickToZoom: false,
+          dblClickToZoom: true,
+        },
+      });
 
-    this.openImage();
+      this.viewer?.world.addHandler('add-item', (event) => {
+        event.item.addOnceHandler('fully-loaded-change', () => {
+          this.resizeContainer();
+          this.viewer?.addOnceHandler(
+            'viewport-change',
+            this.resetZoom.bind(this),
+          );
+        });
+      });
+
+      this.openImage();
+    });
   }
 
   private openImage() {
-    if (!this.viewer) {
-      return;
+    this.zone.runOutsideAngular(() => {
+      if (!this.viewer) {
+        return;
+      }
+
+      this.viewer.close();
+
+      const image = this.currentImage();
+      if (!image) {
+        return;
+      }
+
+      this.viewer.addSimpleImage({ url: image.fullURL });
+    });
+  }
+
+  private resizeContainer() {
+    this.zone.runOutsideAngular(() => {
+      const item = this.viewer?.world.getItemAt(0);
+      const osdContainer = this.osdContainer()?.nativeElement;
+      if (!item || !osdContainer) {
+        return;
+      }
+
+      const { width: maxWidth, height: maxHeight } =
+        this.getContentWidthAndHeight(osdContainer.parentElement);
+
+      const nativeSize = item.getContentSize();
+
+      const scale = Math.min(
+        1,
+        maxWidth / nativeSize.x,
+        maxHeight / nativeSize.y,
+      );
+
+      const targetWidth = Math.round(nativeSize.x * scale);
+      const targetHeight = Math.round(nativeSize.y * scale);
+
+      osdContainer.style.width = `${targetWidth}px`;
+      osdContainer.style.height = `${targetHeight}px`;
+    });
+  }
+
+  private getContentWidthAndHeight(element: HTMLElement | null): { width: number; height: number } {
+    if (!element) {
+      return { width: 0, height: 0 };
     }
 
-    this.viewer.close();
+    const widthWithPaddings = element.clientWidth;
+    const heightWithPaddings = element.clientHeight;
+    const elementComputedStyle = window.getComputedStyle(element, null);
 
-    const image = this.currentImage();
-    if (!image) {
-      return;
-    }
-
-    this.viewer.addSimpleImage({ url: image.fullURL });
+    return {
+      width: widthWithPaddings -
+        parseFloat(elementComputedStyle.paddingLeft) -
+        parseFloat(elementComputedStyle.paddingRight),
+      height: heightWithPaddings -
+        parseFloat(elementComputedStyle.paddingTop) -
+        parseFloat(elementComputedStyle.paddingBottom)
+    };
   }
 }

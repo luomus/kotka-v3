@@ -9,19 +9,19 @@
       }
     </div>
     <div class="viewer-controls">
-      <button class="btn btn-sm btn-outline-light" (click)="zoomIn()" title="Zoom in">
+      <button class="btn btn-outline-light" (click)="zoomIn()" title="Zoom in">
         <i class="fa fa-magnifying-glass-plus"></i>
       </button>
-      <button class="btn btn-sm btn-outline-light" (click)="zoomOut()" title="Zoom out">
+      <button class="btn btn-outline-light" (click)="zoomOut()" title="Zoom out">
         <i class="fa fa-magnifying-glass-minus"></i>
       </button>
-      <button class="btn btn-sm btn-outline-light" (click)="resetZoom()" title="Reset zoom">
+      <button class="btn btn-outline-light" (click)="resetZoom()" title="Reset zoom">
         <i class="fa fa-home"></i>
       </button>
-      <a class="btn btn-sm btn-outline-light ms-2" [href]="currentImage()?.originalURL" [download]="currentImage()?.originalFilename || ''" title="Download file">
+      <a class="btn btn-outline-light ms-2" [href]="currentImage()?.originalURL" [download]="currentImage()?.originalFilename || ''" title="Download file">
         <i class="fa fa-download"></i>
       </a>
-      <button class="btn btn-sm btn-outline-light ms-2" (click)="close()" title="Close">
+      <button class="btn btn-outline-light ms-2" (click)="close()" title="Close">
         <i class="fa fa-xmark"></i>
       </button>
     </div>
