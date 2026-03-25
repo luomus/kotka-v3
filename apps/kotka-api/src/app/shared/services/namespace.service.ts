@@ -15,6 +15,9 @@ export interface NamespaceData {
   namespace_type: SpecimenUrlDataType | 'all' | '',
   qname_prefix: string
 }
+
+export const defaultNamespaceID: string = 'HT';
+
 @Injectable()
 export class NamespaceService {
   constructor (

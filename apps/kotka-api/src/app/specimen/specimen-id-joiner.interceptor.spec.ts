@@ -1,13 +1,17 @@
+import { AxiosResponse } from 'axios';
 import { Test } from '@nestjs/testing';
 import { createMock } from '@golevelup/ts-jest';
 import { CallHandler, ExecutionContext } from '@nestjs/common';
 import { SpecimenIdJoinerInterceptor } from './specimen-id-joiner.interceptor';
 import { NamespaceService } from '../shared/services/namespace.service';
 import { AbschService, LajiApiService, LajiStoreService } from '@kotka/api/services';
+import { of } from 'rxjs';
 
 const mockLajiApiService = jest.mock<LajiApiService>;
-const mockLajiStoreService = jest.mock<LajiStoreService>;
 const mockAbschService = jest.mock<AbschService>;
+const mockLajiStoreService = {
+  getSeqNext: jest.fn().mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data: 33 } as AxiosResponse))
+};
 const mockNamespaceService = {
   getNamespaces: jest.fn().mockImplementation(() => Promise.resolve([{
       namespace_id: 'AA',
@@ -48,6 +52,7 @@ const mockNamespaceService = {
 describe('SpecimenIdJoinerIntereptor', () => {
   let specimenIdJoinerInterceptor: SpecimenIdJoinerInterceptor;
   let namespaceService: NamespaceService;
+  let lajiStoreService: LajiStoreService;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -55,13 +60,14 @@ describe('SpecimenIdJoinerIntereptor', () => {
       controllers: [],
       providers: [SpecimenIdJoinerInterceptor,
       { provide: NamespaceService, useValue: mockNamespaceService },
-      { provide: LajiApiService, useValue: mockLajiApiService },
       { provide: LajiStoreService, useValue: mockLajiStoreService },
+      { provide: LajiApiService, useValue: mockLajiApiService },
       { provide: AbschService, useValue: mockAbschService },
     ],
     }).compile();
 
     namespaceService = moduleRef.get<NamespaceService>(NamespaceService);
+    lajiStoreService = moduleRef.get<LajiStoreService>(LajiStoreService);
     specimenIdJoinerInterceptor = moduleRef.get<SpecimenIdJoinerInterceptor>(SpecimenIdJoinerInterceptor);
   });
 
@@ -306,28 +312,33 @@ describe('SpecimenIdJoinerIntereptor', () => {
     }
   });
 
-  it('If both id-components are missing expect request to pass trough as is',async () => {
+  it('If both id-components are missing expect request a default namespace id to be created',async () => {
     const mockBody = {
       '@type': 'MY.document',
       gatherings: []
     };
 
+    const mockRequest = {
+      method: 'POST',
+      body: mockBody
+    };
+
     const mockContext = createMock<ExecutionContext>({switchToHttp: () => ({
-      getRequest: () => ({
-        method: 'POST',
-        body: mockBody
-      })
+      getRequest: () => (mockRequest)
     })});
 
     const mockNext = createMock<CallHandler>();
+    const mockSequenceRequest = jest.spyOn(lajiStoreService, 'getSeqNext');
 
     await specimenIdJoinerInterceptor.intercept(mockContext, mockNext);
 
     const req = mockContext.switchToHttp().getRequest();
 
-    expect(req).toEqual({method: 'POST', body: mockBody});
+    expect(req).toEqual({method: 'POST', body: { '@type': 'MY.document', gatherings: [], id: 'HT.33' }});
     expect(mockNext.handle).toHaveBeenCalledTimes(1);
     expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(0);
+    expect(mockSequenceRequest).toHaveBeenCalledTimes(1);
+    expect(mockSequenceRequest.mock.calls[0][0]).toEqual('HT');
   });
 
   it('Expect PUT-method to pass trough without errors or modifications',async () => {

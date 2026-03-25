@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
 import { LajiStoreService } from '@kotka/api/services';
-import { lastValueFrom } from 'rxjs';
+import { lastValueFrom, map } from 'rxjs';
 import { ErrorMessages } from '@kotka/shared/models';
 
 @Controller('sequence')
@@ -29,7 +29,7 @@ export class SequenceController {
   async getAccessionNext() {
     const year =  new Date().getFullYear();
     try {
-      const seq = (await lastValueFrom(this.lajiStoreService.getSeqNext(`accession-${year}`, true))).data;
+      const seq = (await lastValueFrom(this.lajiStoreService.getSeqNext(`accession-${year}`, true).pipe(map(res => res.data))));
 
       return `${year}-${seq}`;
     } catch(err) {
@@ -51,7 +51,7 @@ export class SequenceController {
     }
 
     try {
-      const seq = (await lastValueFrom(this.lajiStoreService.getSeqNext(parts[0]))).data;
+      const seq = (await lastValueFrom(this.lajiStoreService.getSeqNext(parts[0]).pipe(map(res => res.data))));
       return `${parts[0]}:${seq}`;
     } catch (err) {
       if (err.status === 404) {

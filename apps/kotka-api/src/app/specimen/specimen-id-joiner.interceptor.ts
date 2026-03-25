@@ -3,14 +3,17 @@ https://docs.nestjs.com/interceptors#interceptors
 */
 
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, HttpException, HttpStatus, InternalServerErrorException } from '@nestjs/common';
-import { Document } from '@kotka/shared/models';
-import { NamespaceService } from '../shared/services/namespace.service';
-import { defaultPrefix } from '@kotka/shared/utils';
+import { Document, Person } from '@kotka/shared/models';
+import { defaultNamespaceID, NamespaceService } from '../shared/services/namespace.service';
+import { acceptedPrefixes, defaultPrefix } from '@kotka/shared/utils';
+import { LajiStoreService } from '@kotka/api/services';
+import { lastValueFrom, map } from 'rxjs';
 
 @Injectable()
 export class SpecimenIdJoinerInterceptor implements NestInterceptor {
   constructor (
     private readonly namespaceService: NamespaceService,
+    private readonly storeService: LajiStoreService
   ) {}
 
   async intercept(context: ExecutionContext, next: CallHandler): Promise<any> {
@@ -23,6 +26,9 @@ export class SpecimenIdJoinerInterceptor implements NestInterceptor {
     const {namespaceID, objectID, ...body} = req.body as (Document & { namespaceID: string, objectID: string });
 
     if (!namespaceID && !objectID) {
+      const sequence = await lastValueFrom(this.storeService.getSeqNext(defaultNamespaceID).pipe(map(res => res.data)));
+
+      req.body = { ...body, id: `${defaultNamespaceID}.${sequence}` };
       return next.handle();
     }
 

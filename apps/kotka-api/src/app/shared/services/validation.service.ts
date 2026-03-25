@@ -7,7 +7,7 @@ import { CoordinateLocationResponse, KotkaDocumentObjectFullType, SpecimenDataTy
 import { Dataset, Document, StoreObject } from '@luomus/laji-schema';
 import { Injectable } from '@nestjs/common';
 import { lastValueFrom, map } from 'rxjs';
-import { NamespaceData, NamespaceService } from './namespace.service';
+import { defaultNamespaceID, NamespaceData, NamespaceService } from './namespace.service';
 import { acceptedPrefixes, convertCoordinatesToWGS84, defaultPrefix, JSONPathAllResponse, parseJSONPointer, parseStoreSearchPath } from '@kotka/shared/utils';
 import { GeometryCollection } from 'geojson';
 import { JSONPath } from 'jsonpath-plus';
@@ -129,6 +129,10 @@ export class ValidationService {
 
     if (namespaceID.includes(':')) {
       [ prefix, namespaceID ] = namespaceID.split(':');
+    }
+
+    if (namespaceID === defaultNamespaceID) {
+      return this.getError(field, `Namespace ${defaultNamespaceID} is default and should not be used explicitly.`);
     }
 
     const datatype = data.datatype;

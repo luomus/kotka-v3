@@ -5,7 +5,7 @@ import { ValidatorInterceptor } from './validator.interceptor';
 import { ApiServicesModule, FormService, LajiStoreService } from '@kotka/api/services';
 import { Reflector } from '@nestjs/core';
 import { ValidationService } from '../services/validation.service';
-import { NamespaceService } from '../services/namespace.service';
+import { defaultNamespaceID, NamespaceService } from '../services/namespace.service';
 import { of } from 'rxjs';
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces';
 import { LajiApiService } from '@kotka/api/services';
@@ -661,6 +661,34 @@ describe('ValidationInterceptor', () => {
       } catch (e) {
         expect(namespaceService.getNamespaces).toBeCalledTimes(1);
         expect(e.options).toEqual({namespaceID:{errors:['Namespace "AC" is not allowed for specimen of type "zoospecimen".']}});
+        expect(mockNext.handle).toBeCalledTimes(0);
+      }
+    });
+
+    it('Explicit default namespace causes validation error', async () => {
+      const mockBody = {
+        namespaceID: defaultNamespaceID,
+        objectID: '123',
+        datatype: 'zoospecimen',
+        gatherings: []
+      };
+      const mockRequest = {
+        method: 'POST',
+        body: mockBody
+      };
+
+      const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+        getRequest: () => mockRequest
+      })});
+
+      const mockNext = createMock<CallHandler>();
+      expect.assertions(3);
+
+      try {
+        await validatorInterceptor.intercept(mockContext, mockNext);
+      } catch (e) {
+        expect(namespaceService.getNamespaces).toBeCalledTimes(0);
+        expect(e.options).toEqual({namespaceID:{errors:[`Namespace ${defaultNamespaceID} is default and should not be used explicitly.`]}});
         expect(mockNext.handle).toBeCalledTimes(0);
       }
     });
