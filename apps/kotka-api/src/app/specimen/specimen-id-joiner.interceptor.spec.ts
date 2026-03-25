@@ -91,6 +91,7 @@ describe('SpecimenIdJoinerIntereptor', () => {
     })});
 
     const mockNext = createMock<CallHandler>();
+    const mockSequenceRequest = jest.spyOn(lajiStoreService, 'getSeqNext');
 
     await specimenIdJoinerInterceptor.intercept(mockContext, mockNext);
 
@@ -98,6 +99,7 @@ describe('SpecimenIdJoinerIntereptor', () => {
     expect(req).toEqual({method: 'POST', body: { id: 'utu:AB.123', gatherings: [] }});
     expect(mockNext.handle).toHaveBeenCalledTimes(1);
     expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(1);
+    expect(mockSequenceRequest).toHaveBeenCalledTimes(0);
   });
 
   it('tun-prefix gets removed from id', async () => {
@@ -116,6 +118,7 @@ describe('SpecimenIdJoinerIntereptor', () => {
     })});
 
     const mockNext = createMock<CallHandler>();
+    const mockSequenceRequest = jest.spyOn(lajiStoreService, 'getSeqNext');
 
     await specimenIdJoinerInterceptor.intercept(mockContext, mockNext);
 
@@ -123,6 +126,7 @@ describe('SpecimenIdJoinerIntereptor', () => {
     expect(req).toEqual({method: 'POST', body: { id: 'AA.123', gatherings: [] }});
     expect(mockNext.handle).toHaveBeenCalledTimes(1);
     expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(1);
+    expect(mockSequenceRequest).toHaveBeenCalledTimes(0);
   });
 
   it('If namespaces has no default namespace add nothing to final id', async () => {
@@ -142,6 +146,7 @@ describe('SpecimenIdJoinerIntereptor', () => {
     })});
 
     const mockNext = createMock<CallHandler>();
+    const mockSequenceRequest = jest.spyOn(lajiStoreService, 'getSeqNext');
 
     await specimenIdJoinerInterceptor.intercept(mockContext, mockNext);
 
@@ -150,6 +155,7 @@ describe('SpecimenIdJoinerIntereptor', () => {
     expect(req).toEqual({method: 'POST', body: { id: 'AA.123', gatherings: [] }});
     expect(mockNext.handle).toHaveBeenCalledTimes(1);
     expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(1);
+    expect(mockSequenceRequest).toHaveBeenCalledTimes(0);
   });
 
       it('If namespaces has default tun-prefix add nothing to final id', async () => {
@@ -169,6 +175,7 @@ describe('SpecimenIdJoinerIntereptor', () => {
     })});
 
     const mockNext = createMock<CallHandler>();
+    const mockSequenceRequest = jest.spyOn(lajiStoreService, 'getSeqNext');
 
     await specimenIdJoinerInterceptor.intercept(mockContext, mockNext);
 
@@ -177,6 +184,7 @@ describe('SpecimenIdJoinerIntereptor', () => {
     expect(req).toEqual({method: 'POST', body: { id: 'AE.123', gatherings: [] }});
     expect(mockNext.handle).toHaveBeenCalledTimes(1);
     expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(1);
+    expect(mockSequenceRequest).toHaveBeenCalledTimes(0);
   });
 
   it('If namespaces has "all" and no prefix dont add the default prefix', async () => {
@@ -196,6 +204,7 @@ describe('SpecimenIdJoinerIntereptor', () => {
     })});
 
     const mockNext = createMock<CallHandler>();
+    const mockSequenceRequest = jest.spyOn(lajiStoreService, 'getSeqNext');
 
     await specimenIdJoinerInterceptor.intercept(mockContext, mockNext);
 
@@ -204,6 +213,7 @@ describe('SpecimenIdJoinerIntereptor', () => {
     expect(req).toEqual({method: 'POST', body: { id: 'AD.123', gatherings: [] }});
     expect(mockNext.handle).toHaveBeenCalledTimes(1);
     expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(1);
+    expect(mockSequenceRequest).toHaveBeenCalledTimes(0);
   });
 
   it('If namespaceID has a default prefix other than "all" or "tun" but none in namespaceID expect it to be added', async () => {
@@ -223,6 +233,7 @@ describe('SpecimenIdJoinerIntereptor', () => {
     })});
 
     const mockNext = createMock<CallHandler>();
+    const mockSequenceRequest = jest.spyOn(lajiStoreService, 'getSeqNext');
 
     await specimenIdJoinerInterceptor.intercept(mockContext, mockNext);
 
@@ -231,6 +242,7 @@ describe('SpecimenIdJoinerIntereptor', () => {
     expect(req).toEqual({method: 'POST', body: { id: 'utu:AB.123', gatherings: [] }});
     expect(mockNext.handle).toHaveBeenCalledTimes(1);
     expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(1);
+    expect(mockSequenceRequest).toHaveBeenCalledTimes(0);
   });
 
   it('If namespace has default prefix all allow adding anything', async () => {
@@ -250,6 +262,7 @@ describe('SpecimenIdJoinerIntereptor', () => {
     })});
 
     const mockNext = createMock<CallHandler>();
+    const mockSequenceRequest = jest.spyOn(lajiStoreService, 'getSeqNext');
 
     await specimenIdJoinerInterceptor.intercept(mockContext, mockNext);
 
@@ -258,6 +271,7 @@ describe('SpecimenIdJoinerIntereptor', () => {
     expect(req).toEqual({method: 'POST', body: { id: 'utu:AD.123', gatherings: [] }});
     expect(mockNext.handle).toHaveBeenCalledTimes(1);
     expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(1);
+    expect(mockSequenceRequest).toHaveBeenCalledTimes(0);
   });
 
   it('If objectID is missing expect thrown bad request error',async () => {
@@ -276,14 +290,16 @@ describe('SpecimenIdJoinerIntereptor', () => {
     })});
 
     const mockNext = createMock<CallHandler>();
+    const mockSequenceRequest = jest.spyOn(lajiStoreService, 'getSeqNext');
 
-    expect.assertions(3);
+    expect.assertions(4);
     try {
       await specimenIdJoinerInterceptor.intercept(mockContext, mockNext);
     } catch (e) {
       expect(e.message).toEqual('objectID must be set if namespaceID is set');
       expect(mockNext.handle).toHaveBeenCalledTimes(0);
       expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(0);
+      expect(mockSequenceRequest).toHaveBeenCalledTimes(0);
     }
   });
 
@@ -301,14 +317,16 @@ describe('SpecimenIdJoinerIntereptor', () => {
     })});
 
     const mockNext = createMock<CallHandler>();
+    const mockSequenceRequest = jest.spyOn(lajiStoreService, 'getSeqNext');
 
-    expect.assertions(3);
+    expect.assertions(4);
     try {
       await specimenIdJoinerInterceptor.intercept(mockContext, mockNext);
     } catch (e) {
       expect(e.message).toEqual('namespaceID must be set if objectID is set');
       expect(mockNext.handle).toHaveBeenCalledTimes(0);
       expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(0);
+      expect(mockSequenceRequest).toHaveBeenCalledTimes(0);
     }
   });
 
@@ -356,6 +374,7 @@ describe('SpecimenIdJoinerIntereptor', () => {
     })});
 
     const mockNext = createMock<CallHandler>();
+    const mockSequenceRequest = jest.spyOn(lajiStoreService, 'getSeqNext');
 
     await specimenIdJoinerInterceptor.intercept(mockContext, mockNext);
 
@@ -364,6 +383,7 @@ describe('SpecimenIdJoinerIntereptor', () => {
     expect(req).toEqual({method: 'PUT', params: { id: 'JA.1' }, body: mockBody});
     expect(mockNext.handle).toHaveBeenCalledTimes(1);
     expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(0);
+    expect(mockSequenceRequest).toHaveBeenCalledTimes(0);
   });
 
   it('Expect GET-method to pass trough without errors',async () => {
@@ -375,6 +395,7 @@ describe('SpecimenIdJoinerIntereptor', () => {
     })});
 
     const mockNext = createMock<CallHandler>();
+    const mockSequenceRequest = jest.spyOn(lajiStoreService, 'getSeqNext');
 
     await specimenIdJoinerInterceptor.intercept(mockContext, mockNext);
 
@@ -383,5 +404,6 @@ describe('SpecimenIdJoinerIntereptor', () => {
     expect(req).toEqual({method: 'GET', params: { id: 'JA.1' }});
     expect(mockNext.handle).toHaveBeenCalledTimes(1);
     expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(0);
+    expect(mockSequenceRequest).toHaveBeenCalledTimes(0);
   });
 });
