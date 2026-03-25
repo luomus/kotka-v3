@@ -16,7 +16,7 @@ export interface NamespaceData {
   qname_prefix: string
 }
 
-export const defaultNamespaceID: string = 'HT';
+export const defaultNamespaceID = 'HT';
 
 @Injectable()
 export class NamespaceService {
