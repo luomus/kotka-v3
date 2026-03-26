@@ -15,6 +15,7 @@ import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.gu
 import { LajiStoreService } from '@kotka/api/services';
 import { lastValueFrom, map } from 'rxjs';
 import { ErrorMessages } from '@kotka/shared/models';
+import { defaultNamespaceID } from '../shared/services/namespace.service';
 
 @Controller('sequence')
 @UseGuards(
@@ -48,6 +49,10 @@ export class SequenceController {
 
     if (parts.length === 1 || !parts[0] || (parts.length > 1 && !!parts[1])) {
       throw new BadRequestException(ErrorMessages.invalidSequenceValueFormat);
+    }
+
+    if(parts[0].startsWith('accession-') && parts[0] === defaultNamespaceID) {
+      throw new BadRequestException(ErrorMessages.protectedSequncePrefix);
     }
 
     try {

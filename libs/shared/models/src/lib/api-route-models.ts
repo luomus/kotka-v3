@@ -42,8 +42,10 @@ export enum ErrorMessages {
   deletionTargetInUse = 'Deletion target is in use.',
   missingIntellectualOwner = 'Missing an intellectualOwner',
   loginRequired = 'Login is required',
+  authTokenReuqired = 'Authentication token required',
   uniqueIDRequired = 'Object must have an unique id, but given exists already.',
-  invalidSequenceValueFormat = 'Invalid value format'
+  invalidSequenceValueFormat = 'Invalid value format',
+  protectedSequncePrefix = 'Given sequence is for internal use only',
 }
 
 export interface LoginResult {
