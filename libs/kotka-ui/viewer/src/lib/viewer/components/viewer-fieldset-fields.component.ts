@@ -14,8 +14,8 @@ import {
   Patch,
 } from '@kotka/shared/models';
 import { ViewerFieldsetFieldComponent } from './viewer-fieldset-field.component';
-import { LajiMapComponent } from '@kotka/ui/laji-map';
-import { DataOptions, Options, TileLayerName } from '@luomus/laji-map';
+import { ViewerMapComponent } from '@kotka/ui/laji-map';
+import { DataOptions } from '@luomus/laji-map';
 import { Feature } from 'geojson';
 import { GetFeatureStyleOptions } from '@luomus/laji-map/lib/map.defs';
 import { PathOptions } from 'leaflet';
@@ -42,7 +42,7 @@ type FeatureDifferenceState = 'current' | 'added' | 'removed';
       <kui-image-gallery [images]="images()"></kui-image-gallery>
     }
     @if (vm().mapData) {
-      <kui-laji-map [data]="vm().mapData" [options]="mapOptions"></kui-laji-map>
+      <kui-viewer-map [data]="vm().mapData"></kui-viewer-map>
     }
     @for (field of vm().fields; track field) {
       <kui-viewer-fieldset-field
@@ -56,9 +56,8 @@ type FeatureDifferenceState = 'current' | 'added' | 'removed';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ViewerFieldsetFieldComponent,
-    LajiMapComponent,
-    LajiMapComponent,
     ImageGalleryComponent,
+    ViewerMapComponent,
   ],
 })
 export class ViewerFieldsetFieldsComponent {
@@ -98,13 +97,6 @@ export class ViewerFieldsetFieldsComponent {
     ),
     { initialValue: [] },
   );
-
-  mapOptions: Options = {
-    tileLayerName: TileLayerName.openStreetMap,
-    zoom: -3,
-    center: [0, 0],
-    viewLocked: true,
-  };
 
   private getMapGeometry(
     data: any,

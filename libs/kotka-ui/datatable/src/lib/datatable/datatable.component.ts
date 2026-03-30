@@ -180,7 +180,7 @@ export class DatatableComponent implements OnDestroy {
     this.modalRef = this.modalService.open(ColumnSettingsModalComponent, {
       backdrop: 'static',
       size: 'md',
-      modalDialogClass: 'column-settings-modal',
+      modalDialogClass: 'scrollable-modal column-settings-modal',
     });
 
     this.modalRef.componentInstance.columns = this.allColumns();
