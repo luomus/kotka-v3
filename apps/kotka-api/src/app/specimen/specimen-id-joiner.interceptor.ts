@@ -19,7 +19,7 @@ export class SpecimenIdJoinerInterceptor implements NestInterceptor {
   async intercept(context: ExecutionContext, next: CallHandler): Promise<any> {
     const req = context.switchToHttp().getRequest();
 
-    if (req.method !== 'POST') {
+    if (req.method !== 'POST' || req.path?.endsWith('_search')) {
       return next.handle();
     }
 

@@ -406,4 +406,31 @@ describe('SpecimenIdJoinerIntereptor', () => {
     expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(0);
     expect(mockSequenceRequest).toHaveBeenCalledTimes(0);
   });
+
+  it('Expect POST-method to pass trough without errors or modifications if the path ends with _search', async () => {
+    const mockBody = {
+      search_after: ['2026-03-28T15:14:01.742Z', 'jx.123']
+    };
+    const mockRequest = {
+      method: 'POST',
+      path: '/_search',
+      body: mockBody,
+    };
+    const mockContext = createMock<ExecutionContext>({
+      switchToHttp: () => ({
+        getRequest: () => mockRequest,
+      }),
+    });
+
+    const mockNext = createMock<CallHandler>();
+    const mockSequenceRequest = jest.spyOn(lajiStoreService, 'getSeqNext');
+
+    await specimenIdJoinerInterceptor.intercept(mockContext, mockNext);
+
+    const req = mockContext.switchToHttp().getRequest();
+    expect(req).toEqual(mockRequest);
+    expect(mockNext.handle).toHaveBeenCalledTimes(1);
+    expect(namespaceService.getNamespaces).toHaveBeenCalledTimes(0);
+    expect(mockSequenceRequest).toHaveBeenCalledTimes(0);
+  });
 });
