@@ -29,7 +29,7 @@ interface DocumentDataResult {
 
 interface ViewModel {
   document?: KotkaDocumentObject;
-  form?: LajiForm.JsonForm;
+  fields?: LajiForm.Field[];
   uri?: string;
   showEditButton?: boolean;
   loading: boolean;
@@ -61,8 +61,6 @@ export class ViewerComponent {
 
   dataType = KotkaDocumentObjectType.specimen;
   uri$ = this.route.queryParams.pipe(map((params) => params['uri']));
-
-  ignoreFields: string[] = ['datatype', 'editor', 'dateEdited', 'creator', 'dateCreated', 'owner'];
 
   formData$: Observable<FormDataResult> = this.formService
     .getFormInJsonFormat(globals.specimenFormId)
@@ -112,7 +110,7 @@ export class ViewerComponent {
       const error = formData.error || documentData.error;
 
       return {
-        form: formData.value,
+        fields: formData.value && this.getFields(formData.value.fields),
         document: documentData.value,
         uri,
         showEditButton:
@@ -123,4 +121,8 @@ export class ViewerComponent {
     }),
     startWith({ loading: true }),
   );
+
+  private getFields(fields: LajiForm.Field[]): LajiForm.Field[] {
+    return fields.filter(field => !['datatype', 'owner'].includes(field.name));
+  }
 }

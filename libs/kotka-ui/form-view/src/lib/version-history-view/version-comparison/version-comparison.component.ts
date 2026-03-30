@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Input,
-  OnChanges
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, Signal } from '@angular/core';
 import { KotkaVersionDifferenceObject, LajiForm, StoreVersion } from '@kotka/shared/models';
 import { SpinnerComponent } from '@kotka/ui/components';
 import { ViewerComponent } from '@kotka/ui/viewer';
@@ -17,34 +12,101 @@ import { CommonModule } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, SpinnerComponent, ViewerComponent, RouterLink],
 })
-export class VersionComparisonComponent implements OnChanges {
-  @Input() versions?: number[];
-  @Input() versionList?: StoreVersion[];
+export class VersionComparisonComponent {
+  versions = input<number[] | undefined>(undefined);
+  versionList = input<StoreVersion[] | undefined>(undefined);
+  form = input<LajiForm.JsonForm | undefined>(undefined);
+  data = input<KotkaVersionDifferenceObject | undefined>(undefined);
 
-  @Input() form?: LajiForm.JsonForm;
-  @Input() data?: KotkaVersionDifferenceObject;
+  fields: Signal<LajiForm.Field[] | undefined>;
+  versionData: Signal<StoreVersion[] | undefined>;
+  previousVersion: Signal<number | undefined>;
+  nextVersion: Signal<number | undefined>;
 
-  versionData?: StoreVersion[];
-  previousVersion?: number;
-  nextVersion?: number;
+  private versionIndices: Signal<number[] | undefined>;
 
-  ngOnChanges() {
-    if (this.versions && this.versionList) {
-      const idx1 = this.versionList.findIndex(
-        (val) => val.version === this.versions?.[0],
-      );
-      const idx2 = this.versionList.findIndex(
-        (val) => val.version === this.versions?.[1],
-      );
+  private metaFields: LajiForm.Field[] = [
+    {
+      name: 'editor',
+      label: 'Editor',
+      type: 'text',
+    },
+    {
+      name: 'dateEdited',
+      label: 'Date edited',
+      type: 'text',
+    },
+    {
+      name: 'creator',
+      label: 'Creator',
+      type: 'text',
+    },
+    {
+      name: 'dateCreated',
+      label: 'Date created',
+      type: 'text',
+    },
+  ];
 
-      this.previousVersion =
-        idx1 > 0 ? this.versionList[idx1 - 1].version : undefined;
-      this.nextVersion =
-        idx2 !== this.versionList.length - 1
-          ? this.versionList[idx2 + 1].version
-          : undefined;
+  constructor() {
+    this.fields = computed(() => {
+      const form = this.form();
 
-      this.versionData = [this.versionList[idx1], this.versionList[idx2]];
-    }
+      if (form) {
+        return [...this.metaFields, ...form.fields];
+      }
+
+      return undefined;
+    });
+
+    this.versionData = computed(() => {
+      const versionList = this.versionList();
+      const indices = this.versionIndices();
+
+      if (versionList && indices) {
+        return [versionList[indices[0]], versionList[indices[1]]];
+      }
+
+      return undefined;
+    });
+
+    this.previousVersion = computed(() => {
+      const versionList = this.versionList();
+      const indices = this.versionIndices();
+
+      if (versionList && indices && indices[0] > 0) {
+        return versionList[indices[0] - 1].version;
+      }
+
+      return undefined;
+    });
+
+    this.nextVersion = computed(() => {
+      const versionList = this.versionList();
+      const indices = this.versionIndices();
+
+      if (versionList && indices && indices[1] < versionList.length - 1) {
+        return versionList[indices[1] + 1].version;
+      }
+
+      return undefined;
+    });
+
+    this.versionIndices = computed(() => {
+      const versions = this.versions();
+      const versionList = this.versionList();
+
+      if (versions && versionList) {
+        const idx1 = versionList.findIndex(
+          (val) => val.version === versions[0],
+        );
+        const idx2 = versionList.findIndex(
+          (val) => val.version === versions[1],
+        );
+        return [idx1, idx2];
+      }
+
+      return undefined;
+    });
   }
 }
