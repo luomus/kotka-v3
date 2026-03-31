@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 import {
   DifferenceObjectValue,
   isPatch,
-  LajiForm
 } from '@kotka/shared/models';
 import { ViewerFieldComponent } from './viewer-field.component';
+import { ViewerField } from '../models/models';
 
 
 @Component({
@@ -28,7 +28,7 @@ import { ViewerFieldComponent } from './viewer-field.component';
 export class ViewerMultilangComponent {
   languages = ['en', 'fi', 'sv'];
 
-  field = input.required<LajiForm.Field>();
+  field = input.required<ViewerField>();
   data = input<any>();
   differenceData = input<DifferenceObjectValue | undefined>();
 

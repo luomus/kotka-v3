@@ -8,12 +8,12 @@ import {
   DifferenceObjectValue,
   isMultiLanguageObject,
   isPatch,
-  LajiForm,
 } from '@kotka/shared/models';
 import { ViewerCollectionComponent } from './viewer-collection.component';
 import { ViewerMultilangComponent } from './viewer-multilang.component';
 import { ViewerFieldComponent } from './viewer-field.component';
 import { ViewerFieldsetComponent } from './viewer-fieldset.component';
+import { ViewerField } from '../models/models';
 
 
 @Component({
@@ -55,7 +55,7 @@ import { ViewerFieldsetComponent } from './viewer-fieldset.component';
   ],
 })
 export class ViewerFieldsetFieldComponent {
-  field = input.required<LajiForm.Field>();
+  field = input.required<ViewerField>();
   data = input<any>();
   differenceData = input<DifferenceObjectValue>();
 

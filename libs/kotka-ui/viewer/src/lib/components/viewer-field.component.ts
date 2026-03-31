@@ -3,12 +3,12 @@ import {
   Component, computed, input, Signal
 } from '@angular/core';
 import {
-  Patch, DifferenceObjectValue, isPatch,
-  LajiForm, isPatchArray
+  Patch, DifferenceObjectValue, isPatch, isPatchArray
 } from '@kotka/shared/models';
 import { ViewerFieldValueArrayComponent } from './viewer-field-value-array.component';
 import { ViewerFieldValueComponent } from './viewer-field-value.component';
 import { CommonModule } from '@angular/common';
+import { ViewerField } from '../models/models';
 
 @Component({
   selector: 'kui-viewer-field',
@@ -54,7 +54,7 @@ import { CommonModule } from '@angular/common';
 })
 export class ViewerFieldComponent {
   label = input<string>();
-  field = input.required<LajiForm.Field>();
+  field = input.required<ViewerField>();
   data = input<any>();
   differenceData = input<DifferenceObjectValue>();
 

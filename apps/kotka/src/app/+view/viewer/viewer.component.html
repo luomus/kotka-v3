@@ -55,3 +55,17 @@
     }
   </kui-main-content>
 }
+
+<ng-template #unitLabelTpl let-field="field" let-data="data">
+  {{ field.label }}
+  @if (data?.primarySpecimen) {
+    <span class="badge bg-primary me-1">Primary specimen</span>
+  }
+</ng-template>
+
+<ng-template #sampleLabelTpl let-field="field" let-data="data">
+  {{ field.label }}
+  @if (data?.id) {
+    <span class="title-muted-text me-1">{{ data.id | toFullUri }}</span>
+  }
+</ng-template>

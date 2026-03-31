@@ -1,9 +1,18 @@
-import { Component, inject } from '@angular/core';
+import {
+  Component, computed,
+  ElementRef,
+  inject, Signal,
+  TemplateRef,
+  viewChild,
+} from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { map, switchMap, startWith, catchError, shareReplay } from 'rxjs/operators';
-import { ApiClient, FormService, UserService, LabelPipe } from '@kotka/ui/core';
+import { ApiClient, FormService, UserService, LabelPipe, ToFullUriPipe } from '@kotka/ui/core';
 import { getId, allowEditForUser } from '@kotka/shared/utils';
-import { ViewerComponent as UiViewerComponent } from '@kotka/ui/viewer';
+import {
+  ViewerComponent as UiViewerComponent,
+  ViewerField,
+} from '@kotka/ui/viewer';
 import { AsyncPipe, DatePipe } from '@angular/common';
 import { SpinnerComponent, MainContentComponent, DocumentNavigatorComponent } from '@kotka/ui/components';
 import { NgbAlert, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
@@ -50,6 +59,7 @@ interface ViewModel {
     NgbPopover,
     LabelPipe,
     DatePipe,
+    ToFullUriPipe,
   ],
   styleUrls: ['./viewer.component.scss'],
 })
@@ -122,7 +132,37 @@ export class ViewerComponent {
     startWith({ loading: true }),
   );
 
-  private getFields(fields: LajiForm.Field[]): LajiForm.Field[] {
-    return fields.filter(field => !['datatype', 'owner'].includes(field.name));
+  private filteredFields = [
+    'datatype',
+    'owner',
+    'gatherings.units.primarySpecimen',
+  ];
+
+  private unitLabelTpl = viewChild<TemplateRef<unknown>>('unitLabelTpl');
+  private sampleLabelTpl = viewChild<TemplateRef<unknown>>('sampleLabelTpl');
+
+  private customLabelTemplates: Signal<Record<string, TemplateRef<unknown> | undefined>> = computed(() => ({
+    'gatherings.units': this.unitLabelTpl(),
+    'gatherings.units.samples': this.sampleLabelTpl(),
+  }));
+
+  private getFields(fields: LajiForm.Field[], path = ''): ViewerField[] {
+    return fields
+      .filter((field): boolean => {
+        return !this.filteredFields.includes(`${path}${field.name}`);
+      })
+      .map((field): ViewerField => {
+        const fullName = `${path}${field.name}`;
+
+        if (field.fields) {
+          return {
+            ...field,
+            fields: this.getFields(field.fields, `${fullName}.`),
+            collectionLabelTemplate: this.customLabelTemplates()[fullName],
+          };
+        }
+
+        return field;
+      });
   }
 }

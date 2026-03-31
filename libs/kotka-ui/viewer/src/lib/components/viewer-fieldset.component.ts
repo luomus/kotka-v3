@@ -9,11 +9,11 @@ import {
   Patch,
   DifferenceObjectValue,
   isPatch,
-  LajiForm,
   DifferenceObject,
 } from '@kotka/shared/models';
 import { CommonModule } from '@angular/common';
 import { ViewerFieldsetFieldsComponent } from './viewer-fieldset-fields.component';
+import { ViewerField } from '../models/models';
 
 
 @Component({
@@ -41,7 +41,7 @@ import { ViewerFieldsetFieldsComponent } from './viewer-fieldset-fields.componen
   imports: [CommonModule, forwardRef(() => ViewerFieldsetFieldsComponent)],
 })
 export class ViewerFieldsetComponent {
-  field = input.required<LajiForm.Field>();
+  field = input.required<ViewerField>();
   data = input<any>();
   differenceData = input<DifferenceObjectValue>();
 

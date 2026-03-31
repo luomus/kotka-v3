@@ -9,7 +9,6 @@ import {
 import {
   isPatch,
   isPatchArray,
-  LajiForm,
   DifferenceObjectValue,
   DifferenceObject,
   Patch,
@@ -19,7 +18,8 @@ import { ViewerFieldsetFieldsComponent } from './viewer-fieldset-fields.componen
 import {
   alignArrayWithPatchArray,
   alignPatchArrayWithArray,
-} from '../../services/utils';
+} from '../services/utils';
+import { ViewerField } from '../models/models';
 
 @Component({
   selector: 'kui-viewer-collection',
@@ -30,13 +30,18 @@ import {
           <div
             class="viewer-collection-item"
             [ngClass]="{
-              'viewer-collection-removed':
-                alignedPatches()[i]?.op === 'remove',
+              'viewer-collection-removed': alignedPatches()[i]?.op === 'remove',
               'viewer-collection-added': alignedPatches()[i]?.op === 'add',
             }"
           >
             <h3 class="viewer-collection-item-title">
-              {{ field().label }}
+              @if (field().collectionLabelTemplate; as tpl) {
+                <ng-container
+                  *ngTemplateOutlet="tpl; context: { field: field(), data: dataItem }"
+                ></ng-container>
+              } @else {
+                {{ field().label }}
+              }
               @if (alignedData().length > 1) {
                 <span class="viewer-collection-item-index">({{ i + 1 }}/{{ alignedData().length }})</span>
               }
@@ -60,7 +65,7 @@ import {
   imports: [CommonModule, forwardRef(() => ViewerFieldsetFieldsComponent)],
 })
 export class ViewerCollectionComponent {
-  field = input.required<LajiForm.Field>();
+  field = input.required<ViewerField>();
   data = input<any[]>();
   differenceData = input<DifferenceObjectValue>();
 

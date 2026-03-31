@@ -41,6 +41,7 @@ export class LabelValueComponent {
     if (!apiLabelType || !['organization', 'collection', 'dataset'].includes(apiLabelType)) {
       return undefined;
     }
+
     return {
       routerLink: '/view',
       queryParams: { uri: getUri(value) }

@@ -9,7 +9,6 @@ import {
 import {
   DifferenceObject,
   isPatch,
-  LajiForm,
   MediaTypes,
   Patch,
 } from '@kotka/shared/models';
@@ -24,9 +23,10 @@ import { ApiClient, Logger } from '@kotka/ui/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { of, switchMap } from 'rxjs';
 import { Image } from '@luomus/laji-schema';
+import { ViewerField } from '../models/models';
 
 interface ViewModel {
-  fields: LajiForm.Field[];
+  fields: ViewerField[];
   data?: any;
   differenceData?: DifferenceObject;
   mapData?: DataOptions;
@@ -64,7 +64,7 @@ export class ViewerFieldsetFieldsComponent {
   private apiClient = inject(ApiClient);
   private logger = inject(Logger);
 
-  fields = input<LajiForm.Field[]>([]);
+  fields = input<ViewerField[]>([]);
   data = input<any>();
   differenceData = input<DifferenceObject>();
 

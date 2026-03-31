@@ -7,10 +7,9 @@ import {
 import {
   DifferenceObject,
   KotkaDocumentObject,
-  LajiForm,
 } from '@kotka/shared/models';
-import { ViewerFieldsetFieldsComponent } from './components/viewer-fieldset-fields.component';
-
+import { ViewerFieldsetFieldsComponent } from '../components/viewer-fieldset-fields.component';
+import { ViewerField } from '../models/models';
 
 @Component({
   selector: 'kui-viewer',
@@ -21,7 +20,7 @@ import { ViewerFieldsetFieldsComponent } from './components/viewer-fieldset-fiel
   imports: [ViewerFieldsetFieldsComponent],
 })
 export class ViewerComponent {
-  fields = input<LajiForm.Field[]>([]);
+  fields = input<ViewerField[]>([]);
   data = input<KotkaDocumentObject | undefined>();
   differenceData = input<DifferenceObject>();
 }

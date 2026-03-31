@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { Patch, LajiForm } from '@kotka/shared/models';
+import { Patch } from '@kotka/shared/models';
 import { ViewerFieldValueComponent } from './viewer-field-value.component';
 import {
   alignArrayWithPatchArray,
   alignPatchArrayWithArray,
-} from '../../services/utils';
+} from '../services/utils';
+import { ViewerField } from '../models/models';
 
 @Component({
   selector: 'kui-viewer-field-value-array',
@@ -27,7 +28,7 @@ import {
   imports: [ViewerFieldValueComponent],
 })
 export class ViewerFieldValueArrayComponent {
-  field = input.required<LajiForm.Field>();
+  field = input.required<ViewerField>();
   data = input<any[]>();
   patches = input<Patch[]>();
 
