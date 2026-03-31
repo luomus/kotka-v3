@@ -68,14 +68,12 @@ import { OldKotkaUrlPipe } from '@kotka/ui/pipes';
             Botany labels (PDF)
           </button>
           <div class="px-3 py-2 w-100 text-center">
-            <a
-              [href]="
-                '/specimens/search?identifier=' + specimenIdQuery | oldKotkaUrl
-              "
-              target="_blank"
-            >
-              Export specimens to Excel
-            </a>
+            <form method="post" [action]="'/specimens/search' | oldKotkaUrl" target="_blank">
+              <input type="hidden" name="identifier" [value]="specimenIdQuery" />
+              <button class="btn btn-link p-0" type="submit">
+                Export specimens to Excel
+              </button>
+            </form>
           </div>
         </div>
       </kui-spinner>
