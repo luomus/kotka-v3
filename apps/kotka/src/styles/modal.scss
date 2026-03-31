@@ -1,9 +1,8 @@
-.modal-dialog {
-  overflow-y: initial;
-}
-.modal-body{
-  max-height: calc(100vh - 175px);
-  overflow-y: auto;
+.scrollable-modal {
+  .modal-body {
+    max-height: calc(100vh - 175px);
+    overflow-y: auto;
+  }
 }
 
 .semi-transparent-modal {

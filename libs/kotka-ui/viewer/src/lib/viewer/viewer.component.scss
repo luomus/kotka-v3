@@ -22,7 +22,7 @@ kui-viewer {
     }
   }
 
-  kui-laji-map {
+  kui-viewer-map {
     display: block;
     width: 256px;
     height: 256px;
@@ -134,7 +134,7 @@ kui-viewer {
 }
 
 @include media-breakpoint-down(md) {
-  kui-viewer kui-laji-map,
+  kui-viewer kui-viewer-map,
   kui-viewer kui-image-gallery {
     float: none;
     width: 100%;
