@@ -16,7 +16,7 @@ export class TriplestoreService {
   }
 
   public put(resource: string, body: string, params = {}) {
-     return this.httpService.put(this.baseUrl + resource, body, { headers: this.headers, params: Object.assign({}, this.baseParams, params) });
+    return this.httpService.put(this.baseUrl + resource, body, { headers: this.headers, params: Object.assign({}, this.baseParams, params) });
   }
 
   public search(search: Record<string, string>, params = {}) {

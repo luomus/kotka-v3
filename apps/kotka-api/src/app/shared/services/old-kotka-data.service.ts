@@ -1,11 +1,10 @@
 import { HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { TriplestoreService } from '@kotka/api/services';
+import { CacheService, Cached } from '@kotka/api/redis-cache';
 import { TriplestoreMapperService } from '@kotka/api/mappers';
 import { Collection } from '@luomus/laji-schema';
 import { lastValueFrom, map, switchMap } from 'rxjs';
-import { Cached } from '../decorators/cached.decorator';
 import { Cron, CronExpression, Timeout } from '@nestjs/schedule';
-import { CacheService } from './cache.service';
 
 const collectionType = 'MY.collection';
 const cache_ttl = 12 * 60 * 60 * 1000; // 12 h

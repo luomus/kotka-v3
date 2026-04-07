@@ -5,7 +5,7 @@ https://docs.nestjs.com/modules
 
 import { Module } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
-import { RedisModule } from '../shared-modules/redis/redis.module';
+import { RedisModule } from '@kotka/api/redis-cache';
 
 @Module({
   imports: [TerminusModule, RedisModule],

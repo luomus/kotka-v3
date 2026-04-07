@@ -4,7 +4,7 @@ https://docs.nestjs.com/controllers#controllers
 
 import { Controller, Get } from '@nestjs/common';
 import { HealthCheck, HealthCheckService, HttpHealthIndicator } from '@nestjs/terminus';
-import { RedisHealthIndicator } from '../shared-modules/redis/redis.health';
+import { RedisHealthIndicator } from '@kotka/api/redis-cache';
 import { StatusResult } from '@kotka/shared/models';
 
 @Controller('status')

@@ -1,0 +1,19 @@
+{
+  "name": "api-redis-cache",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/kotka-api/redis-cache/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/kotka-api/redis-cache"],
+      "options": {
+        "jestConfig": "libs/kotka-api/redis-cache/jest.config.ts"
+      }
+    }
+  }
+}

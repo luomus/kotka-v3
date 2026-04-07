@@ -3,8 +3,7 @@ import { Test } from '@nestjs/testing';
 import { createMock } from '@golevelup/ts-jest';
 import { CallHandler, ExecutionContext } from '@nestjs/common';
 import { SpecimenIdJoinerInterceptor } from './specimen-id-joiner.interceptor';
-import { NamespaceService } from '../shared/services/namespace.service';
-import { AbschService, LajiApiService, LajiStoreService } from '@kotka/api/services';
+import { AbschService, LajiApiService, LajiStoreService, NamespaceService } from '@kotka/api/services';
 import { of } from 'rxjs';
 
 const mockLajiApiService = jest.mock<LajiApiService>;

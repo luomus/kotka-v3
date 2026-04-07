@@ -2,13 +2,17 @@ import { Test } from '@nestjs/testing';
 import { createMock } from '@golevelup/ts-jest';
 import { CallHandler, ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 import { ValidatorInterceptor } from './validator.interceptor';
-import { ApiServicesModule, FormService, LajiStoreService } from '@kotka/api/services';
 import { Reflector } from '@nestjs/core';
-import { ValidationService } from '../services/validation.service';
-import { defaultNamespaceID, NamespaceService } from '../services/namespace.service';
+import {
+  AbschService,
+  defaultNamespaceID,
+  NamespaceService,
+  ValidationService,
+  LajiApiService,
+  FormService,
+  LajiStoreService } from '@kotka/api/services';
 import { of } from 'rxjs';
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces';
-import { LajiApiService } from '@kotka/api/services';
 
 const mockLajiApiService = {
   post: jest.fn().mockImplementation((path, body) => {
@@ -88,6 +92,19 @@ const mockNamespaceService = {
       qname_prefix: 'all'
     }
   ]))
+};
+
+const mockLajiStoreService = {
+  search: jest.fn(),
+  getAll: jest.fn()
+};
+
+const mockFormService = {
+  getForm: jest.fn()
+};
+
+const mockAbschService = {
+  checkIRCCNumberIsValid: jest.fn()
 };
 
 const mockForm = {
@@ -398,11 +415,13 @@ describe('ValidationInterceptor', () => {
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [ApiServicesModule],
       controllers: [],
       providers: [ValidatorInterceptor, ValidationService, Reflector,
         { provide: NamespaceService, useValue: mockNamespaceService },
-        { provide: LajiApiService, useValue: mockLajiApiService }
+        { provide: LajiApiService, useValue: mockLajiApiService },
+        { provide: LajiStoreService, useValue: mockLajiStoreService },
+        { provide: FormService, useValue: mockFormService },
+        { provide: AbschService, useValue: mockAbschService }
       ],
     }).compile();
 
@@ -413,6 +432,10 @@ describe('ValidationInterceptor', () => {
     namespaceService = moduleRef.get<NamespaceService>(NamespaceService);
 
     jest.spyOn(lajiStoreService, 'search').mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data:{ member: [] }} as AxiosResponse));
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   describe('General validator tests', () => {

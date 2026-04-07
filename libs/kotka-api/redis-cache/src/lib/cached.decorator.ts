@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Inject } from '@nestjs/common';
-import { CacheService } from '../services/cache.service';
+import { CacheService } from './cache.service';
 
 export function Cached(cacheKey: string, ttl: number = 10 * 60 * 1000) {
   const injectCacheService = Inject(CacheService);

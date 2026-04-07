@@ -10,7 +10,7 @@ import {
   UnprocessableEntityException
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ValidationService } from '../services/validation.service';
+import { ValidationService } from '@kotka/api/services';
 import { KotkaDocumentObjectFullType } from '@kotka/shared/models';
 
 @Injectable()

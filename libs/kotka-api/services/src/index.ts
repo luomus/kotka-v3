@@ -7,3 +7,5 @@ export * from './lib/form.service';
 export * from './lib/old-kotka-api.service';
 export * from './lib/absch.service';
 export * from './lib/media-api.service';
+export * from './lib/validation.service';
+export * from './lib/namespace.service';

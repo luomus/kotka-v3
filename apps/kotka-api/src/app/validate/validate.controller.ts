@@ -4,7 +4,7 @@ https://docs.nestjs.com/controllers#controllers
 
 import { Controller, InternalServerErrorException, Post, Req, UnprocessableEntityException, UseGuards } from '@nestjs/common';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
-import { ValidationService } from '../shared/services/validation.service';
+import { ValidationService } from '@kotka/api/services';
 import { isEmpty } from 'lodash';
 
 @Controller('validate')

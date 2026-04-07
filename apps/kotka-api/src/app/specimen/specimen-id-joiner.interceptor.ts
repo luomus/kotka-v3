@@ -4,7 +4,7 @@ https://docs.nestjs.com/interceptors#interceptors
 
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, HttpException, HttpStatus, InternalServerErrorException } from '@nestjs/common';
 import { Document } from '@kotka/shared/models';
-import { defaultNamespaceID, NamespaceService } from '../shared/services/namespace.service';
+import { defaultNamespaceID, NamespaceService } from '@kotka/api/services';
 import { defaultPrefix } from '@kotka/shared/utils';
 import { LajiStoreService } from '@kotka/api/services';
 import { lastValueFrom, map } from 'rxjs';

@@ -5,7 +5,7 @@ import passport from 'passport';
 import { AppModule } from './app/app.module';
 import Redis from 'ioredis';
 import { RedisStore } from 'connect-redis';
-import { REDIS } from './app/shared-modules/redis/redis.constants';
+import { REDIS } from '@kotka/api/redis-cache';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

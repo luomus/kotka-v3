@@ -16,6 +16,7 @@
     "baseUrl": ".",
     "esModuleInterop": true,
     "paths": {
+      "@kotka/api/redis-cache": ["libs/kotka-api/redis-cache/src/index.ts"],
       "@kotka/api/mappers": ["libs/kotka-api/mappers/src/index.ts"],
       "@kotka/api/services": ["libs/kotka-api/services/src/index.ts"],
       "@kotka/shared/models": ["libs/shared/models/src/index.ts"],

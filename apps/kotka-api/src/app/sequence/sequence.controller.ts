@@ -12,10 +12,9 @@ import {
   UseGuards
 } from '@nestjs/common';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
-import { LajiStoreService } from '@kotka/api/services';
+import { defaultNamespaceID, LajiStoreService } from '@kotka/api/services';
 import { lastValueFrom, map } from 'rxjs';
 import { ErrorMessages } from '@kotka/shared/models';
-import { defaultNamespaceID } from '../shared/services/namespace.service';
 
 @Controller('sequence')
 @UseGuards(
