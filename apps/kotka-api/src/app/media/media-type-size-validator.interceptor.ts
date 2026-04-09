@@ -6,7 +6,7 @@ import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Unsupported
 import { Observable } from 'rxjs';
 
 @Injectable()
-export class MediaTypeValidatorInterceptor implements NestInterceptor {
+export class MediaTypeSizeValidatorInterceptor implements NestInterceptor {
   acceptedTypes = {
     'pdf': [
       'application/pdf'

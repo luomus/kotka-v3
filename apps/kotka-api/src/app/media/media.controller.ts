@@ -9,6 +9,7 @@ import { map } from 'rxjs';
 import { Image, Pdf } from '@luomus/laji-schema';
 import { MediaAccessInterceptor } from '../shared/interceptors/media-access.interceptor';
 import { ErrorMessages, MediaTypes } from '@kotka/shared/models';
+import { MediaTypeSizeValidatorInterceptor } from './media-type-size-validator.interceptor';
 
 @Controller('media')
 @UseGuards(AuthenticateCookieGuard)
@@ -17,6 +18,7 @@ export class MediaController {
     private readonly mediaService: MediaApiService
   ) {}
 
+  @UseInterceptors(MediaTypeSizeValidatorInterceptor)
   @Post(':type')
   postMedia(@Req() req, @Res() res, @Param('type') type: MediaTypes) {
     return this.mediaService.postMediaStreaming(type, req, res);
