@@ -49,6 +49,7 @@ export class LajiApiController {
   private proxyReq(proxyReq: ClientRequest, req: UserRequest) {
     proxyReq.setHeader('API-Version', 1);
     proxyReq.setHeader('Authorization', process.env['LAJI_API_TOKEN']);
+    proxyReq.setHeader('Accept-Language', 'en');
 
     if (req.user) {
       proxyReq.setHeader('Person-Token', req.user.personToken);

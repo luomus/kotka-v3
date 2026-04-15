@@ -1,7 +1,7 @@
 describe('user', () => {
   it('should automatically redirect to login page', () => {
     cy.visit('/');
-    cy.url().should('include', 'laji-auth');
+    cy.url().should('include', 'login-dev');
   });
 
   it('should show the correct page after login', () => {
