@@ -92,6 +92,7 @@ export class LajiApiController {
     const newQuery = this.getQueryParams(req);
 
     newQuery['access_token'] = process.env['LAJI_API_TOKEN'];
+    newQuery['lang'] = newQuery['lang'] || 'en';
     if (newQuery['includePersonToken']) {
       if (newQuery['includePersonToken'] === 'true') {
         newQuery['personToken'] = req.user.personToken;

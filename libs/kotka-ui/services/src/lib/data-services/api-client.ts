@@ -234,8 +234,7 @@ export class ApiClient {
     const params = new HttpParams()
       .set('type', 'country')
       .set('page', page)
-      .set('pageSize', pageSize)
-      .set('lang', 'en');
+      .set('pageSize', pageSize);
     return this.httpClient.get<PagedResult<Area>>(`${lajiApiPath}areas`, {
       params,
     });
