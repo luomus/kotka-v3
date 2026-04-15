@@ -1,6 +1,6 @@
 import {
-  Component, computed,
-  ElementRef,
+  Component,
+  computed,
   inject, Signal,
   TemplateRef,
   viewChild,
