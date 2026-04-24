@@ -56,6 +56,8 @@ const defaultAdvancedFields = [
   '/gatherings/units/identifications/genusQualifier','/gatherings/units/identifications/speciesQualifier','/gatherings/units/identifications/taxonID','/gatherings/units/identifications/identificationNotes'
 ];
 
+const unreliableDisabledForFields = ['/namespaceID', '/objectID', '/verificationStatus', '/gatherings/units/primarySpecimen'];
+
 @Component({
   selector: 'kotka-specimen-form',
   templateUrl: './specimen-form.component.html',
@@ -335,7 +337,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
         mode: 'jsonPointerSelect',
         ignoreFieldsOfType: ['array', 'object'],
         colorTheme: 'orange',
-        unselectableFields: ['/namespaceID', '/objectID'].concat(getRequiredFields(schema)),
+        unselectableFields: unreliableDisabledForFields.concat(getRequiredFields(schema)),
         unselectableFieldsErrorMsg:
           'This field can\'t be marked as unreliable!',
       });
