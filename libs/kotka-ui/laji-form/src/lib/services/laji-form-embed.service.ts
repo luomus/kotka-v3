@@ -1,5 +1,5 @@
 import { ComponentRef, Type, Injector } from '@angular/core';
-import { LajiFormComponent } from '../laji-form/laji-form.component';
+import LajiFormComponent from '../laji-form/laji-form.component';
 import {
   EmbeddedComponentData,
   EmbedOptions,

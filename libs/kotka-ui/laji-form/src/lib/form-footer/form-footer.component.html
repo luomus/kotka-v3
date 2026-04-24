@@ -19,11 +19,12 @@
       </button>
     }
     @if (showCopyButton()) {
-      @if (hasChanges() && !disabled()) {
+      @if (hasChanges()) {
         <button
           class="btn btn-light col-lg-2 col-sm-3 col-xs-12"
           type="submit"
           (click)="saveAndCopyForm.emit()"
+          [disabled]="disabled()"
           >
           Save & copy as new
         </button>
@@ -32,6 +33,7 @@
           class="btn btn-light col-lg-2 col-sm-3 col-xs-12"
           type="submit"
           (click)="copyForm.emit()"
+          [disabled]="disabled()"
           >
           Copy as new record
         </button>

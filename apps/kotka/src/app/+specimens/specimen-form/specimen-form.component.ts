@@ -81,6 +81,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
   title: Signal<string>;
   prefilledFormData: Signal<Partial<KotkaDocument> | undefined>;
   mediaMetadata: Signal<FormMediaMetadata>;
+  beforeSubmitFunc = this.beforeSubmit.bind(this);
 
   markAdvancedFieldsActive: Signal<boolean>;
   advancedFields = signal<string[] | undefined>([]);
@@ -274,6 +275,19 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
         untracked(this.prevFormData),
       );
     });
+
+    effect(() => {
+      if (this.markUnreliableFieldsActive()) {
+        const unreliableFields = this.lajiFormFieldChooserService.selectedFields();
+        const formData = untracked(this.formData);
+        const currentUnreliable = formData?.unreliableFields || [];
+
+        if (!isEqual(unreliableFields, currentUnreliable)) {
+          // @ts-ignore TODO remove after specimen schema changes (remove ts-ignore)
+          this.formView.setFormData({ ...formData, unreliableFields });
+        }
+      }
+    });
   }
 
   onFormInit(lajiForm: LajiFormComponent) {
@@ -285,6 +299,15 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     this.formData.set(formData);
     if (this.formData() && !this.prevFormData()) {
       this.initialFormData.set(this.formData());
+    }
+  }
+
+  beforeSubmit() {
+    if (this.markAdvancedFieldsActive()) {
+      this.toggleMarkAdvancedFields();
+    }
+    if (this.markUnreliableFieldsActive()) {
+      this.toggleMarkUnreliableFields();
     }
   }
 
@@ -323,9 +346,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     }
 
     if (this.markUnreliableFieldsActive()) {
-      const unreliableFields = this.lajiFormFieldChooserService.stopFieldChooser();
-      // @ts-ignore TODO remove after specimen schema changes (remove ts-ignore)
-      this.formView.setFormData({ ...this.formData(), unreliableFields });
+      this.lajiFormFieldChooserService.stopFieldChooser();
     } else {
       const schema = this.lajiForm.form()?.schema;
       if (!schema) {

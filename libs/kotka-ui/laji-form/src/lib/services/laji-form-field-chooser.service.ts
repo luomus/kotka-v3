@@ -1,5 +1,5 @@
 import { ComponentRef, effect, Injectable, OutputRefSubscription, signal, inject } from '@angular/core';
-import { LajiFormComponent } from '../laji-form/laji-form.component';
+import LajiFormComponent from '../laji-form/laji-form.component';
 import { ComponentService } from '@kotka/ui/core';
 import {
   FieldChooserIgnoreFieldType,
@@ -27,13 +27,15 @@ export class LajiFormFieldChooserService {
   private isActiveSignal = signal<boolean>(false);
   isActive = this.isActiveSignal.asReadonly();
 
+  private selectedFieldsSignal = signal<string[]>([]);
+  selectedFields = this.selectedFieldsSignal.asReadonly();
+
   private fieldChooserComponentRef = signal<ComponentRef<LajiFormFieldChooserComponent>|undefined>(undefined);
 
   private form = signal<LajiForm.SchemaForm|undefined>(undefined);
   private formContainerElem = signal<HTMLElement|undefined>(undefined);
 
   private mode = signal<FieldChooserMode>('fieldSelect');
-  private selected = signal<string[]>([]);
   private ignoreFieldsOfType = signal<FieldChooserIgnoreFieldType[]>([]);
   private unselectableFields = signal<string[]>([]);
   private unselectableFieldsErrorMsg = signal<string|undefined>(undefined);
@@ -52,7 +54,7 @@ export class LajiFormFieldChooserService {
       this.fieldChooserComponentRef()?.setInput('mode', this.mode());
     });
     effect(() => {
-      this.fieldChooserComponentRef()?.setInput('selected', this.selected());
+      this.fieldChooserComponentRef()?.setInput('selected', this.selectedFieldsSignal());
     });
     effect(() => {
       this.fieldChooserComponentRef()?.setInput('ignoreFieldsOfType', this.ignoreFieldsOfType());
@@ -86,7 +88,7 @@ export class LajiFormFieldChooserService {
 
     const componentRef = this.componentService.createComponentFromType(LajiFormFieldChooserComponent);
     componentRef.instance.selectedChange.subscribe(newSelected => {
-      this.selected.set(newSelected);
+      this.selectedFieldsSignal.set(newSelected);
     });
     this.componentService.attachComponent(componentRef, containerElem);
     this.fieldChooserComponentRef.set(componentRef);
@@ -94,7 +96,7 @@ export class LajiFormFieldChooserService {
     this.isActiveSignal.set(true);
 
     this.mode.set(options?.mode || 'fieldSelect');
-    this.selected.set(options?.selected || []);
+    this.selectedFieldsSignal.set(options?.selected || []);
     this.ignoreFieldsOfType.set(options?.ignoreFieldsOfType || []);
     this.unselectableFields.set(options?.unselectableFields || []);
     this.unselectableFieldsErrorMsg.set(options?.unselectableFieldsErrorMsg);
@@ -110,7 +112,7 @@ export class LajiFormFieldChooserService {
       throw new Error('Field chooser is not started');
     }
 
-    const selected = this.selected();
+    const selected = this.selectedFieldsSignal();
 
     this.formContainerElem()?.children[0]?.removeAttribute('inert');
     this.formContainerElem.set(undefined);
@@ -124,7 +126,7 @@ export class LajiFormFieldChooserService {
     this.isActiveSignal.set(false);
 
     this.mode.set('fieldSelect');
-    this.selected.set([]);
+    this.selectedFieldsSignal.set([]);
     this.ignoreFieldsOfType.set([]);
     this.unselectableFields.set([]);
     this.unselectableFieldsErrorMsg.set(undefined);

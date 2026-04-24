@@ -17,7 +17,7 @@ import LajiForm from '@luomus/laji-form/lib/index';
 import { Theme as LajiFormTheme } from '@luomus/laji-form/lib/themes/theme';
 import { scrollIntoViewIfNeeded, uiSchemaJSONPointer, updateSafelyWithJSONPointer } from '@luomus/laji-form/lib/utils';
 import { LajiForm as LajiFormModel } from '@kotka/shared/models';
-import { combineLatest } from 'rxjs';
+import { combineLatest, Observable, of } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { MediaMetadata } from '@luomus/laji-form/lib/components/LajiForm';
 import { Logger, ToastService, FormApiClient } from '@kotka/ui/core';
@@ -31,7 +31,7 @@ type FormData = Record<string, any>;
   styleUrls: ['./laji-form.component.scss'],
   imports: [CommonModule, FormFooterComponent],
 })
-export class LajiFormComponent<T extends FormData = FormData>
+class LajiFormComponent<T extends FormData = FormData>
   implements AfterViewInit, OnDestroy
 {
   private document = inject<Document>(DOCUMENT);
@@ -53,6 +53,7 @@ export class LajiFormComponent<T extends FormData = FormData>
   hiddenFields = input<string[]>();
   additionalClassNames = input<Record<string, string>>();
   confirmFieldDelete = input<boolean>();
+  beforeSubmitFunc = input<() => unknown | Observable<unknown>>();
 
   showFooter = input(true);
   showDeleteButton = input<boolean>();
@@ -139,18 +140,14 @@ export class LajiFormComponent<T extends FormData = FormData>
     this.lajiFormWrapper?.focusField(id);
   }
 
-  saveFormClicked() {
+  submitForm() {
     this.copyAfterSubmit = false;
-    this.ngZone.runOutsideAngular(() => {
-      this.lajiFormWrapper?.submit();
-    });
+    this.doSubmit();
   }
 
-  saveAndCopyFormClicked() {
+  saveAndCopyForm() {
     this.copyAfterSubmit = true;
-    this.ngZone.runOutsideAngular(() => {
-      this.lajiFormWrapper?.submit();
-    });
+    this.doSubmit();
   }
 
   highlightErrors() {
@@ -321,4 +318,29 @@ export class LajiFormComponent<T extends FormData = FormData>
       )
     );
   }
+
+  private doSubmit() {
+    const beforeSubmitFn = this.beforeSubmitFunc();
+
+    if (beforeSubmitFn) {
+      this.ngZone.runOutsideAngular(() => {
+        this.lajiFormWrapper?.pushBlockingLoader();
+      });
+
+      const result = beforeSubmitFn();
+
+      (result instanceof Observable ? result : of(result)).subscribe(() => {
+        this.ngZone.runOutsideAngular(() => {
+          this.lajiFormWrapper?.submit();
+          this.lajiFormWrapper?.popBlockingLoader();
+        });
+      });
+    } else {
+      this.ngZone.runOutsideAngular(() => {
+        this.lajiFormWrapper?.submit();
+      });
+    }
+  }
 }
+
+export default LajiFormComponent;

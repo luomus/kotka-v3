@@ -43,14 +43,13 @@ import { NgTemplateOutlet, TitleCasePipe } from '@angular/common';
     SpinnerComponent,
     LabelPipe,
     NgTemplateOutlet,
-    TitleCasePipe
+    TitleCasePipe,
   ],
 })
 export class FormViewComponent<
   T extends KotkaDocumentObjectType = KotkaDocumentObjectType,
   S extends KotkaDocumentObjectMap[T] = KotkaDocumentObjectMap[T],
->
-{
+> {
   private notifier = inject(ToastService);
   private apiClient = inject(ApiClient);
   private dialogService = inject(DialogService);
@@ -68,6 +67,7 @@ export class FormViewComponent<
     input<(form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>>();
   prefilledFormData = input<Partial<S>>();
   mediaMetadata = input<FormMediaMetadata>();
+  beforeSubmitFunc = input<() => unknown | Observable<unknown>>();
 
   hiddenFields = input<string[]>();
   additionalClassNames = input<Record<string, string>>();
@@ -76,7 +76,7 @@ export class FormViewComponent<
   pageTitle = input<string>();
   allowCopy = input<boolean>();
   footerDisabled = input<boolean>();
-  historyPageLink = input<string[]|string>(['..', 'history']);
+  historyPageLink = input<string[] | string>(['..', 'history']);
 
   headerTpl = input<TemplateRef<unknown>>();
   formContainerTpl = input<TemplateRef<unknown>>();
