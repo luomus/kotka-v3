@@ -17,6 +17,7 @@
   [historyPageLink]="'/specimens/history'"
   [formContainerTpl]="formContainer"
   [customFooterButtonsTpl]="customFooterButtons"
+  [settingsKey]="settingsStorageKey()"
   (formInit)="onFormInit($event)"
   (formDataChange)="onFormDataChange($event)"
   (saveSuccess)="onSaveSuccess($event)"

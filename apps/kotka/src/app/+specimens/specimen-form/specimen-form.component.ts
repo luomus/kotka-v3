@@ -102,6 +102,8 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
   initialFormData = signal<FormData>(undefined);
   initialDocument: Signal<KotkaDocument | undefined>;
 
+  settingsStorageKey = signal<string | undefined>(undefined);
+
   @ViewChild(FormViewComponent, { static: true })
   formView!: FormViewComponent<KotkaDocumentObjectType.specimen>;
 
@@ -205,6 +207,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
 
   initEffects() {
     this.userService.getCurrentLoggedInUser().subscribe((user) => {
+      this.settingsStorageKey.set(`specimen-form-${user.id}-settings`);
       const showOnlyBasicFieldsKey = `specimen-form-${user.id}-show-only-basic-fields`;
       const advancedFieldsKey = `specimen-form-${user.id}-advanced-fields`;
 
@@ -278,7 +281,8 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
 
     effect(() => {
       if (this.markUnreliableFieldsActive()) {
-        const unreliableFields = this.lajiFormFieldChooserService.selectedFields();
+        const unreliableFields =
+          this.lajiFormFieldChooserService.selectedFields();
         const formData = untracked(this.formData);
         const currentUnreliable = formData?.unreliableFields || [];
 

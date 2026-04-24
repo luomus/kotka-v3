@@ -9,6 +9,7 @@ import {
   input,
   output,
   effect,
+  signal,
   DOCUMENT,
   inject,
   TemplateRef
@@ -21,6 +22,7 @@ import { combineLatest, Observable, of } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { MediaMetadata } from '@luomus/laji-form/lib/components/LajiForm';
 import { Logger, ToastService, FormApiClient } from '@kotka/ui/core';
+import { LocalStorageService } from 'ngx-webstorage';
 import { FormFooterComponent } from '../form-footer/form-footer.component';
 
 type FormData = Record<string, any>;
@@ -40,6 +42,7 @@ class LajiFormComponent<T extends FormData = FormData>
   private logger = inject(Logger);
   private ngZone = inject(NgZone);
   private cdr = inject(ChangeDetectorRef);
+  private storage = inject(LocalStorageService);
 
   static TOP_OFFSET = 0;
   static BOTTOM_OFFSET = 50;
@@ -60,11 +63,16 @@ class LajiFormComponent<T extends FormData = FormData>
   showCopyButton = input<boolean>();
   customFooterButtonsTpl = input<TemplateRef<unknown>>();
 
+  settingsKey = input<string>();
+
   hasOnlyWarnings = false;
 
   private lajiFormWrapper?: LajiForm;
   private lajiFormWrapperProto?: any;
   private lajiFormTheme?: LajiFormTheme;
+
+  private settings = signal<Record<string, any> | undefined>(undefined);
+
   private isBlocked = false;
   private copyAfterSubmit = false;
 
@@ -81,6 +89,23 @@ class LajiFormComponent<T extends FormData = FormData>
 
   constructor() {
     effect(() => {
+      const key = this.settingsKey();
+      if (key) {
+        this.settings.set(this.storage.retrieve(key) || undefined);
+      } else {
+        this.settings.set(undefined);
+      }
+    });
+
+    effect(() => {
+      const key = this.settingsKey();
+      const settings = this.settings();
+      if (key && settings) {
+        this.storage.store(key, settings);
+      }
+    });
+
+    effect(() => {
       if (!this.form()) {
         return;
       }
@@ -89,8 +114,14 @@ class LajiFormComponent<T extends FormData = FormData>
       const state = {
         schema: form.schema,
         uiSchema: this.getUiSchema(form, this.disabled(), this.hiddenFields()),
-        uiSchemaContext: this.getUiSchemaContext(form, this.editMode(), this.additionalClassNames(), this.confirmFieldDelete()),
+        uiSchemaContext: this.getUiSchemaContext(
+          form,
+          this.editMode(),
+          this.additionalClassNames(),
+          this.confirmFieldDelete(),
+        ),
         formData: this.formData(),
+        settings: this.settings(),
         mediaMetadata: this.mediaMetadata(),
         validators: form.validators,
         warnings: form.warnings,
@@ -194,14 +225,25 @@ class LajiFormComponent<T extends FormData = FormData>
             rootElem: this.lajiFormRoot.nativeElement,
             theme: this.lajiFormTheme,
             schema: form.schema,
-            uiSchema: this.getUiSchema(form, this.disabled(), this.hiddenFields()),
-            uiSchemaContext: this.getUiSchemaContext(form, this.editMode(), this.additionalClassNames(), this.confirmFieldDelete()),
+            uiSchema: this.getUiSchema(
+              form,
+              this.disabled(),
+              this.hiddenFields(),
+            ),
+            uiSchemaContext: this.getUiSchemaContext(
+              form,
+              this.editMode(),
+              this.additionalClassNames(),
+              this.confirmFieldDelete(),
+            ),
             formData: this.formData(),
             validators: form.validators,
             warnings: form.warnings,
             onSubmit: this.onSubmit.bind(this),
             onChange: this.onChange.bind(this),
             onValidationError: this.onValidationError.bind(this),
+            onSettingsChange: this.onSettingsChange.bind(this),
+            settings: this.settings(),
             apiClient: this.apiClient,
             mediaMetadata: this.mediaMetadata(),
             lang: 'en',
@@ -225,11 +267,15 @@ class LajiFormComponent<T extends FormData = FormData>
     }
   }
 
-  private getUiSchema(form: LajiFormModel.SchemaForm, disabled: boolean | undefined, hiddenFields: string[] | undefined) {
+  private getUiSchema(
+    form: LajiFormModel.SchemaForm,
+    disabled: boolean | undefined,
+    hiddenFields: string[] | undefined,
+  ) {
     let uiSchema = form.uiSchema;
 
-    (hiddenFields || []).forEach(field => {
-      let uiSchemaPointer: string|undefined;
+    (hiddenFields || []).forEach((field) => {
+      let uiSchemaPointer: string | undefined;
       try {
         uiSchemaPointer = uiSchemaJSONPointer(form.schema, field);
       } catch (err) {
@@ -240,7 +286,7 @@ class LajiFormComponent<T extends FormData = FormData>
         uiSchema = updateSafelyWithJSONPointer(
           uiSchema,
           { 'ui:field': 'HiddenField' },
-          uiSchemaPointer
+          uiSchemaPointer,
         );
       }
     });
@@ -248,17 +294,31 @@ class LajiFormComponent<T extends FormData = FormData>
     return { ...uiSchema, 'ui:readonly': disabled };
   }
 
-  private getUiSchemaContext(form: LajiFormModel.SchemaForm, isEdit: boolean | undefined, additionalClassNames: Record<string, string> | undefined, confirmFieldDelete: boolean | undefined) {
+  private getUiSchemaContext(
+    form: LajiFormModel.SchemaForm,
+    isEdit: boolean | undefined,
+    additionalClassNames: Record<string, string> | undefined,
+    confirmFieldDelete: boolean | undefined,
+  ) {
     return {
       ...form.uiSchemaContext,
       isEdit,
       additionalClassNames,
-      confirmDelete: confirmFieldDelete
+      confirmDelete: confirmFieldDelete,
     };
   }
 
+  private onSettingsChange(settings: Record<string, any>) {
+    this.settings.set(settings);
+  }
+
   private onError(error: Error, info: any) {
-    this.logger.error('LajiForm crashed', { error, info, document: this.formData() });
+    this.logger.error('LajiForm crashed', {
+      error,
+      info,
+      document: this.formData(),
+      settings: this.settings(),
+    });
     this.notifier?.showError('An unexpected error occurred');
   }
 

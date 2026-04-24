@@ -73,6 +73,8 @@ export class FormViewComponent<
   additionalClassNames = input<Record<string, string>>();
   confirmFieldDelete = input<boolean>();
 
+  settingsKey = input<string>();
+
   pageTitle = input<string>();
   allowCopy = input<boolean>();
   footerDisabled = input<boolean>();
