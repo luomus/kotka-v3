@@ -33,7 +33,6 @@ export class SpecimenConvertDataToOldFormatInterceptor implements NestIntercepto
       });
 
       req.body = document;
-      return next.handle();
     }
 
     return next
