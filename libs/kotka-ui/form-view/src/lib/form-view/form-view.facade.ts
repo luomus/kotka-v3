@@ -23,6 +23,7 @@ import {
   Person,
 } from '@kotka/shared/models';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { ErrorSchema } from '@rjsf/utils';
 
 export enum FormErrorEnum {
   dataNotFound = 'dataNotFound',
@@ -52,8 +53,7 @@ export interface FormState<S extends KotkaDocumentObject> {
   showCopyButton?: boolean;
   formHasChanges?: boolean;
   disabledAlertDismissed?: boolean;
-  showUniqueIDRequiredAlert?: boolean;
-  showDeleteTargetInUseAlert?: boolean;
+  extraErrors?: ErrorSchema;
 }
 
 @Injectable()
@@ -104,12 +104,8 @@ export class FormViewFacade<
     this.setState({ ...this.state(), disabledAlertDismissed });
   }
 
-  setShowUniqueIDRequiredAlert(showUniqueIDRequiredAlert: boolean) {
-    this.setState({ ...this.state(), showUniqueIDRequiredAlert });
-  }
-
-  setShowDeleteTargetInUseAlert(showDeleteTargetInUseAlert: boolean) {
-    this.setState({ ...this.state(), showDeleteTargetInUseAlert });
+  setExtraErrors(extraErrors?: ErrorSchema) {
+    this.setState({ ...this.state(), extraErrors });
   }
 
   private getInitialStateSub(): Subscription {
@@ -212,7 +208,6 @@ export class FormViewFacade<
       showCopyButton: isEditMode && inputs.allowCopy,
       formHasChanges: false,
       disabledAlertDismissed: false,
-      showDeleteTargetInUseAlert: false,
     };
   }
 

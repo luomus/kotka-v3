@@ -2,7 +2,7 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { LajiStoreService, OldKotkaApiService, TriplestoreService } from '@kotka/api/services';
+import { LajiStoreService, OldKotkaApiService, TriplestoreService, ValidationService } from '@kotka/api/services';
 import { Controller, Get, Param, UseGuards, UseInterceptors } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
@@ -33,12 +33,14 @@ export class SpecimenController extends LajiStoreController<Document> {
     private readonly oldKotkaApiService: OldKotkaApiService,
     protected readonly lajiStoreService: LajiStoreService,
     protected readonly triplestoreService: TriplestoreService,
-    protected readonly triplestoreMapperService: TriplestoreMapperService
+    protected readonly triplestoreMapperService: TriplestoreMapperService,
+    protected readonly validationService: ValidationService,
   ) {
     super(
       lajiStoreService,
       triplestoreService,
       triplestoreMapperService,
+      validationService,
       type,
       false
     );

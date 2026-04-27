@@ -8,7 +8,13 @@ import { FormService } from './form.service';
 import { LajiApiService } from './laji-api.service';
 import { LajiStoreService } from './laji-store.service';
 import { defaultNamespaceID, NamespaceData, NamespaceService } from './namespace.service';
-import { CoordinateLocationResponse, KotkaDocumentObjectFullType, SpecimenDataType, specimenDataTypeToNameMap } from '@kotka/shared/models';
+import {
+  ApiValidationError,
+  CoordinateLocationResponse,
+  KotkaDocumentObjectFullType,
+  SpecimenDataType,
+  specimenDataTypeToNameMap,
+} from '@kotka/shared/models';
 import { Dataset, Document, StoreObject } from '@luomus/laji-schema';
 import { Injectable } from '@nestjs/common';
 import { lastValueFrom, map } from 'rxjs';
@@ -345,7 +351,7 @@ export class ValidationService {
     return this.getError(field, `Found duplicates in other documents, found in ${duplicateIDs.join(', ')}.`);
   }
 
-  private getError(field: string, errorMsg: string, value?: any) {
+  getError(field: string, errorMsg: string, value?: any): ApiValidationError {
     return { errorCode: 'VALIDATION_EXCEPTION', details: { [field]: [errorMsg.replace('%{value}', value)] } };
   }
 

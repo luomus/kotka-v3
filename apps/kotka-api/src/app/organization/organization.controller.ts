@@ -11,7 +11,7 @@ import {
   UseInterceptors
 } from '@nestjs/common';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
-import { LajiStoreService, TriplestoreService } from '@kotka/api/services';
+import { LajiStoreService, TriplestoreService, ValidationService } from '@kotka/api/services';
 import { TriplestoreMapperService } from '@kotka/api/mappers';
 import { LajiStoreController } from '../shared/controllers/laji-store.controller';
 import { ControllerType } from '../shared/decorators/controller-type.decorator';
@@ -46,12 +46,14 @@ export class OrganizationController extends LajiStoreController<Organization> {
   constructor(
     protected readonly lajiStoreService: LajiStoreService,
     protected readonly triplestoreService: TriplestoreService,
-    protected readonly triplestoreMapperService: TriplestoreMapperService
+    protected readonly triplestoreMapperService: TriplestoreMapperService,
+    protected readonly validationService: ValidationService,
   ) {
     super(
       lajiStoreService,
       triplestoreService,
       triplestoreMapperService,
+      validationService,
       type,
     );
   }

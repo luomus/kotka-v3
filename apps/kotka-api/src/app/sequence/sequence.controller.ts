@@ -51,7 +51,7 @@ export class SequenceController {
     }
 
     if(parts[0].startsWith('accession-') && parts[0] === defaultNamespaceID) {
-      throw new BadRequestException(ErrorMessages.protectedSequncePrefix);
+      throw new BadRequestException(ErrorMessages.protectedSequencePrefix);
     }
 
     try {

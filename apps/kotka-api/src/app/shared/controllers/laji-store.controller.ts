@@ -2,12 +2,11 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { ErrorMessages, StoreGetQuery } from '@kotka/shared/models';
+import { StoreGetQuery } from '@kotka/shared/models';
 import { lastValueFrom } from 'rxjs';
-import { LajiStoreService, TriplestoreService } from '@kotka/api/services';
+import { LajiStoreService, TriplestoreService, ValidationService } from '@kotka/api/services';
 import { TriplestoreMapperService } from '@kotka/api/mappers';
 import {
-  BadRequestException,
   Body,
   Delete,
   Get,
@@ -20,7 +19,8 @@ import {
   Put,
   Query,
   Req,
-  UseInterceptors
+  UnprocessableEntityException,
+  UseInterceptors,
 } from '@nestjs/common';
 import { StoreObject } from '@kotka/shared/models';
 import { cloneDeep } from 'lodash';
@@ -37,6 +37,7 @@ export abstract class LajiStoreController<T extends StoreObject> {
     protected readonly lajiStoreService: LajiStoreService,
     protected readonly triplestoreService: TriplestoreService,
     protected readonly triplestoreMapperService: TriplestoreMapperService,
+    protected readonly validationService: ValidationService,
     protected readonly type: string,
     protected readonly useTriplestore = true
   ) {
@@ -76,7 +77,12 @@ export abstract class LajiStoreController<T extends StoreObject> {
       const message = err.response?.data?.message;
 
       if (err.status === 400 && message && existingErrorRegex.test(message)) {
-        throw new BadRequestException(ErrorMessages.uniqueIDRequired);
+        throw new UnprocessableEntityException(
+          this.validationService.getError(
+            '/objectID',
+            'Resource with the given ID exists already.',
+          ),
+        );
       }
 
       console.error(err);

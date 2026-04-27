@@ -2,7 +2,7 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { LajiStoreService, TriplestoreService } from '@kotka/api/services';
+import { LajiStoreService, TriplestoreService, ValidationService } from '@kotka/api/services';
 import { TriplestoreMapperService } from '@kotka/api/mappers';
 import { Controller, UseGuards } from '@nestjs/common';
 import { LajiStoreController } from '../shared/controllers/laji-store.controller';
@@ -28,11 +28,13 @@ export class TransactionController extends LajiStoreController<SpecimenTransacti
     protected readonly lajiStoreService: LajiStoreService,
     protected readonly triplestoreService: TriplestoreService,
     protected readonly triplestoreMapperService: TriplestoreMapperService,
+    protected readonly validationService: ValidationService,
   ) {
       super(
         lajiStoreService,
         triplestoreService,
         triplestoreMapperService,
+        validationService,
         type,
         useTriplestore
       );

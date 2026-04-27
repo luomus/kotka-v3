@@ -24,6 +24,7 @@ import { MediaMetadata } from '@luomus/laji-form/lib/components/LajiForm';
 import { Logger, ToastService, FormApiClient } from '@kotka/ui/core';
 import { LocalStorageService } from 'ngx-webstorage';
 import { FormFooterComponent } from '../form-footer/form-footer.component';
+import { ErrorSchema } from '@rjsf/utils';
 
 type FormData = Record<string, any>;
 
@@ -46,16 +47,21 @@ class LajiFormComponent<T extends FormData = FormData>
 
   static TOP_OFFSET = 0;
   static BOTTOM_OFFSET = 50;
+
   form = input<LajiFormModel.SchemaForm | null>(null);
   formData = input<Partial<T>>({});
+
   editMode = input<boolean>();
   hasChanges = input<boolean>();
   disabled = input<boolean>();
   footerDisabled = input<boolean>();
+
   mediaMetadata = input<MediaMetadata>();
   hiddenFields = input<string[]>();
   additionalClassNames = input<Record<string, string>>();
   confirmFieldDelete = input<boolean>();
+  extraErrors = input<ErrorSchema>();
+
   beforeSubmitFunc = input<() => unknown | Observable<unknown>>();
 
   showFooter = input(true);
@@ -123,6 +129,7 @@ class LajiFormComponent<T extends FormData = FormData>
         formData: this.formData(),
         settings: this.settings(),
         mediaMetadata: this.mediaMetadata(),
+        extraErrors: this.extraErrors(),
         validators: form.validators,
         warnings: form.warnings,
       };
@@ -246,6 +253,7 @@ class LajiFormComponent<T extends FormData = FormData>
             settings: this.settings(),
             apiClient: this.apiClient,
             mediaMetadata: this.mediaMetadata(),
+            extraErrors: this.extraErrors(),
             lang: 'en',
             renderSubmit: false,
             topOffset: LajiFormComponent.TOP_OFFSET,
