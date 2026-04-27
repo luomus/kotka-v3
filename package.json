@@ -37,7 +37,7 @@
     "@luomus/label-designer": "^19.0.0",
     "@luomus/laji-form": "^15.1.112",
     "@luomus/laji-schema": "^2.0.164",
-    "@luomus/laji-validate": "0.0.128",
+    "@luomus/laji-validate": "0.0.131",
     "@nestjs/axios": "^4.0.0",
     "@nestjs/cache-manager": "^3.0.1",
     "@nestjs/common": "^11.1.3",

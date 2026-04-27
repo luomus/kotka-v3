@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 import { ToastService } from '../util-services';
 import { apiBase, lajiApiBase } from './constants';
 import { isMultiLanguageObject } from '@kotka/shared/models';
@@ -92,7 +92,7 @@ export class FormApiClient {
         break;
     }
 
-    return this.httpClient
+    return firstValueFrom(this.httpClient
       .request(options['method'] || 'GET', path, {
         headers: { ...options['headers'], timeout: '120000' },
         params: query,
@@ -106,13 +106,13 @@ export class FormApiClient {
             const json = JSON.parse(response.body!);
             return {
               ...response,
-              json: () => this.processResult(resourceType, json),
+              json: () => Promise.resolve(this.processResult(resourceType, json)),
             };
           }
 
           return {
             ...response,
-            text: () => response.body
+            text: () => Promise.resolve(response.body)
           };
         }),
         catchError((err) => {
@@ -136,10 +136,10 @@ export class FormApiClient {
           ) {
             this.toastService.showGenericError({ pause: true });
           }
-          return of({ ...err, json: () => error });
+
+          return of({ ...err, json: () => Promise.resolve(error) });
         }),
-      )
-      .toPromise(Promise);
+      ));
   }
 
   private getResourceType(resource: string): ResourceType {
