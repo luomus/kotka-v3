@@ -8,20 +8,21 @@ export const organizationsRoutes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    component: OrganizationTableComponent
+    component: OrganizationTableComponent,
   },
   {
     matcher: formMatcher,
     component: OrganizationFormComponent,
     data: {
-      add: { title: 'Add organization' }
+      add: { title: 'Add organization' },
+      forceRouteRefresh: true,
     },
-    canDeactivate: [ ComponentCanDeactivateGuard ],
-    runGuardsAndResolvers: 'always'
+    canDeactivate: [ComponentCanDeactivateGuard],
+    runGuardsAndResolvers: 'always',
   },
   {
     path: 'history',
     pathMatch: 'full',
-    component: OrganizationVersionHistoryComponent
-  }
+    component: OrganizationVersionHistoryComponent,
+  },
 ];

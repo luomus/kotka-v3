@@ -8,17 +8,20 @@ export const datasetsRoutes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    component: DatasetTableComponent
+    component: DatasetTableComponent,
   },
   {
     matcher: formMatcher,
     component: DatasetFormComponent,
-    canDeactivate: [ ComponentCanDeactivateGuard ],
-    runGuardsAndResolvers: 'always'
+    data: {
+      forceRouteRefresh: true,
+    },
+    canDeactivate: [ComponentCanDeactivateGuard],
+    runGuardsAndResolvers: 'always',
   },
   {
     path: 'history',
     pathMatch: 'full',
-    component: DatasetVersionHistoryComponent
-  }
+    component: DatasetVersionHistoryComponent,
+  },
 ];

@@ -1,6 +1,6 @@
 import { Routes, UrlMatchResult, UrlSegment } from '@angular/router';
 import { SpecimenFormComponent } from './specimen-form/specimen-form.component';
-import { ComponentCanDeactivateGuard, formMatcher, RouteReuseStrategyEnum } from '@kotka/ui/core';
+import { ComponentCanDeactivateGuard, formMatcher } from '@kotka/ui/core';
 import { SpecimenTableComponent } from './specimen-table/specimen-table.component';
 import { SpecimenVersionHistoryComponent } from './specimen-version-history/specimen-version-history.component';
 import { NotFoundComponent } from '@kotka/ui/base';
@@ -46,7 +46,7 @@ export const specimensRoutes: Routes = [
   {
     matcher: specimenFormMatcher,
     data: {
-      routeReuseStrategy: RouteReuseStrategyEnum.urlMatch
+      forceRouteRefresh: true
     },
     children: [
       {
@@ -54,9 +54,6 @@ export const specimensRoutes: Routes = [
         component: SpecimenFormComponent,
         canDeactivate: [ ComponentCanDeactivateGuard ],
         runGuardsAndResolvers: 'always',
-        data: {
-          routeReuseStrategy: RouteReuseStrategyEnum.default
-        }
       },
       {
         path: '**',

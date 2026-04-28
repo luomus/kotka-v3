@@ -1,21 +1,22 @@
-import { ActivatedRouteSnapshot, BaseRouteReuseStrategy } from '@angular/router';
-import { Injectable } from '@angular/core';
-import { isEqual } from 'lodash';
-
-export enum RouteReuseStrategyEnum {
-  default = 'default',
-  urlMatch = 'urlMatch'
-}
+import {
+  ActivatedRouteSnapshot,
+  BaseRouteReuseStrategy,
+  Router,
+} from '@angular/router';
+import { inject, Injectable, Injector } from '@angular/core';
 
 @Injectable()
 export class KotkaRouteReuseStrategy extends BaseRouteReuseStrategy {
-  override shouldReuseRoute(future: ActivatedRouteSnapshot, curr: ActivatedRouteSnapshot): boolean {
-    const reuseStrategy: RouteReuseStrategyEnum = Object.values(RouteReuseStrategyEnum).includes(curr.data['routeReuseStrategy'])
-      ? curr.data['routeReuseStrategy']
-      : 'default';
+  private injector = inject(Injector);
 
-    if (reuseStrategy === RouteReuseStrategyEnum.urlMatch) {
-      return isEqual(future.url, curr.url) && super.shouldReuseRoute(future, curr);
+  override shouldReuseRoute(future: ActivatedRouteSnapshot, curr: ActivatedRouteSnapshot): boolean {
+    const router = this.injector.get(Router);
+    const navigation = router.currentNavigation();
+
+    if (curr.data['forceRouteRefresh']) {
+      if (!navigation?.extras.state?.['skipForceRouteRefresh']) {
+        return false;
+      }
     }
 
     return super.shouldReuseRoute(future, curr);

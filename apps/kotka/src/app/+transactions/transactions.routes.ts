@@ -8,17 +8,20 @@ export const transactionsRoutes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    component: TransactionTableComponent
+    component: TransactionTableComponent,
   },
   {
     matcher: formMatcher,
     component: TransactionFormComponent,
-    canDeactivate: [ ComponentCanDeactivateGuard ],
-    runGuardsAndResolvers: 'always'
+    data: {
+      forceRouteRefresh: true,
+    },
+    canDeactivate: [ComponentCanDeactivateGuard],
+    runGuardsAndResolvers: 'always',
   },
   {
     path: 'history',
     pathMatch: 'full',
-    component: TransactionVersionHistoryComponent
-  }
+    component: TransactionVersionHistoryComponent,
+  },
 ];

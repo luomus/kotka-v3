@@ -8,9 +8,7 @@ import { KotkaDocumentObjectType, Document as KotkaDocument, Gathering, isDocume
 import { globals } from '../../../environments/globals';
 import { FormViewContainerComponent } from '@kotka/ui/form-view';
 import { FormViewComponent } from '@kotka/ui/form-view';
-import {
-  UserService
-} from '@kotka/ui/core';
+import { UserService } from '@kotka/ui/core';
 import { ParamMap, RouterLink } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
@@ -246,7 +244,11 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
         );
         this.router.navigate(
           [urlDataType, 'specimens', this.editMode() ? 'edit' : 'add'],
-          { replaceUrl: true, queryParamsHandling: 'preserve' },
+          {
+            replaceUrl: true,
+            queryParamsHandling: 'preserve',
+            state: { skipForceRouteRefresh: true },
+          },
         );
       }
     });
@@ -395,11 +397,8 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     }
 
     const urlDataType = this.getUrlDataTypeFromDataType(formData.datatype);
-
     from(
-      this.router.navigate([urlDataType, 'specimens', 'add'], {
-        state: { routeReuseStrategy: 'urlMatch' },
-      }),
+      this.router.navigate([urlDataType, 'specimens', 'add']),
     ).subscribe(() => {
       this.copyData.set(formData);
       this.cdr.markForCheck();

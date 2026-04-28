@@ -6,7 +6,8 @@ import {
   provideRouter,
   RouteReuseStrategy,
   withEnabledBlockingInitialNavigation,
-  withPreloading
+  withPreloading,
+  withRouterConfig
 } from '@angular/router';
 import { routes } from './app/app.routes';
 import { QuicklinkStrategy } from 'ngx-quicklink';
@@ -46,7 +47,7 @@ function createLoggerLoader(): ILogger {
 
 bootstrapApplication(AppComponent, {
   providers: [
-    provideRouter(routes, withPreloading(QuicklinkStrategy), withEnabledBlockingInitialNavigation()),
+    provideRouter(routes, withPreloading(QuicklinkStrategy), withEnabledBlockingInitialNavigation(), withRouterConfig({ onSameUrlNavigation: 'reload' })),
     provideHttpClient(withInterceptorsFromDi()),
     provideAnimations(),
     provideNgxWebstorage(
