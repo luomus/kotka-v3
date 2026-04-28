@@ -18,7 +18,7 @@ import {
 import { Dataset, Document, StoreObject } from '@luomus/laji-schema';
 import { Injectable } from '@nestjs/common';
 import { lastValueFrom, map } from 'rxjs';
-import { acceptedPrefixes, convertCoordinatesToWGS84, defaultPrefix, JSONPathAllResponse, parseJSONPointer, parseStoreSearchPath } from '@kotka/shared/utils';
+import { acceptedPrefixes, defaultPrefix, JSONPathAllResponse, parseJSONPointer, parseStoreSearchPath } from '@kotka/shared/utils';
 import { GeometryCollection } from 'geojson';
 import { JSONPath } from 'jsonpath-plus';
 import * as lajiValidate from '@luomus/laji-validate';
@@ -237,15 +237,14 @@ export class ValidationService {
       return;
     }
 
-    const coordinateSystem = data.gatherings[0].coordinateSystem!;
-    const latitude = Number(data.gatherings[0].latitude!);
-    const longitude = Number(data.gatherings[0].longitude!);
+    const wgs84Latitude = Number(data.gatherings[0].wgs84Latitude!);
+    const wgs84Longitude = Number(data.gatherings[0].wgs84Longitude!);
 
-    const coordinates = convertCoordinatesToWGS84(latitude, longitude, coordinateSystem);
-
-    if (!coordinates) {
-      return 'Error converting coordinates to WGS84 for validation.';
+    if (!wgs84Latitude || !wgs84Longitude) {
+      return 'No WGS84 coordinates found.';
     }
+
+    const coordinates = [wgs84Latitude, wgs84Longitude]
 
     const geometry: GeometryCollection = {
       type: 'GeometryCollection',
