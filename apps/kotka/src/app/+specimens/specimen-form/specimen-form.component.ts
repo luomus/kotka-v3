@@ -309,12 +309,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
   }
 
   beforeSubmit() {
-    if (this.markAdvancedFieldsActive()) {
-      this.toggleMarkAdvancedFields();
-    }
-    if (this.markUnreliableFieldsActive()) {
-      this.toggleMarkUnreliableFields();
-    }
+    this.stopFieldChoosers();
   }
 
   toggleMarkAdvancedFields() {
@@ -400,6 +395,8 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
       throw new Error('Missing a datatype');
     }
 
+    this.stopFieldChoosers();
+
     const urlDataType = this.getUrlDataTypeFromDataType(formData.datatype);
     from(
       this.router.navigate([urlDataType, 'specimens', 'add'], { state: { skipForceRouteRefresh: true } }),
@@ -407,6 +404,15 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
       this.copyData.set(formData);
       this.cdr.markForCheck();
     });
+  }
+
+  private stopFieldChoosers() {
+    if (this.markAdvancedFieldsActive()) {
+      this.toggleMarkAdvancedFields();
+    }
+    if (this.markUnreliableFieldsActive()) {
+      this.toggleMarkUnreliableFields();
+    }
   }
 
   private getDataTypeFromParamMap(paramMap: ParamMap): DataType | undefined {
