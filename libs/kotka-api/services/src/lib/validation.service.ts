@@ -42,7 +42,13 @@ export class ValidationService {
 
     lajiValidate.extend(lajiValidate.validators.remote, {
       fetch: (path: any, query: any, options: any) => {
-        return this.remoteValidate(query, options);
+        return this.remoteValidate(query, options).then((data) => {
+          if (!data) {
+            return { status: 200 };
+          } else {
+            return { status: 422, json: async () => data };
+          }
+        });
       }
     });
   }
@@ -160,8 +166,6 @@ export class ValidationService {
         return this.getError(field, prefixError);
       }
     }
-
-    return {};
   }
 
   validateNamespaceForType(namespaceID: string, datatype: SpecimenDataType, namespaces: NamespaceData[]) {
@@ -208,15 +212,13 @@ export class ValidationService {
     if (members.length !== 0 && !(members.length === 1 && members[0].id && members[0].id === data.id)) {
       return this.getError(field, 'Dataset name must be unique.');
     }
-
-    return {};
   }
 
   async validateIRCCNumber(data: Record<string, any>, field: string) {
     const value: string | undefined = parseJSONPointer(data, field);
 
     if (!value) {
-      return {};
+      return;
     }
 
     try {
@@ -227,14 +229,12 @@ export class ValidationService {
     } catch (e) {
       return this.getError(field, 'ABSCH API didn\'t respond in time.');
     }
-
-    return {};
   }
 
   async validateCoordinateMunicipality(data: Document, field: string) {
     const value: string | undefined = parseJSONPointer(data, field);
     if (!value) {
-      return {};
+      return;
     }
 
     const coordinateSystem = data.gatherings[0].coordinateSystem!;
@@ -258,7 +258,7 @@ export class ValidationService {
     const localities = await lastValueFrom(this.lajiApiService.post<CoordinateLocationResponse>('coordinates/location', geometry, { lang: 'multi' }).pipe(map(res => res.data)));
 
     if (!localities.results.length) {
-      return {};
+      return;
     }
 
     let matchFound = false;
@@ -287,7 +287,7 @@ export class ValidationService {
     });
 
     if (matchFound || !nonMatches) {
-      return {};
+      return;
     }
 
     return this.getError(field, `Coordinates do not match municipality, has ${value} but coordinates correspond to ${nonMatches.join(', ')}`);
@@ -324,7 +324,7 @@ export class ValidationService {
     const docs = (await lastValueFrom(this.lajiStoreService.getAll<Document>(KotkaDocumentObjectFullType.document, { q: searchBody }))).data;
 
     if (!docs.member.length || (data.id && docs.member.length === 1 && docs.member[0].id === data.id)) {
-      return {};
+      return;
     }
 
     const duplicateIDs: string[] = [];
@@ -346,7 +346,7 @@ export class ValidationService {
         }
       });
     });
-    if (!duplicateIDs.length) return {};
+    if (!duplicateIDs.length) return;
 
     return this.getError(field, `Found duplicates in other documents, found in ${duplicateIDs.join(', ')}.`);
   }

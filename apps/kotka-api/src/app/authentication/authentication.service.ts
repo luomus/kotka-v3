@@ -13,7 +13,7 @@ const kotkaRoles = [
 export class AuthenticationService {
 
   constructor(
-    private readonly lajiApiSevice: LajiApiService,
+    private readonly lajiApiService: LajiApiService,
   ) {}
 
   public getLoginUrl(next = ''): string {
@@ -21,7 +21,7 @@ export class AuthenticationService {
   }
 
   public getProfile(token: string) {
-    const $person = this.lajiApiSevice.get<any>(`person-token/${token}`).pipe(
+    const $person = this.lajiApiService.get<any>(`person-token/${token}`).pipe(
       catchError((err) => { throw new UnauthorizedException('Error retrieving personToken information from laji-auth.', err.message); }),
       mergeMap((res) => {
         if (res.data.target !== process.env['SYSTEM_ID']) {
@@ -30,12 +30,12 @@ export class AuthenticationService {
 
         const next = res.data.next;
 
-        return this.lajiApiSevice.get<any>(`person/${token}`).pipe(
+        return this.lajiApiService.get<any>(`person/${token}`).pipe(
           catchError((err) => { throw new UnauthorizedException('Error retrieving user profile from laji-auth.', err.message); }),
           map(res => res.data),
           map(data => {
             if (!data) {
-              throw new UnauthorizedException('No profile data fond.');
+              throw new UnauthorizedException('No profile data found.');
             }
 
             return data;
@@ -60,7 +60,7 @@ export class AuthenticationService {
   }
 
   public logoutUser(request) {
-    return this.lajiApiSevice.delete(`person-token/${request.user?.personToken}`).pipe(
+    return this.lajiApiService.delete(`person-token/${request.user?.personToken}`).pipe(
       tap(() => this.invalidateSession(request)),
       catchError((err) => {
         throw new InternalServerErrorException('Error terminating user laji-auth login.', err.message);
@@ -69,7 +69,7 @@ export class AuthenticationService {
   }
 
   public checkLoginValidity(request) {
-    return this.lajiApiSevice.get(`person-token/${request.user.personToken}`).pipe(
+    return this.lajiApiService.get(`person-token/${request.user.personToken}`).pipe(
       catchError((err) => {
         if (err.response?.data?.error?.message && err.response?.data?.error?.message.includes('INVALID TOKEN')) {
           this.invalidateSession(request);
