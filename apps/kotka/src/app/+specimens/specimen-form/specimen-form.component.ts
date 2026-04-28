@@ -391,6 +391,10 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     this.formView.lajiForm?.focusField(field);
   }
 
+  override onDeleteSuccess() {
+    this.router.navigate(['specimens', 'search']);
+  }
+
   override onCopyData(formData: Partial<KotkaDocument>) {
     if (!formData.datatype) {
       throw new Error('Missing a datatype');
