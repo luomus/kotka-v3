@@ -6,9 +6,10 @@ import { AppModule } from './app/app.module';
 import Redis from 'ioredis';
 import { RedisStore } from 'connect-redis';
 import { REDIS } from './app/shared-modules/redis/redis.constants';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const redisClient = app.get<Redis>(REDIS);
 
   const globalPrefix = 'api';
@@ -16,6 +17,7 @@ async function bootstrap() {
   const host = process.env.HOST || 'localhost';
   const port = process.env.PORT || 3333;
 
+  app.useBodyParser('json', { limit: '10mb' });
   app.use(
     session({
       store: new RedisStore({
