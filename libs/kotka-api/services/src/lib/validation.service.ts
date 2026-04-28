@@ -244,7 +244,7 @@ export class ValidationService {
       return 'No WGS84 coordinates found.';
     }
 
-    const coordinates = [wgs84Latitude, wgs84Longitude]
+    const coordinates = [wgs84Latitude, wgs84Longitude];
 
     const geometry: GeometryCollection = {
       type: 'GeometryCollection',
