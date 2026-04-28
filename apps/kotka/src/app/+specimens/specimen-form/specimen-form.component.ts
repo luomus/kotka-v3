@@ -402,7 +402,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
 
     const urlDataType = this.getUrlDataTypeFromDataType(formData.datatype);
     from(
-      this.router.navigate([urlDataType, 'specimens', 'add']),
+      this.router.navigate([urlDataType, 'specimens', 'add'], { state: { skipForceRouteRefresh: true } }),
     ).subscribe(() => {
       this.copyData.set(formData);
       this.cdr.markForCheck();

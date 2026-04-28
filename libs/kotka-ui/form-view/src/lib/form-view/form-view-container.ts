@@ -65,7 +65,7 @@ export class FormViewContainerComponent<
 
   onCopyData(formData: Partial<S>): void {
     from(
-      this.router.navigate(['..', 'add'], { relativeTo: this.activeRoute }),
+      this.router.navigate(['..', 'add'], { relativeTo: this.activeRoute, state: { skipForceRouteRefresh: true } }),
     ).subscribe(() => {
       this.copyData.set(formData);
       this.cdr.markForCheck();
