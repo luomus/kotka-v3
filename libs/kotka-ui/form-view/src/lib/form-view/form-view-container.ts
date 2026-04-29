@@ -5,6 +5,7 @@ import { FormViewComponent } from './form-view.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { KotkaDocumentObjectMap, KotkaDocumentObjectType } from '@kotka/shared/models';
 import { getUri } from '@kotka/shared/utils';
+import { PrefilledFormData } from '../models';
 
 @Directive()
 export class FormViewContainerComponent<
@@ -14,7 +15,7 @@ export class FormViewContainerComponent<
   editMode = signal(false);
   dataURI = signal<string | undefined>(undefined);
 
-  copyData = signal<Partial<S> | undefined>(undefined);
+  copyData = signal<PrefilledFormData<S> | undefined>(undefined);
 
   @ViewChild(FormViewComponent<T, S>, { static: true }) formViewComponent!: FormViewComponent<T, S>;
 
@@ -71,7 +72,7 @@ export class FormViewContainerComponent<
     from(
       this.router.navigate(['..', 'add'], { relativeTo: this.activeRoute, state: { skipForceRouteRefresh: true } }),
     ).subscribe(() => {
-      this.copyData.set(formData);
+      this.copyData.set({ data: formData, hasChanges: true });
       this.cdr.markForCheck();
     });
   }

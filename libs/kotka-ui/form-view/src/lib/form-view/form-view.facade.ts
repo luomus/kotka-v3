@@ -24,6 +24,7 @@ import {
 } from '@kotka/shared/models';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { ErrorSchema } from '@rjsf/utils';
+import { PrefilledFormData } from '../models';
 
 export enum FormErrorEnum {
   dataNotFound = 'dataNotFound',
@@ -39,7 +40,7 @@ export interface FormInputs<T extends KotkaDocumentObjectType, S extends KotkaDo
   augmentFormFunc?: (
     form: LajiForm.SchemaForm,
   ) => Observable<LajiForm.SchemaForm>;
-  prefilledFormData?: Partial<S>;
+  prefilledFormData?: PrefilledFormData<S>;
 }
 
 export interface FormState<S extends KotkaDocumentObject> {
@@ -157,7 +158,7 @@ export class FormViewFacade<
     if (inputs.editMode) {
       return this.getFormData$(inputs.dataType, inputs.dataURI);
     } else {
-      return this.getEmptyFormData$(inputs.prefilledFormData);
+      return this.getEmptyFormData$(inputs.prefilledFormData?.data);
     }
   }
 
@@ -206,7 +207,7 @@ export class FormViewFacade<
       disabled,
       showDeleteButton,
       showCopyButton: isEditMode && inputs.allowCopy,
-      formHasChanges: false,
+      formHasChanges: inputs.prefilledFormData?.hasChanges || false,
       disabledAlertDismissed: false,
     };
   }

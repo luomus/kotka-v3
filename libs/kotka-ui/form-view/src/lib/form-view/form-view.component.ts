@@ -18,8 +18,9 @@ import { FormMediaMetadata, LajiFormComponent } from '@kotka/ui/laji-form';
 import {
   FormErrorEnum,
   FormState,
-  FormViewFacade
+  FormViewFacade,
 } from './form-view.facade';
+import { PrefilledFormData } from '../models';
 import { FormViewUtils } from './form-view-utils';
 import { ToastService, DialogService, ApiClient, LabelPipe } from '@kotka/ui/core';
 import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
@@ -64,7 +65,7 @@ export class FormViewComponent<
 
   augmentFormFunc =
     input<(form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>>();
-  prefilledFormData = input<Partial<S>>();
+  prefilledFormData = input<PrefilledFormData<S>>();
   mediaMetadata = input<FormMediaMetadata>();
   beforeSubmitFunc = input<() => unknown | Observable<unknown>>();
 
