@@ -26,6 +26,7 @@ import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 import { MetaFieldsComponent } from '../meta-fields/meta-fields.component';
 import { NgTemplateOutlet, TitleCasePipe } from '@angular/common';
+import { ErrorSchema } from '@rjsf/utils';
 
 @Component({
   selector: 'kotka-form-view',
@@ -241,6 +242,8 @@ export class FormViewComponent<
       this.formViewFacade.setExtraErrors(
         FormViewUtils.apiValidationErrorsToRJSFErrorSchema(err.error)
       );
+    } else if (err.status === 413) {
+      this.formViewFacade.setExtraErrors({ __errors: ['Content is too large.'] } as ErrorSchema);
     } else {
       this.formViewFacade.setExtraErrors(undefined);
       this.notifier.showError(generalErrorMessage);

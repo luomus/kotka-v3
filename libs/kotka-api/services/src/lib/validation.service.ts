@@ -140,6 +140,7 @@ export class ValidationService {
   }
 
   async validateAllowedNamespace(data: Record<string, any>, field: string) {
+    //TODO check both present or reject defult prefix.
     let namespaceID: string = parseJSONPointer(data, field);
     let prefix;
 

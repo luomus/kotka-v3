@@ -130,8 +130,7 @@ export class FormApiClient {
           } else if (
             !(
               err.status === 404 ||
-              (resourceType === ResourceType.validateResource &&
-                err.status === 422)
+              resourceType === ResourceType.validateResource
             )
           ) {
             this.toastService.showGenericError({ pause: true });
