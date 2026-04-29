@@ -237,14 +237,14 @@ export class ValidationService {
       return;
     }
 
-    const wgs84Latitude = Number(data.gatherings[0].wgs84Latitude!);
-    const wgs84Longitude = Number(data.gatherings[0].wgs84Longitude!);
+    const wgs84Latitude = data.gatherings[0].wgs84Latitude;
+    const wgs84Longitude = data.gatherings[0].wgs84Longitude;
 
-    if (!wgs84Latitude || !wgs84Longitude) {
-      return 'No WGS84 coordinates found.';
+    if ((!wgs84Latitude && wgs84Longitude) || (wgs84Latitude && !wgs84Longitude)) {
+      return this.getError(field, 'Only one of the coordinates found.');
     }
 
-    const coordinates = [wgs84Latitude, wgs84Longitude]
+    const coordinates = [Number(wgs84Latitude), Number(wgs84Longitude)];
 
     const geometry: GeometryCollection = {
       type: 'GeometryCollection',
