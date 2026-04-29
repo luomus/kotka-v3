@@ -386,6 +386,10 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     this.formView.lajiForm?.focusField(field);
   }
 
+  override hasChanges(): boolean {
+    return super.hasChanges() || this.markAdvancedFieldsActive();
+  }
+
   override onDeleteSuccess() {
     this.router.navigate(['specimens', 'search']);
   }
@@ -399,7 +403,9 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
 
     const urlDataType = this.getUrlDataTypeFromDataType(formData.datatype);
     from(
-      this.router.navigate([urlDataType, 'specimens', 'add'], { state: { skipForceRouteRefresh: true } }),
+      this.router.navigate([urlDataType, 'specimens', 'add'], {
+        state: { skipForceRouteRefresh: true },
+      }),
     ).subscribe(() => {
       this.copyData.set(formData);
       this.cdr.markForCheck();

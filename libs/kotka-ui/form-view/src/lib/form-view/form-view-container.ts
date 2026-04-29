@@ -37,13 +37,17 @@ export class FormViewContainerComponent<
     this.routeParamUpdateSub.unsubscribe();
   }
 
+  hasChanges() {
+    return this.formViewComponent.getFormHasChanges();
+  }
+
   @HostListener('window:beforeunload')
   preventLeave(): boolean {
-    return !this.formViewComponent.getFormHasChanges();
+    return !this.hasChanges();
   }
 
   canDeactivate(): Observable<boolean> {
-    if (!this.formViewComponent.getFormHasChanges()) {
+    if (!this.hasChanges()) {
       return of(true);
     }
 
