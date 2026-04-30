@@ -508,7 +508,7 @@ describe('ValidationInterceptor', () => {
       try {
         await validatorInterceptor.intercept(mockContext, mockNext);
       } catch (e) {
-        expect(JSON.stringify(e)).toContain('"datasetName":{"en":{"errors":["Required field."]}');
+        expect(JSON.stringify(e)).toContain('"/datasetName/en":["Required field."]');
         expect(mockNext.handle).toBeCalledTimes(0);
       }
     });
@@ -569,7 +569,7 @@ describe('ValidationInterceptor', () => {
         await validatorInterceptor.intercept(mockContext, mockNext);
       } catch (e) {
         expect(lajiStoreService.search).toBeCalledTimes(1);
-        expect(JSON.stringify(e)).toContain('"datasetName":{"en":{"errors":["Dataset name must be unique."]}');
+        expect(JSON.stringify(e)).toContain('"/datasetName/en":["Dataset name must be unique."]');
         expect(mockNext.handle).toBeCalledTimes(0);
       }
     });
@@ -655,7 +655,7 @@ describe('ValidationInterceptor', () => {
         await validatorInterceptor.intercept(mockContext, mockNext);
       } catch (e) {
         expect(namespaceService.getNamespaces).toBeCalledTimes(1);
-        expect(e.options).toEqual({namespaceID:{errors:['Unknown namespace "BB".']}});
+        expect(e.response.details['/namespaceID']).toEqual(['Unknown namespace "BB".']);
         expect(mockNext.handle).toBeCalledTimes(0);
       }
     });
@@ -683,7 +683,7 @@ describe('ValidationInterceptor', () => {
         await validatorInterceptor.intercept(mockContext, mockNext);
       } catch (e) {
         expect(namespaceService.getNamespaces).toBeCalledTimes(1);
-        expect(e.options).toEqual({namespaceID:{errors:['Namespace "AC" is not allowed for specimen of type "zoospecimen".']}});
+        expect(e.response.details['/namespaceID']).toEqual(['Namespace "AC" is not allowed for specimen of type "zoospecimen".']);
         expect(mockNext.handle).toBeCalledTimes(0);
       }
     });
@@ -711,7 +711,7 @@ describe('ValidationInterceptor', () => {
         await validatorInterceptor.intercept(mockContext, mockNext);
       } catch (e) {
         expect(namespaceService.getNamespaces).toBeCalledTimes(0);
-        expect(e.options).toEqual({namespaceID:{errors:[`Namespace ${defaultNamespaceID} is default and should not be used explicitly.`]}});
+        expect(e.response.details['/namespaceID']).toEqual([`Namespace ${defaultNamespaceID} is default and should not be used explicitly.`]);
         expect(mockNext.handle).toBeCalledTimes(0);
       }
     });
@@ -791,7 +791,7 @@ describe('ValidationInterceptor', () => {
         await validatorInterceptor.intercept(mockContext, mockNext);
       } catch (e) {
         expect(namespaceService.getNamespaces).toBeCalledTimes(1);
-        expect(e.options).toEqual({namespaceID:{errors:['Unacceptable prefix in namespace, has "tun" but accepts only "utu".']}});
+        expect(e.response.details['/namespaceID']).toEqual(['Unacceptable prefix in namespace, has "tun" but accepts only "utu".']);
         expect(mockNext.handle).toBeCalledTimes(0);
       }
     });
@@ -871,7 +871,7 @@ describe('ValidationInterceptor', () => {
         await validatorInterceptor.intercept(mockContext, mockNext);
       } catch (e) {
         expect(namespaceService.getNamespaces).toBeCalledTimes(1);
-        expect(e.options).toEqual({namespaceID:{errors:['Unacceptable prefix in namespace, has "utu" but accepts only "tun".']}});
+        expect(e.response.details['/namespaceID']).toEqual(['Unacceptable prefix in namespace, has "utu" but accepts only "tun".']);
         expect(mockNext.handle).toBeCalledTimes(0);
       }
     });
@@ -899,7 +899,7 @@ describe('ValidationInterceptor', () => {
         await validatorInterceptor.intercept(mockContext, mockNext);
       } catch (e) {
         expect(namespaceService.getNamespaces).toBeCalledTimes(1);
-        expect(e.options).toEqual({namespaceID:{errors:['Unknown prefix "test" not accepted.']}});
+        expect(e.response.details['/namespaceID']).toEqual(['Unknown prefix "test" not accepted.']);
         expect(mockNext.handle).toBeCalledTimes(0);
       }
     });
@@ -954,7 +954,11 @@ describe('ValidationInterceptor', () => {
           expect(mockLajiApiService.post).toHaveBeenCalledTimes(1);
           expect(mockLajiApiService.post.mock.calls[0][0]).toEqual('coordinates/location');
           expect(mockLajiApiService.post.mock.calls[0][1]).toEqual(lajiApiBody);
-          expect(e.options).toEqual({gatherings:{'0':{municipality:{errors:['Coordinates do not match municipality, has Porvoo but coordinates correspond to Kangasniemi']}}}});
+          expect(
+            e.response.details['/gatherings/0/municipality']
+          ).toEqual([
+            'Coordinates do not match municipality, has Porvoo but coordinates correspond to Kangasniemi'
+          ]);
           expect(mockNext.handle).toBeCalledTimes(0);
         }
     });
@@ -1095,7 +1099,9 @@ describe('ValidationInterceptor', () => {
           expect(req).toEqual(mockRequest);
           expect(lajiStoreService.getAll).toHaveBeenCalledTimes(1);
           expect(mockNext.handle).toHaveBeenCalledTimes(0);
-          expect(e.options).toEqual({originalSpecimenID:{errors:['Found duplicates in other documents, found in JA.1.']}});
+          expect(
+            e.response.details['/originalSpecimenID']
+          ).toEqual(['Found duplicates in other documents, found in JA.1.']);
         }
       });
     });
@@ -1217,9 +1223,12 @@ describe('ValidationInterceptor', () => {
           expect(req).toEqual(mockRequest);
           expect(lajiStoreService.getAll).toHaveBeenCalledTimes(1);
           expect(mockNext.handle).toHaveBeenCalledTimes(0);
-          expect(e.options.gatherings[0].units[0].samples[1].additionalIDs[0].errors).toEqual(['Duplicate values found within submitted document.']);
-          expect(e.options.gatherings[0].units[0].samples[0].additionalIDs[0].errors).toEqual(['Duplicate values found within submitted document.']);
-
+          expect(
+            e.response.details['/gatherings/0/units/0/samples/1/additionalIDs/0']
+          ).toEqual(['Duplicate values found within submitted document.']);
+          expect(
+            e.response.details['/gatherings/0/units/0/samples/0/additionalIDs/0']
+          ).toEqual(['Duplicate values found within submitted document.']);
         }
       });
 
@@ -1265,7 +1274,11 @@ describe('ValidationInterceptor', () => {
           expect(req).toEqual(mockRequest);
           expect(lajiStoreService.getAll).toHaveBeenCalledTimes(3);
           expect(mockNext.handle).toHaveBeenCalledTimes(0);
-          expect(e.options.gatherings[0].units[0].samples[1].additionalIDs[0].errors).toEqual(['Found duplicates in other documents, found in JA.2.']);
+          expect(
+            e.response.details[
+              '/gatherings/0/units/0/samples/1/additionalIDs/0'
+            ],
+          ).toEqual(['Found duplicates in other documents, found in JA.2.']);
         }
       });
     });
