@@ -349,11 +349,11 @@ const specimenMunicipalityCordinateValidatorSchema = {
         'items': {
           'type': 'object',
           'properties': {
-            'latitude': {
+            'wgs84Latitude': {
               'type': 'string',
               'title': 'Latitude'
             },
-            'longitude': {
+            'wgs84Longitude': {
               'type': 'string',
               'title': 'Longitude'
             },
@@ -920,8 +920,8 @@ describe('ValidationInterceptor', () => {
         datatype: 'botanyspecimen',
         gatherings: [
           {
-            latitude: '62',
-            longitude: '27',
+            wgs84Latitude: '62',
+            wgs84Longitude: '27',
             municipality: 'Porvoo',
             coordinateSystem: 'MY.coordinateSystemWgs84'
           }
@@ -968,8 +968,8 @@ describe('ValidationInterceptor', () => {
         datatype: 'botanyspecimen',
         gatherings: [
           {
-            latitude: '62',
-            longitude: '27',
+            wgs84Latitude: '62',
+            wgs84Longitude: '27',
             municipality: 'Kangasniemi',
             coordinateSystem: 'MY.coordinateSystemWgs84'
           }
@@ -1007,8 +1007,8 @@ describe('ValidationInterceptor', () => {
         datatype: 'botanyspecimen',
         gatherings: [
           {
-            latitude: '0',
-            longitude: '0',
+            wgs84Latitude: '0',
+            wgs84Longitude: '0',
             municipality: 'Berlin',
             coordinateSystem: 'MY.coordinateSystemWgs84'
           }
