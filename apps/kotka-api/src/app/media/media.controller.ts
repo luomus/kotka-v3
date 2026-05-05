@@ -2,7 +2,7 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { BadRequestException, Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Req, Res, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
 import { MediaApiService, NewMediaFile } from '@kotka/api/services';
 import { map } from 'rxjs';
@@ -10,6 +10,7 @@ import { Image, Pdf } from '@luomus/laji-schema';
 import { MediaAccessInterceptor } from '../shared/interceptors/media-access.interceptor';
 import { ErrorMessages, MediaTypes } from '@kotka/shared/models';
 import { MediaTypeSizeValidatorInterceptor } from './media-type-size-validator.interceptor';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('media')
 @UseGuards(AuthenticateCookieGuard)
@@ -18,10 +19,10 @@ export class MediaController {
     private readonly mediaService: MediaApiService
   ) {}
 
-  @UseInterceptors(MediaTypeSizeValidatorInterceptor)
+  @UseInterceptors(FileInterceptor('data'), MediaTypeSizeValidatorInterceptor)
   @Post(':type')
-  postMedia(@Req() req, @Res() res, @Param('type') type: MediaTypes) {
-    return this.mediaService.postMediaStreaming(type, req, res);
+  postMedia(@Param('type') type: MediaTypes, @UploadedFile() file: Express.Multer.File) {
+    return this.mediaService.postMedia(type, file);
   }
 
   @UseInterceptors(MediaAccessInterceptor)

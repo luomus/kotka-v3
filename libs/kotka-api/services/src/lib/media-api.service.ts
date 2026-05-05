@@ -113,12 +113,10 @@ export class MediaApiService {
     req.pipe(proxy);
   }
 
-  postMedia(type: MediaTypes, files: Express.Multer.File[]) {
+  postMedia(type: MediaTypes, file: Express.Multer.File) {
     const formData = new FormData();
 
-    files.forEach((file) => {
-      formData.append(file.originalname, file.buffer, file.originalname);
-    });
+    formData.append(file.originalname, file.buffer, file.originalname);
 
     return this.httpService.post<FileUploadResponse[]>(`${this.urlBase}api/fileUpload`, formData, merge({
         params: {
