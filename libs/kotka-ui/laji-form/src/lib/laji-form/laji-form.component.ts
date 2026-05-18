@@ -18,7 +18,7 @@ import LajiForm from '@luomus/laji-form/lib/index';
 import { Theme as LajiFormTheme } from '@luomus/laji-form/lib/themes/theme';
 import { scrollIntoViewIfNeeded, uiSchemaJSONPointer, updateSafelyWithJSONPointer } from '@luomus/laji-form/lib/utils';
 import { LajiForm as LajiFormModel } from '@kotka/shared/models';
-import { combineLatest, Observable, of } from 'rxjs';
+import { combineLatest } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { MediaMetadata } from '@luomus/laji-form/lib/components/LajiForm';
 import { Logger, ToastService, FormApiClient } from '@kotka/ui/core';
@@ -62,8 +62,6 @@ class LajiFormComponent<T extends FormData = FormData>
   confirmFieldDelete = input<boolean>();
   extraErrors = input<ErrorSchema>();
 
-  beforeSubmitFunc = input<() => unknown | Observable<unknown>>();
-
   showFooter = input(true);
   showDeleteButton = input<boolean>();
   showCopyButton = input<boolean>();
@@ -90,6 +88,7 @@ class LajiFormComponent<T extends FormData = FormData>
   delete = output<Partial<T>>();
   formCopy = output<Partial<T>>();
   formSubmitAndCopy = output<T>();
+  validationError = output<ErrorSchema>();
 
   @ViewChild('lajiForm', { static: true }) lajiFormRoot!: ElementRef;
 
@@ -363,51 +362,35 @@ class LajiFormComponent<T extends FormData = FormData>
     });
   }
 
-  private onValidationError(errors: any) {
+  private onValidationError(errors: ErrorSchema) {
     this.ngZone.run(() => {
       if (this.onlyWarnings(errors)) {
         this.hasOnlyWarnings = true;
-        this.cdr.markForCheck();
       }
+      this.validationError.emit(errors);
+      this.cdr.markForCheck();
     });
   }
 
-  private onlyWarnings(errors: any): boolean {
+  private onlyWarnings(errors: ErrorSchema): boolean {
     if (
-      errors.__errors?.length > 0 &&
-      errors.__errors.every((e: string) => e.indexOf('[warning]') === 0)
+      errors.__errors?.length &&
+      (errors.__errors || []).every((e: string) => e.indexOf('[warning]') === 0)
     ) {
       return true;
     }
     return (
       Object.keys(errors).length > 0 &&
       Object.keys(errors).every(
-        (key) => key !== '__errors' && this.onlyWarnings(errors[key]),
+        (key) => key !== '__errors' && errors[key] && this.onlyWarnings(errors[key]),
       )
     );
   }
 
   private doSubmit() {
-    const beforeSubmitFn = this.beforeSubmitFunc();
-
-    if (beforeSubmitFn) {
-      this.ngZone.runOutsideAngular(() => {
-        this.lajiFormWrapper?.pushBlockingLoader();
-      });
-
-      const result = beforeSubmitFn();
-
-      (result instanceof Observable ? result : of(result)).subscribe(() => {
-        this.ngZone.runOutsideAngular(() => {
-          this.lajiFormWrapper?.submit();
-          this.lajiFormWrapper?.popBlockingLoader();
-        });
-      });
-    } else {
-      this.ngZone.runOutsideAngular(() => {
-        this.lajiFormWrapper?.submit();
-      });
-    }
+    this.ngZone.runOutsideAngular(() => {
+      this.lajiFormWrapper?.submit();
+    });
   }
 }
 

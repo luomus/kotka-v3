@@ -4,7 +4,12 @@ import {
   signal, Signal, untracked, ViewChild,
   DOCUMENT, inject
 } from '@angular/core';
-import { KotkaDocumentObjectType, Document as KotkaDocument, Gathering, isDocument} from '@kotka/shared/models';
+import {
+  KotkaDocumentObjectType,
+  Document as KotkaDocument,
+  Gathering,
+  isDocument,
+} from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
 import {
   FormViewContainerComponent,
@@ -82,7 +87,6 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
   title: Signal<string>;
   prefilledFormData: Signal<PrefilledFormData<KotkaDocument> | undefined>;
   mediaMetadata: Signal<FormMediaMetadata>;
-  beforeSubmitFunc = this.beforeSubmit.bind(this);
 
   markAdvancedFieldsActive: Signal<boolean>;
   advancedFields = signal<string[] | undefined>([]);
@@ -275,9 +279,10 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     });
 
     effect(() => {
-      if (!this.arrayFieldsToMonitorForDeletions().length) {
+      if (this.markUnreliableFieldsActive()) {
         return;
       }
+
       this.updateUnreliableFieldsAfterFormDataChange(
         untracked(this.unreliableFields),
         this.arrayFieldsToMonitorForDeletions(),
@@ -313,7 +318,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     }
   }
 
-  beforeSubmit() {
+  onValidationError() {
     this.stopFieldChoosers();
   }
 
@@ -395,7 +400,15 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     return super.hasChanges() || this.markAdvancedFieldsActive();
   }
 
+  override onSaveSuccess(formData: KotkaDocument) {
+    this.stopFieldChoosers();
+
+    super.onSaveSuccess(formData);
+  }
+
   override onDeleteSuccess() {
+    this.stopFieldChoosers();
+
     this.router.navigate(['specimens', 'search']);
   }
 
@@ -609,8 +622,11 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     });
 
     if (hasChanges) {
-      // @ts-ignore TODO remove after specimen schema changes (remove ts-ignore)
-      this.formView.setFormData({ ...formData, unreliableFields: newUnreliableFields });
+      this.formView.setFormData({
+        ...formData,
+        // @ts-ignore TODO remove after specimen schema changes (remove ts-ignore)
+        unreliableFields: newUnreliableFields,
+      });
     }
   }
 

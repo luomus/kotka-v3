@@ -4,6 +4,7 @@ import { ComponentService } from '@kotka/ui/core';
 import {
   FieldChooserIgnoreFieldType,
   FieldChooserMode,
+  LAJI_FORM_ROOT_ID,
   LajiFormFieldChooserComponent
 } from './laji-form-field-chooser.component';
 import { FieldChooserColorTheme } from './laji-form-field-chooser-highlight.component';
@@ -33,6 +34,7 @@ export class LajiFormFieldChooserService {
   private fieldChooserComponentRef = signal<ComponentRef<LajiFormFieldChooserComponent>|undefined>(undefined);
 
   private form = signal<LajiForm.SchemaForm|undefined>(undefined);
+  private formElem = signal<HTMLElement|undefined>(undefined);
   private formContainerElem = signal<HTMLElement|undefined>(undefined);
 
   private mode = signal<FieldChooserMode>('fieldSelect');
@@ -48,7 +50,7 @@ export class LajiFormFieldChooserService {
       this.fieldChooserComponentRef()?.setInput('form', this.form());
     });
     effect(() => {
-      this.fieldChooserComponentRef()?.setInput('formElem', this.formContainerElem()?.children[0]);
+      this.fieldChooserComponentRef()?.setInput('formContainerElem', this.formContainerElem());
     });
     effect(() => {
       this.fieldChooserComponentRef()?.setInput('mode', this.mode());
@@ -80,10 +82,15 @@ export class LajiFormFieldChooserService {
       throw new Error('Form is missing');
     }
 
-    this.form.set(form);
+    const formElem: HTMLElement | null = lajiForm.lajiFormRoot.nativeElement.querySelector(`#${LAJI_FORM_ROOT_ID}`);
+    const containerElem = formElem?.parentElement;
+    if (!formElem || !containerElem) {
+      throw new Error('Form element or its container is missing');
+    }
 
-    const containerElem: HTMLElement = lajiForm.lajiFormRoot.nativeElement;
-    containerElem.children[0].setAttribute('inert', '');
+    this.form.set(form);
+    formElem.setAttribute('inert', '');
+    this.formElem.set(formElem);
     this.formContainerElem.set(containerElem);
 
     const componentRef = this.componentService.createComponentFromType(LajiFormFieldChooserComponent);
@@ -114,7 +121,7 @@ export class LajiFormFieldChooserService {
 
     const selected = this.selectedFieldsSignal();
 
-    this.formContainerElem()?.children[0]?.removeAttribute('inert');
+    this.formElem()?.removeAttribute('inert');
     this.formContainerElem.set(undefined);
 
     const componentRef = this.fieldChooserComponentRef();

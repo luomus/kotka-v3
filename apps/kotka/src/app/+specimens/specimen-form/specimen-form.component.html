@@ -1,8 +1,5 @@
 <kotka-form-view
   [style.visibility]="advancedFields() ? 'visible' : 'hidden'"
-  [ngClass]="{
-    'laji-form-error-list-hidden': markAdvancedFieldsActive() || markUnreliableFieldsActive()
-  }"
   [formId]="formId"
   [dataType]="formDataType"
   [dataTypeName]="'specimen'"
@@ -11,8 +8,6 @@
   [allowCopy]="!!dataType()"
   [prefilledFormData]="copyData() || prefilledFormData()"
   [mediaMetadata]="mediaMetadata()"
-  [beforeSubmitFunc]="beforeSubmitFunc"
-  [footerDisabled]="markAdvancedFieldsActive()"
   [hiddenFields]="hiddenFields()"
   [additionalClassNames]="additionalClassNames()"
   [confirmFieldDelete]="true"
@@ -26,6 +21,7 @@
   (saveSuccess)="onSaveSuccess($event)"
   (deleteSuccess)="onDeleteSuccess()"
   (copyData)="onCopyData($event)"
+  (validationError)="onValidationError()"
 ></kotka-form-view>
 
 <ng-template #formContainer let-formContentTpl>

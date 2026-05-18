@@ -67,7 +67,6 @@ export class FormViewComponent<
     input<(form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>>();
   prefilledFormData = input<PrefilledFormData<S>>();
   mediaMetadata = input<FormMediaMetadata>();
-  beforeSubmitFunc = input<() => unknown | Observable<unknown>>();
 
   hiddenFields = input<string[]>();
   additionalClassNames = input<Record<string, string>>();
@@ -96,6 +95,7 @@ export class FormViewComponent<
   saveSuccess = output<S>();
   deleteSuccess = output<void>();
   copyData = output<Partial<S>>();
+  validationError = output<ErrorSchema>();
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
 
@@ -241,10 +241,12 @@ export class FormViewComponent<
   private onErrorResponse(err: any, generalErrorMessage = 'Save failed!') {
     if (err.error?.errorCode === 'VALIDATION_EXCEPTION') {
       this.formViewFacade.setExtraErrors(
-        FormViewUtils.apiValidationErrorsToRJSFErrorSchema(err.error)
+        FormViewUtils.apiValidationErrorsToRJSFErrorSchema(err.error),
       );
     } else if (err.status === 413) {
-      this.formViewFacade.setExtraErrors({ __errors: ['Content is too large.'] } as ErrorSchema);
+      this.formViewFacade.setExtraErrors({
+        __errors: ['Content is too large.'],
+      } as ErrorSchema);
     } else {
       this.formViewFacade.setExtraErrors(undefined);
       this.notifier.showError(generalErrorMessage);

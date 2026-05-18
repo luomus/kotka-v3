@@ -4,9 +4,11 @@ import {
   LajiFormFieldChooserHighlightComponent
 } from './laji-form-field-chooser-highlight.component';
 
-import { DialogService, WINDOW } from '@kotka/ui/core';
+import { DialogService } from '@kotka/ui/core';
 import { LajiForm } from '@kotka/shared/models';
 import { parseSchemaFromFormDataPointer } from '@luomus/laji-form/lib/utils';
+
+export const LAJI_FORM_ROOT_ID = '_laji-form_root';
 
 export type FieldChooserMode = 'fieldSelect'|'jsonPointerSelect';
 
@@ -29,7 +31,7 @@ interface HighlightData extends HighlightDimensions {
 
 const getJsonPointerFromId = (schemaElemId: string): string => {
   return schemaElemId
-    .replace(/_laji-form_root/g, '')
+    .replace(new RegExp(LAJI_FORM_ROOT_ID, 'g'), '')
     .replace(/_/g, '/');
 };
 
@@ -39,11 +41,13 @@ const getFieldFromJsonPointer = (jsonPointer: string): string => {
 };
 
 const getHighlightElemIdFromSchemaElemId = (schemaElemId: string): string => {
-  return schemaElemId.replace('_laji-form_root', '_laji-form_field_chooser');
+  return schemaElemId.replace(LAJI_FORM_ROOT_ID, '_laji-form_field_chooser');
 };
 
+const selector = 'kui-laji-form-field-chooser';
+
 @Component({
-  selector: 'kui-laji-form-field-chooser',
+  selector,
   template: `
     @for (highlight of highlights(); track highlight.id; let idx = $index) {
       <kui-laji-form-field-chooser-highlight
@@ -65,18 +69,17 @@ const getHighlightElemIdFromSchemaElemId = (schemaElemId: string): string => {
 })
 export class LajiFormFieldChooserComponent implements OnDestroy {
   private document = inject<Document>(DOCUMENT);
-  private window = inject<Window>(WINDOW);
   private dialogService = inject(DialogService);
 
-  form = input<LajiForm.SchemaForm|undefined>(undefined);
-  formElem = input<HTMLElement|undefined>(undefined);
+  form = input<LajiForm.SchemaForm | undefined>(undefined);
+  formContainerElem = input<HTMLElement | undefined>(undefined);
 
   mode = input<FieldChooserMode>('fieldSelect');
   selected = input<string[]>([]); // if the mode is fieldSelect this should be a list of fields (i.e. ["/gatherings/dateBegin"]), and if the mode is jsonPointerSelect this should be a list of jsonPointers (i.e. ["/gatherings/0/dateBegin"])
 
   ignoreFieldsOfType = input<FieldChooserIgnoreFieldType[]>([]);
   unselectableFields = input<string[]>([]);
-  unselectableFieldsErrorMsg = input<string|undefined>(undefined);
+  unselectableFieldsErrorMsg = input<string | undefined>(undefined);
 
   colorTheme = input<FieldChooserColorTheme>('red');
 
@@ -86,72 +89,146 @@ export class LajiFormFieldChooserComponent implements OnDestroy {
   selectedChange = output<string[]>();
 
   private highlightIndexesBySelectedProp: Signal<Record<string, number[]>>;
-  private mutationObserver: MutationObserver;
+
+  private formMutationObserver: MutationObserver;
+  private formContainerMutationObserver: MutationObserver;
+  private resizeObserver: ResizeObserver;
+
+  private resizeRafId: number | null = null;
 
   constructor() {
-    this.mutationObserver = new MutationObserver(() => {
+    // if form structure changes, recreate highlights
+    this.formMutationObserver = new MutationObserver(() => {
       if (!this.form()) {
         return;
       }
-      this.highlights.set(this.getHighlights(this.form()!, this.mode(), this.ignoreFieldsOfType()));
+
+      this.highlights.set(
+        this.getHighlights(
+          this.form()!,
+          this.mode(),
+          this.ignoreFieldsOfType(),
+        ),
+      );
+    });
+
+    // if new children are added to container, observe them with ResizeObserver in case they affect layout
+    this.formContainerMutationObserver = new MutationObserver(
+      (mutationList) => {
+        for (const mutation of mutationList) {
+          if (
+            mutation.target === this.formContainerElem() &&
+            mutation.type === 'childList'
+          ) {
+            Array.from(mutation.addedNodes).forEach((child) => {
+              if (child instanceof HTMLElement) {
+                this.resizeObserver.observe(child);
+              }
+            });
+          }
+        }
+
+        this.scheduleResizeUpdate();
+      },
+    );
+
+    this.resizeObserver = new ResizeObserver(() => {
+      this.scheduleResizeUpdate();
     });
 
     effect(() => {
-      this.mutationObserver.disconnect();
+      this.formMutationObserver.disconnect();
+      this.formContainerMutationObserver.disconnect();
+      this.resizeObserver.disconnect();
 
-      const element = this.formElem();
-      if (element) {
-        this.mutationObserver.observe(element, { childList: true, subtree: true });
+      const formContainer = this.formContainerElem();
+      if (!formContainer) {
+        return;
       }
+
+      Array.from(formContainer.children).forEach((child) => {
+        if (child.nodeName.toLowerCase() === selector) {
+          return;
+        }
+
+        if (child.id === LAJI_FORM_ROOT_ID) {
+          this.formMutationObserver.observe(child, {
+            childList: true,
+            subtree: true,
+          });
+        }
+
+        this.resizeObserver.observe(child);
+      });
+
+      this.formContainerMutationObserver.observe(formContainer, {
+        childList: true,
+      });
     });
 
     effect(() => {
       if (!this.form()) {
         return;
       }
-      this.highlights.set(this.getHighlights(this.form()!, this.mode(), this.ignoreFieldsOfType()));
+
+      this.highlights.set(
+        this.getHighlights(
+          this.form()!,
+          this.mode(),
+          this.ignoreFieldsOfType(),
+        ),
+      );
     });
 
-    this.highlightIndexesBySelectedProp = computed(() => (
+    this.highlightIndexesBySelectedProp = computed(() =>
       this.getHighlightIndexesBySelectedProp(
         this.highlights(),
-        this.mode() === 'fieldSelect' ? 'field' : 'jsonPointer'
-      )
-    ));
+        this.mode() === 'fieldSelect' ? 'field' : 'jsonPointer',
+      ),
+    );
 
-    this.highlightSelectedByIdx = computed(() => (
-      this.getHighlightSelectedByIdx(this.selected(), this.highlightIndexesBySelectedProp())
-    ));
+    this.highlightSelectedByIdx = computed(() =>
+      this.getHighlightSelectedByIdx(
+        this.selected(),
+        this.highlightIndexesBySelectedProp(),
+      ),
+    );
   }
 
   ngOnDestroy() {
-    this.mutationObserver.disconnect();
+    this.formMutationObserver.disconnect();
+    this.formContainerMutationObserver.disconnect();
+    this.resizeObserver.disconnect();
+
+    if (this.resizeRafId !== null) {
+      cancelAnimationFrame(this.resizeRafId);
+    }
   }
 
   @HostListener('window:resize', [])
   onResize() {
-    this.highlights.update(highlightData => (
-      highlightData.map(data => ({ ...data, ...this.getDimensions(data.schemaElem) })))
-    );
+    this.scheduleResizeUpdate();
   }
 
   setSelected(highlight: HighlightData, selected: boolean) {
     const { field, jsonPointer } = highlight;
 
     if (selected && this.unselectableFields().includes(field)) {
-      this.dialogService.alert(this.unselectableFieldsErrorMsg() || 'Field can\'t be selected');
+      this.dialogService.alert(
+        this.unselectableFieldsErrorMsg() || 'Field can\'t be selected',
+      );
       return;
     }
 
     let newSelected: string[];
 
     if (this.mode() === 'fieldSelect') {
-      newSelected = this.selected().filter(val => val !== field);
+      newSelected = this.selected().filter((val) => val !== field);
       if (selected) {
         newSelected.push(field);
       }
     } else {
-      newSelected = this.selected().filter(val => val !== jsonPointer);
+      newSelected = this.selected().filter((val) => val !== jsonPointer);
       if (selected) {
         newSelected.push(jsonPointer);
       }
@@ -160,7 +237,20 @@ export class LajiFormFieldChooserComponent implements OnDestroy {
     this.selectedChange.emit(newSelected);
   }
 
-  private getHighlights(form: LajiForm.SchemaForm, mode: FieldChooserMode, ignore: FieldChooserIgnoreFieldType[]): HighlightData[] {
+  private updateDimensions() {
+    this.highlights.update((highlightData) =>
+      highlightData.map((data) => ({
+        ...data,
+        ...this.getDimensions(data.schemaElem),
+      })),
+    );
+  }
+
+  private getHighlights(
+    form: LajiForm.SchemaForm,
+    mode: FieldChooserMode,
+    ignore: FieldChooserIgnoreFieldType[],
+  ): HighlightData[] {
     const highlights: HighlightData[] = [];
 
     if (mode === 'fieldSelect') {
@@ -168,7 +258,7 @@ export class LajiFormFieldChooserComponent implements OnDestroy {
     }
 
     const schemaElems = Array.from<HTMLElement>(
-      this.document.querySelectorAll('[id^=_laji-form_root_]'),
+      this.document.querySelectorAll(`[id^=${LAJI_FORM_ROOT_ID}_]`),
     );
 
     schemaElems.forEach((schemaElem: HTMLElement) => {
@@ -179,11 +269,17 @@ export class LajiFormFieldChooserComponent implements OnDestroy {
       if (ignore.includes('arrayItem') && isArrayItem) {
         return;
       } else if (schema.type === 'array') {
-        if (ignore.includes('array') || (ignore.includes('objectArray') && schema.items.type === 'object')) {
+        if (
+          ignore.includes('array') ||
+          (ignore.includes('objectArray') && schema.items.type === 'object')
+        ) {
           return;
         }
       } else if (schema.type === 'object') {
-        if (ignore.includes('object') || (ignore.includes('objectArrayItem') && isArrayItem)) {
+        if (
+          ignore.includes('object') ||
+          (ignore.includes('objectArrayItem') && isArrayItem)
+        ) {
           return;
         }
       }
@@ -196,14 +292,17 @@ export class LajiFormFieldChooserComponent implements OnDestroy {
         jsonPointer,
         ...this.getDimensions(schemaElem),
         schemaElem,
-        selected: false
+        selected: false,
       });
     });
 
     return highlights;
   }
 
-  private getHighlightIndexesBySelectedProp(highlights: HighlightData[], prop: keyof Pick<HighlightData, 'field'|'jsonPointer'>): Record<string, number[]> {
+  private getHighlightIndexesBySelectedProp(
+    highlights: HighlightData[],
+    prop: keyof Pick<HighlightData, 'field' | 'jsonPointer'>,
+  ): Record<string, number[]> {
     const result: Record<string, number[]> = {};
 
     highlights.forEach((highlight, idx) => {
@@ -216,11 +315,14 @@ export class LajiFormFieldChooserComponent implements OnDestroy {
     return result;
   }
 
-  private getHighlightSelectedByIdx(selected: string[], highlightIndexesBySelectedProp: Record<string, number[]>) {
+  private getHighlightSelectedByIdx(
+    selected: string[],
+    highlightIndexesBySelectedProp: Record<string, number[]>,
+  ) {
     const result: Record<number, boolean> = {};
 
-    selected.forEach(fieldOrJsonPointer => {
-      highlightIndexesBySelectedProp[fieldOrJsonPointer]?.forEach(idx => {
+    selected.forEach((fieldOrJsonPointer) => {
+      highlightIndexesBySelectedProp[fieldOrJsonPointer]?.forEach((idx) => {
         result[idx] = true;
       });
     });
@@ -230,8 +332,20 @@ export class LajiFormFieldChooserComponent implements OnDestroy {
 
   private getDimensions(schemaElem: HTMLElement): HighlightDimensions {
     const { top, width, left, height } = schemaElem.getBoundingClientRect();
-    const scrolled = this.window.scrollY;
+    const { top: offsetTop = 0, left: offsetLeft = 0 } =
+      this.formContainerElem()?.offsetParent?.getBoundingClientRect() || {};
 
-    return { top: top + scrolled, width, left, height };
+    return { top: top - offsetTop, width, left: left - offsetLeft, height };
+  }
+
+  private scheduleResizeUpdate() {
+    if (this.resizeRafId !== null) {
+      return;
+    }
+
+    this.resizeRafId = requestAnimationFrame(() => {
+      this.resizeRafId = null;
+      this.updateDimensions();
+    });
   }
 }

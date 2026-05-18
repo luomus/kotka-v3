@@ -52,7 +52,6 @@
           [customFooterButtonsTpl]="customFooterButtonsTpl()"
           [mediaMetadata]="mediaMetadata()"
           [extraErrors]="vm.extraErrors"
-          [beforeSubmitFunc]="beforeSubmitFunc()"
           [hiddenFields]="hiddenFields()"
           [additionalClassNames]="additionalClassNames()"
           [confirmFieldDelete]="confirmFieldDelete()"
@@ -63,6 +62,7 @@
           (delete)="onDelete($event)"
           (formCopy)="onCopy($event)"
           (formSubmitAndCopy)="onSubmitAndCopy($event)"
+          (validationError)="validationError.emit($event)"
         >
         </kui-laji-form>
       </ng-template>
