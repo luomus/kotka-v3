@@ -3,7 +3,7 @@ https://docs.nestjs.com/interceptors#interceptors
 */
 
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, UnsupportedMediaTypeException, PayloadTooLargeException, UnprocessableEntityException } from '@nestjs/common';
-import { MediaTypes } from 'libs/shared/models/src/lib/api-route-models';
+import { MediaTypes } from '@kotka/shared/models';
 import { Observable } from 'rxjs';
 
 @Injectable()
