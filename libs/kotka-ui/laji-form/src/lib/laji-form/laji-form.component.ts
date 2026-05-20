@@ -364,7 +364,7 @@ class LajiFormComponent<T extends FormData = FormData>
 
   private onValidationError(errors: ErrorSchema) {
     this.highlightErrors();
-    
+
     this.ngZone.run(() => {
       if (this.onlyWarnings(errors)) {
         this.hasOnlyWarnings = true;
