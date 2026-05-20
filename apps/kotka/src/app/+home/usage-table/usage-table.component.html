@@ -1,0 +1,18 @@
+<h2>{{ title() }}</h2>
+<table class="basictable">
+  <thead>
+    <tr>
+      <th class="text-right" style="width: 50%">User</th>
+      <th class="text-right">Added</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (entry of entries(); track entry.user) {
+      <tr>
+        <td>{{ entry.user }}</td>
+        <td>{{ entry.count }}</td>
+      </tr>
+    }
+  </tbody>
+</table>
+
