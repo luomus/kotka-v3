@@ -14,6 +14,8 @@ import { TriplestoreMapperService } from '@kotka/api/mappers';
 import { SpecimenIdJoinerInterceptor } from './specimen-id-joiner.interceptor';
 import { SpecimenConvertDataToOldFormatInterceptor } from './specimen-convert-data-to-old-format.interceptor';
 import { SpecimenImageInterceptor } from './specimen-image.interceptor';
+import { CoordinateMatchInterceptor } from './coordinate-match.interceptor';
+import { ClearUncertainFieldOrphansInterceptor } from './clear-uncertain-field-orphans.interceptor';
 
 const type = KotkaDocumentObjectFullType.document;
 
@@ -24,6 +26,8 @@ const type = KotkaDocumentObjectFullType.document;
   ApiMethodAccessGuard,
 )
 @UseInterceptors(
+  ClearUncertainFieldOrphansInterceptor,
+  CoordinateMatchInterceptor,
   SpecimenConvertDataToOldFormatInterceptor,
   SpecimenIdJoinerInterceptor,
   SpecimenImageInterceptor,
