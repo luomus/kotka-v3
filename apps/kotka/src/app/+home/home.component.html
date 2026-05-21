@@ -1,0 +1,58 @@
+<kui-main-content pageTitle="" containerClass="container" [hasBottomMargin]="true">
+  <div class="row mt-4">
+    <div class="col-sm-7">
+      <div class="row">
+        <div class="col-sm-12">
+          <h2>Help</h2>
+          <ul>
+            <li><a href="https://wiki.helsinki.fi/xwiki/bin/view/digit/Kotka%20Collection%20Management%20System/Manual%20for%20Kotka/">Manual</a>
+              &ndash; How to use Kotka
+            </li>
+            <li><a routerLink="/view/fields">Fields used by Kotka</a>
+              &ndash; What data fields mean and how they are validated
+            </li>
+          </ul>
+          <ul>
+            <li><a routerLink="/tools/excel-generator">Excel generator</a>
+              &ndash; Generic excel file generator for importing data
+            </li>
+          </ul>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12">
+          <h2>Tools</h2>
+          <ul>
+            <li><a routerLink="/tools/generic-label">Create generic labels</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12">
+          @if (news()) {
+            <div [innerHTML]="news()"></div>
+          }
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-5">
+      <div id="specimen-chart" style="width:100%;height: 320px; padding-top: 10px;">
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-4">
+      <kotka-usage-table title="10 most active users of all time" [entries]="usageTotal()" />
+    </div>
+    <div class="col-sm-4">
+      <kotka-usage-table title="10 most active users this year" [entries]="usageThisYear()" />
+    </div>
+    <div class="col-sm-4">
+      <kotka-usage-table title="10 most active users this month" [entries]="usageThisMonth()" />
+    </div>
+  </div>
+  <p>*
+    <small>These numbers are based upon specimens created in kotka.</small>
+  </p>
+</kui-main-content>

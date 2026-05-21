@@ -15,17 +15,67 @@ function specimenMatcher(segments: UrlSegment[]): UrlMatchResult|null {
 }
 
 const baseRoutes: Routes = [
-  { path: 'user', loadChildren: () => import('./+user/user.routes').then(m => m.userRoutes), data: {preload: false} },
-  { path: '', canActivate: [OnlyLoggedInGuard], children: [
-      { path: 'tags', loadChildren: () => import('./+datasets/datasets.routes').then(m => m.datasetsRoutes), data: {preload: false} },
-      { path: 'organizations', loadChildren: () => import('./+organizations/organizations.routes').then(m => m.organizationsRoutes), data: {preload: false} },
-      { path: 'transactions', loadChildren: () => import('./+transactions/transactions.routes').then(m => m.transactionsRoutes), data: {preload: false} },
-      { path: 'tools', loadChildren: () => import('./+tools/tools.routes').then(m => m.toolsRoutes), data: {preload: false} },
-      { path: 'view', loadChildren: () => import('./+view/view.routes').then(m => m.viewRoutes), data: {preload: false} },
-      { matcher: specimenMatcher, loadChildren: () => import('./+specimens/specimens.routes').then(m => m.specimensRoutes), data: {preload: false} },
-      { path: '**', pathMatch: 'full', component: NotFoundComponent }
-    ]
-  }
+  {
+    path: 'user',
+    loadChildren: () => import('./+user/user.routes').then((m) => m.userRoutes),
+    data: { preload: false },
+  },
+  {
+    path: '',
+    canActivate: [OnlyLoggedInGuard],
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        loadChildren: () =>
+          import('./+home/home.routes').then((m) => m.homeRoutes),
+        data: { preload: false },
+      },
+      {
+        path: 'tags',
+        loadChildren: () =>
+          import('./+datasets/datasets.routes').then((m) => m.datasetsRoutes),
+        data: { preload: false },
+      },
+      {
+        path: 'organizations',
+        loadChildren: () =>
+          import('./+organizations/organizations.routes').then(
+            (m) => m.organizationsRoutes,
+          ),
+        data: { preload: false },
+      },
+      {
+        path: 'transactions',
+        loadChildren: () =>
+          import('./+transactions/transactions.routes').then(
+            (m) => m.transactionsRoutes,
+          ),
+        data: { preload: false },
+      },
+      {
+        path: 'tools',
+        loadChildren: () =>
+          import('./+tools/tools.routes').then((m) => m.toolsRoutes),
+        data: { preload: false },
+      },
+      {
+        path: 'view',
+        loadChildren: () =>
+          import('./+view/view.routes').then((m) => m.viewRoutes),
+        data: { preload: false },
+      },
+      {
+        matcher: specimenMatcher,
+        loadChildren: () =>
+          import('./+specimens/specimens.routes').then(
+            (m) => m.specimensRoutes,
+          ),
+        data: { preload: false },
+      },
+      { path: '**', pathMatch: 'full', component: NotFoundComponent },
+    ],
+  },
 ];
 
 export const routes: Routes = [

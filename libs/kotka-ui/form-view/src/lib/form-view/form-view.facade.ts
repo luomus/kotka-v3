@@ -25,6 +25,7 @@ import {
 import { toObservable } from '@angular/core/rxjs-interop';
 import { ErrorSchema } from '@rjsf/utils';
 import { PrefilledFormData } from '../models';
+import { getDefaultFormState } from '@luomus/laji-form/lib/utils';
 
 export enum FormErrorEnum {
   dataNotFound = 'dataNotFound',
@@ -194,6 +195,8 @@ export class FormViewFacade<
     formData: Partial<S>,
     user: Person,
   ): FormState<S> {
+    formData = getDefaultFormState(form.schema, formData, form.schema);
+
     const isEditMode = inputs.editMode;
     const disabled = isEditMode && !allowEditForUser(formData, user);
     const showDeleteButton =

@@ -1,6 +1,5 @@
 ARG TARGET
 FROM node:22 as builder
-ARG CONFIGURATION=production
 ENV NODE_ENV build
 ENV CYPRESS_INSTALL_BINARY 0
 
@@ -22,16 +21,15 @@ COPY --chown=node:node ./styles ./styles
 
 # Build kotka and kotka-api
 RUN npm run ng -- build kotka-api \
- && npm run ng -- build kotka --configuration $CONFIGURATION
+ && npm run ng -- build kotka
 
 
 FROM nginxinc/nginx-unprivileged as kotka
-ARG CONFIGURATION=production
 
 USER nginx
 
 # Set default nginx config
-COPY --chown=nginx:nginx ./tools/docker/nginx/nginx-$CONFIGURATION.conf /etc/nginx/conf.d/default.conf
+COPY --chown=nginx:nginx ./tools/docker/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 RUN chmod a+r /etc/nginx/conf.d/default.conf
 
 COPY --chown=nginx:nginx --from=builder /app/dist/apps/kotka /usr/share/nginx/html/
