@@ -5,7 +5,8 @@ https://docs.nestjs.com/controllers#controllers
 import {
   Controller, DefaultValuePipe,
   Get,
-  Param, ParseArrayPipe, ParseIntPipe, Query,
+  Param, ParseArrayPipe, ParseBoolPipe, ParseIntPipe, Query,
+  Req,
   UseGuards
 } from '@nestjs/common';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
@@ -21,8 +22,20 @@ export class CollectionController {
   ) {}
 
   @Get('autocomplete')
-  async getCollectionAutocomplete(@Query('query') query = '', @Query('limit', new DefaultValuePipe('10'), ParseIntPipe) limit = 10) {
-    const jsonData = await this.oldKotkaDataService.getAllCollections();
+  async getCollectionAutocomplete(@Req() req, @Query('query') query = '', @Query('limit', new DefaultValuePipe('10'), ParseIntPipe) limit = 10, @Query('onlyOwnCollections', new DefaultValuePipe('false'), ParseBoolPipe) onlyOwnCollections = false) {
+    let jsonData = await this.oldKotkaDataService.getAllCollections();
+
+    if (onlyOwnCollections) {
+      const userOrgs = req.user.profile.organisation || [];
+
+      jsonData = jsonData.filter(collection => {
+        if (collection.owner && userOrgs.includes(collection.owner)) {
+          return true;
+        }
+        return false;
+      });
+    }
+
     return this.autocompleteService.getAutocompleteResults(jsonData, 'collectionName.en', query, limit);
   }
 
