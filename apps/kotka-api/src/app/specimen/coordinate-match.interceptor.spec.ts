@@ -21,7 +21,7 @@ describe('CoordinateMatchInterceptor', () => {
     it('If no coordinates are set throw no error', async () => {
       const mockBody = {
         gatherings: [{}]
-      }
+      };
       const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
         getRequest: () => ({
           method: 'POST',
@@ -42,7 +42,7 @@ describe('CoordinateMatchInterceptor', () => {
           coordinateSystem: 'MY.coordinateSystemWgs84',
           wgs84Longitude: 24.945831
         }]
-      }
+      };
       const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
         getRequest: () => ({
           method: 'POST',
@@ -68,7 +68,7 @@ describe('CoordinateMatchInterceptor', () => {
           wgs84Longitude: 24.945831,
           wgs84Latitude: 60.16952
         }]
-      }
+      };
       const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
         getRequest: () => ({
           method: 'POST',
@@ -98,7 +98,7 @@ describe('CoordinateMatchInterceptor', () => {
           wgs84Longitude: 24.83830372,
           wgs84Latitude: 60.20638293
         }]
-      }
+      };
       const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
         getRequest: () => ({
           method: 'POST',
@@ -126,7 +126,7 @@ describe('CoordinateMatchInterceptor', () => {
           wgs84Longitude: 24.83830372,
           wgs84Latitude: 60.20638293
         }]
-      }
+      };
       const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
         getRequest: () => ({
           method: 'POST',

@@ -70,7 +70,7 @@ describe('ClearUncertainFieldOrphansInterceptor', () => {
         coordinateSystem: 'wgs84',
       }],
       condition: 'value',
-    }
+    };
     const mockContext = createMock<ExecutionContext>({
       switchToHttp: () => ({
         getRequest: () => ({
@@ -100,7 +100,7 @@ describe('ClearUncertainFieldOrphansInterceptor', () => {
         coordinateSystem: 'wgs84',
       }],
       condition: 'value',
-    }
+    };
     const mockContext = createMock<ExecutionContext>({
       switchToHttp: () => ({
         getRequest: () => ({
@@ -131,7 +131,7 @@ describe('ClearUncertainFieldOrphansInterceptor', () => {
         coordinateSystem: 'wgs84',
       }],
       condition: 'value',
-    }
+    };
     const mockContext = createMock<ExecutionContext>({
       switchToHttp: () => ({
         getRequest: () => ({

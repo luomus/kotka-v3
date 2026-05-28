@@ -2,7 +2,7 @@
 https://docs.nestjs.com/interceptors#interceptors
 */
 
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler, HttpException, HttpStatus, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler, HttpException, HttpStatus } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { Document } from '@kotka/shared/models';
 import { convertCoordinatesToWGS84 } from '@kotka/shared/utils';
@@ -11,7 +11,6 @@ const COORDINATE_DELTA = 0.01;
 
 @Injectable()
 export class CoordinateMatchInterceptor implements NestInterceptor {
-  constructor () {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<Document> {
     const req = context.switchToHttp().getRequest();

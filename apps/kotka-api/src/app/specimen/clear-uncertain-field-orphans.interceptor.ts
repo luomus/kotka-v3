@@ -9,7 +9,6 @@ import { parseJSONPointer } from '@kotka/shared/utils';
 
 @Injectable()
 export class ClearUncertainFieldOrphansInterceptor implements NestInterceptor {
-  constructor () {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<Document> {
     const req = context.switchToHttp().getRequest();
@@ -33,7 +32,7 @@ export class ClearUncertainFieldOrphansInterceptor implements NestInterceptor {
       }
 
       return true;
-    })
+    });
 
     //@ts-ignore
     body.unreliableFields = unrealiableFields;
