@@ -23,7 +23,6 @@ import {
   Person,
 } from '@kotka/shared/models';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { ErrorSchema } from '@rjsf/utils';
 import { PrefilledFormData } from '../models';
 import { getDefaultFormState } from '@luomus/laji-form/lib/utils';
 
@@ -55,7 +54,6 @@ export interface FormState<S extends KotkaDocumentObject> {
   showCopyButton?: boolean;
   formHasChanges?: boolean;
   disabledAlertDismissed?: boolean;
-  extraErrors?: ErrorSchema;
 }
 
 @Injectable()
@@ -104,10 +102,6 @@ export class FormViewFacade<
 
   setDisabledAlertDismissed(disabledAlertDismissed: boolean) {
     this.setState({ ...this.state(), disabledAlertDismissed });
-  }
-
-  setExtraErrors(extraErrors?: ErrorSchema) {
-    this.setState({ ...this.state(), extraErrors });
   }
 
   private getInitialStateSub(): Subscription {

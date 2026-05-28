@@ -234,21 +234,19 @@ export class FormViewComponent<
 
   private onSuccessResponse() {
     this.formViewFacade.setFormHasChanges(false);
-    this.formViewFacade.setExtraErrors(undefined);
     this.lajiForm?.unBlock();
   }
 
   private onErrorResponse(err: any, generalErrorMessage = 'Save failed!') {
     if (err.error?.errorCode === 'VALIDATION_EXCEPTION') {
-      this.formViewFacade.setExtraErrors(
+      this.lajiForm?.showErrors(
         FormViewUtils.apiValidationErrorsToRJSFErrorSchema(err.error),
       );
     } else if (err.status === 413) {
-      this.formViewFacade.setExtraErrors({
+      this.lajiForm?.showErrors({
         __errors: ['Content is too large.'],
       } as ErrorSchema);
     } else {
-      this.formViewFacade.setExtraErrors(undefined);
       this.notifier.showError(generalErrorMessage);
     }
 

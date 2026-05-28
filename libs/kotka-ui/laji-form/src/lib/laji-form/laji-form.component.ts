@@ -60,7 +60,6 @@ class LajiFormComponent<T extends FormData = FormData>
   hiddenFields = input<string[]>();
   additionalClassNames = input<Record<string, string>>();
   confirmFieldDelete = input<boolean>();
-  extraErrors = input<ErrorSchema>();
 
   showFooter = input(true);
   showDeleteButton = input<boolean>();
@@ -128,7 +127,6 @@ class LajiFormComponent<T extends FormData = FormData>
         formData: this.formData(),
         settings: this.settings(),
         mediaMetadata: this.mediaMetadata(),
-        extraErrors: this.extraErrors(),
         validators: form.validators,
         warnings: form.warnings,
       };
@@ -166,15 +164,27 @@ class LajiFormComponent<T extends FormData = FormData>
   }
 
   openAllMultiActiveArrays() {
-    this.lajiFormWrapper?.openAllMultiActiveArrays();
+    this.ngZone.runOutsideAngular(() => {
+      this.lajiFormWrapper?.openAllMultiActiveArrays();
+    });
   }
 
   closeAllMultiActiveArrays() {
-    this.lajiFormWrapper?.closeAllMultiActiveArrays();
+    this.ngZone.runOutsideAngular(() => {
+      this.lajiFormWrapper?.closeAllMultiActiveArrays();
+    });
   }
 
   focusField(id: string) {
-    this.lajiFormWrapper?.focusField(id);
+    this.ngZone.runOutsideAngular(() => {
+      this.lajiFormWrapper?.focusField(id);
+    });
+  }
+
+  showErrors(errors: ErrorSchema) {
+    this.ngZone.runOutsideAngular(() => {
+      this.lajiFormWrapper?.setState({ extraErrors: errors });
+    });
   }
 
   submitForm() {
@@ -252,7 +262,6 @@ class LajiFormComponent<T extends FormData = FormData>
             settings: this.settings(),
             apiClient: this.apiClient,
             mediaMetadata: this.mediaMetadata(),
-            extraErrors: this.extraErrors(),
             lang: 'en',
             renderSubmit: false,
             topOffset: LajiFormComponent.TOP_OFFSET,
