@@ -16,6 +16,7 @@ import { SpecimenConvertDataToOldFormatInterceptor } from './specimen-convert-da
 import { SpecimenImageInterceptor } from './specimen-image.interceptor';
 import { CoordinateMatchInterceptor } from './coordinate-match.interceptor';
 import { ClearUncertainFieldOrphansInterceptor } from './clear-uncertain-field-orphans.interceptor';
+import { AssociatedTaxaToUnitInterceptor } from './associated-taxa-to-unit.interceptor';
 
 const type = KotkaDocumentObjectFullType.document;
 
@@ -28,6 +29,7 @@ const type = KotkaDocumentObjectFullType.document;
 @UseInterceptors(
   ClearUncertainFieldOrphansInterceptor,
   CoordinateMatchInterceptor,
+  AssociatedTaxaToUnitInterceptor,
   SpecimenConvertDataToOldFormatInterceptor,
   SpecimenIdJoinerInterceptor,
   SpecimenImageInterceptor,
