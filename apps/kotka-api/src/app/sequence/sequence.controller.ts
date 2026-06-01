@@ -31,7 +31,7 @@ export class SequenceController {
     try {
       const seq = (await lastValueFrom(this.lajiStoreService.getSeqNext(`accession-${year}`, true).pipe(map(res => res.data))));
 
-      return `${year}-${seq}`;
+      return `${year}-${seq.toString().padStart(4, '0')}`;
     } catch(err) {
       console.error(err);
       throw new InternalServerErrorException(err.message);
