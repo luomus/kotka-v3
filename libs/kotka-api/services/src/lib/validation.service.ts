@@ -255,16 +255,20 @@ export class ValidationService {
       }]
     };
 
-    const localities = await lastValueFrom(this.lajiApiService.post<CoordinateLocationResponse>('coordinates/location', geometry, { lang: 'multi' }).pipe(map(res => res.data)));
+    let localities = await lastValueFrom(this.lajiApiService.post<CoordinateLocationResponse>('coordinates/location', geometry, { lang: 'multi' }).pipe(map(res => res.data.results)));
 
-    if (!localities.results.length) {
+    localities = localities.filter(locality => {
+      return locality.types.includes('municipality');
+    });
+
+    if (!localities.length) {
       return;
     }
 
     let matchFound = false;
     const nonMatches: string[] = [];
 
-    localities.results.forEach(locality => {
+    localities.forEach(locality => {
       if (!locality.types.includes('municipality')) {
         return;
       }
