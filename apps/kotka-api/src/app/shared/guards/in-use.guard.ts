@@ -3,9 +3,9 @@ https://docs.nestjs.com/guards#guards
 */
 
 import {
+  getError,
   LajiStoreService,
   TriplestoreService,
-  ValidationService,
 } from '@kotka/api/services';
 import {
   Injectable,
@@ -23,7 +23,6 @@ export class InUseGuard implements CanActivate {
   constructor(
     private readonly triplestoreService: TriplestoreService,
     private readonly lajistoreSevice: LajiStoreService,
-    private readonly validationService: ValidationService,
     private readonly reflector: Reflector
   ) {}
 
@@ -82,7 +81,7 @@ export class InUseGuard implements CanActivate {
 
     if (found) {
       throw new ForbiddenException(
-        this.validationService.getError(
+        getError(
           '/',
           'This resource can\'t be deleted because there are resources that are attached to it.',
         ),

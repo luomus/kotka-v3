@@ -149,7 +149,7 @@ export class ValidationService {
     }
 
     if (namespaceID === defaultNamespaceID) {
-      return this.getError(field, `Namespace ${defaultNamespaceID} is default and should not be used explicitly.`);
+      return getError(field, `Namespace ${defaultNamespaceID} is default and should not be used explicitly.`);
     }
 
     const datatype = data.datatype;
@@ -158,13 +158,13 @@ export class ValidationService {
 
     const namespaceError = this.validateNamespaceForType(namespaceID, datatype, namespaces);
     if (namespaceError) {
-      return this.getError(field, namespaceError);
+      return getError(field, namespaceError);
     }
 
     if (prefix) {
       const prefixError = this.validatePrefixForNamespace(prefix, namespaceID, namespaces);
       if (prefixError) {
-        return this.getError(field, prefixError);
+        return getError(field, prefixError);
       }
     }
   }
@@ -211,7 +211,7 @@ export class ValidationService {
     const members: Dataset[] = await lastValueFrom(this.lajiStoreService.search<Dataset>(KotkaDocumentObjectFullType.dataset, { query: { match: { [datasetNameField]: datasetName } } }).pipe(map(res => res.data?.member)));
 
     if (members.length !== 0 && !(members.length === 1 && members[0].id && members[0].id === data.id)) {
-      return this.getError(field, 'Dataset name must be unique.');
+      return getError(field, 'Dataset name must be unique.');
     }
   }
 
@@ -225,10 +225,10 @@ export class ValidationService {
     try {
       const isValid = await this.abschService.checkIRCCNumberIsValid(value);
       if (!isValid) {
-        return this.getError(field, 'Invalid IRCC number "%{value}" given.', value);
+        return getError(field, 'Invalid IRCC number "%{value}" given.', value);
       }
     } catch (e) {
-      return this.getError(field, 'ABSCH API didn\'t respond in time.');
+      return getError(field, 'ABSCH API didn\'t respond in time.');
     }
   }
 
@@ -242,7 +242,7 @@ export class ValidationService {
     const wgs84Longitude = data.gatherings[0].wgs84Longitude;
 
     if ((!wgs84Latitude && wgs84Longitude) || (wgs84Latitude && !wgs84Longitude)) {
-      return this.getError(field, 'Only one of the coordinates found.');
+      return getError(field, 'Only one of the coordinates found.');
     }
 
     const coordinates = [Number(wgs84Latitude), Number(wgs84Longitude)];
@@ -294,13 +294,13 @@ export class ValidationService {
       return;
     }
 
-    return this.getError(field, `Coordinates do not match municipality, has ${value} but coordinates correspond to ${nonMatches.join(', ')}`);
+    return getError(field, `Coordinates do not match municipality, has ${value} but coordinates correspond to ${nonMatches.join(', ')}`);
   }
 
   async validateDocumentSequenceIdUnique(data: any, field: any) {
     const value: string = parseJSONPointer(data, field);
     const storePath = parseStoreSearchPath(field);
-    const documentInternalSearchPath = this.getValueSiblingsPath(field);
+    const documentInternalSearchPath = getValueSiblingsPath(field);
 
     const siblings: JSONPathAllResponse[] = JSONPath({ json: data, path: documentInternalSearchPath, resultType: 'all', wrap: true });
     let duplicates = false;
@@ -320,7 +320,7 @@ export class ValidationService {
     });
 
     if (duplicates) {
-      return this.getError(field, 'Duplicate values found within submitted document.');
+      return getError(field, 'Duplicate values found within submitted document.');
     }
 
     const searchBody = `${storePath}: "${value}"`;
@@ -352,16 +352,18 @@ export class ValidationService {
     });
     if (!duplicateIDs.length) return;
 
-    return this.getError(field, `Found duplicates in other documents, found in ${duplicateIDs.join(', ')}.`);
+    return getError(field, `Found duplicates in other documents, found in ${duplicateIDs.join(', ')}.`);
   }
 
-  getError(field: string, errorMsg: string, value?: any): ApiValidationError {
+
+}
+
+export function getValueSiblingsPath(path: string) {
+  return path.split('/').map(part => {
+    return /^\d+$/g.test(part) ? '*' : part;
+  });
+}
+
+export function getError(field: string, errorMsg: string, value?: any): ApiValidationError {
     return { errorCode: 'VALIDATION_EXCEPTION', details: { [field]: [errorMsg.replace('%{value}', value)] } };
   }
-
-  private getValueSiblingsPath(path: string) {
-    return path.split('/').map(part => {
-      return /^\d+$/g.test(part) ? '*' : part;
-    });
-  }
-}

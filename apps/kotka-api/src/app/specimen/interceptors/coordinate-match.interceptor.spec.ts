@@ -35,7 +35,28 @@ describe('CoordinateMatchInterceptor', () => {
       expect(mockNext.handle).toHaveBeenCalledTimes(1);
     });
 
-    it('If not all coordinateFields are set throw error 1', async () => {
+    it('If no wgs84 coordinates are set throw no error', async () => {
+      const mockBody = {
+        gatherings: [{
+          latitude: 6676357,
+          longitude: 380191,
+          coordinateSystem: 'MY.coordinateSystemEtrs-tm35fin',
+        }]
+      };
+      const mockContext = createMock<ExecutionContext>({ switchToHttp: () => ({
+        getRequest: () => ({
+          method: 'POST',
+          body: mockBody,
+        })
+      })});
+
+      const mockNext = createMock<CallHandler>();
+
+      coordinateMatchInterceptor.intercept(mockContext, mockNext);
+      expect(mockNext.handle).toHaveBeenCalledTimes(1);
+    });
+
+    it('If not all coordinateFields when a wgs84-field is present are set throw error 1', async () => {
       const mockBody = {
         gatherings: [{
           longitude: 24.945831,
@@ -52,16 +73,18 @@ describe('CoordinateMatchInterceptor', () => {
 
       const mockNext = createMock<CallHandler>();
 
-      expect.assertions(2);
+      expect.assertions(4);
       try {
         coordinateMatchInterceptor.intercept(mockContext, mockNext);
       } catch (e) {
-        expect(e.message).toEqual('Missing expected coordinate data');
+        expect(e.status).toEqual(422);
+        expect(e.response.errorCode).toEqual('VALIDATION_EXCEPTION');
+        expect(e.response.details).toEqual({'/gatherings/0': ['Missing expected coordinate data']});
         expect(mockNext.handle).toHaveBeenCalledTimes(0);
       }
     });
 
-    it('If not all coordinateFields are set throw error 2', async () => {
+    it('If not all coordinateFields when a wgs84-field is present are set throw error 2', async () => {
       const mockBody = {
         gatherings: [{
           latitude: 60.16952,
@@ -78,11 +101,14 @@ describe('CoordinateMatchInterceptor', () => {
 
       const mockNext = createMock<CallHandler>();
 
-      expect.assertions(2);
+      expect.assertions(4);
       try {
         coordinateMatchInterceptor.intercept(mockContext, mockNext);
       } catch (e) {
-        expect(e.message).toEqual('Missing expected coordinate data');
+        console.log(e);
+        expect(e.status).toEqual(422);
+        expect(e.response.errorCode).toEqual('VALIDATION_EXCEPTION');
+        expect(e.response.details).toEqual({'/gatherings/0': ['Missing expected coordinate data']});
         expect(mockNext.handle).toHaveBeenCalledTimes(0);
       }
     });
@@ -108,11 +134,13 @@ describe('CoordinateMatchInterceptor', () => {
 
       const mockNext = createMock<CallHandler>();
 
-      expect.assertions(2);
+      expect.assertions(4);
       try {
         coordinateMatchInterceptor.intercept(mockContext, mockNext);
       } catch (e) {
-        expect(e.message).toEqual('Provided WGS84 coordinates do not match original coordinates');
+        expect(e.status).toEqual(422);
+        expect(e.response.errorCode).toEqual('VALIDATION_EXCEPTION');
+        expect(e.response.details).toEqual({'/gatherings/0': ['Provided WGS84 coordinates do not match original coordinates']});
         expect(mockNext.handle).toHaveBeenCalledTimes(0);
       }
     });

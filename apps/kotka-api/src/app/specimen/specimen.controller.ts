@@ -11,12 +11,12 @@ import { KotkaDocumentObjectFullType, KotkaDocumentObjectType } from '@kotka/sha
 import { ControllerType } from '../shared/decorators/controller-type.decorator';
 import { LajiStoreController } from '../shared/controllers/laji-store.controller';
 import { TriplestoreMapperService } from '@kotka/api/mappers';
-import { SpecimenIdJoinerInterceptor } from './specimen-id-joiner.interceptor';
-import { SpecimenConvertDataToOldFormatInterceptor } from './specimen-convert-data-to-old-format.interceptor';
-import { SpecimenImageInterceptor } from './specimen-image.interceptor';
-import { CoordinateMatchInterceptor } from './coordinate-match.interceptor';
-import { ClearUncertainFieldOrphansInterceptor } from './clear-uncertain-field-orphans.interceptor';
-import { AssociatedTaxaToUnitInterceptor } from './associated-taxa-to-unit.interceptor';
+import { SpecimenIdJoinerInterceptor } from './interceptors/specimen-id-joiner.interceptor';
+import { SpecimenConvertDataToOldFormatInterceptor } from './interceptors/specimen-convert-data-to-old-format.interceptor';
+import { SpecimenImageInterceptor } from './interceptors/specimen-image.interceptor';
+import { CoordinateMatchInterceptor } from './interceptors/coordinate-match.interceptor';
+import { ClearUncertainFieldOrphansInterceptor } from './interceptors/clear-uncertain-field-orphans.interceptor';
+import { AssociatedTaxaToUnitInterceptor } from './interceptors/associated-taxa-to-unit.interceptor';
 
 const type = KotkaDocumentObjectFullType.document;
 

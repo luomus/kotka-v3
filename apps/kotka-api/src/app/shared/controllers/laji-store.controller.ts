@@ -4,7 +4,7 @@ https://docs.nestjs.com/controllers#controllers
 
 import { StoreGetQuery } from '@kotka/shared/models';
 import { lastValueFrom } from 'rxjs';
-import { LajiStoreService, TriplestoreService, ValidationService } from '@kotka/api/services';
+import { getError, LajiStoreService, TriplestoreService, ValidationService } from '@kotka/api/services';
 import { TriplestoreMapperService } from '@kotka/api/mappers';
 import {
   Body,
@@ -78,7 +78,7 @@ export abstract class LajiStoreController<T extends StoreObject> {
 
       if (err.status === 400 && message && existingErrorRegex.test(message)) {
         throw new UnprocessableEntityException(
-          this.validationService.getError(
+          getError(
             '/objectID',
             'Resource with the given ID exists already.',
           ),
