@@ -18,11 +18,19 @@ export class OldKotkaDataService {
   ) {}
 
   async getCollection(id: string) {
-    return this.getObject<Collection>(collectionType, id);
+    const collections = await this.getAllCollections();
+    const collection = collections.find(collection => collection.id === id);
+
+    if (!collection) {
+      throw new NotFoundException();
+    }
+
+    return collection;
   }
 
   async getCollections(ids: string[]) {
-    return this.getObjects<Collection>(collectionType, ids);
+    const collections = await this.getAllCollections();
+    return collections.filter(collection => ids.includes(collection.id!));
   }
 
   @Cached('allCollections', cache_ttl)

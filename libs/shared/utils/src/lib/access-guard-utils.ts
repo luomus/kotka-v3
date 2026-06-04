@@ -10,6 +10,10 @@ const deleteAllowedForTypes = [
   KotkaDocumentObjectFullType.document
 ];
 
+export function isAdmin(user: Person): boolean {
+  return user.role?.includes('MA.admin') || user.roleKotka === 'MA.admin';
+}
+
 export function allowEditForUser(document: Partial<KotkaDocumentObject>, user: Person): boolean {
   if (user.role?.includes('MA.admin')) {
     return true;
