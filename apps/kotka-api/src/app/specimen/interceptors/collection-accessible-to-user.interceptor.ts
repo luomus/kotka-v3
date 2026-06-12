@@ -13,7 +13,7 @@ import { getError } from '@kotka/api/services';
 import { OldKotkaDataService } from '../../shared/services/old-kotka-data.service';
 
 const collectionIDPath = '/collectionID';
-const sampleCollectionIDPath = '/gatherings/*/units/*/samples/*/collectionID'
+const sampleCollectionIDPath = '/gatherings/*/units/*/samples/*/collectionID';
 
 @Injectable()
 export class CollectionAccessibleToUserInterceptor implements NestInterceptor {

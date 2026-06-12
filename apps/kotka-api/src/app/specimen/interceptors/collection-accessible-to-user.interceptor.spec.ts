@@ -71,7 +71,7 @@ const mockOldKotkaDataService = {
 
     return Promise.resolve(collections);
   })
-}
+};
 
 describe('CollectionAccessibleToUserInterceptor', () => {
   let collectionAccessibleToUserInterceptor: CollectionAccessibleToUserInterceptor;
