@@ -10,18 +10,37 @@ export class LajiApiService {
     private readonly httpService: HttpService,
   ) {}
 
-  private baseParams = { access_token: process.env['LAJI_API_TOKEN'] };
   private baseUrl = process.env['LAJI_API_URL'];
-
-  public get<T>(path: string, params = {}): Observable<AxiosResponse<T>> {
-    return this.httpService.get(this.baseUrl + path, { params: {...this.baseParams, ...params} });
+  private baseHeaders: { [key: string]: string | number } = {
+    'API-Version': 1,
+    'Authorization': process.env['LAJI_API_TOKEN']!,
+    'Accept-Language': 'en'
   }
 
-  public post<T>(path: string, body: StoreObject, params = {}): Observable<AxiosResponse<T>> {
-    return this.httpService.post(this.baseUrl + path, body, { params: { ...this.baseParams, ...params} });
+  public get<T>(path: string, params = {}, personToken?: string): Observable<AxiosResponse<T>> {
+    const headers = { ...this.baseHeaders };
+    if (personToken) {
+      headers['Person-Token'] = personToken;
+    }
+
+    return this.httpService.get(this.baseUrl + path, { params, headers });
   }
 
-  public delete<T>(path: string, params = {}): Observable<AxiosResponse<T>> {
-    return this.httpService.delete(this.baseUrl + path, { params: {...this.baseParams, ...params} });
+  public post<T>(path: string, body: StoreObject, params = {}, personToken?: string): Observable<AxiosResponse<T>> {
+    const headers = { ...this.baseHeaders };
+    if (personToken) {
+      headers['Person-Token'] = personToken;
+    }
+
+    return this.httpService.post(this.baseUrl + path, body, { params, headers });
+  }
+
+  public delete<T>(path: string, params = {}, personToken?: string): Observable<AxiosResponse<T>> {
+    const headers = { ...this.baseHeaders };
+    if (personToken) {
+      headers['Person-Token'] = personToken;
+    }
+
+    return this.httpService.delete(this.baseUrl + path, { params, headers });
   }
 }

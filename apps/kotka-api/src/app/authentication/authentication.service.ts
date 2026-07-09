@@ -21,7 +21,7 @@ export class AuthenticationService {
   }
 
   public getProfile(token: string) {
-    const $person = this.lajiApiService.get<any>(`person-token/${token}`).pipe(
+    const $person = this.lajiApiService.get<any>('authentication-event', undefined, token).pipe(
       catchError((err) => { throw new UnauthorizedException('Error retrieving personToken information from laji-auth.', err.message); }),
       mergeMap((res) => {
         if (res.data.target !== process.env['SYSTEM_ID']) {
@@ -30,7 +30,7 @@ export class AuthenticationService {
 
         const next = res.data.next;
 
-        return this.lajiApiService.get<any>(`person/${token}`).pipe(
+        return this.lajiApiService.get<any>(`person`, undefined, token).pipe(
           catchError((err) => { throw new UnauthorizedException('Error retrieving user profile from laji-auth.', err.message); }),
           map(res => res.data),
           map(data => {
@@ -60,7 +60,7 @@ export class AuthenticationService {
   }
 
   public logoutUser(request) {
-    return this.lajiApiService.delete(`person-token/${request.user?.personToken}`).pipe(
+    return this.lajiApiService.delete('authentication-event', undefined, request.user?.personToken).pipe(
       tap(() => this.invalidateSession(request)),
       catchError((err) => {
         throw new InternalServerErrorException('Error terminating user laji-auth login.', err.message);
@@ -69,7 +69,7 @@ export class AuthenticationService {
   }
 
   public checkLoginValidity(request) {
-    return this.lajiApiService.get(`person-token/${request.user.personToken}`).pipe(
+    return this.lajiApiService.get('authentication-event', undefined, request.user?.personToken).pipe(
       catchError((err) => {
         if (err.response?.data?.error?.message && err.response?.data?.error?.message.includes('INVALID TOKEN')) {
           this.invalidateSession(request);
