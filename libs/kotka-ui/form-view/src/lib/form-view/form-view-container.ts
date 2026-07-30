@@ -1,6 +1,13 @@
 import { ChangeDetectorRef, Directive, HostListener, inject, OnDestroy, signal, ViewChild } from '@angular/core';
 import { ComponentCanDeactivate, DialogService, navigationEnd$ } from '@kotka/ui/core';
-import { from, Observable, of, Subscription } from 'rxjs';
+import {
+  finalize,
+  from,
+  Observable,
+  of,
+  shareReplay,
+  Subscription,
+} from 'rxjs';
 import { FormViewComponent } from './form-view.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { KotkaDocumentObjectMap, KotkaDocumentObjectType } from '@kotka/shared/models';
@@ -20,6 +27,7 @@ export class FormViewContainerComponent<
   @ViewChild(FormViewComponent<T, S>, { static: true }) formViewComponent!: FormViewComponent<T, S>;
 
   private routeParamUpdateSub: Subscription;
+  private canDeactivateConfirm$?: Observable<boolean>;
 
   protected dialogService = inject(DialogService);
   protected activeRoute = inject(ActivatedRoute);
@@ -52,9 +60,20 @@ export class FormViewContainerComponent<
       return of(true);
     }
 
-    return this.dialogService.confirm(
+    if (this.canDeactivateConfirm$) {
+      return this.canDeactivateConfirm$;
+    }
+
+    this.canDeactivateConfirm$ = this.dialogService.confirm(
       'Are you sure you want to leave and discard unsaved changes?',
+    ).pipe(
+      finalize(() => {
+        this.canDeactivateConfirm$ = undefined;
+      }),
+      shareReplay(1)
     );
+
+    return this.canDeactivateConfirm$;
   }
 
   onSaveSuccess(formData: S) {
