@@ -8,6 +8,11 @@
 // https://on.cypress.io/custom-commands
 // ***********************************************
 
+interface FilterDefinition {
+  colIndex: number;
+  value: string;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-namespace
 declare namespace Cypress {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -18,6 +23,7 @@ declare namespace Cypress {
     disableSameSiteCookieRestrictions(): void;
     getCountFromText(selector: string): Chainable<number>;
     getChangedCountFromText(selector: string, prevCount: number): Chainable<number>;
+    removeTestDataIfExists(pageUrl: string, filters: FilterDefinition[]): void;
   }
 }
 
@@ -72,6 +78,28 @@ Cypress.Commands.add('disableSameSiteCookieRestrictions', () => {
         res.headers['set-cookie'] = res.headers['set-cookie'].map(disableSameSite);
       } else {
         res.headers['set-cookie'] = disableSameSite(res.headers['set-cookie']);
+      }
+    });
+  });
+});
+
+Cypress.Commands.add('removeTestDataIfExists', (pageUrl: string, filters: FilterDefinition[]) => {
+  cy.setUserAsLoggedIn();
+  cy.visit(pageUrl);
+
+  cy.getCountFromText('[data-cy=total-count]').then(totalCount => {
+    filters.forEach(({ colIndex, value }) => {
+      cy.get(`.ag-floating-filter[aria-colindex=${colIndex}] input`).first().type(value);
+    });
+
+    cy.getChangedCountFromText('[data-cy=total-count]', totalCount).then(count => {
+      if (count > 0) {
+        // eslint-disable-next-line cypress/no-unnecessary-waiting
+        cy.wait(1000); // ag-grid throws an error without the wait
+        cy.get('.edit-button').first().click();
+        cy.get('[data-cy=form-delete]').click();
+        cy.get('[data-cy=confirm-ok]').click();
+        cy.url({ timeout: 10000 }).should('equal', Cypress.config('baseUrl') + pageUrl);
       }
     });
   });

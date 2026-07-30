@@ -20,26 +20,10 @@ describe('datasets', () => {
     const personsResponsible = 'Testing, E2E';
 
     before(() => {
-      cy.setUserAsLoggedIn();
-      cy.visit('/tags');
-
-      cy.getCountFromText('[data-cy=total-count]').then(totalCount => {
-        // search for test tag
-        cy.get('.ag-floating-filter[aria-colindex=2] input').first().type(tagName);
-        cy.get('.ag-floating-filter[aria-colindex=3] input').first().type(personsResponsible);
-
-        // remove the test tag if it already exists
-        cy.getChangedCountFromText('[data-cy=total-count]', totalCount).then(count => {
-          if (count > 0) {
-            // eslint-disable-next-line cypress/no-unnecessary-waiting
-            cy.wait(1000); // ag-grid throws an error without the wait
-            cy.get('.edit-button').first().click();
-            cy.get('[data-cy=form-delete]').click();
-            cy.get('[data-cy=confirm-ok]').click();
-            cy.url({ timeout: 10000 }).should('equal', Cypress.config('baseUrl') + '/tags');
-          }
-        });
-      });
+      cy.removeTestDataIfExists('/tags', [
+        { colIndex: 2, value: tagName },
+        { colIndex: 3, value: personsResponsible },
+      ]);
     });
 
     beforeEach(() => {

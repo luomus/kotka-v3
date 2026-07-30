@@ -27,7 +27,7 @@
 <ng-template #formContainer let-formContentTpl>
   <div class="row">
     <div class="col-lg-3 col-md-3 col-sm-3 col-12 order-sm-last">
-      <div class="button-group-container d-sm-inline-block rounded bg-light py-3 mb-3">
+      <div class="button-group-container d-sm-inline-block rounded bg-light py-3 mb-3" data-cy="specimen-form-sidebar">
         @if (lajiForm?.form() && formData()) {
           <kotka-specimen-form-nav
             [form]="lajiForm!.form()!"
@@ -40,12 +40,14 @@
           <button
             class="btn btn-light"
             (click)="expandAll()"
+            data-cy="expand-all-button"
           >
             Expand all
           </button>
           <button
             class="btn btn-light mb-3"
             (click)="collapseAll()"
+            data-cy="collapse-all-button"
           >
             Collapse all
           </button>
@@ -58,6 +60,7 @@
               }"
               [disabled]="!lajiForm"
               (click)="toggleMarkAdvancedFields()"
+              data-cy="mark-advanced-fields-button"
             >
               {{ markAdvancedFieldsActive() ? 'Marking advanced fields. Stop and save' : 'Start marking advanced fields' }}
             </button>
@@ -79,6 +82,7 @@
               }"
               [disabled]="!lajiForm"
               (click)="toggleMarkUnreliableFields()"
+              data-cy="mark-unreliable-fields-button"
             >
               {{ markUnreliableFieldsActive() ? 'Stop marking unreliable fields' : 'Start marking unreliable fields' }}
             </button>
