@@ -1,11 +1,13 @@
 import {
   Component,
   computed,
-  inject, Signal,
+  inject,
+  input,
+  Signal,
   TemplateRef,
   viewChild,
 } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { map, switchMap, startWith, catchError, shareReplay } from 'rxjs/operators';
 import { ApiClient, FormService, UserService, LabelPipe, ToFullUriPipe } from '@kotka/ui/core';
 import { getId, allowEditForUser } from '@kotka/shared/utils';
@@ -23,6 +25,7 @@ import {
   KotkaDocumentObject,
 } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 interface FormDataResult {
   value?: LajiForm.JsonForm;
@@ -46,8 +49,8 @@ interface ViewModel {
 }
 
 @Component({
-  selector: 'kotka-viewer',
-  templateUrl: './viewer.component.html',
+  selector: 'kotka-specimen-viewer',
+  templateUrl: './specimen-viewer.component.html',
   imports: [
     UiViewerComponent,
     SpinnerComponent,
@@ -61,16 +64,18 @@ interface ViewModel {
     DatePipe,
     ToFullUriPipe,
   ],
-  styleUrls: ['./viewer.component.scss'],
+  styleUrls: ['./specimen-viewer.component.scss'],
 })
-export class ViewerComponent {
-  private route = inject(ActivatedRoute);
+export class SpecimenViewerComponent {
   private apiClient = inject(ApiClient);
   private formService = inject(FormService);
   private userService = inject(UserService);
 
+  uri = input.required<string>();
+
   dataType = KotkaDocumentObjectType.specimen;
-  uri$ = this.route.queryParams.pipe(map((params) => params['uri']));
+
+  uri$ = toObservable(this.uri);
 
   formData$: Observable<FormDataResult> = this.formService
     .getFormInJsonFormat(globals.specimenFormId)
