@@ -66,6 +66,14 @@ const baseRoutes: Routes = [
         data: { preload: false },
       },
       {
+        path: 'accessions',
+        loadChildren: () =>
+          import('./+accessions/accessions.routes').then(
+            (m) => m.accessionsRoutes,
+          ),
+        data: { preload: false },
+      },
+      {
         matcher: specimenMatcher,
         loadChildren: () =>
           import('./+specimens/specimens.routes').then(
