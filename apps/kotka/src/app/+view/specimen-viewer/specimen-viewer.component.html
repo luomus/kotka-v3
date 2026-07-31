@@ -2,7 +2,12 @@
   <ng-template #headerTemplate>
     <div class="header-layout">
       <div class="header-left-group">
-      <h1 data-cy="main-header">{{ vm.uri }}</h1>
+      <h1 data-cy="main-header">
+        @if (vm.specimenDataType === "accession") {
+          Accession
+        }
+        {{ vm.uri }}
+      </h1>
         @if (vm.showEditButton) {
           <a
             type="button"
@@ -12,6 +17,9 @@
           >
             <i class="fa fa-pen-to-square"></i>
           </a>
+        }
+        @if (vm.specimenDataType === "accession") {
+          <a routerLink="/accessions" [queryParams]="{ uri: uri() }">branches</a>
         }
       </div>
       @if (vm.document) {
