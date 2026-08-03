@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { map, shareReplay, startWith, switchMap } from 'rxjs/operators';
 import { AsyncPipe } from '@angular/common';
 import { NotFoundComponent } from '@kotka/ui/base';
@@ -28,8 +28,7 @@ interface ViewModel {
     NotFoundComponent,
     MainContentComponent,
     NgbAlert,
-    SpinnerComponent,
-    RouterLink,
+    SpinnerComponent
   ],
 })
 export class AccessionComponent {

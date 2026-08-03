@@ -7,6 +7,9 @@
           Accession
         }
         {{ uri() }}
+        @if (vm.specimenDataType === "accession" && vm.document?.originalSpecimenID) {
+          ({{ vm.document?.originalSpecimenID }})
+        }
       </h1>
         @if (vm.showEditButton) {
           <a

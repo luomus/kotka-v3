@@ -6,6 +6,9 @@
           <h1 data-cy="main-header">
             Accession
             {{ uri }}
+            @if (vm.document?.originalSpecimenID) {
+              ({{ vm.document?.originalSpecimenID }})
+            }
           </h1>
           @if (vm.document) {
             <button
