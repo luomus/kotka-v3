@@ -18,7 +18,7 @@
               <i class="fa fa-circle-plus"></i> Add branch
             </button>
             <button
-              class="btn btn-info"
+              class="btn btn-outline-secondary"
               (click)="openSpecimenViewer(uri)"
             >
               <i class="fa fa-eye"></i> View
@@ -36,12 +36,25 @@
           {{ vm.error }}
         </ngb-alert>
       } @else {
-        @for (branch of vm.branches; track branch.id) {
-          <kotka-branch-card
-            [branch]="branch"
-            (editBranch)="openBranchForm(uri, $event)"
-          ></kotka-branch-card>
-        }
+        <div class="mb-3 d-flex align-items-center gap-2">
+          <span>Depleted:</span>
+          <div class="btn-group btn-group-sm">
+            <button class="btn btn-outline-secondary" [class.active]="showDepleted" (click)="showDepleted = true">Show</button>
+            <button class="btn btn-outline-secondary" [class.active]="!showDepleted" (click)="showDepleted = false">Hide</button>
+          </div>
+        </div>
+        <div class="row">
+          @for (branch of vm.branches; track branch.id) {
+            @if (showDepleted || branch.exists) {
+              <div class="col-md-2 col-sm-3 g-3">
+                <kotka-branch-card
+                  [branch]="branch"
+                  (editBranch)="openBranchForm(uri, $event)"
+                ></kotka-branch-card>
+              </div>
+            }
+          }
+        </div>
       }
     </kui-main-content>
   }

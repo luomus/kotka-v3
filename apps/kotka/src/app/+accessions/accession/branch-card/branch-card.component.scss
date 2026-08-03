@@ -1,0 +1,11 @@
+@import "styles/bootstrap";
+
+.branch-card {
+  &.bg-success-subtle {
+    border-left: 4px solid $success;
+  }
+
+  &.bg-secondary-subtle {
+    border-left: 4px solid $secondary;
+  }
+}

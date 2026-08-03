@@ -49,6 +49,8 @@ export class AccessionComponent {
   private documentDataService = inject(DocumentDataService);
   private modalService = inject(NgbModal);
 
+  showDepleted = true;
+
   private refreshBranches$ = new Subject<void>();
 
   uri$ = this.route.queryParams.pipe(map((params) => params['uri']));
