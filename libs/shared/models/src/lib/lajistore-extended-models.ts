@@ -35,6 +35,8 @@ export type KotkaDocumentObject =
   | SpecimenTransaction
   | Branch
 
+export type MainKotkaDocumentObject = Exclude<KotkaDocumentObject, Branch>;
+
 export enum KotkaDocumentObjectType {
   dataset = 'dataset',
   transaction = 'transaction',
