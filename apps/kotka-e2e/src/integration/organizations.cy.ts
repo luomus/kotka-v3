@@ -27,25 +27,9 @@ describe('organizations', () => {
     const organizationName = 'e2e testing organization';
 
     before(() => {
-      cy.setUserAsLoggedIn();
-      cy.visit('/organizations');
-
-      cy.getCountFromText('[data-cy=total-count]').then(totalCount => {
-        // search for test organization
-        cy.get('.ag-floating-filter[aria-colindex=2] input').first().type(organizationName);
-
-        // remove the test organization if it already exists
-        cy.getChangedCountFromText('[data-cy=total-count]', totalCount).then(count => {
-          if (count > 0) {
-            // eslint-disable-next-line cypress/no-unnecessary-waiting
-            cy.wait(1000); // ag-grid throws an error without the wait
-            cy.get('.edit-button').first().click();
-            cy.get('[data-cy=form-delete]').click();
-            cy.get('[data-cy=confirm-ok]').click();
-            cy.url({ timeout: 10000 }).should('equal', Cypress.config('baseUrl') + '/organizations');
-          }
-        });
-      });
+      cy.removeTestDataIfExists('/organizations', [
+        { colIndex: 2, value: organizationName },
+      ]);
     });
 
     beforeEach(() => {

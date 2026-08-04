@@ -1,5 +1,6 @@
 ARG TARGET
 FROM node:22 as builder
+ARG CONFIGURATION=production
 ENV NODE_ENV build
 ENV CYPRESS_INSTALL_BINARY 0
 
@@ -21,7 +22,7 @@ COPY --chown=node:node ./styles ./styles
 
 # Build kotka and kotka-api
 RUN npm run ng -- build kotka-api \
- && npm run ng -- build kotka
+ && npm run ng -- build kotka --configuration $CONFIGURATION
 
 
 FROM nginxinc/nginx-unprivileged as kotka

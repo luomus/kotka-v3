@@ -1,28 +1,48 @@
 import {
   Component,
   computed,
-  inject, Signal,
+  inject,
+  input,
+  Signal,
   TemplateRef,
   viewChild,
 } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { map, switchMap, startWith, catchError, shareReplay } from 'rxjs/operators';
-import { ApiClient, FormService, UserService, LabelPipe, ToFullUriPipe } from '@kotka/ui/core';
-import { getId, allowEditForUser } from '@kotka/shared/utils';
+import { RouterLink } from '@angular/router';
+import {
+  catchError,
+  map,
+  shareReplay,
+  startWith,
+  switchMap,
+} from 'rxjs/operators';
+import {
+  ApiClient,
+  FormService,
+  LabelPipe,
+  ToFullUriPipe,
+  UserService,
+} from '@kotka/ui/core';
+import { allowEditForUser, getId } from '@kotka/shared/utils';
 import {
   ViewerComponent as UiViewerComponent,
   ViewerField,
 } from '@kotka/ui/viewer';
 import { AsyncPipe, DatePipe } from '@angular/common';
-import { SpinnerComponent, MainContentComponent, DocumentNavigatorComponent } from '@kotka/ui/components';
+import {
+  DocumentNavigatorComponent,
+  MainContentComponent,
+  SpinnerComponent,
+} from '@kotka/ui/components';
 import { NgbAlert, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { combineLatest, Observable, of } from 'rxjs';
 import {
+  Document,
   KotkaDocumentObjectType,
   LajiForm,
-  KotkaDocumentObject,
+  SpecimenDataType,
 } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 interface FormDataResult {
   value?: LajiForm.JsonForm;
@@ -31,13 +51,14 @@ interface FormDataResult {
 }
 
 interface DocumentDataResult {
-  value?: KotkaDocumentObject;
+  value?: Document;
   loading: boolean;
   error?: string;
 }
 
 interface ViewModel {
-  document?: KotkaDocumentObject;
+  specimenDataType?: SpecimenDataType | string;
+  document?: Document;
   fields?: LajiForm.Field[];
   uri?: string;
   showEditButton?: boolean;
@@ -46,8 +67,8 @@ interface ViewModel {
 }
 
 @Component({
-  selector: 'kotka-viewer',
-  templateUrl: './viewer.component.html',
+  selector: 'kotka-specimen-viewer',
+  templateUrl: './specimen-viewer.component.html',
   imports: [
     UiViewerComponent,
     SpinnerComponent,
@@ -61,16 +82,17 @@ interface ViewModel {
     DatePipe,
     ToFullUriPipe,
   ],
-  styleUrls: ['./viewer.component.scss'],
+  styleUrls: ['./specimen-viewer.component.scss'],
 })
-export class ViewerComponent {
-  private route = inject(ActivatedRoute);
+export class SpecimenViewerComponent {
   private apiClient = inject(ApiClient);
   private formService = inject(FormService);
   private userService = inject(UserService);
 
+  uri = input.required<string>();
+
+  uri$ = toObservable(this.uri);
   dataType = KotkaDocumentObjectType.specimen;
-  uri$ = this.route.queryParams.pipe(map((params) => params['uri']));
 
   formData$: Observable<FormDataResult> = this.formService
     .getFormInJsonFormat(globals.specimenFormId)
@@ -92,19 +114,21 @@ export class ViewerComponent {
         return of({ loading: false, error: 'Resource not found' });
       }
       const id = getId(uri);
-      return this.apiClient.getDocumentById(this.dataType, id).pipe(
-        map((value) => ({
-          value,
-          loading: false,
-        })),
-        startWith({ loading: true }),
-        catchError(() => {
-          return of({
+      return this.apiClient
+        .getDocumentById(KotkaDocumentObjectType.specimen, id)
+        .pipe(
+          map((value) => ({
+            value,
             loading: false,
-            error: `Resource with URI ${uri} not found`,
-          });
-        }),
-      );
+          })),
+          startWith({ loading: true }),
+          catchError(() => {
+            return of({
+              loading: false,
+              error: `Resource with URI ${uri} not found`,
+            });
+          }),
+        );
     }),
     shareReplay(1),
   );
@@ -120,6 +144,7 @@ export class ViewerComponent {
       const error = formData.error || documentData.error;
 
       return {
+        specimenDataType: documentData.value?.datatype,
         fields: formData.value && this.getFields(formData.value.fields),
         document: documentData.value,
         uri,
@@ -141,7 +166,9 @@ export class ViewerComponent {
   private unitLabelTpl = viewChild<TemplateRef<unknown>>('unitLabelTpl');
   private sampleLabelTpl = viewChild<TemplateRef<unknown>>('sampleLabelTpl');
 
-  private customLabelTemplates: Signal<Record<string, TemplateRef<unknown> | undefined>> = computed(() => ({
+  private customLabelTemplates: Signal<
+    Record<string, TemplateRef<unknown> | undefined>
+  > = computed(() => ({
     'gatherings.units': this.unitLabelTpl(),
     'gatherings.units.samples': this.sampleLabelTpl(),
   }));

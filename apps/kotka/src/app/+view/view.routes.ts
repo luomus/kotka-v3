@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import { ViewerComponent } from './viewer/viewer.component';
+import { ViewComponent } from './view/view.component';
 
 export const viewRoutes: Routes = [
-  { path: '', pathMatch: 'full', component: ViewerComponent },
+  { path: '', pathMatch: 'full', component: ViewComponent },
 ];

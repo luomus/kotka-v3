@@ -1,11 +1,7 @@
 import { Patch } from '@kotka/shared/models';
 
 export const alignArrayWithPatchArray = (data: any[] | undefined, patches: Patch[] | undefined): any[] => {
-  if (!data) {
-    return data || [];
-  }
-
-  const result = [...data];
+  const result: any[] = data ? [...data] : [];
 
   let itemsAddedToMiddle = 0;
 
@@ -14,7 +10,7 @@ export const alignArrayWithPatchArray = (data: any[] | undefined, patches: Patch
 
     if (value?.op === 'add' && (result[newIdx] || newIdx >= result.length)) {
       result.splice(newIdx, 0, undefined);
-      if (idx < data.length) {
+      if (idx < (data?.length ?? 0)) {
         itemsAddedToMiddle++;
       }
     }

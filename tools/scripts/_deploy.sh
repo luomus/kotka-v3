@@ -4,7 +4,8 @@ set -e -a
 SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 REGISTRY=${1}
 TARGET_SERVER=${2}
-TOKEN=${3}
+CONFIGURATION=${3}
+TOKEN=${4}
 
 if [[ -n "$TOKEN" ]]; then
   oc login --server=${TARGET_SERVER} --token=${TOKEN}
@@ -35,8 +36,8 @@ fi
 oc project ${OC_PROJECT}
 
 echo "Building..."
-docker build -t kotka-api -f tools/docker/kotka/prod/Dockerfile --target kotka-api .
-docker build -t kotka -f tools/docker/kotka/prod/Dockerfile --target kotka .
+docker build -t kotka-api -f tools/docker/kotka/prod/Dockerfile --target kotka-api --build-arg CONFIGURATION=${CONFIGURATION} .
+docker build -t kotka -f tools/docker/kotka/prod/Dockerfile --target kotka --build-arg CONFIGURATION=${CONFIGURATION} .
 
 echo "Tagging..."
 docker tag kotka-api "${REGISTRY}/kotka-api:latest"
