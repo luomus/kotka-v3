@@ -4,7 +4,7 @@ https://docs.nestjs.com/providers#services
 
 import { Injectable } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
-import { Cached } from '@kotka/api/redis-cache';
+import { Cached } from '@kotka/api/cache';
 import { SpecimenUrlDataType } from '@kotka/shared/models';
 import { TriplestoreService } from './triplestore.service';
 
@@ -21,7 +21,7 @@ export const defaultNamespaceID = 'HT';
 @Injectable()
 export class NamespaceService {
   constructor (
-    private readonly triplestoreService: TriplestoreService
+    private readonly triplestoreService: TriplestoreService,
   ) {}
 
   @Cached('namespaces', 24 * 3600 * 1000)

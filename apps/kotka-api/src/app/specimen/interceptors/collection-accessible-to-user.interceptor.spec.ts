@@ -4,7 +4,7 @@ import { CallHandler, ExecutionContext, } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { CollectionAccessibleToUserInterceptor } from './collection-accessible-to-user.interceptor';
 import { Collection } from '@luomus/laji-schema/models';
-import { OldKotkaDataService } from '../../shared/services/old-kotka-data.service';
+import { OldKotkaDataService } from '@kotka/api/services';
 
 const adminProfile = {
   id: 'MA.1',

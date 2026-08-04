@@ -10,7 +10,7 @@ import { ApiMethodAccessGuard } from '../shared/guards/api-method-access.guard';
 import { KotkaDocumentObjectFullType, KotkaDocumentObjectType } from '@kotka/shared/models';
 import { ControllerType } from '../shared/decorators/controller-type.decorator';
 import { LajiStoreController } from '../shared/controllers/laji-store.controller';
-import { TriplestoreMapperService } from '@kotka/api/mappers';
+import { TriplestoreMapperService } from '@kotka/api/services';
 import { SpecimenIdJoinerInterceptor } from './interceptors/specimen-id-joiner.interceptor';
 import { SpecimenConvertDataToOldFormatInterceptor } from './interceptors/specimen-convert-data-to-old-format.interceptor';
 import { SpecimenImageInterceptor } from './interceptors/specimen-image.interceptor';

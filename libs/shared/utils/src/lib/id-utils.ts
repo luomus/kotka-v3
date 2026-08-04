@@ -1,5 +1,5 @@
-const defaultDomain = 'http://tun.fi/';
-const domainMap: Record<string, string> = {
+export const defaultDomain = 'http://tun.fi/';
+export const domainMap: Record<string, string> = {
   'tun:': defaultDomain,
   'luomus:': 'http://id.luomus.fi/',
   'zmuo:': 'http://id.zmuo.oulu.fi/',
@@ -7,7 +7,14 @@ const domainMap: Record<string, string> = {
   'utu:': 'http://mus.utu.fi/',
   'gbif-dataset:': 'https://www.gbif.org/dataset/',
 };
-
+export const idPrefixMap: Record<string, string> = {
+  'http://tun.fi/': 'tun',
+  'http://id.luomus.fi/': 'luomus',
+  'http://id.zmuo.oulu.fi/': 'zmuo',
+  'http://id.herb.oulu.fi/': 'herbo',
+  'http://mus.utu.fi/': 'utu',
+  'https://www.gbif.org/dataset/': 'gbif-dataset',
+};
 export const defaultPrefix = 'tun';
 export const acceptedPrefixes = ['luomus', 'zmuo', 'herbo', 'utu', 'gbif-dataset', 'tun'];
 export type QnamePrefix = 'luomus' | 'zmuo' | 'herbo' | 'utu' | 'gbif-dataset' | 'tun'
@@ -50,6 +57,17 @@ export function getDomainAndIdWithoutPrefix(value: string): string[] {
   }
 
   return [defaultDomain, value];
+}
+
+export function getPrefixAndId(value: string): string[] {
+  if (typeof value !== 'string' || value === '') return ['', value];
+
+  if (value.includes(':')) {
+    const [prefix, id] = value.split(':');
+    return [prefix, id];
+  }
+
+  return [defaultPrefix, value];
 }
 
 export function getIdWithoutPrefix(value: string): string {

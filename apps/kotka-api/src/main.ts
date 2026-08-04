@@ -5,7 +5,7 @@ import passport from 'passport';
 import { AppModule } from './app/app.module';
 import Redis from 'ioredis';
 import { RedisStore } from 'connect-redis';
-import { REDIS } from '@kotka/api/redis-cache';
+import { REDIS } from '@kotka/api/cache';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {

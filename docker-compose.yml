@@ -1,4 +1,15 @@
 services:
+  elastic:
+    build:
+      context: ./tools/docker/elasticsearch
+      dockerfile: Dockerfile
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - 9200:9200
+    volumes:
+      - elastic:/usr/share/elasticsearch/data
   redis:
     image: redis
     environment:
@@ -31,3 +42,4 @@ services:
 volumes:
   shared-volume:
   redis:
+  elastic:

@@ -2,8 +2,7 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { LajiStoreService } from '@kotka/api/services';
-import { TypeMigrationService } from '@kotka/api/mappers';
+import { LajiStoreService, TypeMigrationService } from '@kotka/api/services';
 import { Dataset, Organization, SpecimenTransaction } from '@luomus/laji-schema';
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import moment from 'moment';

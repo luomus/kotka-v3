@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 import { JSONPath } from 'jsonpath-plus';
 import { isAdmin } from '@kotka/shared/utils';
 import { getError } from '@kotka/api/services';
-import { OldKotkaDataService } from '../../shared/services/old-kotka-data.service';
+import { OldKotkaDataService } from '@kotka/api/services';
 
 const collectionIDPath = '/collectionID';
 const sampleCollectionIDPath = '/gatherings/*/units/*/samples/*/collectionID';

@@ -5,11 +5,10 @@ https://docs.nestjs.com/modules
 
 import { Module } from '@nestjs/common';
 import { ApiServicesModule } from '@kotka/api/services';
-import { MappersModule } from '@kotka/api/mappers';
 import { SharedModule } from '../shared/shared.module';
 
 @Module({
-  imports: [ApiServicesModule, MappersModule, SharedModule],
+  imports: [ApiServicesModule, SharedModule],
   controllers: [TransactionController],
   providers: []
 })

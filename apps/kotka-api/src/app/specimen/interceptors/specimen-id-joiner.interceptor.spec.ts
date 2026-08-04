@@ -3,10 +3,9 @@ import { Test } from '@nestjs/testing';
 import { createMock } from '@golevelup/ts-jest';
 import { CallHandler, ExecutionContext } from '@nestjs/common';
 import { SpecimenIdJoinerInterceptor } from './specimen-id-joiner.interceptor';
-import { AbschService, LajiApiService, LajiStoreService, NamespaceService } from '@kotka/api/services';
+import { AbschService, LajiStoreService, NamespaceService } from '@kotka/api/services';
 import { of } from 'rxjs';
 
-const mockLajiApiService = jest.mock<LajiApiService>;
 const mockAbschService = jest.mock<AbschService>;
 const mockLajiStoreService = {
   getSeqNext: jest.fn().mockImplementation(() => of({ status: 200, statusText: '', headers: {}, config: {}, data: 33 } as AxiosResponse))
@@ -60,7 +59,6 @@ describe('SpecimenIdJoinerIntereptor', () => {
       providers: [SpecimenIdJoinerInterceptor,
       { provide: NamespaceService, useValue: mockNamespaceService },
       { provide: LajiStoreService, useValue: mockLajiStoreService },
-      { provide: LajiApiService, useValue: mockLajiApiService },
       { provide: AbschService, useValue: mockAbschService },
     ],
     }).compile();

@@ -1,7 +1,7 @@
 {
-  "name": "api-mappers",
+  "name": "api-cache",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/kotka-api/mappers/src",
+  "sourceRoot": "libs/kotka-api/cache/src",
   "projectType": "library",
   "tags": [],
   "targets": {
@@ -10,9 +10,9 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/kotka-api/mappers"],
+      "outputs": ["{workspaceRoot}/coverage/libs/kotka-api/cache"],
       "options": {
-        "jestConfig": "libs/kotka-api/mappers/jest.config.ts"
+        "jestConfig": "libs/kotka-api/cache/jest.config.ts"
       }
     }
   }

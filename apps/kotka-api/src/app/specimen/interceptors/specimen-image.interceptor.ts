@@ -22,6 +22,14 @@ export class SpecimenImageInterceptor implements NestInterceptor {
 
       if (images) req.body = body;
 
+      return next.handle().pipe(
+        map((data: Document) => {
+          if (images) {
+            data.images = images || [];
+          }
+          return data;
+        })
+      );
     } else if (req.method === 'GET' && context.getHandler().name === 'get') {
       return next.handle().pipe(
         mergeMap((data: Document) => {
@@ -31,7 +39,7 @@ export class SpecimenImageInterceptor implements NestInterceptor {
             map((media: Media[]) => {
               const images = media.map(media => media.id!).sort();
 
-              if (images) data.images = images;
+              data.images = images || [];
 
               return data;
             })

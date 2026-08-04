@@ -6,6 +6,7 @@ import { StoreGetQuery, StoreQueryResult } from '@kotka/shared/models';
 import { StoreVersion } from '@kotka/shared/models';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
+import { JSONSchema4 } from 'json-schema';
 
 @Injectable()
 export class LajiStoreService {
@@ -15,6 +16,14 @@ export class LajiStoreService {
 
   private urlBase = process.env['LAJI_STORE_URL'];
   private baseConfig = { headers: { Authorization: 'Basic ' + process.env['LAJI_STORE_AUTH'] }};
+
+  getJsonSchema(type: string) {
+    return this.httpService.get<JSONSchema4>(`${this.urlBase}json-schema/${type}`);
+  }
+
+  public getContext(target: string) {
+    return this.httpService.get<any>(this.urlBase + 'json-ld-context/'+ target + '.json');
+  }
 
   getAll<T>(type: string, query: StoreGetQuery = {}) {
     return this.httpService.get<StoreQueryResult<T>>(`${this.urlBase}${type}`, Object.assign({ params: query }, this.baseConfig));

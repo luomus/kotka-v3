@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
 import { AutocompleteService } from '../shared/services/autocomplete.service';
-import { OldKotkaDataService } from '../shared/services/old-kotka-data.service';
+import { OldKotkaDataService } from '@kotka/api/services';
 
 @Controller('collection')
 @UseGuards(AuthenticateCookieGuard)

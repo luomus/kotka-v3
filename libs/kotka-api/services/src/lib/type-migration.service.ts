@@ -196,7 +196,7 @@ export class TypeMigrationService {
 
     return toReturn as T;
   }
-  
+
   private mapProp (type: string, key: string, value: any, to: Record<string, any>) {
     if (Array.isArray(value)) {
       to[key] = value.map(val => {

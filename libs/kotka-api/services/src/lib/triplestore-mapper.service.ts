@@ -6,7 +6,8 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { lastValueFrom, map } from 'rxjs';
 import { parse, serialize, graph } from 'rdflib';
 import { compact, toRDF } from 'jsonld';
-import { LajiApiService, SchemaService } from '@kotka/api/services';
+import { LajiStoreService } from './laji-store.service';
+import { LajiApiService } from './laji-api.service';
 import { StoreObject } from '@luomus/laji-schema';
 import { escapeRegExp, set } from 'lodash';
 import { TypeMigrationService } from './type-migration.service';
@@ -24,7 +25,7 @@ const baseUrl = 'http://tun.fi/';
 @Injectable()
 export class TriplestoreMapperService implements OnModuleInit {
   constructor (
-    private schemaService: SchemaService,
+    private readonly storeService: LajiStoreService,
     private lajiApiService: LajiApiService,
     private typeMigrationService: TypeMigrationService,
   ) {}
@@ -185,7 +186,6 @@ export class TriplestoreMapperService implements OnModuleInit {
 
     return new Promise( (resolve) => {
       parse(rdf, store, baseUrl, 'application/n-quads', (err, data) => {
-
         serialize(null, data, undefined, 'application/rdf+xml', (err, data) => {
           data = data.replace(/IIII/g, '.').replace(/:tun/g, '').replace(/tun:/g, '').replace(/rdf:datatype="http:\/\/www.w3.org\/1999\/02\/22-rdf-syntax-ns#langString" /g, '');
           resolve(data);
@@ -207,7 +207,8 @@ export class TriplestoreMapperService implements OnModuleInit {
   }
 
   private async initContext(type: string) {
-    const ctx = await lastValueFrom(this.schemaService.getContext(this.normalizeJsonLdType(type)).pipe(map(res => res.data)));
+    try {
+    const ctx = await lastValueFrom(this.storeService.getContext(this.normalizeJsonLdType(type)).pipe(map(res => res.data)));
     const properties = await lastValueFrom(this.lajiApiService.get<Record<string, any>>(`metadata/classes/${type}/properties`).pipe(map(res => res.data?.results)));
     const ctx2 = { '@context': {} };
     const ctx3 = { '@context': {} };
@@ -272,6 +273,11 @@ export class TriplestoreMapperService implements OnModuleInit {
     this.fromContext[type] = ctx2;
     this.returnContext[type] = ctx3;
     this.typeMapContext[type] =ctx4;
+
+    } catch (e) {
+      console.error(`Error initializing context for type ${type}:`, e);
+      throw e;
+    }
   }
 
   private typeMapValue(key: string, value: string, context: object) {

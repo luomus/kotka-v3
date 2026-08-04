@@ -5,10 +5,10 @@ https://docs.nestjs.com/modules
 
 import { Module } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
-import { RedisModule } from '@kotka/api/redis-cache';
+import { CacheModule } from '@kotka/api/cache';
 
 @Module({
-  imports: [TerminusModule, RedisModule],
+  imports: [TerminusModule, CacheModule],
   controllers: [StatusController],
   providers: []
 })

@@ -1,6 +1,6 @@
 /* eslint-disable */
 export default {
-  displayName: 'api-redis-cache',
+  displayName: 'api-cache',
   preset: '../../../jest.preset.js',
   globals: {},
   testEnvironment: 'node',
@@ -13,5 +13,5 @@ export default {
     ],
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../../../coverage/libs/kotka-api/redis-cache',
+  coverageDirectory: '../../../coverage/libs/kotka-api/cache',
 };

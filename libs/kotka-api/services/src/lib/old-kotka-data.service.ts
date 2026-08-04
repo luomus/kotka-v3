@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { TriplestoreService } from '@kotka/api/services';
-import { CacheService, Cached } from '@kotka/api/redis-cache';
-import { TriplestoreMapperService } from '@kotka/api/mappers';
+import { TriplestoreService,  } from './triplestore.service';
+import { CacheService, Cached } from 'libs/kotka-api/cache/src';
+import { TriplestoreMapperService } from './triplestore-mapper.service';
 import { Collection } from '@luomus/laji-schema';
 import { lastValueFrom, map, switchMap } from 'rxjs';
 import { Cron, CronExpression, Timeout } from '@nestjs/schedule';

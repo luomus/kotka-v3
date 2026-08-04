@@ -1,5 +1,5 @@
 import { LajiStoreService, TriplestoreService } from '@kotka/api/services';
-import { TriplestoreMapperService, TypeMigrationService } from '@kotka/api/mappers';
+import { TriplestoreMapperService, TypeMigrationService } from '@kotka/api/services';
 import { Command, Console } from 'nestjs-console';
 import { lastValueFrom, map } from 'rxjs';
 import { Organization, StoreObject } from '@kotka/shared/models';

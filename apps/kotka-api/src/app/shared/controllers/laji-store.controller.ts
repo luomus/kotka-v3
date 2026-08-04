@@ -5,7 +5,7 @@ https://docs.nestjs.com/controllers#controllers
 import { StoreGetQuery } from '@kotka/shared/models';
 import { lastValueFrom } from 'rxjs';
 import { getError, LajiStoreService, TriplestoreService, ValidationService } from '@kotka/api/services';
-import { TriplestoreMapperService } from '@kotka/api/mappers';
+import { TriplestoreMapperService } from '@kotka/api/services';
 import {
   Body,
   Delete,

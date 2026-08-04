@@ -49,6 +49,7 @@ export enum ErrorMessages {
   loginRequired = 'Login is required',
   invalidSequenceValueFormat = 'Invalid value format',
   protectedSequencePrefix = 'Given sequence is for internal use only',
+  authTokenReuqired = 'Authentication token is required',
 }
 
 export interface LoginResult {
