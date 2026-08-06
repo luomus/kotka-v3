@@ -6,4 +6,5 @@ export const globals: Globals = {
   transactionFormId: 'MHL.930',
   specimenFormId: 'MHL.1158',
   imageMetadataFormId: 'MHL.1160',
+  branchFormId: 'MHL.1230'
 };

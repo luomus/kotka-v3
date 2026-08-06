@@ -6,6 +6,7 @@ export interface Globals {
   transactionFormId: string;
   specimenFormId: string;
   imageMetadataFormId: string;
+  branchFormId: string;
 }
 
 export const WINDOW = new InjectionToken<Window>('window');

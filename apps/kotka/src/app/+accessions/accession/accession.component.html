@@ -12,10 +12,16 @@
           </h1>
           @if (vm.document) {
             <button
+              class="btn btn-success"
+              (click)="openBranchForm(uri)"
+            >
+              <i class="fa fa-circle-plus"></i> Add branch
+            </button>
+            <button
               class="btn btn-info"
               (click)="openSpecimenViewer(uri)"
             >
-              <i class="fa fa-eye"></i>
+              <i class="fa fa-eye"></i> View
             </button>
           }
         </div>
@@ -29,8 +35,13 @@
         <ngb-alert type="danger" [dismissible]="false">
           {{ vm.error }}
         </ngb-alert>
-      } @else if (vm.document) {
-        content here
+      } @else {
+        @for (branch of vm.branches; track branch.id) {
+          <kotka-branch-card
+            [branch]="branch"
+            (editBranch)="openBranchForm(uri, $event)"
+          ></kotka-branch-card>
+        }
       }
     </kui-main-content>
   }

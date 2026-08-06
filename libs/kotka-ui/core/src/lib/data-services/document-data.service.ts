@@ -17,20 +17,25 @@ export class DocumentDataService {
 
   getDocumentData<T extends KotkaDocumentObjectType>(type: T, uri: string): Observable<DocumentDataResult<T>> {
     if (!uri) {
-      return of<DocumentDataResult<T>>({ loading: false, error: 'Resource not found' });
+      return of({ loading: false, error: 'Resource not found' });
     }
 
     const id = getId(uri);
     return this.apiClient.getDocumentById(type, id).pipe(
       map((value) => ({
         value,
-        loading: false as const,
+        loading: false,
       })),
-      startWith({ loading: true as const } as DocumentDataResult<T>),
-      catchError(() => {
-        return of<DocumentDataResult<T>>({
+      startWith({ loading: true }),
+      catchError((err) => {
+        const error =
+          err.status === 404
+            ? `Resource with URI ${uri} not found`
+            : 'An unexpected error occurred';
+
+        return of({
           loading: false,
-          error: `Resource with URI ${uri} not found`,
+          error,
         });
       }),
     );

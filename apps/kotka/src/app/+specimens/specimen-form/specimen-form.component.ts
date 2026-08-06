@@ -11,10 +11,7 @@ import {
   isDocument,
 } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
-import {
-  FormViewContainerComponent,
-  PrefilledFormData,
-} from '@kotka/ui/form-view';
+import { FormViewContainerComponent } from '@kotka/ui/form-view';
 import { FormViewComponent } from '@kotka/ui/form-view';
 import { UserService } from '@kotka/ui/core';
 import { ParamMap, RouterLink } from '@angular/router';
@@ -85,7 +82,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
 
   dataType: Signal<DataType | undefined>;
   title: Signal<string>;
-  prefilledFormData: Signal<PrefilledFormData<KotkaDocument> | undefined>;
+  prefilledFormData: Signal<Partial<KotkaDocument> | undefined>;
   mediaMetadata: Signal<FormMediaMetadata>;
 
   markAdvancedFieldsActive: Signal<boolean>;
@@ -140,13 +137,11 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
       this.getTitle(this.dataType(), this.editMode(), this.dataURI()),
     );
 
-    this.prefilledFormData = computed(
-      (): PrefilledFormData<KotkaDocument> => ({
-        data: {
-          datatype: this.dataType(),
-          gatherings: [{ units: [{}] }],
-        },
-      }),
+    this.prefilledFormData = computed(() => (
+      this.editMode() ? undefined : {
+        datatype: this.dataType(),
+        gatherings: [{ units: [{}] }]
+      })
     );
 
     this.mediaMetadata = computed(() => ({
@@ -425,7 +420,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
         state: { skipForceRouteRefresh: true },
       }),
     ).subscribe(() => {
-      this.copyData.set({ data: formData, hasChanges: true });
+      this.copyData.set(formData);
       this.cdr.markForCheck();
     });
   }
