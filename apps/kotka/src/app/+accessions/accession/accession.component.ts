@@ -14,7 +14,6 @@ import { FormModalComponent } from '@kotka/ui/form-view';
 import { globals } from '../../../environments/globals';
 import { getId, getUri } from '@kotka/shared/utils';
 import { Branch } from '@luomus/laji-schema';
-import { BranchCardComponent } from './branch-card/branch-card.component';
 import { BranchTableComponent } from './branch-table/branch-table.component';
 
 interface BranchesResult {
