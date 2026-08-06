@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { DUAL, KEYV, REDIS } from './redis.constants';
 import { RedisHealthIndicator } from './redis.health';
-import { createKeyv, Keyv } from '@keyv/redis'
-import { Cacheable, KeyvCacheableMemory } from 'cacheable'
+import { createKeyv, Keyv } from '@keyv/redis';
+import { Cacheable, KeyvCacheableMemory } from 'cacheable';
 import { Redis } from 'ioredis';
 
 @Module({

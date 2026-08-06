@@ -15,7 +15,7 @@ export class LajiApiService {
     'API-Version': 1,
     'Authorization': process.env['LAJI_API_TOKEN']!,
     'Accept-Language': 'en'
-  }
+  };
 
   public get<T>(path: string, params = {}, personToken?: string): Observable<AxiosResponse<T>> {
     const headers = { ...this.baseHeaders };
