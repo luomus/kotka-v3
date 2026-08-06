@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { TriplestoreService,  } from './triplestore.service';
-import { CacheService, Cached } from 'libs/kotka-api/cache/src';
+import { CacheService, Cached } from '@kotka/api/cache';
 import { TriplestoreMapperService } from './triplestore-mapper.service';
 import { Collection } from '@luomus/laji-schema';
 import { lastValueFrom, map, switchMap } from 'rxjs';

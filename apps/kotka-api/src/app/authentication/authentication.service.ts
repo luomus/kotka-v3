@@ -30,7 +30,7 @@ export class AuthenticationService {
 
         const next = res.data.next;
 
-        return this.lajiApiService.get<any>(`person`, undefined, token).pipe(
+        return this.lajiApiService.get<any>('person', undefined, token).pipe(
           catchError((err) => { throw new UnauthorizedException('Error retrieving user profile from laji-auth.', err.message); }),
           map(res => res.data),
           map(data => {

@@ -15,6 +15,8 @@ import { CollectionModule } from './collection/collection.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { LajiApiModule } from './laji-api/laji-api.module';
 import { SequenceModule } from './sequence/sequence.module';
+import { BranchModule } from './branch/branch.module';
+
 @Module({
   imports: [
     CacheModule,
@@ -32,9 +34,10 @@ import { SequenceModule } from './sequence/sequence.module';
     OrganizationModule,
     CollectionModule,
     SequenceModule,
+    BranchModule,
     LajiApiModule,
   ],
   controllers: [],
-  providers: []
+  providers: [],
 })
 export class AppModule {}

@@ -75,3 +75,9 @@ $enable-caret: false;
 
 $input-btn-padding-y-sm:      .1rem;
 $input-btn-padding-x-sm:      .25rem;
+
+:root {
+  @each $name, $value in $grid-breakpoints {
+    --kotka-breakpoint-#{$name}: #{$value};
+  }
+}

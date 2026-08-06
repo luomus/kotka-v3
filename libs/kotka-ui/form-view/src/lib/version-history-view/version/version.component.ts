@@ -5,7 +5,7 @@ import {
   Input,
   OnChanges, Output, ViewChild
 } from '@angular/core';
-import { LajiForm, StoreVersion, KotkaDocumentObject } from '@kotka/shared/models';
+import { LajiForm, StoreVersion, MainKotkaDocumentObject } from '@kotka/shared/models';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { SpinnerComponent } from '@kotka/ui/components';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
@@ -20,7 +20,7 @@ import { RouterLink } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [SpinnerComponent, NgbAlert, MetaFieldsComponent, LajiFormComponent, RouterLink],
 })
-export class VersionComponent<S extends KotkaDocumentObject>
+export class VersionComponent<S extends MainKotkaDocumentObject>
   implements OnChanges
 {
   @Input() visibleDataTypeName?: string;

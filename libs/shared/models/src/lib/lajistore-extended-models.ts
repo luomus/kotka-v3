@@ -1,4 +1,11 @@
-import { Dataset, Document, Organization, Sample, SpecimenTransaction } from '@luomus/laji-schema';
+import {
+  Branch,
+  Dataset,
+  Document,
+  Organization,
+  Sample,
+  SpecimenTransaction,
+} from '@luomus/laji-schema';
 export * from '@luomus/laji-schema';
 
 export type SpecimenDataType = 'botanyspecimen'|'zoospecimen'|'palaeontology'|'accession'|'culture';
@@ -26,6 +33,9 @@ export type KotkaDocumentObject =
   | Organization
   | Sample
   | SpecimenTransaction
+  | Branch
+
+export type MainKotkaDocumentObject = Exclude<KotkaDocumentObject, Branch>;
 
 export enum KotkaDocumentObjectType {
   dataset = 'dataset',
@@ -33,7 +43,13 @@ export enum KotkaDocumentObjectType {
   organization = 'organization',
   sample = 'sample',
   specimen = 'specimen',
+  branch = 'branch',
 }
+
+export type MainKotkaDocumentObjectType = Exclude<
+  KotkaDocumentObjectType,
+  KotkaDocumentObjectType.branch
+>;
 
 export interface KotkaDocumentObjectMap {
   [KotkaDocumentObjectType.dataset]: Dataset;
@@ -41,6 +57,7 @@ export interface KotkaDocumentObjectMap {
   [KotkaDocumentObjectType.organization]: Organization;
   [KotkaDocumentObjectType.sample]: Sample;
   [KotkaDocumentObjectType.transaction]: SpecimenTransaction;
+  [KotkaDocumentObjectType.branch]: Branch;
 }
 
 export enum KotkaDocumentObjectFullType {
@@ -48,7 +65,8 @@ export enum KotkaDocumentObjectFullType {
   transaction = 'HRX.specimenTransaction',
   document = 'MY.document',
   organization = 'MOS.organization',
-  sample = 'MF.sample'
+  sample = 'MF.sample', // TODO should be removed?
+  branch = 'PUU.branch',
 }
 
 export const STORE_OBJECTS = [

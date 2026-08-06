@@ -10,7 +10,11 @@ import {
   Signal,
   inject,
 } from '@angular/core';
-import { KotkaDocumentObjectType, KotkaDocumentObjectMap, LajiForm } from '@kotka/shared/models';
+import {
+  LajiForm,
+  MainKotkaDocumentObjectType,
+  KotkaDocumentObjectMap,
+} from '@kotka/shared/models';
 import {
   Observable
 } from 'rxjs';
@@ -20,7 +24,6 @@ import {
   FormState,
   FormViewFacade,
 } from './form-view.facade';
-import { PrefilledFormData } from '../models';
 import { FormViewUtils } from './form-view-utils';
 import { ToastService, DialogService, ApiClient, LabelPipe } from '@kotka/ui/core';
 import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
@@ -47,7 +50,7 @@ import { ErrorSchema } from '@rjsf/utils';
   ],
 })
 export class FormViewComponent<
-  T extends KotkaDocumentObjectType = KotkaDocumentObjectType,
+  T extends MainKotkaDocumentObjectType = MainKotkaDocumentObjectType,
   S extends KotkaDocumentObjectMap[T] = KotkaDocumentObjectMap[T],
 > {
   private notifier = inject(ToastService);
@@ -62,10 +65,11 @@ export class FormViewComponent<
 
   editMode = input.required<boolean>();
   dataURI = input.required<string | undefined>();
+  formData = input<Partial<S>>();
+  hasChanges = input<boolean>();
 
   augmentFormFunc =
     input<(form: LajiForm.SchemaForm) => Observable<LajiForm.SchemaForm>>();
-  prefilledFormData = input<PrefilledFormData<S>>();
   mediaMetadata = input<FormMediaMetadata>();
 
   hiddenFields = input<string[]>();
@@ -108,9 +112,10 @@ export class FormViewComponent<
         dataType: this.dataType(),
         editMode: this.editMode(),
         dataURI: this.dataURI(),
+        formData: this.formData(),
+        hasChanges: this.hasChanges(),
         allowCopy: this.allowCopy(),
         augmentFormFunc: this.augmentFormFunc(),
-        prefilledFormData: this.prefilledFormData(),
       });
     });
 

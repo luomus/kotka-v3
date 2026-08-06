@@ -1,5 +1,10 @@
-import { ChangeDetectionStrategy, Component, Input, TemplateRef } from '@angular/core';
-import { KotkaDocumentObject } from '@kotka/shared/models';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  TemplateRef,
+} from '@angular/core';
+import { MainKotkaDocumentObject } from '@kotka/shared/models';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LabelPipe } from '@kotka/ui/core';
@@ -12,10 +17,10 @@ import { LabelPipe } from '@kotka/ui/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MetaFieldsComponent {
-  @Input() formData?: Partial<KotkaDocumentObject>;
-  @Input() editMode?: boolean;
-  @Input() dataURI?: string;
-  @Input() historyPageLink?: string[]|string;
+  formData = input<Partial<MainKotkaDocumentObject>>();
+  editMode = input<boolean>();
+  dataURI = input<string>();
+  historyPageLink = input<string[]|string>();
 
-  @Input() containerTpl?: TemplateRef<unknown>;
+  containerTpl = input<TemplateRef<unknown>>();
 }

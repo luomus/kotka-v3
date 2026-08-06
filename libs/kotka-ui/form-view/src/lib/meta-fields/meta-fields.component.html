@@ -1,19 +1,19 @@
-@if (containerTpl) {
-  <ng-container *ngTemplateOutlet="containerTpl; context: {$implicit: metaFields}"></ng-container>
+@if (containerTpl()) {
+  <ng-container *ngTemplateOutlet="containerTpl(); context: {$implicit: metaFields}"></ng-container>
 } @else {
   <ng-container *ngTemplateOutlet="metaFields"></ng-container>
 }
 
 <ng-template #metaFields>
-  @if (editMode && formData) {
+  @if (editMode() && formData()) {
     <div class="mb-1">
       <strong class="d-block">Last edited by</strong>
-      <span>{{ (formData.editor || '') | label }} on {{ formData.dateEdited | date:'dd.MM.yyyy HH:mm' }} </span>
-      @if (dataURI && historyPageLink) {
-        <a [routerLink]="historyPageLink" [queryParams]="{ uri: dataURI }">view history</a>
+      <span>{{ (formData()?.editor || '') | label }} on {{ formData()?.dateEdited | date:'dd.MM.yyyy HH:mm' }} </span>
+      @if (dataURI() && historyPageLink()) {
+        <a [routerLink]="historyPageLink()" [queryParams]="{ uri: dataURI() }">view history</a>
       }
       <strong class="d-block">Originally created by</strong>
-      <span>{{ (formData.creator || '') | label }} on {{ formData.dateCreated | date:'dd.MM.yyyy HH:mm' }}</span>
+      <span>{{ (formData()?.creator || '') | label }} on {{ formData()?.dateCreated | date:'dd.MM.yyyy HH:mm' }}</span>
     </div>
   }
 </ng-template>

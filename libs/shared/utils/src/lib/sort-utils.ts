@@ -1,4 +1,4 @@
-import { Identification } from "@luomus/laji-schema/models";
+import { Identification } from '@luomus/laji-schema/models';
 
 export function identificationSort(identifications: Identification[]): Identification[] {
  return identifications.sort((a, b) => compareIdentification(a, b));
@@ -38,7 +38,7 @@ export function compareIdentification(a: Identification, b: Identification): num
   } else if (!dateA && dateB) {
     return 1;
   } else if (dateStringA && !dateStringB) {
-    return -1
+    return -1;
   } else if (!dateStringA && dateStringB) {
     return 1;
   }

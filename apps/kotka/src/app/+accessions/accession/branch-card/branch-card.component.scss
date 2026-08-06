@@ -1,0 +1,27 @@
+@import "styles/bootstrap";
+
+.branch-card {
+  &.bg-success-subtle {
+    border-left: 4px solid $success;
+
+    &:hover {
+      background-color: tint-color($success, 75%) !important;
+    }
+
+    &:active {
+      background-color: tint-color($success, 70%) !important;
+    }
+  }
+
+  &.bg-secondary-subtle {
+    border-left: 4px solid $secondary;
+
+    &:hover {
+      background-color: tint-color($secondary, 75%) !important;
+    }
+
+    &:active {
+      background-color: tint-color($secondary, 70%) !important;
+    }
+  }
+}

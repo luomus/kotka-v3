@@ -46,7 +46,7 @@ export class CacheService {
           lookupCacheArray.push({key: `${cacheKey}_${key}`, value: data[key], ttl: ttl as PerStoreTtl });
         }
 
-        const res = await this.cacheService.setMany(lookupCacheArray);
+        await this.cacheService.setMany(lookupCacheArray);
       } else {
         await this.cacheService.set(cacheKey, data, { ttl });
       }

@@ -6,14 +6,17 @@
         @if (vm.specimenDataType === "accession") {
           Accession
         }
-        {{ vm.uri }}
+        {{ uri() }}
+        @if (vm.specimenDataType === "accession" && vm.document?.originalSpecimenID) {
+          ({{ vm.document?.originalSpecimenID }})
+        }
       </h1>
         @if (vm.showEditButton) {
           <a
             type="button"
             class="btn btn-info edit-button"
             routerLink="/specimens/edit"
-            [queryParams]="{ uri: vm.uri }"
+            [queryParams]="{ uri: uri() }"
           >
             <i class="fa fa-pen-to-square"></i>
           </a>
@@ -42,7 +45,7 @@
     </div>
   </ng-template>
 
-  <kui-main-content [pageTitle]="vm.uri || ''" [headerTpl]="headerTemplate" containerClass="container" [hasBottomMargin]="true">
+  <kui-main-content [pageTitle]="uri() || ''" [headerTpl]="headerTemplate" containerClass="container" [hasBottomMargin]="true">
     @if (vm.loading) {
       <kui-spinner></kui-spinner>
     } @else if (vm.error) {

@@ -31,7 +31,6 @@ import {
   provideHttpClient,
   withInterceptorsFromDi
 } from '@angular/common/http';
-import { provideAnimations } from '@angular/platform-browser/animations';
 import { globals } from './environments/globals';
 
 if (environment.production) {
@@ -49,7 +48,6 @@ bootstrapApplication(AppComponent, {
   providers: [
     provideRouter(routes, withPreloading(QuicklinkStrategy), withEnabledBlockingInitialNavigation(), withRouterConfig({ onSameUrlNavigation: 'reload' })),
     provideHttpClient(withInterceptorsFromDi()),
-    provideAnimations(),
     provideNgxWebstorage(
       withNgxWebstorageConfig({ prefix: 'kotka-', separator: '' }),
       withLocalStorage()

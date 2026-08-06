@@ -1,0 +1,57 @@
+@if (uri$ | async; as uri) {
+  @if (vm$ | async; as vm) {
+    <ng-template #headerTemplate>
+      <div class="header-layout">
+        <div class="header-left-group">
+          <h1 data-cy="main-header">
+            Accession
+            {{ uri }}
+            @if (vm.document?.originalSpecimenID) {
+              ({{ vm.document?.originalSpecimenID }})
+            }
+          </h1>
+          @if (vm.document) {
+            <button
+              class="btn btn-success"
+              (click)="openBranchForm(uri)"
+            >
+              <i class="fa fa-circle-plus"></i> Add branch
+            </button>
+            <button
+              class="btn btn-outline-secondary"
+              (click)="openSpecimenViewer(uri)"
+            >
+              <i class="fa fa-eye"></i> View
+            </button>
+          }
+        </div>
+      </div>
+    </ng-template>
+
+    <kui-main-content [pageTitle]="uri || ''" [headerTpl]="headerTemplate" containerClass="container" [hasBottomMargin]="true">
+      @if (vm.loading) {
+        <kui-spinner></kui-spinner>
+      } @else if (vm.error) {
+        <ngb-alert type="danger" [dismissible]="false">
+          {{ vm.error }}
+        </ngb-alert>
+      } @else if (vm.branches) {
+        <div class="mb-3 d-flex align-items-center gap-2">
+          <span>Depleted:</span>
+          <div class="btn-group btn-group-sm">
+            <button class="btn btn-outline-secondary" [class.active]="showDepleted" (click)="showDepleted = true">Show</button>
+            <button class="btn btn-outline-secondary" [class.active]="!showDepleted" (click)="showDepleted = false">Hide</button>
+          </div>
+        </div>
+        <kotka-branch-table
+          [branches]="vm.branches"
+          [showDepleted]="showDepleted"
+          (editBranch)="openBranchForm(uri, $event)"
+        ></kotka-branch-table>
+      }
+    </kui-main-content>
+  }
+} @else {
+  <kotka-not-found></kotka-not-found>
+}
+

@@ -1,4 +1,4 @@
-import { computed, Injectable, OnDestroy, signal, inject } from '@angular/core';
+import { computed, inject, Injectable, OnDestroy, signal } from '@angular/core';
 import { ApiClient, FormService, UserService } from '@kotka/ui/core';
 import {
   catchError,
@@ -7,40 +7,45 @@ import {
   Observable,
   of,
   Subscription,
-  switchMap, throwError
+  switchMap,
+  throwError,
 } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import {
-  allowEditForUser,
   allowDeleteForUser,
+  allowEditForUser,
   getId,
 } from '@kotka/shared/utils';
 import {
   KotkaDocumentObject,
-  KotkaDocumentObjectType,
   KotkaDocumentObjectMap,
+  KotkaDocumentObjectType,
   LajiForm,
   Person,
 } from '@kotka/shared/models';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { PrefilledFormData } from '../models';
 import { getDefaultFormState } from '@luomus/laji-form/lib/utils';
+import { Branch } from '@luomus/laji-schema';
 
 export enum FormErrorEnum {
   dataNotFound = 'dataNotFound',
   genericError = 'genericError',
 }
 
-export interface FormInputs<T extends KotkaDocumentObjectType, S extends KotkaDocumentObjectMap[T]> {
+export interface FormInputs<
+  T extends KotkaDocumentObjectType,
+  S extends KotkaDocumentObjectMap[T],
+> {
   formId: string;
   dataType: T;
   editMode: boolean;
   dataURI?: string;
+  formData?: Partial<S>;
+  hasChanges?: boolean;
   allowCopy?: boolean;
   augmentFormFunc?: (
     form: LajiForm.SchemaForm,
   ) => Observable<LajiForm.SchemaForm>;
-  prefilledFormData?: PrefilledFormData<S>;
 }
 
 export interface FormState<S extends KotkaDocumentObject> {
@@ -69,10 +74,10 @@ export class FormViewFacade<
   private store = signal<FormState<S>>({ loading: false });
   state = this.store.asReadonly();
 
-  formData = computed(() => (this.state()?.formData));
-  disabled = computed(() => (this.state()?.disabled));
+  formData = computed(() => this.state()?.formData);
+  disabled = computed(() => this.state()?.disabled);
 
-  private inputs = signal<FormInputs<T, S>|undefined>(undefined);
+  private inputs = signal<FormInputs<T, S> | undefined>(undefined);
 
   private initialStateSub: Subscription;
 
@@ -88,12 +93,23 @@ export class FormViewFacade<
     this.inputs.set(inputs);
   }
 
-  setFormData(formData: Partial<S>, formHasChanges = true, forceUpdate = false) {
+  setFormData(
+    formData: Partial<S>,
+    formHasChanges = true,
+    forceUpdate = false,
+  ) {
     const state = this.state();
 
-    const formDataLastForceUpdatedVersion = forceUpdate ? formData : state.formDataLastForceUpdatedVersion;
+    const formDataLastForceUpdatedVersion = forceUpdate
+      ? formData
+      : state.formDataLastForceUpdatedVersion;
 
-    this.setState({ ...state, formData, formDataLastForceUpdatedVersion, formHasChanges });
+    this.setState({
+      ...state,
+      formData,
+      formDataLastForceUpdatedVersion,
+      formHasChanges,
+    });
   }
 
   setFormHasChanges(formHasChanges: boolean) {
@@ -149,21 +165,36 @@ export class FormViewFacade<
       );
   }
 
-  private getInitialFormData$(inputs: FormInputs<T, S>): Observable<Partial<S>> {
+  private getInitialFormData$(
+    inputs: FormInputs<T, S>,
+  ): Observable<Partial<S>> {
     if (inputs.editMode) {
+      if (inputs.formData) {
+        return of(inputs.formData);
+      }
       return this.getFormData$(inputs.dataType, inputs.dataURI);
     } else {
-      return this.getEmptyFormData$(inputs.prefilledFormData?.data);
+      return this.getEmptyFormData$(
+        inputs.dataType,
+        inputs.formData,
+      );
     }
   }
 
-  private getEmptyFormData$(prefilledFormData?: Partial<S>): Observable<Partial<S>> {
+  private getEmptyFormData$(
+    dataType: T,
+    prefilledFormData?: Partial<S>,
+  ): Observable<Partial<S>> {
     return this.userService.getCurrentLoggedInUser().pipe(
       map((user) => {
         const formData: Partial<S> = {};
-        if (user?.organisation && user.organisation.length === 1) {
-          formData.owner = user.organisation[0];
+
+        if (dataType !== KotkaDocumentObjectType.branch) {
+          if (user?.organisation && user.organisation.length === 1) {
+            (formData as Partial<Exclude<S, Branch>>).owner = user.organisation[0];
+          }
         }
+
         return { ...formData, ...prefilledFormData };
       }),
     );
@@ -192,7 +223,7 @@ export class FormViewFacade<
     formData = getDefaultFormState(form.schema, formData, form.schema);
 
     const isEditMode = inputs.editMode;
-    const disabled = isEditMode && !allowEditForUser(formData, user);
+    const disabled = isEditMode && !allowEditForUser(<S>formData, user);
     const showDeleteButton =
       isEditMode && !disabled && allowDeleteForUser(<S>formData, user);
 
@@ -204,7 +235,7 @@ export class FormViewFacade<
       disabled,
       showDeleteButton,
       showCopyButton: isEditMode && inputs.allowCopy,
-      formHasChanges: inputs.prefilledFormData?.hasChanges || false,
+      formHasChanges: inputs.hasChanges || false,
       disabledAlertDismissed: false,
     };
   }

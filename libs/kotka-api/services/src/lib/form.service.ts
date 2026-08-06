@@ -7,12 +7,13 @@ import { lastValueFrom } from 'rxjs';
 import { LajiApiService } from './laji-api.service';
 import { KotkaDocumentObjectFullType } from '@kotka/shared/models';
 
-const types: {[ type in KotkaDocumentObjectFullType ]: string} = {
+const types: { [type in KotkaDocumentObjectFullType]: string } = {
   [KotkaDocumentObjectFullType.dataset]: 'MHL.731',
   [KotkaDocumentObjectFullType.organization]: 'MHL.1152',
   [KotkaDocumentObjectFullType.transaction]: 'MHL.930',
   [KotkaDocumentObjectFullType.document]: 'MHL.1158',
-  [KotkaDocumentObjectFullType.sample]: ''
+  [KotkaDocumentObjectFullType.sample]: '',
+  [KotkaDocumentObjectFullType.branch]: 'MHL.1230',
 };
 
 @Injectable()

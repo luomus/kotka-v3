@@ -1,0 +1,40 @@
+@let vm = formState();
+
+<div class="modal-header">
+  <h4 class="modal-title">{{ title }}</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+</div>
+
+<div class="modal-body">
+  @if (!vm.loading) {
+    @if (vm.errorType; as errorType) {
+      <ngb-alert [type]="'danger'" [dismissible]="false">
+        @if (errorType === formErrorEnum.dataNotFound) {
+          Document was not found
+        } @else {
+          An unexpected error occurred
+        }
+      </ngb-alert>
+    } @else if (vm.form && vm.formData && vm.formDataLastForceUpdatedVersion) {
+      <kui-laji-form
+        [form]="vm.form"
+        [formData]="vm.formDataLastForceUpdatedVersion"
+        [editMode]="editMode"
+        [hasChanges]="vm.formHasChanges"
+        [disabled]="vm.disabled"
+        [showFooter]="false"
+        (formChange)="onChange($event)"
+        (formSubmit)="onSubmit($event)"
+      />
+    }
+  } @else {
+    <kui-spinner />
+  }
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+  <button class="btn btn-success" (click)="save()" [disabled]="vm.disabled">Save</button>
+</div>
+
+

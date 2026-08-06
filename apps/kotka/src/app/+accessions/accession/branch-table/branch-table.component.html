@@ -1,0 +1,26 @@
+@for (row of rows$ | async; track $index) {
+  <div class="row">
+    @for (branch of row; track branch.id) {
+      <div class="col-md-2 col-sm-3 g-3">
+        <kotka-branch-card
+          [branch]="branch"
+          (editBranch)="editBranch.emit($event)"
+          (click)="toggleBranchOpen(branch.id!)"
+        ></kotka-branch-card>
+      </div>
+    }
+  </div>
+  <div class="row">
+    @for (branch of row; track branch.id) {
+      <div class="col-md-2 col-sm-3 g-3 mt-1">
+        @if (branchIsOpen[branch.id!]) {
+          <kotka-branch-events-card
+            animate.enter="enter-animation"
+            animate.leave="leave-animation"
+            [branch]="branch"
+          ></kotka-branch-events-card>
+        }
+      </div>
+    }
+  </div>
+}
