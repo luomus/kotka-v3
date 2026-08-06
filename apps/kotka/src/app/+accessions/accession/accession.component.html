@@ -35,7 +35,7 @@
         <ngb-alert type="danger" [dismissible]="false">
           {{ vm.error }}
         </ngb-alert>
-      } @else {
+      } @else if (vm.branches) {
         <div class="mb-3 d-flex align-items-center gap-2">
           <span>Depleted:</span>
           <div class="btn-group btn-group-sm">
@@ -43,18 +43,11 @@
             <button class="btn btn-outline-secondary" [class.active]="!showDepleted" (click)="showDepleted = false">Hide</button>
           </div>
         </div>
-        <div class="row">
-          @for (branch of vm.branches; track branch.id) {
-            @if (showDepleted || branch.exists) {
-              <div class="col-md-2 col-sm-3 g-3">
-                <kotka-branch-card
-                  [branch]="branch"
-                  (editBranch)="openBranchForm(uri, $event)"
-                ></kotka-branch-card>
-              </div>
-            }
-          }
-        </div>
+        <kotka-branch-table
+          [branches]="vm.branches"
+          [showDepleted]="showDepleted"
+          (editBranch)="openBranchForm(uri, $event)"
+        ></kotka-branch-table>
       }
     </kui-main-content>
   }

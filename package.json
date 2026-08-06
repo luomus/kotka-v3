@@ -24,7 +24,7 @@
     "@ag-grid-community/csv-export": "32.3.5",
     "@ag-grid-community/infinite-row-model": "32.3.5",
     "@ag-grid-community/styles": "^33.0.3",
-    "@angular/animations": "20.3.9",
+    "@angular/cdk": "20.2.14",
     "@angular/common": "20.3.9",
     "@angular/compiler": "20.3.9",
     "@angular/core": "20.3.9",

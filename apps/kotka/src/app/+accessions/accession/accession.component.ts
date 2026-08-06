@@ -15,6 +15,7 @@ import { globals } from '../../../environments/globals';
 import { getId, getUri } from '@kotka/shared/utils';
 import { Branch } from '@luomus/laji-schema';
 import { BranchCardComponent } from './branch-card/branch-card.component';
+import { BranchTableComponent } from './branch-table/branch-table.component';
 
 interface BranchesResult {
   value?: Branch[];
@@ -40,7 +41,7 @@ interface ViewModel {
     MainContentComponent,
     NgbAlert,
     SpinnerComponent,
-    BranchCardComponent,
+    BranchTableComponent,
   ],
 })
 export class AccessionComponent {
@@ -151,7 +152,7 @@ export class AccessionComponent {
       modalRef.componentInstance.formData = branch;
     } else {
       modalRef.componentInstance.formData = {
-        accessionID: getId(uri)
+        accessionID: getId(uri),
       };
     }
 

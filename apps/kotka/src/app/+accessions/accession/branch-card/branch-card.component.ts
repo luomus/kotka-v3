@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, Input, Output, EventEmitter } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  output,
+} from '@angular/core';
 import { Branch } from '@luomus/laji-schema';
 import { LabelPipe } from '@kotka/ui/core';
 import { NgClass } from '@angular/common';
@@ -11,10 +16,11 @@ import { NgClass } from '@angular/common';
   imports: [LabelPipe, NgClass],
 })
 export class BranchCardComponent {
-  @Input({ required: true }) branch!: Branch;
-  @Output() editBranch = new EventEmitter<Branch>();
+  branch = input.required<Branch>();
+  editBranch = output<Branch>();
 
-  editBranchClick() {
-    this.editBranch.emit(this.branch);
+  editBranchClick(event: Event) {
+    event.stopPropagation();
+    this.editBranch.emit(this.branch());
   }
 }

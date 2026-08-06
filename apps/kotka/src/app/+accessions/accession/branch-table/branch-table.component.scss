@@ -1,0 +1,37 @@
+kotka-branch-card {
+  cursor: pointer;
+}
+
+kotka-branch-events-card {
+  display: block;
+}
+
+.enter-animation {
+  animation: expand-from-top 0.1s ease-in-out;
+}
+
+.leave-animation {
+  animation: shrink-from-bottom 0.1s ease-in-out;
+}
+
+@keyframes expand-from-top {
+  from {
+    height: 0;
+    overflow: hidden;
+  }
+  to {
+    height: 100%;
+    overflow: hidden;
+  }
+}
+
+@keyframes shrink-from-bottom {
+  from {
+    height: 100%;
+    overflow: hidden;
+  }
+  to {
+    height: 0;
+    overflow: hidden;
+  }
+}

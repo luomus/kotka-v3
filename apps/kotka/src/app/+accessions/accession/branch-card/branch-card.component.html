@@ -1,17 +1,19 @@
-<div class="card h-100 branch-card" [ngClass]="{
-  'bg-success-subtle': branch.exists,
-  'text-success-emphasis': branch.exists,
-  'bg-secondary-subtle': !branch.exists,
-  'text-secondary-emphasis': !branch.exists
-}">
+<div
+  class="card h-100 branch-card"
+  [ngClass]="{
+    'bg-success-subtle': branch().exists,
+    'text-success-emphasis': branch().exists,
+    'bg-secondary-subtle': !branch().exists,
+    'text-secondary-emphasis': !branch().exists
+  }"
+>
   <div class="card-body d-flex flex-column">
-    <div class="fs-5 fw-semibold">{{ branch.collectionID | label }}</div>
-    <div class="small">{{ branch.location }}</div>
+    <div class="fs-5 fw-semibold">{{ branch().collectionID | label }}</div>
+    <div class="small">{{ branch().location }}</div>
     <div class="mt-auto pt-2">
-      <button class="btn btn-light btn-sm" (click)="editBranchClick()" style="align-self: start;">
+      <button class="btn btn-light btn-sm" (click)="editBranchClick($event)" style="align-self: start;">
         <i class="fa fa-pen"></i> Edit
       </button>
     </div>
   </div>
 </div>
-
