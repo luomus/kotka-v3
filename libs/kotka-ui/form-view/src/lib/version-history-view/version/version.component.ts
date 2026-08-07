@@ -5,12 +5,18 @@ import {
   Input,
   OnChanges, Output, ViewChild
 } from '@angular/core';
-import { LajiForm, StoreVersion, MainKotkaDocumentObject } from '@kotka/shared/models';
+import {
+  LajiForm,
+  StoreVersion,
+  MainKotkaDocumentObjectType,
+  KotkaDocumentObjectMap,
+} from '@kotka/shared/models';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { SpinnerComponent } from '@kotka/ui/components';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 import { MetaFieldsComponent } from '../../meta-fields/meta-fields.component';
 import { RouterLink } from '@angular/router';
+import { DataTypeNamePipePipe } from '@kotka/ui/core';
 
 
 @Component({
@@ -18,12 +24,21 @@ import { RouterLink } from '@angular/router';
   templateUrl: './version.component.html',
   styleUrls: ['./version.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SpinnerComponent, NgbAlert, MetaFieldsComponent, LajiFormComponent, RouterLink],
+  imports: [
+    SpinnerComponent,
+    NgbAlert,
+    MetaFieldsComponent,
+    LajiFormComponent,
+    RouterLink,
+    DataTypeNamePipePipe,
+  ],
 })
-export class VersionComponent<S extends MainKotkaDocumentObject>
-  implements OnChanges
+export class VersionComponent<
+  T extends MainKotkaDocumentObjectType = MainKotkaDocumentObjectType,
+  S extends KotkaDocumentObjectMap[T] = KotkaDocumentObjectMap[T],
+> implements OnChanges
 {
-  @Input() visibleDataTypeName?: string;
+  @Input() dataType?: T;
 
   @Input() version?: number;
   @Input() versionList?: StoreVersion[];

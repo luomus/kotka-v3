@@ -14,7 +14,6 @@ import {
     <kotka-version-history-view
       [formId]="formId"
       [dataType]="dataType"
-      [dataTypeName]="'specimen'"
     ></kotka-version-history-view>
   `,
   styles: [],

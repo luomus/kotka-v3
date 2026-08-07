@@ -1,4 +1,5 @@
 export * from './capitalize-first-letter-pipe';
+export * from './data-type-name.pipe';
 export * from './enum-pipe';
 export * from './join.pipe';
 export * from './label.pipe';

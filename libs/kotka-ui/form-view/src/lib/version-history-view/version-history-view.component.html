@@ -2,12 +2,12 @@
   <kui-main-content
     class="mb-5"
     [containerClass]="'container'"
-    [pageTitle]="(dataTypeName | titlecase) + (dataURI ? (' ' + dataURI) : '')"
+    [pageTitle]="(dataType | dataTypeName: true) + (dataURI ? (' ' + dataURI) : '')"
     >
     @if (isErrorViewModel(vm)) {
       <ngb-alert [type]="'danger'" [dismissible]="false">
         @if (vm.errorType === versionHistoryErrorEnum.dataNotFound) {
-          {{ dataTypeName | titlecase }} @if (dataURI) {
+          {{ dataType | dataTypeName: true }} @if (dataURI) {
           with URI {{ dataURI }}
           }was not found.
         } @else {
@@ -24,7 +24,7 @@
       }
       @if (view === versionHistoryViewEnum.version) {
         <kotka-version
-          [visibleDataTypeName]="dataTypeName"
+          [dataType]="dataType"
           [version]="version"
           [versionList]="vm.versionList"
           [form]="vm.form"

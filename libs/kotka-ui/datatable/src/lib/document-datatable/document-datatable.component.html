@@ -5,8 +5,8 @@
   [enableFileExport]="enableFileExport()"
   [enableColumnSelection]="enableColumnSelection()"
   [settingsKey]="settingsKey()"
-  [dataTypeName]="dataTypeName()"
-  [dataTypeNamePlural]="dataTypeNamePlural()"
+  [dataTypeName]="dataType() | dataTypeName"
+  [dataTypeNamePlural]="dataType() | dataTypeName: false: true"
   [defaultFilterModel]="defaultFilterModel()"
 >
 </kui-datatable>

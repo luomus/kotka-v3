@@ -1,6 +1,6 @@
 <kui-spinner [spinning]="version === undefined || !versionList" [hideContentWhileLoading]="true">
   <ngb-alert [type]="'warning'" [dismissible]="false">
-    <strong>You are viewing an old version of this {{ visibleDataTypeName }}.</strong>
+    <strong>You are viewing an old version of this {{ dataType | dataTypeName }}.</strong>
     <div class="mt-1">
       <span><a [routerLink]="['..', 'edit']" [queryParams]="{ version: undefined }" queryParamsHandling="merge">View current version</a></span>
       <span class="ms-2">|</span>

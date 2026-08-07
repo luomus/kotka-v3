@@ -13,7 +13,7 @@ import {
   KotkaDocumentObjectType,
   ListResponse
 } from '@kotka/shared/models';
-import { ApiClient, DocumentListSearchParams, UserService } from '@kotka/ui/core';
+import { ApiClient, DataTypeNamePipePipe, DocumentListSearchParams, UserService } from '@kotka/ui/core';
 import { map, switchMap } from 'rxjs';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 
@@ -26,9 +26,12 @@ export interface DatatableLoadedData<T extends KotkaDocumentObjectType = KotkaDo
   selector: 'kui-document-datatable',
   templateUrl: './document-datatable.component.html',
   styleUrls: ['./document-datatable.component.scss'],
-  imports: [CommonModule, DatatableComponent],
+  imports: [CommonModule, DatatableComponent, DataTypeNamePipePipe],
 })
-export class DocumentDatatableComponent<T extends KotkaDocumentObjectType = KotkaDocumentObjectType, S extends KotkaDocumentObjectMap[T] = KotkaDocumentObjectMap[T]> {
+export class DocumentDatatableComponent<
+  T extends KotkaDocumentObjectType = KotkaDocumentObjectType,
+  S extends KotkaDocumentObjectMap[T] = KotkaDocumentObjectMap[T],
+> {
   private apiClient = inject(ApiClient);
   private dataService = inject(DatatableDataService);
   private userService = inject(UserService);
@@ -41,9 +44,6 @@ export class DocumentDatatableComponent<T extends KotkaDocumentObjectType = Kotk
 
   enableFileExport = input<boolean>();
   enableColumnSelection = input<boolean>();
-
-  dataTypeName = input<string>('item');
-  dataTypeNamePlural = input<string>();
 
   defaultFilterModel = input<DatatableFilter>({});
 
@@ -69,13 +69,10 @@ export class DocumentDatatableComponent<T extends KotkaDocumentObjectType = Kotk
         );
 
         this.apiClient
-          .getDocumentList<T, S>(
-            searchParams.type,
-            searchParams.page,
-            searchParams.pageSize,
-            searchParams.sort,
-            searchParams.searchQueryString
-          )
+          .getDocumentList<
+            T,
+            S
+          >(searchParams.type, searchParams.page, searchParams.pageSize, searchParams.sort, searchParams.searchQueryString)
           .subscribe((result) => {
             params.successCallback(result.member, result.totalItems);
             this.loadData.emit({ searchParams, result });
@@ -85,10 +82,12 @@ export class DocumentDatatableComponent<T extends KotkaDocumentObjectType = Kotk
 
     this.settingsKey = toSignal(
       toObservable(this.dataType).pipe(
-        switchMap(dataType => this.userService.getCurrentLoggedInUser().pipe(
-          map(user => `${dataType}-table-${user.id}`)
-        ))
-      )
+        switchMap((dataType) =>
+          this.userService
+            .getCurrentLoggedInUser()
+            .pipe(map((user) => `${dataType}-table-${user.id}`)),
+        ),
+      ),
     );
 
     effect(() => {

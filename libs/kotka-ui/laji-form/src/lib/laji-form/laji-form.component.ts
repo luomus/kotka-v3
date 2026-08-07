@@ -26,7 +26,7 @@ import { LocalStorageService } from 'ngx-webstorage';
 import { FormFooterComponent } from '../form-footer/form-footer.component';
 import { ErrorSchema } from '@rjsf/utils';
 
-type FormData = Record<string, any>;
+export type FormData = Record<string, any>;
 
 @Component({
   selector: 'kui-laji-form',

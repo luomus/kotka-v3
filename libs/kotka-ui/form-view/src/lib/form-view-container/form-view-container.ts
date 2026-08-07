@@ -8,7 +8,7 @@ import {
   shareReplay,
   Subscription,
 } from 'rxjs';
-import { FormViewComponent } from './form-view.component';
+import { FormViewComponent } from '../form-view/form-view.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { KotkaDocumentObjectMap, MainKotkaDocumentObjectType } from '@kotka/shared/models';
 import { getUri } from '@kotka/shared/utils';

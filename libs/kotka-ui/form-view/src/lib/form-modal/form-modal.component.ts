@@ -8,43 +8,38 @@ import {
   ViewChild,
 } from '@angular/core';
 import { NgbActiveModal, NgbAlert } from '@ng-bootstrap/ng-bootstrap';
-import { Observable } from 'rxjs';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
-import { ApiClient, ToastService } from '@kotka/ui/core';
+import { ToastService } from '@kotka/ui/core';
 import { SpinnerComponent } from '@kotka/ui/components';
-import {
-  KotkaDocumentObjectMap,
-  KotkaDocumentObjectType,
-} from '@kotka/shared/models';
-import { FormErrorEnum, FormState, FormViewFacade } from '../form-view/form-view.facade';
-import { FormViewUtils } from '../form-view/form-view-utils';
+import { FormState, FormFacade } from '../services/form.facade';
+import { FormViewUtils } from '../services/form-view-utils';
 import { ErrorSchema } from '@rjsf/utils';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'kotka-form-modal',
   templateUrl: './form-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [FormViewFacade],
+  providers: [FormFacade],
   imports: [LajiFormComponent, SpinnerComponent, NgbAlert],
 })
-export class FormModalComponent<
-  T extends KotkaDocumentObjectType = KotkaDocumentObjectType,
-  S extends KotkaDocumentObjectMap[T] = KotkaDocumentObjectMap[T],
-> {
+export class FormModalComponent<T extends FormData> {
   modal = inject(NgbActiveModal);
-  private facade = inject<FormViewFacade<T, S>>(FormViewFacade);
-  private apiClient = inject(ApiClient);
+
+  private facade = inject<FormFacade<T>>(FormFacade);
   private notifier = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
 
   formId!: string;
-  dataType!: T;
   editMode = false;
-  formData?: Partial<S>;
-  title = '';
+  formData?: Partial<T>;
+  allowEdit?: false;
+  allowDelete?: false;
 
-  formState: Signal<FormState<S>>;
-  formErrorEnum = FormErrorEnum;
+  title = '';
+  save$!: (data: T) => Observable<T>;
+
+  formState: Signal<FormState<T>>;
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
 
@@ -54,14 +49,15 @@ export class FormModalComponent<
     afterNextRender(() => {
       this.facade.setInputs({
         formId: this.formId,
-        dataType: this.dataType,
         editMode: this.editMode,
-        formData: this.formData
+        formData: this.formData,
+        allowEdit: this.allowEdit,
+        allowDelete: this.allowDelete
       });
     });
   }
 
-  onChange(data: Partial<S>) {
+  onChange(data: Partial<T>) {
     this.facade.setFormData(data);
   }
 
@@ -69,7 +65,7 @@ export class FormModalComponent<
     this.lajiForm?.submitForm();
   }
 
-  onSubmit(data: S) {
+  onSubmit(data: T) {
     this.lajiForm?.block();
 
     this.save$(data).subscribe({
@@ -83,14 +79,6 @@ export class FormModalComponent<
         this.onErrorResponse(err);
       },
     });
-  }
-
-  private save$(data: S): Observable<S> {
-    if (this.editMode && data.id) {
-      return this.apiClient.updateDocument(this.dataType, data.id, data);
-    } else {
-      return this.apiClient.createDocument(this.dataType, data);
-    }
   }
 
   private onErrorResponse(err: any) {

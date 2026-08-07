@@ -13,7 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { MainKotkaDocumentObjectType, KotkaDocumentObjectMap } from '@kotka/shared/models';
 import { isEqual } from 'lodash';
-import { navigationEnd$ } from '@kotka/ui/core';
+import { DataTypeNamePipePipe, navigationEnd$ } from '@kotka/ui/core';
 import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 import { VersionListComponent } from './version-list/version-list.component';
@@ -34,6 +34,7 @@ import { CommonModule } from '@angular/common';
     VersionComponent,
     VersionComparisonComponent,
     SpinnerComponent,
+    DataTypeNamePipePipe,
   ],
   providers: [VersionHistoryViewFacade],
 })
@@ -43,13 +44,14 @@ export class VersionHistoryViewComponent<
   >
   implements OnChanges, OnDestroy
 {
-  private versionHistoryFacade = inject<VersionHistoryViewFacade<T, S>>(VersionHistoryViewFacade);
+  private versionHistoryFacade = inject<VersionHistoryViewFacade<T, S>>(
+    VersionHistoryViewFacade,
+  );
   private router = inject(Router);
   private activeRoute = inject(ActivatedRoute);
 
   @Input() formId?: string;
   @Input() dataType?: T;
-  @Input() dataTypeName = '';
 
   dataURI?: string;
   version?: number;

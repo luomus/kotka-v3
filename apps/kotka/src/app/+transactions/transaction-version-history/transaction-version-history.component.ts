@@ -17,7 +17,6 @@ import {
     <kotka-version-history-view
       [formId]="formId"
       [dataType]="dataType"
-      [dataTypeName]="'transaction'"
       (formInit)="onFormInit($event.lajiForm, $event.formData)"
     ></kotka-version-history-view>
   `,

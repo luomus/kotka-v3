@@ -1,8 +1,7 @@
 @let vm = formState();
-@let defaultTitle = editMode() ? 'Edit ' + dataTypeName() + ' ' + (dataURI() || '') : 'Add ' + dataTypeName();
 
 <kui-main-content
-  [pageTitle]="pageTitle() ? pageTitle()! : defaultTitle"
+  [pageTitle]="pageTitle() ? pageTitle()! : defaultPageTitle()"
   [headerTpl]="headerTpl() ? headerTplWithContext : undefined"
   [containerClass]="'container'"
 >
@@ -13,19 +12,15 @@
   </ng-template>
 
   @if (!vm.loading) {
-    @if (vm.errorType; as errorType) {
+    @if (vm.error) {
       <ngb-alert [type]="'danger'" [dismissible]="false">
-        @if (errorType === formErrorEnum.dataNotFound) {
-          {{ dataTypeName() | titlecase }}{{ dataURI() ? ' with URI ' + dataURI() : '' }} was not found
-        } @else {
-          An unexpected error occurred
-        }
+        {{ vm.error }}
       </ngb-alert>
     } @else if (vm.form && vm.formData && vm.formDataLastForceUpdatedVersion) {
       @if (vm.disabled && !vm.disabledAlertDismissed) {
         <ngb-alert [type]="'warning'" (closed)="dismissDisabledAlert()">
           <strong>Note:</strong>
-          You can only view this {{ dataTypeName() }}. To be able to edit this {{ dataTypeName() }}, you must belong to {{ vm.formData.owner | label }}
+          You can only view this {{ dataType() | dataTypeName }}. To be able to edit this {{ dataType() | dataTypeName }}, you must belong to {{ vm.formData.owner | label }}
         </ngb-alert>
       }
 

@@ -1,5 +1,8 @@
-import { KotkaDocumentObject, KotkaDocumentObjectFullType } from '@kotka/shared/models';
-import { isBranch, Person } from '@luomus/laji-schema';
+import {
+  KotkaDocumentObjectFullType,
+  MainKotkaDocumentObject,
+} from '@kotka/shared/models';
+import { Person } from '@luomus/laji-schema';
 import moment from 'moment';
 import { MARoleKotkaEnum } from '@luomus/laji-schema';
 
@@ -14,11 +17,7 @@ export function isAdmin(user: Person): boolean {
   return user.role?.includes('MA.admin') || user.roleKotka === 'MA.admin';
 }
 
-export function allowEditForUser(document: KotkaDocumentObject, user: Person): boolean {
-  if (isBranch(document)) {
-    return true; // TODO
-  }
-
+export function allowEditForUser(document: Partial<MainKotkaDocumentObject>, user: Person): boolean {
   if (user.role?.includes('MA.admin')) {
     return true;
   }
@@ -36,11 +35,7 @@ export function allowEditForUser(document: KotkaDocumentObject, user: Person): b
   return true;
 }
 
-export function allowDeleteForUser(document: KotkaDocumentObject, user: Person): boolean {
-  if (isBranch(document)) {
-    return true; // TODO
-  }
-
+export function allowDeleteForUser(document: Partial<MainKotkaDocumentObject>, user: Person): boolean {
   const type = document['@type'] as KotkaDocumentObjectFullType;
 
   if (!type) {

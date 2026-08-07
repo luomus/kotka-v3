@@ -1,4 +1,4 @@
 export * from './lib/form-view/form-view.component';
-export * from './lib/form-view/form-view-container';
+export * from './lib/form-view-container/form-view-container';
 export * from './lib/form-modal/form-modal.component';
 export * from './lib/version-history-view/version-history-view.component';

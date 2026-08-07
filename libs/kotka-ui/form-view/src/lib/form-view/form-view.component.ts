@@ -8,7 +8,7 @@ import {
   output,
   effect,
   Signal,
-  inject,
+  inject, computed,
 } from '@angular/core';
 import {
   LajiForm,
@@ -20,17 +20,16 @@ import {
 } from 'rxjs';
 import { FormMediaMetadata, LajiFormComponent } from '@kotka/ui/laji-form';
 import {
-  FormErrorEnum,
-  FormState,
-  FormViewFacade,
-} from './form-view.facade';
-import { FormViewUtils } from './form-view-utils';
-import { ToastService, DialogService, ApiClient, LabelPipe } from '@kotka/ui/core';
+  FormState
+} from '../services/form.facade';
+import { FormViewUtils } from '../services/form-view-utils';
+import { ToastService, DialogService, ApiClient, LabelPipe, getDataTypeName, DataTypeNamePipePipe } from '@kotka/ui/core';
 import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 import { MetaFieldsComponent } from '../meta-fields/meta-fields.component';
-import { NgTemplateOutlet, TitleCasePipe } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import { ErrorSchema } from '@rjsf/utils';
+import { FormViewFacade } from '../services/form-view.facade';
 
 @Component({
   selector: 'kotka-form-view',
@@ -46,7 +45,7 @@ import { ErrorSchema } from '@rjsf/utils';
     SpinnerComponent,
     LabelPipe,
     NgTemplateOutlet,
-    TitleCasePipe,
+    DataTypeNamePipePipe,
   ],
 })
 export class FormViewComponent<
@@ -61,7 +60,6 @@ export class FormViewComponent<
 
   formId = input.required<string>();
   dataType = input.required<T>();
-  dataTypeName = input('');
 
   editMode = input.required<boolean>();
   dataURI = input.required<string | undefined>();
@@ -88,9 +86,8 @@ export class FormViewComponent<
   metaFieldsContainerTpl = input<TemplateRef<unknown>>();
   customFooterButtonsTpl = input<TemplateRef<unknown>>();
 
+  defaultPageTitle: Signal<string>;
   formState: Signal<FormState<S>>;
-
-  formErrorEnum = FormErrorEnum;
 
   formDataChange = output<Partial<S | undefined>>();
   formInit = output<LajiFormComponent>();
@@ -104,6 +101,15 @@ export class FormViewComponent<
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
 
   constructor() {
+    this.defaultPageTitle = computed(() => {
+      const dataTypeName = getDataTypeName(this.dataType());
+      if (this.editMode()) {
+        return `Edit ${dataTypeName}` + (this.dataURI() ? ` ${this.dataURI()}` : '');
+      } else {
+        return `Add ${dataTypeName}`;
+      }
+    });
+
     this.formState = this.formViewFacade.state;
 
     effect(() => {
@@ -151,7 +157,9 @@ export class FormViewComponent<
 
   onDelete(data: Partial<S>) {
     this.dialogService
-      .confirm(`Are you sure you want to delete this ${this.dataTypeName()}?`)
+      .confirm(
+        `Are you sure you want to delete this ${getDataTypeName(this.dataType())}?`,
+      )
       .subscribe((confirm) => {
         if (confirm) {
           this.delete(data);

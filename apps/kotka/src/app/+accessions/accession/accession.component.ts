@@ -12,7 +12,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SpecimenViewerModalComponent } from './specimen-viewer-modal/specimen-viewer-modal.component';
 import { FormModalComponent } from '@kotka/ui/form-view';
 import { globals } from '../../../environments/globals';
-import { getId, getUri } from '@kotka/shared/utils';
+import { getId } from '@kotka/shared/utils';
 import { Branch } from '@luomus/laji-schema';
 import { BranchTableComponent } from './branch-table/branch-table.component';
 
@@ -139,15 +139,22 @@ export class AccessionComponent {
     });
 
     modalRef.componentInstance.formId = globals.branchFormId;
-    modalRef.componentInstance.dataType = KotkaDocumentObjectType.branch;
     modalRef.componentInstance.editMode = editMode;
+    modalRef.componentInstance.allowEdit = true; // TODO
+    modalRef.componentInstance.allowDelete = true; // TODO
     modalRef.componentInstance.title = editMode ? 'Edit Branch' : 'Add Branch';
+    modalRef.componentInstance.save$ = (data: Branch) => {
+      if (editMode) {
+        if (!data.id) {
+          throw new Error('Branch is missing an id');
+        }
+        return this.apiClient.updateDocument(KotkaDocumentObjectType.branch, data.id, data);
+      } else {
+        return this.apiClient.createDocument(KotkaDocumentObjectType.branch, data);
+      }
+    };
 
     if (editMode) {
-      if (!branch.id) {
-        throw new Error('Branch is missing an id');
-      }
-      modalRef.componentInstance.dataURI = getUri(branch.id);
       modalRef.componentInstance.formData = branch;
     } else {
       modalRef.componentInstance.formData = {

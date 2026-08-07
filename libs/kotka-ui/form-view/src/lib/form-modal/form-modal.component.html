@@ -7,13 +7,9 @@
 
 <div class="modal-body">
   @if (!vm.loading) {
-    @if (vm.errorType; as errorType) {
+    @if (vm.error) {
       <ngb-alert [type]="'danger'" [dismissible]="false">
-        @if (errorType === formErrorEnum.dataNotFound) {
-          Document was not found
-        } @else {
-          An unexpected error occurred
-        }
+        {{ vm.error }}
       </ngb-alert>
     } @else if (vm.form && vm.formData && vm.formDataLastForceUpdatedVersion) {
       <kui-laji-form
