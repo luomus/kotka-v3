@@ -5,14 +5,14 @@ https://docs.nestjs.com/providers#services
 import { Injectable } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { Cached } from '@kotka/api/cache';
-import { SpecimenUrlDataType } from '@kotka/shared/models';
+import { SpecimenDataTypeName } from '@kotka/shared/models';
 import { TriplestoreService } from './triplestore.service';
 
 export interface NamespaceData {
   namespace_id: string,
   person_in_charge: string,
   purpose: string,
-  namespace_type: SpecimenUrlDataType | 'all' | '',
+  namespace_type: SpecimenDataTypeName | 'all' | '',
   qname_prefix: string
 }
 

@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ValidationService } from '@kotka/api/services';
-import { ApiValidationError, KotkaDocumentObjectFullType } from '@kotka/shared/models';
+import { ApiValidationError, KotkaDocumentFullType } from '@kotka/shared/models';
 
 @Injectable()
 export class ValidatorInterceptor implements NestInterceptor {
@@ -22,7 +22,7 @@ export class ValidatorInterceptor implements NestInterceptor {
 
   async intercept(context: ExecutionContext, next: CallHandler): Promise<any> {
     const req = context.switchToHttp().getRequest();
-    const type: KotkaDocumentObjectFullType = this.reflector.get('controllerType', context.getClass());
+    const type: KotkaDocumentFullType = this.reflector.get('controllerType', context.getClass());
 
     if (!req.body) {
       throw new UnprocessableEntityException('No request body to validate.');

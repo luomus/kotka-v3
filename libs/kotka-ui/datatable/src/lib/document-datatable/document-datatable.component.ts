@@ -9,15 +9,15 @@ import {
 import { DatatableComponent } from '../datatable/datatable.component';
 import { DatatableDataService } from './datatable-data.service';
 import {
-  KotkaDocumentObjectMap,
-  KotkaDocumentObjectType,
+  KotkaRootDocumentMap,
+  KotkaRootDocumentType,
   ListResponse
 } from '@kotka/shared/models';
 import { ApiClient, DataTypeNamePipePipe, DocumentListSearchParams, UserService } from '@kotka/ui/core';
 import { map, switchMap } from 'rxjs';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 
-export interface DatatableLoadedData<T extends KotkaDocumentObjectType = KotkaDocumentObjectType, S extends KotkaDocumentObjectMap[T] = KotkaDocumentObjectMap[T]> {
+export interface DatatableLoadedData<T extends KotkaRootDocumentType = KotkaRootDocumentType, S extends KotkaRootDocumentMap[T] = KotkaRootDocumentMap[T]> {
   searchParams: DocumentListSearchParams<T>;
   result: ListResponse<S>;
 }
@@ -29,8 +29,8 @@ export interface DatatableLoadedData<T extends KotkaDocumentObjectType = KotkaDo
   imports: [CommonModule, DatatableComponent, DataTypeNamePipePipe],
 })
 export class DocumentDatatableComponent<
-  T extends KotkaDocumentObjectType = KotkaDocumentObjectType,
-  S extends KotkaDocumentObjectMap[T] = KotkaDocumentObjectMap[T],
+  T extends KotkaRootDocumentType = KotkaRootDocumentType,
+  S extends KotkaRootDocumentMap[T] = KotkaRootDocumentMap[T],
 > {
   private apiClient = inject(ApiClient);
   private dataService = inject(DatatableDataService);

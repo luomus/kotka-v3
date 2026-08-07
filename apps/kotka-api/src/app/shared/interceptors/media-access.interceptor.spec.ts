@@ -6,7 +6,7 @@ import { Reflector } from '@nestjs/core';
 import { of, lastValueFrom } from 'rxjs';
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces';
 import { MediaAccessInterceptor } from './media-access.interceptor';
-import { KotkaDocumentObjectFullType, MediaTypes } from '@kotka/shared/models';
+import { KotkaDocumentFullType, MediaTypes } from '@kotka/shared/models';
 
 const kotkaAdminUser = {
   role: [''],
@@ -786,7 +786,7 @@ describe('MediaAccessInterceptor', () => {
         await mediaAccessInterceptor.intercept(mockContext, mockNext);
 
         expect(mockGet).toHaveBeenCalledTimes(1);
-        expect(mockGet.mock.calls[0][0]).toBe(KotkaDocumentObjectFullType.document);
+        expect(mockGet.mock.calls[0][0]).toBe(KotkaDocumentFullType.document);
         expect(mockGet.mock.calls[0][1]).toBe('JX.1');
         expect(mockGetAll).toHaveBeenCalledTimes(0);
         expect(mockGetMedia).toHaveBeenCalledTimes(0);
@@ -821,7 +821,7 @@ describe('MediaAccessInterceptor', () => {
           expect(e.status).toBe(403);
           expect(e.message).toBe('Forbidden, no rights to document/s associated with the image');
           expect(mockGet).toHaveBeenCalledTimes(1);
-          expect(mockGet.mock.calls[0][0]).toBe(KotkaDocumentObjectFullType.document);
+          expect(mockGet.mock.calls[0][0]).toBe(KotkaDocumentFullType.document);
           expect(mockGet.mock.calls[0][1]).toBe('JX.2');
           expect(mockGetAll).toHaveBeenCalledTimes(0);
           expect(mockGetMedia).toHaveBeenCalledTimes(0);
@@ -854,7 +854,7 @@ describe('MediaAccessInterceptor', () => {
 
         expect(mockGet).toHaveBeenCalledTimes(0);
         expect(mockGetAll).toHaveBeenCalledTimes(1);
-        expect(mockGetAll.mock.calls[0][0]).toBe(KotkaDocumentObjectFullType.document);
+        expect(mockGetAll.mock.calls[0][0]).toBe(KotkaDocumentFullType.document);
         expect(mockGetAll.mock.calls[0][1]).toStrictEqual({'fields': 'id,owner', 'q': 'id: "JX.1","JX.2","luomus:JX.3"'});
         expect(mockGetMedia).toHaveBeenCalledTimes(0);
         expect(mockNext.handle).toHaveBeenCalledTimes(1);
@@ -889,7 +889,7 @@ describe('MediaAccessInterceptor', () => {
           expect(e.message).toBe('Forbidden, no rights to document/s associated with the image');
           expect(mockGetAll).toHaveBeenCalledTimes(1);
           expect(mockGet).toHaveBeenCalledTimes(0);
-          expect(mockGetAll.mock.calls[0][0]).toBe(KotkaDocumentObjectFullType.document);
+          expect(mockGetAll.mock.calls[0][0]).toBe(KotkaDocumentFullType.document);
           expect(mockGetAll.mock.calls[0][1]).toStrictEqual({'fields': 'id,owner', 'q': 'id: "JX.1","JX.2","luomus:JX.3"'});
           expect(mockGetMedia).toHaveBeenCalledTimes(0);
           expect(mockNext.handle).toHaveBeenCalledTimes(0);
@@ -925,7 +925,7 @@ describe('MediaAccessInterceptor', () => {
           expect(e.message).toBe('Forbidden, no rights to document/s associated with the image');
           expect(mockGetAll).toHaveBeenCalledTimes(1);
           expect(mockGet).toHaveBeenCalledTimes(0);
-          expect(mockGetAll.mock.calls[0][0]).toBe(KotkaDocumentObjectFullType.document);
+          expect(mockGetAll.mock.calls[0][0]).toBe(KotkaDocumentFullType.document);
           expect(mockGetAll.mock.calls[0][1]).toStrictEqual({'fields': 'id,owner', 'q': 'id: "JX.1","JX.2","luomus:JX.3"'});
           expect(mockGetMedia).toHaveBeenCalledTimes(0);
           expect(mockNext.handle).toHaveBeenCalledTimes(0);
@@ -1202,7 +1202,7 @@ describe('MediaAccessInterceptor', () => {
         await mediaAccessInterceptor.intercept(mockContext, mockNext);
 
         expect(mockGet).toHaveBeenCalledTimes(1);
-        expect(mockGet.mock.calls[0][0]).toBe(KotkaDocumentObjectFullType.document);
+        expect(mockGet.mock.calls[0][0]).toBe(KotkaDocumentFullType.document);
         expect(mockGet.mock.calls[0][1]).toBe('JX.1');
         expect(mockGetAll).toHaveBeenCalledTimes(0);
         expect(mockGetMedia).toHaveBeenCalledTimes(1);
@@ -1235,7 +1235,7 @@ describe('MediaAccessInterceptor', () => {
 
         expect(mockGet).toHaveBeenCalledTimes(0);
         expect(mockGetAll).toHaveBeenCalledTimes(1);
-        expect(mockGetAll.mock.calls[0][0]).toBe(KotkaDocumentObjectFullType.document);
+        expect(mockGetAll.mock.calls[0][0]).toBe(KotkaDocumentFullType.document);
         expect(mockGetAll.mock.calls[0][1]).toStrictEqual({'fields': 'id,owner', 'q': 'id: "JX.1","JX.2","luomus:JX.3"'});
         expect(mockGetMedia).toHaveBeenCalledTimes(1);
         expect(mockNext.handle).toHaveBeenCalledTimes(1);
@@ -1271,7 +1271,7 @@ describe('MediaAccessInterceptor', () => {
           expect(e.status).toBe(403);
           expect(e.message).toBe('Forbidden to edit image metadata, no right to edit associated document/s');
           expect(mockGet).toHaveBeenCalledTimes(1);
-          expect(mockGet.mock.calls[0][0]).toBe(KotkaDocumentObjectFullType.document);
+          expect(mockGet.mock.calls[0][0]).toBe(KotkaDocumentFullType.document);
           expect(mockGet.mock.calls[0][1]).toBe('JX.2');
           expect(mockGetAll).toHaveBeenCalledTimes(0);
           expect(mockGetMedia).toHaveBeenCalledTimes(1);
@@ -1312,7 +1312,7 @@ describe('MediaAccessInterceptor', () => {
           expect(e.message).toBe('Forbidden to edit image metadata, no right to edit associated document/s');
           expect(mockGet).toHaveBeenCalledTimes(0);
           expect(mockGetAll).toHaveBeenCalledTimes(1);
-          expect(mockGetAll.mock.calls[0][0]).toBe(KotkaDocumentObjectFullType.document);
+          expect(mockGetAll.mock.calls[0][0]).toBe(KotkaDocumentFullType.document);
           expect(mockGetAll.mock.calls[0][1]).toStrictEqual({'fields': 'id,owner', 'q': 'id: "JX.1","JX.2","luomus:JX.3"'});
           expect(mockGetMedia).toHaveBeenCalledTimes(1);
           expect(mockGetMedia.mock.calls[0][0]).toBe('MM.2');
@@ -1347,7 +1347,7 @@ describe('MediaAccessInterceptor', () => {
 
         expect(mockGet).toHaveBeenCalledTimes(0);
         expect(mockGetAll).toHaveBeenCalledTimes(1);
-        expect(mockGetAll.mock.calls[0][0]).toBe(KotkaDocumentObjectFullType.document);
+        expect(mockGetAll.mock.calls[0][0]).toBe(KotkaDocumentFullType.document);
         expect(mockGetAll.mock.calls[0][1]).toStrictEqual({'fields': 'id,owner', 'q': 'id: "JX.1","JX.4"'});
         expect(mockGetMedia).toHaveBeenCalledTimes(1);
         expect(mockNext.handle).toHaveBeenCalledTimes(1);
@@ -1379,7 +1379,7 @@ describe('MediaAccessInterceptor', () => {
 
         expect(mockGet).toHaveBeenCalledTimes(0);
         expect(mockGetAll).toHaveBeenCalledTimes(1);
-        expect(mockGetAll.mock.calls[0][0]).toBe(KotkaDocumentObjectFullType.document);
+        expect(mockGetAll.mock.calls[0][0]).toBe(KotkaDocumentFullType.document);
         expect(mockGetAll.mock.calls[0][1]).toStrictEqual({'fields': 'id,owner', 'q': 'id: "JX.1","JX.4"'});
         expect(mockGetMedia).toHaveBeenCalledTimes(1);
         expect(mockNext.handle).toHaveBeenCalledTimes(1);
@@ -1416,7 +1416,7 @@ describe('MediaAccessInterceptor', () => {
           expect(e.message).toBe('Forbidden to add specimenID to metadata, no right to edit associated document/s');
           expect(mockGet).toHaveBeenCalledTimes(0);
           expect(mockGetAll).toHaveBeenCalledTimes(1);
-          expect(mockGetAll.mock.calls[0][0]).toBe(KotkaDocumentObjectFullType.document);
+          expect(mockGetAll.mock.calls[0][0]).toBe(KotkaDocumentFullType.document);
           expect(mockGetAll.mock.calls[0][1]).toStrictEqual({'fields': 'id,owner', 'q': 'id: "JX.1","JX.2","luomus:JX.3"'});
           expect(mockGetMedia).toHaveBeenCalledTimes(1);
           expect(mockGetMedia.mock.calls[0][0]).toBe('MM.1');
@@ -1456,7 +1456,7 @@ describe('MediaAccessInterceptor', () => {
           expect(e.message).toBe('Forbidden to remove specimenID from metadata, no right to edit associated document/s');
           expect(mockGet).toHaveBeenCalledTimes(0);
           expect(mockGetAll).toHaveBeenCalledTimes(1);
-          expect(mockGetAll.mock.calls[0][0]).toBe(KotkaDocumentObjectFullType.document);
+          expect(mockGetAll.mock.calls[0][0]).toBe(KotkaDocumentFullType.document);
           expect(mockGetAll.mock.calls[0][1]).toStrictEqual({'fields': 'id,owner', 'q': 'id: "JX.1","JX.2","luomus:JX.3"'});
           expect(mockGetMedia).toHaveBeenCalledTimes(1);
           expect(mockGetMedia.mock.calls[0][0]).toBe('MM.1');
@@ -1578,7 +1578,7 @@ describe('MediaAccessInterceptor', () => {
         await mediaAccessInterceptor.intercept(mockContext, mockNext);
 
         expect(mockGet).toHaveBeenCalledTimes(1);
-        expect(mockGet.mock.calls[0][0]).toBe(KotkaDocumentObjectFullType.document);
+        expect(mockGet.mock.calls[0][0]).toBe(KotkaDocumentFullType.document);
         expect(mockGet.mock.calls[0][1]).toBe('JX.1');
         expect(mockGetAll).toHaveBeenCalledTimes(0);
         expect(mockGetMedia).toHaveBeenCalledTimes(1);
@@ -1611,7 +1611,7 @@ describe('MediaAccessInterceptor', () => {
 
         expect(mockGet).toHaveBeenCalledTimes(0);
         expect(mockGetAll).toHaveBeenCalledTimes(1);
-        expect(mockGetAll.mock.calls[0][0]).toBe(KotkaDocumentObjectFullType.document);
+        expect(mockGetAll.mock.calls[0][0]).toBe(KotkaDocumentFullType.document);
         expect(mockGetAll.mock.calls[0][1]).toStrictEqual({'fields': 'id,owner', 'q': 'id: "JX.1","JX.4"'});
         expect(mockGetMedia).toHaveBeenCalledTimes(1);
         expect(mockGetMedia.mock.calls[0][0]).toBe('MM.1');
@@ -1647,7 +1647,7 @@ describe('MediaAccessInterceptor', () => {
           expect(e.status).toBe(403);
           expect(e.message).toBe('Forbidden, no rights to document/s associated with the image');
           expect(mockGet).toHaveBeenCalledTimes(1);
-          expect(mockGet.mock.calls[0][0]).toBe(KotkaDocumentObjectFullType.document);
+          expect(mockGet.mock.calls[0][0]).toBe(KotkaDocumentFullType.document);
           expect(mockGet.mock.calls[0][1]).toBe('JX.2');
           expect(mockGetAll).toHaveBeenCalledTimes(0);
           expect(mockGetMedia).toHaveBeenCalledTimes(1);
@@ -1686,7 +1686,7 @@ describe('MediaAccessInterceptor', () => {
           expect(e.message).toBe('Forbidden, no rights to document/s associated with the image');
           expect(mockGet).toHaveBeenCalledTimes(0);
           expect(mockGetAll).toHaveBeenCalledTimes(1);
-          expect(mockGetAll.mock.calls[0][0]).toBe(KotkaDocumentObjectFullType.document);
+          expect(mockGetAll.mock.calls[0][0]).toBe(KotkaDocumentFullType.document);
           expect(mockGetAll.mock.calls[0][1]).toStrictEqual({'fields': 'id,owner', 'q': 'id: "JX.1","JX.2","luomus:JX.3"'});
           expect(mockGetMedia).toHaveBeenCalledTimes(1);
           expect(mockGetMedia.mock.calls[0][0]).toBe('MM.1');

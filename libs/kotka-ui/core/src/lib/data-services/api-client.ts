@@ -2,9 +2,9 @@ import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import {
   Area,
-  KotkaDocumentObject,
-  KotkaDocumentObjectType,
-  KotkaDocumentObjectMap,
+  KotkaRootDocument,
+  KotkaRootDocumentType,
+  KotkaRootDocumentMap,
   KotkaVersionDifference,
   KotkaVersionDifferenceObject,
   LajiForm,
@@ -33,7 +33,7 @@ const path = apiBase + '/';
 const authPath = apiBase + '/auth/';
 const lajiApiPath = lajiApiBase + '/';
 
-export interface DocumentListSearchParams<T extends KotkaDocumentObjectType = KotkaDocumentObjectType> {
+export interface DocumentListSearchParams<T extends KotkaRootDocumentType = KotkaRootDocumentType> {
   type: T,
   page?: number,
   pageSize?: number,
@@ -50,33 +50,33 @@ export class ApiClient {
   private httpClient = inject(HttpClient);
 
   getDocumentById<
-    T extends KotkaDocumentObjectType,
-    S extends KotkaDocumentObjectMap[T],
+    T extends KotkaRootDocumentType,
+    S extends KotkaRootDocumentMap[T],
   >(type: T, id: string): Observable<S> {
     return this.httpClient.get<S>(path + type + '/' + id);
   }
 
   createDocument<
-    T extends KotkaDocumentObjectType,
-    S extends KotkaDocumentObjectMap[T],
+    T extends KotkaRootDocumentType,
+    S extends KotkaRootDocumentMap[T],
   >(type: T, data: S): Observable<S> {
     return this.httpClient.post<S>(path + type, data);
   }
 
   updateDocument<
-    T extends KotkaDocumentObjectType,
-    S extends KotkaDocumentObjectMap[T],
+    T extends KotkaRootDocumentType,
+    S extends KotkaRootDocumentMap[T],
   >(type: T, id: string, data: S): Observable<S> {
     return this.httpClient.put<S>(path + type + '/' + id, data);
   }
 
-  deleteDocument(type: KotkaDocumentObjectType, id: string): Observable<null> {
+  deleteDocument(type: KotkaRootDocumentType, id: string): Observable<null> {
     return this.httpClient.delete<null>(path + type + '/' + id);
   }
 
   getDocumentList<
-    T extends KotkaDocumentObjectType,
-    S extends KotkaDocumentObjectMap[T],
+    T extends KotkaRootDocumentType,
+    S extends KotkaRootDocumentMap[T],
     X extends string[] | undefined = undefined,
     Y extends X extends string[] ? Partial<S> : S = S,
   >(
@@ -110,8 +110,8 @@ export class ApiClient {
   }
 
   getDocumentsById<
-    T extends KotkaDocumentObjectType,
-    S extends KotkaDocumentObjectMap[T],
+    T extends KotkaRootDocumentType,
+    S extends KotkaRootDocumentMap[T],
     X extends string[] | undefined = undefined,
     Y extends X extends string[] ? Partial<S> : S = S,
   >(
@@ -161,8 +161,8 @@ export class ApiClient {
   }
 
   getAllDocuments<
-    T extends KotkaDocumentObjectType,
-    S extends KotkaDocumentObjectMap[T],
+    T extends KotkaRootDocumentType,
+    S extends KotkaRootDocumentMap[T],
     X extends string[] | undefined = undefined,
     Y extends X extends string[] ? Partial<S> : S = S,
   >(
@@ -177,7 +177,7 @@ export class ApiClient {
   }
 
   getDocumentVersionList(
-    type: KotkaDocumentObjectType,
+    type: KotkaRootDocumentType,
     id: string,
   ): Observable<StoreVersion[]> {
     return this.httpClient.get<StoreVersion[]>(
@@ -186,15 +186,15 @@ export class ApiClient {
   }
 
   getDocumentVersionData<
-    T extends KotkaDocumentObjectType,
-    S extends KotkaDocumentObjectMap[T],
+    T extends KotkaRootDocumentType,
+    S extends KotkaRootDocumentMap[T],
   >(type: T, id: string, version: number): Observable<S> {
     return this.httpClient.get<S>(path + type + '/' + id + '/_ver/' + version);
   }
 
   getDocumentVersionDifference<
-    T extends KotkaDocumentObjectType,
-    S extends KotkaDocumentObjectMap[T],
+    T extends KotkaRootDocumentType,
+    S extends KotkaRootDocumentMap[T],
   >(
     type: T,
     id: string,
@@ -210,8 +210,8 @@ export class ApiClient {
 
   getAutocomplete(
     type:
-      | KotkaDocumentObjectType.dataset
-      | KotkaDocumentObjectType.organization,
+      | KotkaRootDocumentType.dataset
+      | KotkaRootDocumentType.organization,
     query = '',
   ): Observable<AutocompleteResult[]> {
     const params = new HttpParams().set('query', query);
@@ -309,7 +309,7 @@ export class ApiClient {
     return this.httpClient.get<PagedResult<any>>(`${lajiApiPath}autocomplete/taxa`, { params });
   }
 
-  private convertVersionDifferenceFormat<S extends KotkaDocumentObject>(
+  private convertVersionDifferenceFormat<S extends KotkaRootDocument>(
     data: KotkaVersionDifference<S>,
   ): KotkaVersionDifferenceObject<S> {
     const diff = {};
@@ -379,8 +379,8 @@ export class ApiClient {
   }
 
   private getAllDocumentsRecursively<
-    T extends KotkaDocumentObjectType,
-    S extends KotkaDocumentObjectMap[T],
+    T extends KotkaRootDocumentType,
+    S extends KotkaRootDocumentMap[T],
     X extends string[] | undefined = undefined,
     Y extends X extends string[] ? Partial<S> : S = S,
   >(

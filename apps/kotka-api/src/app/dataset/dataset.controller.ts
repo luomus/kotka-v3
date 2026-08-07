@@ -12,14 +12,14 @@ import { ApiMethodAccessGuard } from '../shared/guards/api-method-access.guard';
 import { InUseGuard } from '../shared/guards/in-use.guard';
 import { InUseTypesSet } from '../shared/decorators/in-use-types-set.decorator';
 import { Dataset } from '@luomus/laji-schema';
-import { KotkaDocumentObjectFullType, KotkaDocumentObjectType } from '@kotka/shared/models';
+import { KotkaDocumentFullType, KotkaRootDocumentType } from '@kotka/shared/models';
 import { lastValueFrom } from 'rxjs';
 
-const type = KotkaDocumentObjectFullType.dataset;
+const type = KotkaDocumentFullType.dataset;
 
-@Controller(KotkaDocumentObjectType.dataset)
+@Controller(KotkaRootDocumentType.dataset)
 @ControllerType(type)
-@InUseTypesSet([KotkaDocumentObjectFullType.document, KotkaDocumentObjectFullType.organization])
+@InUseTypesSet([KotkaDocumentFullType.document, KotkaDocumentFullType.organization])
 @UseGuards(
   AuthenticateCookieGuard,
   ApiMethodAccessGuard,

@@ -1,12 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, map, startWith } from 'rxjs/operators';
-import { KotkaDocumentObjectType, KotkaDocumentObjectMap } from '@kotka/shared/models';
+import { KotkaRootDocumentType, KotkaRootDocumentMap } from '@kotka/shared/models';
 import { ApiClient } from './api-client';
 import { getId } from '@kotka/shared/utils';
 
-export interface DocumentDataResult<T extends KotkaDocumentObjectType = KotkaDocumentObjectType> {
-  value?: KotkaDocumentObjectMap[T];
+export interface DocumentDataResult<T extends KotkaRootDocumentType = KotkaRootDocumentType> {
+  value?: KotkaRootDocumentMap[T];
   loading: boolean;
   error?: string;
 }
@@ -15,7 +15,7 @@ export interface DocumentDataResult<T extends KotkaDocumentObjectType = KotkaDoc
 export class DocumentDataService {
   private apiClient = inject(ApiClient);
 
-  getDocumentData<T extends KotkaDocumentObjectType>(type: T, uri: string): Observable<DocumentDataResult<T>> {
+  getDocumentData<T extends KotkaRootDocumentType>(type: T, uri: string): Observable<DocumentDataResult<T>> {
     if (!uri) {
       return of({ loading: false, error: 'Resource not found' });
     }

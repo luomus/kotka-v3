@@ -17,24 +17,24 @@ import { LajiStoreController } from '../shared/controllers/laji-store.controller
 import { ControllerType } from '../shared/decorators/controller-type.decorator';
 import { ApiMethodAccessGuard } from '../shared/guards/api-method-access.guard';
 import { Organization } from '@luomus/laji-schema';
-import { KotkaDocumentObjectFullType, KotkaDocumentObjectType, Person } from '@kotka/shared/models';
+import { KotkaDocumentFullType, KotkaRootDocumentType, Person } from '@kotka/shared/models';
 import { lastValueFrom } from 'rxjs';
 import { set } from 'lodash';
 import { OrganizationFullNameInterceptor } from './organization-fullname.interceptor';
 import { InUseTypesSet } from '../shared/decorators/in-use-types-set.decorator';
 import { InUseGuard } from '../shared/guards/in-use.guard';
 
-const type = KotkaDocumentObjectFullType.organization;
+const type = KotkaDocumentFullType.organization;
 
-@Controller(KotkaDocumentObjectType.organization)
+@Controller(KotkaRootDocumentType.organization)
 @ControllerType(type)
 @InUseTypesSet([
-  KotkaDocumentObjectFullType.document,
-  KotkaDocumentObjectFullType.organization,
-  KotkaDocumentObjectFullType.transaction,
-  KotkaDocumentObjectFullType.dataset,
-  KotkaDocumentObjectFullType.document,
-  KotkaDocumentObjectFullType.sample
+  KotkaDocumentFullType.document,
+  KotkaDocumentFullType.organization,
+  KotkaDocumentFullType.transaction,
+  KotkaDocumentFullType.dataset,
+  KotkaDocumentFullType.document,
+  KotkaDocumentFullType.sample
 ])
 @UseGuards(
   AuthenticateCookieGuard,

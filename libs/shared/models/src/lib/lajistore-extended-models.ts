@@ -3,15 +3,14 @@ import {
   Dataset,
   Document,
   Organization,
-  Sample,
   SpecimenTransaction,
 } from '@luomus/laji-schema';
 export * from '@luomus/laji-schema';
 
 export type SpecimenDataType = 'botanyspecimen'|'zoospecimen'|'palaeontology'|'accession'|'culture';
-export type SpecimenUrlDataType = 'botany'|'zoo'|'palaeontology'|'accession'|'culture';
+export type SpecimenDataTypeName = 'botany'|'zoo'|'palaeontology'|'accession'|'culture';
 
-export const specimenUrlToDataTypeMap: Record<SpecimenUrlDataType, SpecimenDataType> = {
+export const specimenNameToTypeMap: Record<SpecimenDataTypeName, SpecimenDataType> = {
   botany: 'botanyspecimen',
   zoo: 'zoospecimen',
   palaeontology: 'palaeontology',
@@ -19,7 +18,7 @@ export const specimenUrlToDataTypeMap: Record<SpecimenUrlDataType, SpecimenDataT
   culture: 'culture',
 };
 
-export const specimenDataTypeToNameMap: Record<SpecimenDataType, SpecimenUrlDataType> = {
+export const specimenTypeToNameMap: Record<SpecimenDataType, SpecimenDataTypeName> = {
   botanyspecimen: 'botany',
   zoospecimen: 'zoo',
   palaeontology: 'palaeontology',
@@ -27,52 +26,58 @@ export const specimenDataTypeToNameMap: Record<SpecimenDataType, SpecimenUrlData
   culture: 'culture',
 };
 
-export type KotkaDocumentObject =
+export type KotkaRootDocument =
   | Dataset
   | Document
   | Organization
-  | Sample
   | SpecimenTransaction
   | Branch
 
-export type MainKotkaDocumentObject = Exclude<KotkaDocumentObject, Branch>;
+export type KotkaMainDocument = Exclude<KotkaRootDocument, Branch>;
 
-export enum KotkaDocumentObjectType {
+export enum KotkaRootDocumentType {
   dataset = 'dataset',
   transaction = 'transaction',
   organization = 'organization',
-  sample = 'sample',
   specimen = 'specimen',
   branch = 'branch',
 }
 
-export type MainKotkaDocumentObjectType = Exclude<
-  KotkaDocumentObjectType,
-  KotkaDocumentObjectType.branch
+export type KotkaMainDocumentType = Exclude<
+  KotkaRootDocumentType,
+  KotkaRootDocumentType.branch
 >;
 
-export interface KotkaDocumentObjectMap {
-  [KotkaDocumentObjectType.dataset]: Dataset;
-  [KotkaDocumentObjectType.specimen]: Document;
-  [KotkaDocumentObjectType.organization]: Organization;
-  [KotkaDocumentObjectType.sample]: Sample;
-  [KotkaDocumentObjectType.transaction]: SpecimenTransaction;
-  [KotkaDocumentObjectType.branch]: Branch;
+export interface KotkaRootDocumentMap {
+  [KotkaRootDocumentType.dataset]: Dataset;
+  [KotkaRootDocumentType.specimen]: Document;
+  [KotkaRootDocumentType.organization]: Organization;
+  [KotkaRootDocumentType.transaction]: SpecimenTransaction;
+  [KotkaRootDocumentType.branch]: Branch;
 }
 
-export enum KotkaDocumentObjectFullType {
+export enum KotkaDocumentFullType {
   dataset = 'GX.dataset',
-  transaction = 'HRX.specimenTransaction',
-  document = 'MY.document',
   organization = 'MOS.organization',
-  sample = 'MF.sample', // TODO should be removed?
+  transaction = 'HRX.specimenTransaction',
+  transactionEvent = 'HRX.specimenTransactionEvent',
+  document = 'MY.document',
+  gathering = 'MY.gathering',
+  unit = 'MY.unit',
+  identification = 'MY.identification',
+  type = 'MY.typeSpecimen',
+  sample = 'MF.sample',
+  preparation = 'MF.preparationClass',
   branch = 'PUU.branch',
+  event = 'PUU.event'
 }
 
-export const STORE_OBJECTS = [
-  KotkaDocumentObjectFullType.dataset,
-  KotkaDocumentObjectFullType.organization,
-  KotkaDocumentObjectFullType.transaction
+export const STORE_OBJECTS: KotkaDocumentFullType[] = [
+  KotkaDocumentFullType.dataset,
+  KotkaDocumentFullType.organization,
+  KotkaDocumentFullType.transaction,
+  KotkaDocumentFullType.document,
+  KotkaDocumentFullType.branch,
 ];
 
 export interface MultiLanguage {
@@ -128,7 +133,7 @@ interface CoordinateResultBox {
   southwest: CoordinateResultPoint
 }
 
-export interface KotkaVersionDifference<S extends KotkaDocumentObject = KotkaDocumentObject> {
+export interface KotkaVersionDifference<S extends KotkaRootDocument = KotkaRootDocument> {
   original: S;
   patch: StorePatch[];
 }
@@ -139,7 +144,7 @@ export interface DifferenceObject {
 export type Patch = Omit<StorePatch, 'path'>;
 export type DifferenceObjectValue = DifferenceObject|DifferenceObject[]|Patch|Patch[];
 
-export interface KotkaVersionDifferenceObject<S extends KotkaDocumentObject = KotkaDocumentObject> {
+export interface KotkaVersionDifferenceObject<S extends KotkaRootDocument = KotkaRootDocument> {
   original: S;
   diff: DifferenceObject;
 }

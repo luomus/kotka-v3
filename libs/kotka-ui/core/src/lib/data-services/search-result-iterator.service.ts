@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { KotkaDocumentObject, KotkaDocumentObjectMap, KotkaDocumentObjectType } from '@kotka/shared/models';
+import { KotkaRootDocument, KotkaRootDocumentMap, KotkaRootDocumentType } from '@kotka/shared/models';
 import { ApiClient, DocumentListSearchParams } from './api-client';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -24,9 +24,9 @@ export class SearchResultIteratorService {
   private userService = inject(UserService);
 
   private userId = toSignal(this.userService.user$.pipe(map(user => user?.id)));
-  private searchParamsByType: Partial<{ [ T in KotkaDocumentObjectType ]: SearchParams }> = {};
+  private searchParamsByType: Partial<{ [ T in KotkaRootDocumentType ]: SearchParams }> = {};
 
-  setSearchParams(type: KotkaDocumentObjectType, searchParams: SearchParams, store = true) {
+  setSearchParams(type: KotkaRootDocumentType, searchParams: SearchParams, store = true) {
     this.searchParamsByType[type] = searchParams;
     if (store) {
       this.storage.store(this.getSearchParamsStorageKey(type, this.userId()), searchParams);
@@ -34,22 +34,22 @@ export class SearchResultIteratorService {
   }
 
   getPrevious<
-    T extends KotkaDocumentObjectType,
-    S extends KotkaDocumentObjectMap[T],
+    T extends KotkaRootDocumentType,
+    S extends KotkaRootDocumentMap[T],
   >(type: T, data: S): Observable<string | undefined> {
     return this.getFollowingDocument(type, data, true);
   }
 
   getNext<
-    T extends KotkaDocumentObjectType,
-    S extends KotkaDocumentObjectMap[T],
+    T extends KotkaRootDocumentType,
+    S extends KotkaRootDocumentMap[T],
   >(type: T, data: S): Observable<string | undefined> {
     return this.getFollowingDocument(type, data);
   }
 
   private getFollowingDocument<
-    T extends KotkaDocumentObjectType,
-    S extends KotkaDocumentObjectMap[T],
+    T extends KotkaRootDocumentType,
+    S extends KotkaRootDocumentMap[T],
   >(type: T, data: S, reverse = false): Observable<string | undefined> {
     const searchParams = this.getSearchParams(type, this.userId());
     if (!searchParams || !searchParams.sort) {
@@ -93,7 +93,7 @@ export class SearchResultIteratorService {
     return sorts.map(sort => sort.field + ' ' + sort.direction).join(',');
   }
 
-  private getSearchAfter(data: KotkaDocumentObject, sorts: Sort[]): (string | number | boolean | null)[] {
+  private getSearchAfter(data: KotkaRootDocument, sorts: Sort[]): (string | number | boolean | null)[] {
     return sorts.map(sort => {
       let result = isKeyOfObject(sort.field, data) ? data[sort.field] : undefined;
 
@@ -113,13 +113,13 @@ export class SearchResultIteratorService {
     });
   }
 
-  private getSearchParams(type: KotkaDocumentObjectType, userId: string | undefined): SearchParams {
+  private getSearchParams(type: KotkaRootDocumentType, userId: string | undefined): SearchParams {
     const result = this.searchParamsByType[type] || this.storage.retrieve(this.getSearchParamsStorageKey(type, userId));
     this.searchParamsByType[type] = result;
     return result;
   }
 
-  private getSearchParamsStorageKey(type: KotkaDocumentObjectType, userId: string | undefined): string {
+  private getSearchParamsStorageKey(type: KotkaRootDocumentType, userId: string | undefined): string {
     if (!userId) {
       throw new Error('Missing user id!');
     }

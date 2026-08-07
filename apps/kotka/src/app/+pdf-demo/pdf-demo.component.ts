@@ -6,7 +6,7 @@ import {
 import { ActivatedRoute } from '@angular/router';
 import { map, switchMap } from 'rxjs/operators';
 import { ApiClient } from '@kotka/ui/core';
-import { KotkaDocumentObjectType } from '@kotka/shared/models';
+import { KotkaRootDocumentType } from '@kotka/shared/models';
 import { Observable, combineLatest } from 'rxjs';
 import { TransactionPdfSheetsContextService } from '../+transactions/transaction-pdf-sheets/services/transaction-pdf-sheets-context-service';
 import { getId } from '@kotka/shared/utils';
@@ -66,7 +66,7 @@ export class PdfDemoComponent {
     const data$ = params$.pipe(
       switchMap((params) => {
         return this.apiClient.getDocumentById(
-          KotkaDocumentObjectType.transaction,
+          KotkaRootDocumentType.transaction,
           params.id,
         );
       }),

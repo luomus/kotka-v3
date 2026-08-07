@@ -5,15 +5,14 @@ https://docs.nestjs.com/providers#services
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { LajiApiService } from './laji-api.service';
-import { KotkaDocumentObjectFullType } from '@kotka/shared/models';
+import { KotkaDocumentFullType } from '@kotka/shared/models';
 
-const types: { [type in KotkaDocumentObjectFullType]: string } = {
-  [KotkaDocumentObjectFullType.dataset]: 'MHL.731',
-  [KotkaDocumentObjectFullType.organization]: 'MHL.1152',
-  [KotkaDocumentObjectFullType.transaction]: 'MHL.930',
-  [KotkaDocumentObjectFullType.document]: 'MHL.1158',
-  [KotkaDocumentObjectFullType.sample]: '',
-  [KotkaDocumentObjectFullType.branch]: 'MHL.1230',
+const types: Partial<{ [type in KotkaDocumentFullType]: string }> = {
+  [KotkaDocumentFullType.dataset]: 'MHL.731',
+  [KotkaDocumentFullType.organization]: 'MHL.1152',
+  [KotkaDocumentFullType.transaction]: 'MHL.930',
+  [KotkaDocumentFullType.document]: 'MHL.1158',
+  [KotkaDocumentFullType.branch]: 'MHL.1230',
 };
 
 @Injectable()
@@ -25,7 +24,7 @@ export class FormService {
     private readonly lajiApiService: LajiApiService
   ) {}
 
-  async getForm(type: KotkaDocumentObjectFullType) {
+  async getForm(type: KotkaDocumentFullType) {
     if (!this.forms[type]) {
       await this.initForm(type);
     }
@@ -33,7 +32,7 @@ export class FormService {
     return this.forms[type];
   }
 
-  async getValidators(type: KotkaDocumentObjectFullType) {
+  async getValidators(type: KotkaDocumentFullType) {
     if (!this.forms[type]) {
       await this.initForm(type);
     }
@@ -41,7 +40,7 @@ export class FormService {
     return this.forms[type]['validators'];
   }
 
-  async getSchema(type: KotkaDocumentObjectFullType) {
+  async getSchema(type: KotkaDocumentFullType) {
     if (!this.forms[type]) {
       await this.initForm(type);
     }
@@ -49,7 +48,7 @@ export class FormService {
     return this.forms[type]['schema'];
   }
 
-  async initForm(type: KotkaDocumentObjectFullType) {
+  async initForm(type: KotkaDocumentFullType) {
     if (!types[type]) {
       throw new InternalServerErrorException(`Could not find formId for document of type ${type}`);
     }

@@ -19,7 +19,7 @@ import {
 } from '@kotka/ui/datatable';
 import { Organization } from '@luomus/laji-schema';
 import { debounceTime, Subject, Subscription } from 'rxjs';
-import { KotkaDocumentObjectType } from '@kotka/shared/models';
+import { KotkaRootDocumentType } from '@kotka/shared/models';
 import { MainContentComponent } from '@kotka/ui/components';
 import { FormsModule } from '@angular/forms';
 
@@ -31,7 +31,7 @@ import { FormsModule } from '@angular/forms';
   imports: [MainContentComponent, FormsModule, DocumentDatatableComponent],
 })
 export class OrganizationTableComponent implements OnInit, OnDestroy {
-  dataType = KotkaDocumentObjectType.organization;
+  dataType = KotkaRootDocumentType.organization;
 
   columns: DatatableColumn[] = [
     {

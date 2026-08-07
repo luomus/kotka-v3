@@ -5,7 +5,7 @@ import {
   DOCUMENT, inject
 } from '@angular/core';
 import {
-  KotkaDocumentObjectType,
+  KotkaRootDocumentType,
   Document as KotkaDocument,
   Gathering,
   isDocument,
@@ -33,9 +33,9 @@ import { from } from 'rxjs';
 import { SpecimenFormNavComponent } from '../specimen-form-nav/specimen-form-nav';
 import {
   SpecimenDataType as DataType,
-  SpecimenUrlDataType as UrlDataType,
-  specimenDataTypeToNameMap as dataTypeToNameMap,
-  specimenUrlToDataTypeMap as urlToDataTypeMap,
+  SpecimenDataTypeName as UrlDataType,
+  specimenTypeToNameMap as dataTypeToNameMap,
+  specimenNameToTypeMap as urlToDataTypeMap,
 } from '@kotka/shared/models';
 import { DocumentNavigatorComponent } from '@kotka/ui/components';
 
@@ -75,10 +75,10 @@ const unreliableDisabledForFields = ['/namespaceID', '/objectID', '/verification
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocumentObjectType.specimen> {
+export class SpecimenFormComponent extends FormViewContainerComponent<KotkaRootDocumentType.specimen> {
   formId = globals.specimenFormId;
-  formDataType: KotkaDocumentObjectType.specimen =
-    KotkaDocumentObjectType.specimen;
+  formDataType: KotkaRootDocumentType.specimen =
+    KotkaRootDocumentType.specimen;
 
   dataType: Signal<DataType | undefined>;
   title: Signal<string>;
@@ -107,7 +107,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
   settingsStorageKey = signal<string | undefined>(undefined);
 
   @ViewChild(FormViewComponent, { static: true })
-  formView!: FormViewComponent<KotkaDocumentObjectType.specimen>;
+  formView!: FormViewComponent<KotkaRootDocumentType.specimen>;
 
   private formDataDataType: Signal<string | undefined>;
   private unreliableFields: Signal<string[]>;

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { ApiClient, FormService } from '@kotka/ui/core';
 import { Organization, SpecimenTransaction } from '@luomus/laji-schema';
-import { KotkaDocumentObjectType, LajiForm } from '@kotka/shared/models';
+import { KotkaRootDocumentType, LajiForm } from '@kotka/shared/models';
 import { forkJoin, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { globals } from '../../../../environments/globals';
@@ -80,7 +80,7 @@ export class TransactionPdfSheetsContextService {
   ): Observable<Organization | undefined> {
     return organizationId
       ? this.apiClient.getDocumentById(
-          KotkaDocumentObjectType.organization,
+          KotkaRootDocumentType.organization,
           organizationId,
         )
       : of(undefined);

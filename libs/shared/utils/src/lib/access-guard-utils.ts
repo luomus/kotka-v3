@@ -1,23 +1,23 @@
 import {
-  KotkaDocumentObjectFullType,
-  MainKotkaDocumentObject,
+  KotkaDocumentFullType,
+  KotkaMainDocument,
 } from '@kotka/shared/models';
 import { Person } from '@luomus/laji-schema';
 import moment from 'moment';
 import { MARoleKotkaEnum } from '@luomus/laji-schema';
 
 const deleteAllowedForTypes = [
-  KotkaDocumentObjectFullType.dataset,
-  KotkaDocumentObjectFullType.transaction,
-  KotkaDocumentObjectFullType.organization,
-  KotkaDocumentObjectFullType.document
+  KotkaDocumentFullType.dataset,
+  KotkaDocumentFullType.transaction,
+  KotkaDocumentFullType.organization,
+  KotkaDocumentFullType.document
 ];
 
 export function isAdmin(user: Person): boolean {
   return user.role?.includes('MA.admin') || user.roleKotka === 'MA.admin';
 }
 
-export function allowEditForUser(document: Partial<MainKotkaDocumentObject>, user: Person): boolean {
+export function allowEditForUser(document: Partial<KotkaMainDocument>, user: Person): boolean {
   if (user.role?.includes('MA.admin')) {
     return true;
   }
@@ -35,8 +35,8 @@ export function allowEditForUser(document: Partial<MainKotkaDocumentObject>, use
   return true;
 }
 
-export function allowDeleteForUser(document: Partial<MainKotkaDocumentObject>, user: Person): boolean {
-  const type = document['@type'] as KotkaDocumentObjectFullType;
+export function allowDeleteForUser(document: Partial<KotkaMainDocument>, user: Person): boolean {
+  const type = document['@type'] as KotkaDocumentFullType;
 
   if (!type) {
     return false;

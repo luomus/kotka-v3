@@ -9,7 +9,7 @@ import {
   Image,
   Person,
   Document,
-  KotkaDocumentObjectFullType,
+  KotkaDocumentFullType,
   MediaTypes,
 } from '@kotka/shared/models';
 import { MediaApiService, LajiStoreService } from '@kotka/api/services';
@@ -109,14 +109,14 @@ export class MediaAccessInterceptor implements NestInterceptor {
       let docs: Partial<Document>[];
       if (all.length === 1) {
         const doc = await lastValueFrom(this.lajiStoreService.get<Document>(
-          KotkaDocumentObjectFullType.document,
+          KotkaDocumentFullType.document,
           all[0]
         ).pipe(map(res => res.data)));
 
         docs = [doc];
       } else {
         docs = await lastValueFrom(this.lajiStoreService.getAll<Document>(
-          KotkaDocumentObjectFullType.document,
+          KotkaDocumentFullType.document,
           {q: `id: ${all.map(id => `"${id}"`).join(',')}`, fields: 'id,owner'}
         ).pipe(map(res => res.data.member)));
       }
@@ -162,7 +162,7 @@ export class MediaAccessInterceptor implements NestInterceptor {
 
     if (ids.length === 1) {
       const doc = await lastValueFrom(this.lajiStoreService.get<Document>(
-        KotkaDocumentObjectFullType.document,
+        KotkaDocumentFullType.document,
         ids[0]
       ).pipe(map(res => res.data)));
 
@@ -172,7 +172,7 @@ export class MediaAccessInterceptor implements NestInterceptor {
 
     } else if(ids.length > 1) {
       const docs = await lastValueFrom(this.lajiStoreService.getAll<Document>(
-        KotkaDocumentObjectFullType.document,
+        KotkaDocumentFullType.document,
         {q: `id: ${ids.map(id => `"${id}"`).join(',')}`, fields: 'id,owner'}
       ).pipe(map(res => res.data.member)));
 

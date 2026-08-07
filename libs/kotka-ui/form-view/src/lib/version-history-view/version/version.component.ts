@@ -8,8 +8,8 @@ import {
 import {
   LajiForm,
   StoreVersion,
-  MainKotkaDocumentObjectType,
-  KotkaDocumentObjectMap,
+  KotkaMainDocumentType,
+  KotkaRootDocumentMap,
 } from '@kotka/shared/models';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { SpinnerComponent } from '@kotka/ui/components';
@@ -34,8 +34,8 @@ import { DataTypeNamePipePipe } from '@kotka/ui/core';
   ],
 })
 export class VersionComponent<
-  T extends MainKotkaDocumentObjectType = MainKotkaDocumentObjectType,
-  S extends KotkaDocumentObjectMap[T] = KotkaDocumentObjectMap[T],
+  T extends KotkaMainDocumentType = KotkaMainDocumentType,
+  S extends KotkaRootDocumentMap[T] = KotkaRootDocumentMap[T],
 > implements OnChanges
 {
   @Input() dataType?: T;

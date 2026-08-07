@@ -4,7 +4,7 @@ import {
   input,
   TemplateRef,
 } from '@angular/core';
-import { MainKotkaDocumentObject } from '@kotka/shared/models';
+import { KotkaMainDocument } from '@kotka/shared/models';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LabelPipe } from '@kotka/ui/core';
@@ -17,7 +17,7 @@ import { LabelPipe } from '@kotka/ui/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MetaFieldsComponent {
-  formData = input<Partial<MainKotkaDocumentObject>>();
+  formData = input<Partial<KotkaMainDocument>>();
   editMode = input<boolean>();
   dataURI = input<string>();
   historyPageLink = input<string[]|string>();

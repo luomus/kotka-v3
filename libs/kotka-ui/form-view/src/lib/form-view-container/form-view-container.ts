@@ -10,13 +10,13 @@ import {
 } from 'rxjs';
 import { FormViewComponent } from '../form-view/form-view.component';
 import { ActivatedRoute, Router } from '@angular/router';
-import { KotkaDocumentObjectMap, MainKotkaDocumentObjectType } from '@kotka/shared/models';
+import { KotkaRootDocumentMap, KotkaMainDocumentType } from '@kotka/shared/models';
 import { getUri } from '@kotka/shared/utils';
 
 @Directive()
 export class FormViewContainerComponent<
-  T extends MainKotkaDocumentObjectType = MainKotkaDocumentObjectType,
-  S extends KotkaDocumentObjectMap[T] = KotkaDocumentObjectMap[T]
+  T extends KotkaMainDocumentType = KotkaMainDocumentType,
+  S extends KotkaRootDocumentMap[T] = KotkaRootDocumentMap[T]
 > implements OnDestroy, ComponentCanDeactivate {
   editMode = signal(false);
   dataURI = signal<string | undefined>(undefined);

@@ -1,7 +1,7 @@
 import { Component, effect, inject, input, OnDestroy, signal } from '@angular/core';
 import {
-  KotkaDocumentObjectMap,
-  KotkaDocumentObjectType,
+  KotkaRootDocumentMap,
+  KotkaRootDocumentType,
 } from '@kotka/shared/models';
 import { RouterLink } from '@angular/router';
 import { SpinnerComponent } from '../spinner/spinner.component';
@@ -53,8 +53,8 @@ interface NavigatorState {
   imports: [RouterLink, SpinnerComponent, ToFullUriPipe],
 })
 export class DocumentNavigatorComponent<
-  T extends KotkaDocumentObjectType = KotkaDocumentObjectType,
-  S extends KotkaDocumentObjectMap[T] = KotkaDocumentObjectMap[T],
+  T extends KotkaRootDocumentType = KotkaRootDocumentType,
+  S extends KotkaRootDocumentMap[T] = KotkaRootDocumentMap[T],
 > implements OnDestroy {
   private searchResultIteratorService = inject(SearchResultIteratorService);
 

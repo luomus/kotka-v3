@@ -12,9 +12,9 @@ import {
 } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import {
-  KotkaDocumentObject,
-  KotkaDocumentObjectType,
-  KotkaDocumentObjectMap,
+  KotkaRootDocument,
+  KotkaRootDocumentType,
+  KotkaRootDocumentMap,
   KotkaVersionDifferenceObject,
   LajiForm,
   StoreVersion,
@@ -32,7 +32,7 @@ export enum VersionHistoryViewEnum {
   versionComparison = 'versionComparison',
 }
 
-export interface VersionHistoryInputs<T extends KotkaDocumentObjectType> {
+export interface VersionHistoryInputs<T extends KotkaRootDocumentType> {
   formId: string;
   dataType: T;
   dataURI?: string;
@@ -41,7 +41,7 @@ export interface VersionHistoryInputs<T extends KotkaDocumentObjectType> {
   view?: VersionHistoryViewEnum;
 }
 
-export interface VersionHistoryState<S extends KotkaDocumentObject> {
+export interface VersionHistoryState<S extends KotkaRootDocument> {
   versionList?: StoreVersion[];
   form?: LajiForm.SchemaForm;
   jsonForm?: LajiForm.JsonForm;
@@ -53,16 +53,16 @@ export interface ErrorViewModel {
   errorType: VersionHistoryErrorEnum;
 }
 
-export type ViewModel<S extends KotkaDocumentObject> =
+export type ViewModel<S extends KotkaRootDocument> =
   | VersionHistoryState<S>
   | ErrorViewModel;
 
-export function isSuccessViewModel<S extends KotkaDocumentObject>(
+export function isSuccessViewModel<S extends KotkaRootDocument>(
   viewModel: ViewModel<S>,
 ): viewModel is VersionHistoryState<S> {
   return !isErrorViewModel(viewModel);
 }
-export function isErrorViewModel<S extends KotkaDocumentObject>(
+export function isErrorViewModel<S extends KotkaRootDocument>(
   viewModel: ViewModel<S>,
 ): viewModel is ErrorViewModel {
   return 'errorType' in viewModel;
@@ -70,8 +70,8 @@ export function isErrorViewModel<S extends KotkaDocumentObject>(
 
 @Injectable()
 export class VersionHistoryViewFacade<
-  T extends KotkaDocumentObjectType,
-  S extends KotkaDocumentObjectMap[T],
+  T extends KotkaRootDocumentType,
+  S extends KotkaRootDocumentMap[T],
 > {
   private formService = inject(FormService);
   private apiClient = inject(ApiClient);

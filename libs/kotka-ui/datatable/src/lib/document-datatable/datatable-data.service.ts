@@ -11,13 +11,13 @@ import {
 } from '../models/models';
 import { Injectable } from '@angular/core';
 import { DocumentListSearchParams } from '@kotka/ui/core';
-import { KotkaDocumentObjectType } from '@kotka/shared/models';
+import { KotkaRootDocumentType } from '@kotka/shared/models';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DatatableDataService {
-  getSearchParams<T extends KotkaDocumentObjectType>(
+  getSearchParams<T extends KotkaRootDocumentType>(
     type: T,
     columns: DatatableColumn[],
     startRow: number,

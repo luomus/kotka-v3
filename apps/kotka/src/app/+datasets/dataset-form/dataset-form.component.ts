@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { isDataset, KotkaDocumentObjectType } from '@kotka/shared/models';
+import { isDataset, KotkaRootDocumentType } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
 import { FormViewContainerComponent, FormViewComponent } from '@kotka/ui/form-view';
 import { OldKotkaUrlPipe } from '@kotka/ui/core';
@@ -11,9 +11,9 @@ import { OldKotkaUrlPipe } from '@kotka/ui/core';
   imports: [FormViewComponent, OldKotkaUrlPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DatasetFormComponent extends FormViewContainerComponent<KotkaDocumentObjectType.dataset> {
+export class DatasetFormComponent extends FormViewContainerComponent<KotkaRootDocumentType.dataset> {
   formId = globals.datasetFormId;
-  dataType: KotkaDocumentObjectType.dataset = KotkaDocumentObjectType.dataset;
+  dataType: KotkaRootDocumentType.dataset = KotkaRootDocumentType.dataset;
 
   protected readonly isDataset = isDataset;
 }

@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { catchError, map, shareReplay, startWith, switchMap } from 'rxjs/operators';
 import { AsyncPipe } from '@angular/common';
 import { NotFoundComponent } from '@kotka/ui/base';
-import { Document, KotkaDocumentObjectType, SpecimenDataType } from '@kotka/shared/models';
+import { Document, KotkaRootDocumentType, SpecimenDataType } from '@kotka/shared/models';
 import { combineLatest, Observable, of, Subject } from 'rxjs';
 import { ApiClient, DocumentDataResult, DocumentDataService } from '@kotka/ui/core';
 import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
@@ -55,11 +55,11 @@ export class AccessionComponent {
 
   uri$ = this.route.queryParams.pipe(map((params) => params['uri']));
 
-  accession$: Observable<DocumentDataResult<KotkaDocumentObjectType.specimen>> =
+  accession$: Observable<DocumentDataResult<KotkaRootDocumentType.specimen>> =
     this.uri$.pipe(
       switchMap((uri) =>
         this.documentDataService
-          .getDocumentData(KotkaDocumentObjectType.specimen, uri)
+          .getDocumentData(KotkaRootDocumentType.specimen, uri)
           .pipe(
             map((data) => {
               const accession: SpecimenDataType = 'accession';
@@ -84,7 +84,7 @@ export class AccessionComponent {
     switchMap(([uri]) =>
       this.apiClient
         .getAllDocuments(
-          KotkaDocumentObjectType.branch,
+          KotkaRootDocumentType.branch,
           1000,
           undefined,
           `accessionID:${getId(uri)}`,
@@ -148,9 +148,9 @@ export class AccessionComponent {
         if (!data.id) {
           throw new Error('Branch is missing an id');
         }
-        return this.apiClient.updateDocument(KotkaDocumentObjectType.branch, data.id, data);
+        return this.apiClient.updateDocument(KotkaRootDocumentType.branch, data.id, data);
       } else {
-        return this.apiClient.createDocument(KotkaDocumentObjectType.branch, data);
+        return this.apiClient.createDocument(KotkaRootDocumentType.branch, data);
       }
     };
 

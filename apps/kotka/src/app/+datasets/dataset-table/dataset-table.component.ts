@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DatatableColumn, URICellRendererComponent, DocumentDatatableComponent } from '@kotka/ui/datatable';
-import { KotkaDocumentObjectType } from '@kotka/shared/models';
+import { KotkaRootDocumentType } from '@kotka/shared/models';
 import { MainContentComponent } from '@kotka/ui/components';
 
 @Component({
@@ -11,7 +11,7 @@ import { MainContentComponent } from '@kotka/ui/components';
   imports: [MainContentComponent, DocumentDatatableComponent],
 })
 export class DatasetTableComponent {
-  dataType = KotkaDocumentObjectType.dataset;
+  dataType = KotkaRootDocumentType.dataset;
 
   columns: DatatableColumn[] = [
     {

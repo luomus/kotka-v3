@@ -11,7 +11,7 @@ import {
   DatatableLoadedData,
   DocumentDatatableComponent,
 } from '@kotka/ui/datatable';
-import { KotkaDocumentObjectType, Document } from '@kotka/shared/models';
+import { KotkaRootDocumentType, Document } from '@kotka/shared/models';
 import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
 import { FormsModule } from '@angular/forms';
 import {
@@ -41,7 +41,7 @@ export class SpecimenTableComponent {
   private apiClient = inject(ApiClient);
   private searchResultIteratorService = inject(SearchResultIteratorService);
 
-  dataType: KotkaDocumentObjectType.specimen = KotkaDocumentObjectType.specimen;
+  dataType: KotkaRootDocumentType.specimen = KotkaRootDocumentType.specimen;
 
   columns: DatatableColumn[] = [
     {

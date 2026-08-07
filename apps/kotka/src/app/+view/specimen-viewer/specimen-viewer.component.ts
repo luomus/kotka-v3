@@ -38,7 +38,7 @@ import { NgbAlert, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { combineLatest, Observable, of } from 'rxjs';
 import {
   Document,
-  KotkaDocumentObjectType,
+  KotkaRootDocumentType,
   LajiForm,
   SpecimenDataType,
 } from '@kotka/shared/models';
@@ -86,7 +86,7 @@ export class SpecimenViewerComponent {
   uri = input.required<string>();
 
   uri$ = toObservable(this.uri);
-  dataType = KotkaDocumentObjectType.specimen;
+  dataType = KotkaRootDocumentType.specimen;
 
   formData$: Observable<FormDataResult> = this.formService
     .getFormInJsonFormat(globals.specimenFormId)
@@ -102,10 +102,10 @@ export class SpecimenViewerComponent {
       shareReplay(1),
     );
 
-  documentData$: Observable<DocumentDataResult<KotkaDocumentObjectType.specimen>> = this.uri$.pipe(
+  documentData$: Observable<DocumentDataResult<KotkaRootDocumentType.specimen>> = this.uri$.pipe(
     switchMap((uri) =>
       this.documentDataService.getDocumentData(
-        KotkaDocumentObjectType.specimen, uri
+        KotkaRootDocumentType.specimen, uri
       ),
     ),
     shareReplay(1),

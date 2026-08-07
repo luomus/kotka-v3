@@ -9,8 +9,8 @@ import {
 } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
-  KotkaDocumentObjectMap,
-  MainKotkaDocumentObjectType,
+  KotkaRootDocumentMap,
+  KotkaMainDocumentType,
 } from '@kotka/shared/models';
 import {
   FormFacade,
@@ -25,8 +25,8 @@ import {
 } from '@kotka/shared/utils';
 
 export interface FormViewInputs<
-  T extends MainKotkaDocumentObjectType,
-  S extends KotkaDocumentObjectMap[T],
+  T extends KotkaMainDocumentType,
+  S extends KotkaRootDocumentMap[T],
 > extends Omit<FormInputs<S>, 'allowEdit' | 'allowDelete'> {
   dataType: T;
   dataURI?: string;
@@ -34,8 +34,8 @@ export interface FormViewInputs<
 
 @Injectable()
 export class FormViewFacade<
-  T extends MainKotkaDocumentObjectType,
-  S extends KotkaDocumentObjectMap[T],
+  T extends KotkaMainDocumentType,
+  S extends KotkaRootDocumentMap[T],
 > extends FormFacade<S, FormViewInputs<T, S>> {
   private userService = inject(UserService);
   private apiClient = inject(ApiClient);

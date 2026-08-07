@@ -16,7 +16,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { lastValueFrom } from 'rxjs';
-import { KotkaDocumentObjectFullType, STORE_OBJECTS, StoreObject } from '@kotka/shared/models';
+import { KotkaDocumentFullType, STORE_OBJECTS, StoreObject } from '@kotka/shared/models';
 
 @Injectable()
 export class InUseGuard implements CanActivate {
@@ -35,16 +35,16 @@ export class InUseGuard implements CanActivate {
       return true;
     }
 
-    const controllerType: KotkaDocumentObjectFullType = this.reflector.get('controllerType', context.getClass());
+    const controllerType: KotkaDocumentFullType = this.reflector.get('controllerType', context.getClass());
     const inUseTypes: Array<string> = this.reflector.get('inUseTypes', context.getClass());
     const storeInUseTargets = {
-      [KotkaDocumentObjectFullType.organization]: {
-        [KotkaDocumentObjectFullType.transaction]: ['correspondentOrganization', 'owner'],
-        [KotkaDocumentObjectFullType.organization]: ['owner'],
-        [KotkaDocumentObjectFullType.dataset]: ['owner'],
+      [KotkaDocumentFullType.organization]: {
+        [KotkaDocumentFullType.transaction]: ['correspondentOrganization', 'owner'],
+        [KotkaDocumentFullType.organization]: ['owner'],
+        [KotkaDocumentFullType.dataset]: ['owner'],
       },
-      [KotkaDocumentObjectFullType.dataset]: {
-        [KotkaDocumentObjectFullType.organization]: ['datasetID']
+      [KotkaDocumentFullType.dataset]: {
+        [KotkaDocumentFullType.organization]: ['datasetID']
       }
     };
 
@@ -56,7 +56,7 @@ export class InUseGuard implements CanActivate {
     let found = false;
 
     for (const type of inUseTypes) {
-      if (STORE_OBJECTS.includes(type as KotkaDocumentObjectFullType)) {
+      if (STORE_OBJECTS.includes(type as KotkaDocumentFullType)) {
         const targets = storeInUseTargets[controllerType]?.[type];
 
         if (!targets) throw new InternalServerErrorException(`Unable to find store target fields for type ${type}`);
@@ -71,7 +71,7 @@ export class InUseGuard implements CanActivate {
       } else {
         if (!triplestoreSearchResponse) triplestoreSearchResponse = await lastValueFrom(this.triplestoreService.search({ object: req.params.id }, { format: 'JSON' }));
 
-        const data = Object.keys(triplestoreSearchResponse.data['rdf:RDF']).filter(key => inUseTypes.includes(key) && !STORE_OBJECTS.includes(key as KotkaDocumentObjectFullType));
+        const data = Object.keys(triplestoreSearchResponse.data['rdf:RDF']).filter(key => inUseTypes.includes(key) && !STORE_OBJECTS.includes(key as KotkaDocumentFullType));
         if (data && data.length > 0) {
           found = true;
           break;

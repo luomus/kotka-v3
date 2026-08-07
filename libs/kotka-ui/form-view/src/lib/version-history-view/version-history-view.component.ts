@@ -11,7 +11,7 @@ import {
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
-import { MainKotkaDocumentObjectType, KotkaDocumentObjectMap } from '@kotka/shared/models';
+import { KotkaMainDocumentType, KotkaRootDocumentMap } from '@kotka/shared/models';
 import { isEqual } from 'lodash';
 import { DataTypeNamePipePipe, navigationEnd$ } from '@kotka/ui/core';
 import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
@@ -39,8 +39,8 @@ import { CommonModule } from '@angular/common';
   providers: [VersionHistoryViewFacade],
 })
 export class VersionHistoryViewComponent<
-    T extends MainKotkaDocumentObjectType = MainKotkaDocumentObjectType,
-    S extends KotkaDocumentObjectMap[T] = KotkaDocumentObjectMap[T],
+    T extends KotkaMainDocumentType = KotkaMainDocumentType,
+    S extends KotkaRootDocumentMap[T] = KotkaRootDocumentMap[T],
   >
   implements OnChanges, OnDestroy
 {

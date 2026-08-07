@@ -12,8 +12,8 @@ import {
 } from '@angular/core';
 import {
   LajiForm,
-  MainKotkaDocumentObjectType,
-  KotkaDocumentObjectMap,
+  KotkaMainDocumentType,
+  KotkaRootDocumentMap,
 } from '@kotka/shared/models';
 import {
   Observable
@@ -49,8 +49,8 @@ import { FormViewFacade } from '../services/form-view.facade';
   ],
 })
 export class FormViewComponent<
-  T extends MainKotkaDocumentObjectType = MainKotkaDocumentObjectType,
-  S extends KotkaDocumentObjectMap[T] = KotkaDocumentObjectMap[T],
+  T extends KotkaMainDocumentType = KotkaMainDocumentType,
+  S extends KotkaRootDocumentMap[T] = KotkaRootDocumentMap[T],
 > {
   private notifier = inject(ToastService);
   private apiClient = inject(ApiClient);

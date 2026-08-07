@@ -3,7 +3,7 @@ import { catchError, Observable, of, ReplaySubject, switchMap } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { ApiClient } from '@kotka/ui/core';
 import { Organization } from '@luomus/laji-schema';
-import { KotkaDocumentObjectType } from '@kotka/shared/models';
+import { KotkaRootDocumentType } from '@kotka/shared/models';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -60,7 +60,7 @@ export class OrganizationAddressEmbedComponent {
     }
 
     return this.apiClient
-      .getDocumentById(KotkaDocumentObjectType.organization, organizationId)
+      .getDocumentById(KotkaRootDocumentType.organization, organizationId)
       .pipe(
         catchError((e) => {
           if (e?.status === 404) {
