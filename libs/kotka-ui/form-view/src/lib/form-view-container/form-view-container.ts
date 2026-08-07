@@ -1,39 +1,40 @@
-import { ChangeDetectorRef, Directive, HostListener, inject, OnDestroy, signal, ViewChild } from '@angular/core';
-import { ComponentCanDeactivate, DialogService, navigationEnd$ } from '@kotka/ui/core';
+import { ChangeDetectorRef, Directive, inject, OnDestroy, signal, ViewChild } from '@angular/core';
+import { navigationEnd$ } from '@kotka/ui/core';
 import {
-  finalize,
   from,
-  Observable,
-  of,
-  shareReplay,
   Subscription,
 } from 'rxjs';
 import { FormViewComponent } from '../form-view/form-view.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { KotkaRootDocumentMap, KotkaMainDocumentType } from '@kotka/shared/models';
 import { getUri } from '@kotka/shared/utils';
+import { WithLeaveConfirmComponent } from '@kotka/ui/components';
 
 @Directive()
 export class FormViewContainerComponent<
-  T extends KotkaMainDocumentType = KotkaMainDocumentType,
-  S extends KotkaRootDocumentMap[T] = KotkaRootDocumentMap[T]
-> implements OnDestroy, ComponentCanDeactivate {
+    T extends KotkaMainDocumentType = KotkaMainDocumentType,
+    S extends KotkaRootDocumentMap[T] = KotkaRootDocumentMap[T],
+  >
+  extends WithLeaveConfirmComponent
+  implements OnDestroy
+{
   editMode = signal(false);
   dataURI = signal<string | undefined>(undefined);
 
   copyData = signal<Partial<S> | undefined>(undefined);
 
-  @ViewChild(FormViewComponent<T, S>, { static: true }) formViewComponent!: FormViewComponent<T, S>;
+  @ViewChild(FormViewComponent<T, S>, { static: true })
+  formViewComponent!: FormViewComponent<T, S>;
 
   private routeParamUpdateSub: Subscription;
-  private canDeactivateConfirm$?: Observable<boolean>;
 
-  protected dialogService = inject(DialogService);
   protected activeRoute = inject(ActivatedRoute);
   protected router = inject(Router);
   protected cdr = inject(ChangeDetectorRef);
 
   constructor() {
+    super();
+
     this.setRouteParams();
 
     this.routeParamUpdateSub = navigationEnd$(this.router).subscribe(() => {
@@ -45,34 +46,8 @@ export class FormViewContainerComponent<
     this.routeParamUpdateSub.unsubscribe();
   }
 
-  hasChanges() {
+  override requiresConfirm(): boolean {
     return this.formViewComponent.getFormHasChanges();
-  }
-
-  @HostListener('window:beforeunload')
-  preventLeave(): boolean {
-    return !this.hasChanges();
-  }
-
-  canDeactivate(): Observable<boolean> {
-    if (!this.hasChanges()) {
-      return of(true);
-    }
-
-    if (this.canDeactivateConfirm$) {
-      return this.canDeactivateConfirm$;
-    }
-
-    this.canDeactivateConfirm$ = this.dialogService.confirm(
-      'Are you sure you want to leave and discard unsaved changes?',
-    ).pipe(
-      finalize(() => {
-        this.canDeactivateConfirm$ = undefined;
-      }),
-      shareReplay(1)
-    );
-
-    return this.canDeactivateConfirm$;
   }
 
   onSaveSuccess(formData: S) {
@@ -88,7 +63,10 @@ export class FormViewContainerComponent<
 
   onCopyData(formData: Partial<S>): void {
     from(
-      this.router.navigate(['..', 'add'], { relativeTo: this.activeRoute, state: { skipForceRouteRefresh: true } }),
+      this.router.navigate(['..', 'add'], {
+        relativeTo: this.activeRoute,
+        state: { skipForceRouteRefresh: true },
+      }),
     ).subscribe(() => {
       this.copyData.set(formData);
       this.cdr.markForCheck();

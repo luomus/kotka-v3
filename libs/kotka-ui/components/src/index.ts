@@ -1,4 +1,5 @@
 export * from './lib/autocomplete/autocomplete.component';
+export * from './lib/with-leave-confirm/with-leave-confirm.component';
 export * from './lib/document-navigator/document-navigator.component';
 export * from './lib/image-gallery/image-gallery.component';
 export * from './lib/image-gallery/image-viewer-modal/image-viewer-modal.component';

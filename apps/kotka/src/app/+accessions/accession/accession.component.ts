@@ -1,13 +1,26 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnDestroy,
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { catchError, map, shareReplay, startWith, switchMap } from 'rxjs/operators';
 import { AsyncPipe } from '@angular/common';
 import { NotFoundComponent } from '@kotka/ui/base';
 import { Document, KotkaRootDocumentType, SpecimenDataType } from '@kotka/shared/models';
 import { combineLatest, Observable, of, Subject } from 'rxjs';
-import { ApiClient, DocumentDataResult, DocumentDataService } from '@kotka/ui/core';
-import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
-import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
+import {
+  ApiClient,
+  DocumentDataResult,
+  DocumentDataService,
+} from '@kotka/ui/core';
+import {
+  MainContentComponent,
+  SpinnerComponent,
+  WithLeaveConfirmComponent,
+} from '@kotka/ui/components';
+import { NgbAlert, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SpecimenViewerModalComponent } from './specimen-viewer-modal/specimen-viewer-modal.component';
 import { FormModalComponent } from '@kotka/ui/form-view';
@@ -43,7 +56,10 @@ interface ViewModel {
     BranchTableComponent,
   ],
 })
-export class AccessionComponent {
+export class AccessionComponent
+  extends WithLeaveConfirmComponent
+  implements OnDestroy
+{
   private route = inject(ActivatedRoute);
   private apiClient = inject(ApiClient);
   private documentDataService = inject(DocumentDataService);
@@ -51,12 +67,16 @@ export class AccessionComponent {
 
   showDepleted = true;
 
+  uri$ = this.route.queryParams.pipe(map((params) => params['uri']));
+  vm$: Observable<ViewModel>;
+
+  private activeModalRef?: NgbModalRef;
   private refreshBranches$ = new Subject<void>();
 
-  uri$ = this.route.queryParams.pipe(map((params) => params['uri']));
+  constructor() {
+    super();
 
-  accession$: Observable<DocumentDataResult<KotkaRootDocumentType.specimen>> =
-    this.uri$.pipe(
+    const accession$: Observable<DocumentDataResult<KotkaRootDocumentType.specimen>> = this.uri$.pipe(
       switchMap((uri) =>
         this.documentDataService
           .getDocumentData(KotkaRootDocumentType.specimen, uri)
@@ -77,58 +97,70 @@ export class AccessionComponent {
       shareReplay(1),
     );
 
-  branches$: Observable<BranchesResult> = combineLatest([
-    this.uri$,
-    this.refreshBranches$.pipe(startWith(undefined)),
-  ]).pipe(
-    switchMap(([uri]) =>
-      this.apiClient
-        .getAllDocuments(
-          KotkaRootDocumentType.branch,
-          1000,
-          undefined,
-          `accessionID:${getId(uri)}`,
-        )
-        .pipe(
-          map((value) => ({
-            value,
-            loading: false,
-          })),
-          startWith({ loading: true }),
-          catchError(() => {
-            return of({
+    const branches$: Observable<BranchesResult> = combineLatest([
+      this.uri$,
+      this.refreshBranches$.pipe(startWith(undefined)),
+    ]).pipe(
+      switchMap(([uri]) =>
+        this.apiClient
+          .getAllDocuments(
+            KotkaRootDocumentType.branch,
+            1000,
+            undefined,
+            `accessionID:${getId(uri)}`,
+          )
+          .pipe(
+            map((value) => ({
+              value,
               loading: false,
-              error: 'An unexpected error occurred',
-            });
-          }),
-        ),
-    ),
-    shareReplay(1),
-  );
+            })),
+            startWith({ loading: true }),
+            catchError(() => {
+              return of({
+                loading: false,
+                error: 'An unexpected error occurred',
+              });
+            }),
+          ),
+      ),
+      shareReplay(1),
+    );
 
-  vm$: Observable<ViewModel> = combineLatest([
-    this.accession$,
-    this.branches$,
-  ]).pipe(
-    map(([accession, branches]) => {
-      const loading = accession.loading || branches.loading;
-      const error = accession.error || branches.error;
+    this.vm$ = combineLatest([accession$, branches$]).pipe(
+      map(([accession, branches]) => {
+        const loading = accession.loading || branches.loading;
+        const error = accession.error || branches.error;
 
-      return {
-        document: accession.value,
-        branches: branches.value,
-        loading,
-        error,
-      };
-    }),
-    startWith({ loading: true }),
-  );
+        return {
+          document: accession.value,
+          branches: branches.value,
+          loading,
+          error,
+        };
+      }),
+      startWith({ loading: true }),
+    );
+  }
+
+  ngOnDestroy() {
+    this.activeModalRef?.close();
+  }
+
+  override requiresConfirm(): boolean {
+    const modalInstance = this.activeModalRef?.componentInstance;
+    if (modalInstance instanceof FormModalComponent) {
+      return modalInstance.formState().formHasChanges || false;
+    }
+    return false;
+  }
 
   openSpecimenViewer(uri: string) {
     const modalRef = this.modalService.open(SpecimenViewerModalComponent, {
       size: 'lg',
     });
     modalRef.componentInstance.uri = uri;
+
+    this.activeModalRef = modalRef;
   }
 
   openBranchForm(uri: string, branch?: Branch) {
@@ -148,9 +180,16 @@ export class AccessionComponent {
         if (!data.id) {
           throw new Error('Branch is missing an id');
         }
-        return this.apiClient.updateDocument(KotkaRootDocumentType.branch, data.id, data);
+        return this.apiClient.updateDocument(
+          KotkaRootDocumentType.branch,
+          data.id,
+          data,
+        );
       } else {
-        return this.apiClient.createDocument(KotkaRootDocumentType.branch, data);
+        return this.apiClient.createDocument(
+          KotkaRootDocumentType.branch,
+          data,
+        );
       }
     };
 
@@ -165,5 +204,7 @@ export class AccessionComponent {
     modalRef.closed.subscribe(() => {
       this.refreshBranches$.next();
     });
+
+    this.activeModalRef = modalRef;
   }
 }

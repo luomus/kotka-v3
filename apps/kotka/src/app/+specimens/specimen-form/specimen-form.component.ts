@@ -391,8 +391,8 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaRootD
     this.formView.lajiForm?.focusField(field);
   }
 
-  override hasChanges(): boolean {
-    return super.hasChanges() || this.markAdvancedFieldsActive();
+  override requiresConfirm(): boolean {
+    return super.requiresConfirm() || this.markAdvancedFieldsActive();
   }
 
   override onSaveSuccess(formData: KotkaDocument) {
