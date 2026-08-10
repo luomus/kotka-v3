@@ -1,82 +1,26 @@
 @if (vm$ | async; as vm) {
   <ng-template #headerTemplate>
-    <div class="header-layout">
-      <div class="header-left-group">
-      <h1 data-cy="main-header">
-        @if (vm.specimenDataType === "accession") {
-          Accession
-        }
-        {{ uri() }}
-        @if (vm.specimenDataType === "accession" && vm.document?.originalSpecimenID) {
-          ({{ vm.document?.originalSpecimenID }})
-        }
-      </h1>
-        @if (vm.showEditButton) {
-          <a
-            type="button"
-            class="btn btn-info edit-button"
-            routerLink="/specimens/edit"
-            [queryParams]="{ uri: uri() }"
-          >
-            <i class="fa fa-pen-to-square"></i>
-          </a>
-        }
-        @if (vm.specimenDataType === "accession") {
-          <a routerLink="/accessions" [queryParams]="{ uri: uri() }">branches</a>
-        }
-      </div>
-      @if (vm.document) {
-        <button
-          type="button"
-          class="btn btn-light user-info-button"
-          [ngbPopover]="popoverTemplate"
-          placement="bottom"
-        >
-          <i class="fa fa-user"></i>
-        </button>
-        <ng-template #popoverTemplate>
-          <div>
-            <strong>Created by</strong> {{ vm.document.creator | label }} {{ vm.document.dateCreated | date:'dd.MM.yyyy HH:mm' }}<br>
-            <strong>Edited by</strong> {{ vm.document.editor | label }} {{ vm.document.dateEdited | date:'dd.MM.yyyy HH:mm' }}<br>
-            <strong>Current owner is</strong> {{ vm.document.owner | label }}
-          </div>
-        </ng-template>
-      }
-    </div>
+    <kotka-specimen-viewer-header
+      [uri]="uri()"
+      [specimenDataType]="vm.specimenDataType"
+      [document]="vm.document"
+      [showEditButton]="!!vm.showEditButton"
+    ></kotka-specimen-viewer-header>
   </ng-template>
 
   <kui-main-content [pageTitle]="uri() || ''" [headerTpl]="headerTemplate" containerClass="container" [hasBottomMargin]="true">
-    @if (vm.loading) {
-      <kui-spinner></kui-spinner>
-    } @else if (vm.error) {
-      <ngb-alert type="danger" [dismissible]="false">
-        {{ vm.error }}
-      </ngb-alert>
-    } @else if (vm.fields && vm.document) {
-      <kui-viewer
-        [fields]="vm.fields"
-        [data]="vm.document"
-      ></kui-viewer>
-      <kui-document-navigator
-        class="bg-white p-2 rounded-2 shadow border"
-        [dataType]="dataType"
-        [data]="$any(vm.document)"
-        buttonRouterLink="/view"
-      ></kui-document-navigator>
-    }
+    <kotka-specimen-viewer-content
+      [loading]="vm.loading"
+      [error]="vm.error"
+      [fields]="vm.fields"
+      [document]="vm.document"
+    ></kotka-specimen-viewer-content>
+    <kui-document-navigator
+      class="bg-white p-2 rounded-2 shadow border"
+      [dataType]="dataType"
+      [data]="vm.document"
+      buttonRouterLink="/view"
+    ></kui-document-navigator>
   </kui-main-content>
 }
 
-<ng-template #unitLabelTpl let-field="field" let-data="data">
-  {{ field.label }}
-  @if (data?.primarySpecimen) {
-    <span class="badge bg-primary me-1">Primary specimen</span>
-  }
-</ng-template>
-
-<ng-template #sampleLabelTpl let-field="field" let-data="data">
-  {{ field.label }}
-  @if (data?.id) {
-    <span class="title-muted-text me-1">{{ data.id | toFullUri }}</span>
-  }
-</ng-template>

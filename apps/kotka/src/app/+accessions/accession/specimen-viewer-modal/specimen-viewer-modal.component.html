@@ -1,9 +1,23 @@
-<div class="modal-header bg-light">
-  <button type="button" class="btn btn-light ms-auto" (click)="modal.dismiss()" aria-label="Close">
-    <i class="fa fa-xmark"></i>
-  </button>
-</div>
-<div class="modal-body">
-  <kotka-specimen-viewer [uri]="uri"></kotka-specimen-viewer>
-</div>
+@if (vm$ | async; as vm) {
+  <div class="modal-header">
+    <kotka-specimen-viewer-header class="flex-grow-1 me-1"
+      [uri]="uri"
+      [specimenDataType]="vm.specimenDataType"
+      [document]="vm.document"
+      [showEditButton]="!!vm.showEditButton"
+      [showBranchesLink]="false"
+    ></kotka-specimen-viewer-header>
+    <button type="button" class="btn btn-light ms-auto mb-2" (click)="modal.dismiss()" aria-label="Close">
+      <i class="fa fa-xmark"></i>
+    </button>
+  </div>
+  <div class="modal-body">
+    <kotka-specimen-viewer-content
+      [loading]="vm.loading"
+      [error]="vm.error"
+      [fields]="vm.fields"
+      [document]="vm.document"
+    ></kotka-specimen-viewer-content>
+  </div>
+}
 

@@ -1,0 +1,44 @@
+<div class="header-layout">
+  <div class="header-left-group">
+    <h1 data-cy="main-header">
+      @if (specimenDataType() === "accession") {
+        Accession
+      }
+      {{ uri() }}
+      @if (specimenDataType() === "accession" && document()?.originalSpecimenID) {
+        ({{ document()?.originalSpecimenID }})
+      }
+    </h1>
+    @if (showEditButton()) {
+      <a
+        type="button"
+        class="btn btn-info edit-button"
+        routerLink="/specimens/edit"
+        [queryParams]="{ uri: uri() }"
+      >
+        <i class="fa fa-pen-to-square"></i>
+      </a>
+    }
+    @if (specimenDataType() === "accession" && showBranchesLink()) {
+      <a routerLink="/accessions" [queryParams]="{ uri: uri() }">branches</a>
+    }
+  </div>
+  @if (document()) {
+    <button
+      type="button"
+      class="btn btn-light user-info-button"
+      [ngbPopover]="popoverTemplate"
+      placement="bottom"
+    >
+      <i class="fa fa-user"></i>
+    </button>
+    <ng-template #popoverTemplate>
+      <div>
+        <strong>Created by</strong> {{ document()!.creator | label }} {{ document()!.dateCreated | date:'dd.MM.yyyy HH:mm' }}<br>
+        <strong>Edited by</strong> {{ document()!.editor | label }} {{ document()!.dateEdited | date:'dd.MM.yyyy HH:mm' }}<br>
+        <strong>Current owner is</strong> {{ document()!.owner | label }}
+      </div>
+    </ng-template>
+  }
+</div>
+

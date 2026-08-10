@@ -1,0 +1,27 @@
+@if (loading()) {
+  <kui-spinner></kui-spinner>
+} @else if (error()) {
+  <ngb-alert type="danger" [dismissible]="false">
+    {{ error() }}
+  </ngb-alert>
+} @else if (viewerFields() && document()) {
+  <kui-viewer
+    [fields]="viewerFields()!"
+    [data]="document()!"
+  ></kui-viewer>
+}
+
+<ng-template #unitLabelTpl let-field="field" let-data="data">
+  {{ field.label }}
+  @if (data?.primarySpecimen) {
+    <span class="badge bg-primary me-1">Primary specimen</span>
+  }
+</ng-template>
+
+<ng-template #sampleLabelTpl let-field="field" let-data="data">
+  {{ field.label }}
+  @if (data?.id) {
+    <span class="title-muted-text me-1">{{ data.id | toFullUri }}</span>
+  }
+</ng-template>
+
