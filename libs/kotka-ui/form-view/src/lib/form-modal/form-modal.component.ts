@@ -10,7 +10,7 @@ import {
 import { NgbActiveModal, NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { ToastService } from '@kotka/ui/core';
-import { SpinnerComponent } from '@kotka/ui/components';
+import { ModalComponent, SpinnerComponent } from '@kotka/ui/components';
 import { FormState, FormFacade } from '../services/form.facade';
 import { FormViewUtils } from '../services/form-view-utils';
 import { ErrorSchema } from '@rjsf/utils';
@@ -21,7 +21,7 @@ import { Observable } from 'rxjs';
   templateUrl: './form-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [FormFacade],
-  imports: [LajiFormComponent, SpinnerComponent, NgbAlert],
+  imports: [LajiFormComponent, SpinnerComponent, NgbAlert, ModalComponent],
 })
 export class FormModalComponent<T extends FormData> {
   modal = inject(NgbActiveModal);
@@ -52,7 +52,7 @@ export class FormModalComponent<T extends FormData> {
         editMode: this.editMode,
         formData: this.formData,
         allowEdit: this.allowEdit,
-        allowDelete: this.allowDelete
+        allowDelete: this.allowDelete,
       });
     });
   }

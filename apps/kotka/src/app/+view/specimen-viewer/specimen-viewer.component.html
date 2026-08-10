@@ -1,6 +1,7 @@
 @if (vm$ | async; as vm) {
   <ng-template #headerTemplate>
     <kotka-specimen-viewer-header
+      class="d-block mb-2"
       [uri]="uri()"
       [specimenDataType]="vm.specimenDataType"
       [document]="vm.document"

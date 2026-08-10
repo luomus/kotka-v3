@@ -1,11 +1,8 @@
 @let vm = formState();
 
-<div class="modal-header">
-  <h4 class="modal-title">{{ title }}</h4>
-  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
-</div>
+<kui-modal>
+  <h2 slot="header" class="modal-title">{{ title }}</h2>
 
-<div class="modal-body">
   @if (!vm.loading) {
     @if (vm.error) {
       <ngb-alert [type]="'danger'" [dismissible]="false">
@@ -26,11 +23,10 @@
   } @else {
     <kui-spinner />
   }
-</div>
 
-<div class="modal-footer">
-  <button class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
-  <button class="btn btn-success" (click)="save()" [disabled]="vm.disabled">Save</button>
-</div>
-
+  <ng-content slot="footer">
+    <button class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button class="btn btn-success" (click)="save()" [disabled]="vm.disabled">Save</button>
+  </ng-content>
+</kui-modal>
 
