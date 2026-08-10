@@ -1,7 +1,7 @@
 @let vm = formState();
 
 <kui-modal>
-  <h2 slot="header" class="modal-title">{{ title }}</h2>
+  <h2 kuiModalHeader class="modal-title">{{ title }}</h2>
 
   @if (!vm.loading) {
     @if (vm.error) {
@@ -24,9 +24,9 @@
     <kui-spinner />
   }
 
-  <ng-content slot="footer">
+  <ng-container kuiModalFooter>
     <button class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
     <button class="btn btn-success" (click)="save()" [disabled]="vm.disabled">Save</button>
-  </ng-content>
+  </ng-container>
 </kui-modal>
 

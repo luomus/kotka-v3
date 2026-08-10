@@ -1,0 +1,11 @@
+:host {
+  display: block;
+}
+
+.header-container:empty {
+  display: none;
+}
+
+.with-bottom-margin {
+  margin-bottom: 80px;
+}

@@ -4,7 +4,11 @@ import {
   input,
 } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
-import { DocumentNavigatorComponent, MainContentComponent } from '@kotka/ui/components';
+import {
+  DocumentNavigatorComponent,
+  MainContentComponent,
+  MainContentHeaderDirective,
+} from '@kotka/ui/components';
 import { KotkaRootDocumentType } from '@kotka/shared/models';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { SpecimenViewerHeaderComponent } from './specimen-viewer-header/specimen-viewer-header.component';
@@ -19,6 +23,7 @@ export { SpecimenViewerViewModel } from './specimen-viewer-data.service';
   imports: [
     AsyncPipe,
     MainContentComponent,
+    MainContentHeaderDirective,
     SpecimenViewerHeaderComponent,
     SpecimenViewerContentComponent,
     DocumentNavigatorComponent,

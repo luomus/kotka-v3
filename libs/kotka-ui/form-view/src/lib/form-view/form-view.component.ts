@@ -24,7 +24,11 @@ import {
 } from '../services/form.facade';
 import { FormViewUtils } from '../services/form-view-utils';
 import { ToastService, DialogService, ApiClient, LabelPipe, getDataTypeName, DataTypeNamePipePipe } from '@kotka/ui/core';
-import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
+import {
+  MainContentComponent,
+  MainContentHeaderDirective,
+  SpinnerComponent,
+} from '@kotka/ui/components';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 import { MetaFieldsComponent } from '../meta-fields/meta-fields.component';
 import { NgTemplateOutlet } from '@angular/common';
@@ -39,6 +43,7 @@ import { FormViewFacade } from '../services/form-view.facade';
   providers: [FormViewFacade],
   imports: [
     MainContentComponent,
+    MainContentHeaderDirective,
     NgbAlert,
     MetaFieldsComponent,
     LajiFormComponent,

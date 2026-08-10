@@ -1,7 +1,7 @@
 @if (uri$ | async; as uri) {
   @if (vm$ | async; as vm) {
-    <ng-template #headerTemplate>
-      <div class="header-layout">
+    <kui-main-content [pageTitle]="uri || ''" containerClass="container" [hasBottomMargin]="true">
+      <div kuiMainContentHeader class="header-layout">
         <div class="header-left-group">
           <h1 data-cy="main-header">
             Accession
@@ -26,9 +26,7 @@
           }
         </div>
       </div>
-    </ng-template>
 
-    <kui-main-content [pageTitle]="uri || ''" [headerTpl]="headerTemplate" containerClass="container" [hasBottomMargin]="true">
       @if (vm.loading) {
         <kui-spinner></kui-spinner>
       } @else if (vm.error) {

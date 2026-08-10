@@ -5,7 +5,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   selector: 'kui-modal',
   template: `
     <div class="modal-header">
-      <ng-content select="[slot='header']"></ng-content>
+      <ng-content select="[kuiModalHeader]"></ng-content>
       <button
         type="button"
         class="btn btn-light ms-auto"
@@ -19,7 +19,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
       <ng-content></ng-content>
     </div>
     <div class="modal-footer">
-      <ng-content select="[slot='footer']"></ng-content>
+      <ng-content select="[kuiModalFooter]"></ng-content>
     </div>
   `,
   styleUrls: ['./modal.component.scss'],

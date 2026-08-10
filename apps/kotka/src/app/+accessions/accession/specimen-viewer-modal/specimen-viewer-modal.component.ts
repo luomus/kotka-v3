@@ -4,7 +4,7 @@ import { SpecimenViewerContentComponent } from '../../../+view/specimen-viewer/s
 import { AsyncPipe } from '@angular/common';
 import { Observable, of } from 'rxjs';
 import { SpecimenViewerDataService, SpecimenViewerViewModel } from '../../../+view/specimen-viewer/specimen-viewer-data.service';
-import { ModalComponent } from '@kotka/ui/components';
+import { ModalComponent, ModalHeaderDirective } from '@kotka/ui/components';
 
 @Component({
   selector: 'kotka-specimen-viewer-modal',
@@ -16,6 +16,7 @@ import { ModalComponent } from '@kotka/ui/components';
     SpecimenViewerContentComponent,
     AsyncPipe,
     ModalComponent,
+    ModalHeaderDirective,
   ],
 })
 export class SpecimenViewerModalComponent implements OnInit {

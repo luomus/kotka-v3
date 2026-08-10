@@ -17,6 +17,7 @@ import {
 } from '@kotka/ui/core';
 import {
   MainContentComponent,
+  MainContentHeaderDirective,
   SpinnerComponent,
   WithLeaveConfirmComponent,
 } from '@kotka/ui/components';
@@ -51,6 +52,7 @@ interface ViewModel {
     AsyncPipe,
     NotFoundComponent,
     MainContentComponent,
+    MainContentHeaderDirective,
     NgbAlert,
     SpinnerComponent,
     BranchTableComponent,

@@ -2,14 +2,11 @@
 
 <kui-main-content
   [pageTitle]="pageTitle() ? pageTitle()! : defaultPageTitle()"
-  [headerTpl]="headerTpl() ? headerTplWithContext : undefined"
   [containerClass]="'container'"
 >
-  <ng-template #headerTplWithContext>
-    @if (headerTpl(); as tpl) {
-      <ng-container *ngTemplateOutlet="tpl; context: { editMode: editMode(), dataURI: dataURI(), formData: vm.formData }"></ng-container>
-    }
-  </ng-template>
+  @if (headerTpl(); as tpl) {
+    <ng-container kuiMainContentHeader *ngTemplateOutlet="tpl; context: { editMode: editMode(), dataURI: dataURI(), formData: vm.formData }"></ng-container>
+  }
 
   @if (!vm.loading) {
     @if (vm.error) {
