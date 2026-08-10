@@ -19,6 +19,7 @@ export interface SpecimenViewerViewModel {
   specimenDataType?: SpecimenDataType | string;
   document?: Document;
   fields?: LajiForm.Field[];
+  title?: string;
   showEditButton?: boolean;
   loading: boolean;
   error?: string;
@@ -62,6 +63,7 @@ export class SpecimenViewerDataService {
         specimenDataType: documentData.value?.datatype,
         fields: formData.value?.fields,
         document: documentData.value,
+        title: documentData.title,
         showEditButton: documentData.value && allowEditForUser(documentData.value, user),
         loading: formData.loading || documentData.loading,
         error: formData.error || documentData.error,
@@ -70,4 +72,3 @@ export class SpecimenViewerDataService {
     );
   }
 }
-

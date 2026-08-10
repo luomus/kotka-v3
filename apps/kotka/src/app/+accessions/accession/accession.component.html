@@ -1,14 +1,10 @@
 @if (uri$ | async; as uri) {
   @if (vm$ | async; as vm) {
-    <kui-main-content [pageTitle]="uri || ''" containerClass="container" [hasBottomMargin]="true">
+    <kui-main-content [pageTitle]="vm.title || uri" containerClass="container" [hasBottomMargin]="true">
       <div kuiMainContentHeader class="header-layout">
         <div class="header-left-group">
           <h1 data-cy="main-header">
-            Accession
-            {{ uri }}
-            @if (vm.document?.originalSpecimenID) {
-              ({{ vm.document?.originalSpecimenID }})
-            }
+            {{ vm.title || uri }}
           </h1>
           @if (vm.document) {
             <button

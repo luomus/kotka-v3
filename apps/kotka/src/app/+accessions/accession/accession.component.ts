@@ -37,6 +37,7 @@ interface BranchesResult {
 }
 
 interface ViewModel {
+  title?: string;
   document?: Document;
   branches?: Branch[];
   loading: boolean;
@@ -134,6 +135,7 @@ export class AccessionComponent
         const error = accession.error || branches.error;
 
         return {
+          title: accession.title,
           document: accession.value,
           branches: branches.value,
           loading,

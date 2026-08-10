@@ -1,13 +1,7 @@
 <div class="header-layout">
   <div class="header-left-group">
     <h1 data-cy="main-header">
-      @if (specimenDataType() === "accession") {
-        Accession
-      }
-      {{ uri() }}
-      @if (specimenDataType() === "accession" && document()?.originalSpecimenID) {
-        ({{ document()?.originalSpecimenID }})
-      }
+      {{ pageTitle() }}
     </h1>
     @if (showEditButton()) {
       <a

@@ -1,9 +1,10 @@
 @if (vm$ | async; as vm) {
-  <kui-main-content [pageTitle]="uri() || ''" containerClass="container" [hasBottomMargin]="true">
+  <kui-main-content [pageTitle]="vm.title || uri()" containerClass="container" [hasBottomMargin]="true">
     <kotka-specimen-viewer-header
       kuiMainContentHeader
       class="d-block mb-2"
       [uri]="uri()"
+      [pageTitle]="vm.title || uri()"
       [specimenDataType]="vm.specimenDataType"
       [document]="vm.document"
       [showEditButton]="!!vm.showEditButton"
