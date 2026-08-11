@@ -1,12 +1,17 @@
 @let vm = formState();
 
 <kui-main-content
-  [pageTitle]="pageTitle() ? pageTitle()! : defaultPageTitle()"
+  [pageTitle]="pageTitle() ?? defaultPageTitle()"
   [containerClass]="'container'"
 >
-  @if (headerTpl(); as tpl) {
-    <ng-container kuiMainContentHeader *ngTemplateOutlet="tpl; context: { editMode: editMode(), dataURI: dataURI(), formData: vm.formData }"></ng-container>
-  }
+  <ng-container kuiMainContentHeader>
+    @if (headerTpl(); as tpl) {
+      <ng-container *ngTemplateOutlet="tpl; context: { editMode: editMode(), dataURI: dataURI(), formData: vm.formData }"></ng-container>
+    } @else {
+      <h1 data-cy="main-header">{{ pageTitle() ?? defaultPageTitle() }}</h1>
+    }
+  </ng-container>
+
 
   @if (!vm.loading) {
     @if (vm.error) {
