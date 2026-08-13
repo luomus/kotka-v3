@@ -20,10 +20,10 @@ COPY --chown=node:node ./apps ./apps
 COPY --chown=node:node ./libs ./libs
 COPY --chown=node:node ./styles ./styles
 
-# Build kotka and kotka-api
+# Build kotka, kotka-api and kotka-cli
 RUN npm run ng -- build kotka-api \
- && npm run ng -- build kotka --configuration $CONFIGURATION
-
+  && npm run ng -- build kotka-cli \
+  && npm run ng -- build kotka --configuration $CONFIGURATION
 
 FROM nginxinc/nginx-unprivileged as kotka
 
@@ -56,3 +56,17 @@ RUN npm ci --ignore-scripts --only=production \
 EXPOSE 3333
 
 CMD [ "node", "main.js" ]
+
+FROM node:22 as kotka-cli
+ENV NODE_ENV production
+
+WORKDIR /app
+RUN chown -Rh node:node /app
+USER node
+
+COPY --chown=node:node --from=builder /app/dist/apps/kotka-cli /app/package*.json ./
+
+RUN npm ci --only=production \
+ && npm cache clean --force
+
+CMD [ "tail", "-f", "/dev/null"]

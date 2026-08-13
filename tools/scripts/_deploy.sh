@@ -37,19 +37,23 @@ oc project ${OC_PROJECT}
 
 echo "Building..."
 docker build -t kotka-api -f tools/docker/kotka/prod/Dockerfile --target kotka-api --build-arg CONFIGURATION=${CONFIGURATION} .
+docker build -t kotka-cli -f tools/docker/kotka/prod/Dockerfile --target kotka-cli --build-arg CONFIGURATION=${CONFIGURATION} .
 docker build -t kotka -f tools/docker/kotka/prod/Dockerfile --target kotka --build-arg CONFIGURATION=${CONFIGURATION} .
 
 echo "Tagging..."
 docker tag kotka-api "${REGISTRY}/kotka-api:latest"
+docker tag kotka-cli "${REGISTRY}/kotka-cli:latest"
 docker tag kotka "${REGISTRY}/kotka:latest"
 
 echo "Pushing..."
 docker login -u `oc whoami` -p `oc whoami --show-token` ${REGISTRY}
 docker push "${REGISTRY}/kotka-api"
+docker push "${REGISTRY}/kotka-cli"
 docker push "${REGISTRY}/kotka"
 
 echo "Apply changes"
 oc apply -f tools/openshift/kotka-api-deploymentconfig.yaml
+oc apply -f tools/openshift/kotka-cli-deploymentconfig.yaml
 oc apply -f tools/openshift/kotka-deploymentconfig.yaml
 
 echo "Restarting pods"

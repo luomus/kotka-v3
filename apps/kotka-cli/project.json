@@ -6,13 +6,13 @@
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@nrwl/webpack:webpack",
+      "executor": "@nx/webpack:webpack",
       "outputs": ["{options.outputPath}"],
       "options": {
+        "webpackConfig": "apps/kotka-cli/webpack.config.js",
         "outputPath": "dist/apps/kotka-cli",
         "main": "apps/kotka-cli/src/main.ts",
         "tsConfig": "apps/kotka-cli/tsconfig.app.json",
-        "assets": ["apps/kotka-cli/src/assets"],
         "target": "node",
         "compiler": "tsc"
       },
@@ -53,3 +53,4 @@
     }
   }
 }
+

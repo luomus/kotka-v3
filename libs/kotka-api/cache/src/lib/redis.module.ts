@@ -4,6 +4,7 @@ import { RedisHealthIndicator } from './redis.health';
 import { createKeyv, Keyv } from '@keyv/redis';
 import { Cacheable, KeyvCacheableMemory } from 'cacheable';
 import { Redis } from 'ioredis';
+import { CacheService } from './cache.service';
 
 @Module({
   providers: [
@@ -36,8 +37,9 @@ import { Redis } from 'ioredis';
         });
       }
     },
-    RedisHealthIndicator
+    RedisHealthIndicator,
+    CacheService
   ],
-  exports: [REDIS, DUAL, RedisHealthIndicator],
+  exports: [REDIS, DUAL, RedisHealthIndicator, CacheService],
 })
 export class CacheModule {}

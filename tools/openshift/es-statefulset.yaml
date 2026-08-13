@@ -1,0 +1,118 @@
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: elastic
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      component: elasticsearch
+      role: data
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: elastic
+  labels:
+    app: elasticsearch
+    component: elasticsearch
+spec:
+  selector:
+    matchLabels:
+      component: elasticsearch
+      role: data
+  serviceName: elastic
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: elasticsearch
+        http: enabled
+        role: data
+    spec:
+      containers:
+        - name: elastic
+          image: 'luomus/elasticsearch:9.3.3'
+          env:
+            - name: ES_HOME
+              value: "/usr/share/elasticsearch"
+            - name: ES_JAVA_OPTS
+              value: "-Xms1024m -Xmx1024m"
+            - name: node.store.allow_mmap
+              value: "false"
+            - name: cluster.name
+              value: "kotka-es-cluster"
+            - name: discovery.seed_hosts
+              value: "es-transport"
+            - name: action.auto_create_index
+              value: ".kibana*,.logstash*,.management*,.monitoring*,.security*,.triggered_watches*,.watcher-history*,.watches*"
+            - name: index.store.type
+              value: "niofs"
+            - name: node.roles
+              value: "master,data,transform"
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: node.name
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: processors
+              valueFrom:
+                resourceFieldRef:
+                  resource: limits.cpu
+          ports:
+            - containerPort: 9200
+              protocol: TCP
+              name: http
+          resources: {}
+          volumeMounts:
+            - name: storage
+              mountPath: /usr/share/elasticsearch/data
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            successThreshold: 1
+            tcpSocket:
+              port: transport
+            timeoutSeconds: 3
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /_cluster/health
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            successThreshold: 1
+            timeoutSeconds: 6
+      resources:
+        requests:
+          cpu: "0.1"
+          memory: 3Gi
+        limits:
+          cpu: "0.5"
+          memory: 3Gi
+      initContainers:
+        - name: elasticsearch-plugin
+          command:
+            - sh
+            - -c
+            - |
+              elasticsearch-plugin install analysis-icu
+      restartPolicy: Always
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
+  volumeClaimTemplates:
+    - metadata:
+        name: storage
+      spec:
+        storageClassName: data-2
+        accessModes: [ ReadWriteOnce ]
+        resources:
+          requests:
+            storage: 15Gi
