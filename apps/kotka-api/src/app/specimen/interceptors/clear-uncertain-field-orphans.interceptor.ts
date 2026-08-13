@@ -20,7 +20,7 @@ export class ClearUncertainFieldOrphansInterceptor implements NestInterceptor {
 
     let unrealiableFields = body.unreliableFields as unknown as string[] | undefined;
 
-    if (!unrealiableFields) {
+    if (unrealiableFields === undefined) {
       return next.handle();
     }
 
@@ -34,8 +34,12 @@ export class ClearUncertainFieldOrphansInterceptor implements NestInterceptor {
       return true;
     });
 
-    //@ts-ignore
-    body.unreliableFields = unrealiableFields;
+    if (unrealiableFields.length !== 0) {
+      //@ts-ignore
+      body.unreliableFields = unrealiableFields;
+    } else {
+      delete body.unreliableFields;
+    }
 
     return next.handle();
   }
