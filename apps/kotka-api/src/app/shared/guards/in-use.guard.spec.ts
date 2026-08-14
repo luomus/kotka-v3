@@ -70,7 +70,7 @@ describe('InUseGuard', () => {
         return 'GX.dataset';
       } else if (key === 'inUseTypes') {
         return [
-          'MY.document'
+          'MY.unit'
         ];
       }
     });
@@ -78,7 +78,7 @@ describe('InUseGuard', () => {
       data: {
         'rdf:RDF': {
           'xmlns':	'http://tun.fi/',
-          'MY.document': [],
+          'MY.unit': [],
         }
       },
       status: 200,
@@ -148,7 +148,7 @@ describe('InUseGuard', () => {
         return [
           'MOS.organization',
           'MY.document',
-          'MY.sample'
+          'MY.unit'
         ];
       }
     });

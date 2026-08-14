@@ -42,9 +42,11 @@ export class InUseGuard implements CanActivate {
         [KotkaDocumentFullType.transaction]: ['correspondentOrganization', 'owner'],
         [KotkaDocumentFullType.organization]: ['owner'],
         [KotkaDocumentFullType.dataset]: ['owner'],
+        [KotkaDocumentFullType.document]: ['owner', 'gatherings.units.samples.collectionID'],
       },
       [KotkaDocumentFullType.dataset]: {
-        [KotkaDocumentFullType.organization]: ['datasetID']
+        [KotkaDocumentFullType.organization]: ['datasetID'],
+        [KotkaDocumentFullType.document]: ['datasetID', 'gatherings.units.samples.datasetID'],
       }
     };
 
