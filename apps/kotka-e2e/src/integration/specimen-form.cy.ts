@@ -81,9 +81,9 @@ describe('specimen form', () => {
       cy.get('#root_gatherings_0_units_0_recordBasis').type(
         'Observation{enter}',
       );
-      cy.get('#root_gatherings_0_units_0_identifications_0_taxon').type(
-        testTaxon + '{enter}',
-      );
+      cy.get('#root_gatherings_0_units_0_identifications_0_taxon').type(testTaxon);
+      cy.press(Cypress.Keyboard.Keys.TAB);
+      cy.get('#root_gatherings_0_units_0_identifications_0_taxon').parent().should('have.class', 'text-success');
 
       // submit form
       cy.get('[data-cy=form-submit]').click();
