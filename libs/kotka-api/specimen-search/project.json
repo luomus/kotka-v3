@@ -1,0 +1,19 @@
+{
+  "name": "specimen-search",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/kotka-api/specimen-search/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/kotka-api/specimen-search"],
+      "options": {
+        "jestConfig": "libs/kotka-api/specimen-search/jest.config.ts"
+      }
+    }
+  }
+}

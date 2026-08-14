@@ -3,7 +3,7 @@ https://docs.nestjs.com/controllers#controllers
 */
 
 import { LajiStoreService, OldKotkaApiService, TriplestoreService, ValidationService } from '@kotka/api/services';
-import { Controller, Get, Param, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards, UseInterceptors, Query, Post, Body } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
 import { ApiMethodAccessGuard } from '../shared/guards/api-method-access.guard';
@@ -18,6 +18,8 @@ import { CoordinateMatchInterceptor } from './interceptors/coordinate-match.inte
 import { ClearUncertainFieldOrphansInterceptor } from './interceptors/clear-uncertain-field-orphans.interceptor';
 import { AssociatedTaxaToUnitInterceptor } from './interceptors/associated-taxa-to-unit.interceptor';
 import { CollectionAccessibleToUserInterceptor } from './interceptors/collection-accessible-to-user.interceptor';
+import { SpecimenIndexerInterceptor } from './interceptors/sspecimen-search-indexer.interceptor';
+import { SpecimenSearchService } from '@kotka/api/specimen-search';
 
 const type = KotkaDocumentFullType.document;
 
@@ -34,8 +36,10 @@ const type = KotkaDocumentFullType.document;
   CollectionAccessibleToUserInterceptor,
   SpecimenConvertDataToOldFormatInterceptor,
   SpecimenIdJoinerInterceptor,
+  SpecimenIndexerInterceptor,
   SpecimenImageInterceptor,
 )
+
 export class SpecimenController extends LajiStoreController<Document> {
   constructor(
     private readonly oldKotkaApiService: OldKotkaApiService,
@@ -43,6 +47,7 @@ export class SpecimenController extends LajiStoreController<Document> {
     protected readonly triplestoreService: TriplestoreService,
     protected readonly triplestoreMapperService: TriplestoreMapperService,
     protected readonly validationService: ValidationService,
+    protected readonly specimenSearchService: SpecimenSearchService
   ) {
     super(
       lajiStoreService,
@@ -57,5 +62,15 @@ export class SpecimenController extends LajiStoreController<Document> {
   @Get('range/:range')
   async getRange(@Param('range') range: string) {
     return await lastValueFrom(this.oldKotkaApiService.getRange(range));
+  }
+
+  @Get('autocomplete')
+  async getAutocomplete(@Query('field') field?: string = 'unit', @Query('q') query: string, @Query('limit') limit?: number = 10) {
+    return await this.specimenSearchService.getAutocompleteSuggestions(field, query, limit);
+  }
+
+  @Post('esSearch')
+  async esSearch(@Body() body: any) {
+    return await this.specimenSearchService.getSearchResults(body.type, body.query, body.limit, body.page, body.sort, body.fields);
   }
 }

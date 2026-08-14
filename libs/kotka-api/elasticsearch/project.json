@@ -1,0 +1,19 @@
+{
+  "name": "elasticsearch",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/kotka-api/elasticsearch/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/kotka-api/elasticsearch"],
+      "options": {
+        "jestConfig": "libs/kotka-api/elasticsearch/jest.config.ts"
+      }
+    }
+  }
+}
