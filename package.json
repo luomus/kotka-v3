@@ -37,7 +37,7 @@
     "@fortawesome/fontawesome-free": "^6.7.2",
     "@keyv/redis": "^5.1.6",
     "@luomus/label-designer": "^19.0.0",
-    "@luomus/laji-form": "^15.1.120",
+    "@luomus/laji-form": "^15.1.125",
     "@luomus/laji-schema": "^2.0.164",
     "@luomus/laji-validate": "0.0.132",
     "@nestjs/axios": "^4.0.0",
