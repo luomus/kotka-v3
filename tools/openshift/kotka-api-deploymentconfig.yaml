@@ -77,6 +77,11 @@ spec:
                 secretKeyRef:
                   name: kotka-secret
                   key: TRIPLESTORE_AUTH
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: kotka-config
+                  key: REDIS_HOST
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
