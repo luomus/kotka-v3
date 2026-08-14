@@ -11,7 +11,7 @@
       "options": {
         "webpackConfig": "apps/kotka-cli/webpack.config.js",
         "outputPath": "dist/apps/kotka-cli",
-        "main": "apps/kotka-cli/src/main.ts",
+        "main": "apps/kotka-cli/src/console.ts",
         "tsConfig": "apps/kotka-cli/tsconfig.app.json",
         "target": "node",
         "compiler": "tsc"
