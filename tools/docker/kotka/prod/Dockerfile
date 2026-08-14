@@ -66,7 +66,7 @@ USER node
 
 COPY --chown=node:node --from=builder /app/dist/apps/kotka-cli /app/package*.json ./
 
-RUN npm ci --only=production \
+RUN npm ci --ignore-scripts --only=production \
  && npm cache clean --force
 
 CMD [ "tail", "-f", "/dev/null"]
