@@ -16,7 +16,6 @@ import { CacheModule } from '@kotka/api/cache';
     ConsoleModule,
     ApiServicesModule,
   ],
-  controllers: [MigrateCommand, SequenceCommand ],
   providers: [MigrateCommand, SequenceCommand ]
 })
 export class KotkaCliModule {}
