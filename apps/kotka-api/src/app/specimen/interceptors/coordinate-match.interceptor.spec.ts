@@ -105,7 +105,6 @@ describe('CoordinateMatchInterceptor', () => {
       try {
         coordinateMatchInterceptor.intercept(mockContext, mockNext);
       } catch (e) {
-        console.log(e);
         expect(e.status).toEqual(422);
         expect(e.response.errorCode).toEqual('VALIDATION_EXCEPTION');
         expect(e.response.details).toEqual({'/gatherings/0': ['Missing expected coordinate data']});
