@@ -6,9 +6,12 @@ import { RouterLink } from '@angular/router';
 
 
 interface RendererExtraParams {
+  showEditLink?: boolean;
   editRouterLink?: string[];
+  getEditRouterQueryParams?: (data: any) => Record<string, string>;
   showViewLink?: boolean;
   viewRouterLink?: string[];
+  getViewRouterQueryParams?: (data: any) => Record<string, string>;
 }
 
 type RendererParams = ICellRendererParams & RendererExtraParams;
@@ -17,24 +20,22 @@ type RendererParams = ICellRendererParams & RendererExtraParams;
   selector: 'kui-uri-cell-renderer',
   template: `
     @if (id) {
-      <div class="uri-cell-layout">
-        <a
-          type="button"
-          class="btn btn-info edit-button"
-          [routerLink]="editRouterLink"
-          [queryParams]="{
-            uri: domain + id,
-          }"
-        >
-          <i class="fa fa-pen-to-square"></i>
-        </a>
+      <div class="uri-cell-layout" [class.has-edit-button]="showEditLink">
+        @if (showEditLink) {
+          <a
+            type="button"
+            class="btn btn-info edit-button"
+            [routerLink]="editRouterLink"
+            [queryParams]="editRouterQueryParams"
+          >
+            <i class="fa fa-pen-to-square"></i>
+          </a>
+        }
         @if (showViewLink) {
           <a
             class="view-link"
             [routerLink]="viewRouterLink"
-            [queryParams]="{
-              uri: domain + id,
-            }"
+            [queryParams]="viewRouterQueryParams"
           >
             <small class="domain-value">{{ domain }}</small>
             <span class="id-value" title="{{ id }}">{{ id }}</span>
@@ -50,12 +51,19 @@ type RendererParams = ICellRendererParams & RendererExtraParams;
     `
       .uri-cell-layout {
         display: inline-grid;
-        grid-template-columns: auto auto;
+        grid-template-columns: auto;
         grid-template-rows: auto auto;
+        grid-template-areas:
+          'domain'
+          'id';
+        column-gap: 2px;
+      }
+
+      .uri-cell-layout.has-edit-button {
+        grid-template-columns: auto auto;
         grid-template-areas:
           'button domain'
           'button id';
-        column-gap: 2px;
       }
 
       .uri-cell-layout .edit-button {
@@ -84,15 +92,16 @@ type RendererParams = ICellRendererParams & RendererExtraParams;
 export class URICellRendererComponent extends CellRendererComponent<RendererParams> {
   domain = '';
   id = '';
-  editRouterLink: string[]|string = 'edit';
+
+  showEditLink = true;
+  editRouterLink: string[] | string = 'edit';
+  editRouterQueryParams?: Record<string, string>;
+
   showViewLink = false;
-  viewRouterLink: string[]|string = '/view';
+  viewRouterLink: string[] | string = '/view';
+  viewRouterQueryParams?: Record<string, string>;
 
   override paramsChange() {
-    this.editRouterLink = this.params.editRouterLink || 'edit';
-    this.showViewLink = this.params.showViewLink || false;
-    this.viewRouterLink = this.params.viewRouterLink || '/view';
-
     if (!this.params.value) {
       this.domain = '';
       this.id = '';
@@ -100,8 +109,18 @@ export class URICellRendererComponent extends CellRendererComponent<RendererPara
     }
 
     const [domain, id] = getDomainAndIdWithoutPrefix(this.params.value);
+    const uri = domain + id;
+
     this.domain = domain;
     this.id = id;
+
+    this.showEditLink = this.params.showEditLink ?? true;
+    this.editRouterLink = this.params.editRouterLink || 'edit';
+    this.editRouterQueryParams = this.params.getEditRouterQueryParams ? this.params.getEditRouterQueryParams(this.params.data) : { uri };
+
+    this.showViewLink = this.params.showViewLink ?? false;
+    this.viewRouterLink = this.params.viewRouterLink || '/view';
+    this.viewRouterQueryParams = this.params.getViewRouterQueryParams ? this.params.getViewRouterQueryParams(this.params.data) : { uri };
   }
 
   static override getExportValue(value: string): string {

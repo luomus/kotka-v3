@@ -3,6 +3,7 @@ import { SpecimenFormComponent } from './specimen-form/specimen-form.component';
 import { ComponentCanDeactivateGuard, formMatcher } from '@kotka/ui/core';
 import { SpecimenTableComponent } from './specimen-table/specimen-table.component';
 import { SpecimenVersionHistoryComponent } from './specimen-version-history/specimen-version-history.component';
+import { BranchSearchComponent } from './branch-search/branch-search.component';
 import { NotFoundComponent } from '@kotka/ui/base';
 
 function specimenFormMatcher(segments: UrlSegment[]): UrlMatchResult|null {
@@ -29,37 +30,42 @@ export const specimensRoutes: Routes = [
       {
         path: 'search',
         pathMatch: 'full',
-        component: SpecimenTableComponent
+        component: SpecimenTableComponent,
+      },
+      {
+        path: 'search-branch',
+        pathMatch: 'full',
+        component: BranchSearchComponent,
       },
       {
         path: 'history',
         pathMatch: 'full',
-        component: SpecimenVersionHistoryComponent
+        component: SpecimenVersionHistoryComponent,
       },
       {
         path: '',
         pathMatch: 'full',
-        component: NotFoundComponent
-      }
-    ]
+        component: NotFoundComponent,
+      },
+    ],
   },
   {
     matcher: specimenFormMatcher,
     data: {
-      forceRouteRefresh: true
+      forceRouteRefresh: true,
     },
     children: [
       {
         matcher: formMatcher,
         component: SpecimenFormComponent,
-        canDeactivate: [ ComponentCanDeactivateGuard ],
+        canDeactivate: [ComponentCanDeactivateGuard],
         runGuardsAndResolvers: 'always',
       },
       {
         path: '**',
         pathMatch: 'full',
-        component: NotFoundComponent
-      }
-    ]
-  }
+        component: NotFoundComponent,
+      },
+    ],
+  },
 ];

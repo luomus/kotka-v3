@@ -19,7 +19,7 @@
               <ul class="dropdown-menu" ngbDropdownMenu role="menu" aria-labelledby="specimens-menu">
                 <li><a class="dropdown-item" routerLink="/specimens/search">Search specimens</a></li>
                 <li><a class="dropdown-item" [href]="'/specimens/search-sample' | oldKotkaUrl">Search preparations/samples</a></li>
-                <li><a class="dropdown-item" [href]="'/specimens/search-branch' | oldKotkaUrl">Search branches</a></li>
+                <li><a class="dropdown-item" routerLink="/specimens/search-branch">Search branches</a></li>
                 <li><a class="dropdown-item" [href]="'/culture' | oldKotkaUrl">Search cultures</a></li>
                 <li role="presentation" class="dropdown-divider"></li>
                 <li><a class="dropdown-item" routerLink="/botany/specimens/add" data-cy="botany-specimens-add"><i class="fa fa-plus"></i> Add botanical</a></li>
