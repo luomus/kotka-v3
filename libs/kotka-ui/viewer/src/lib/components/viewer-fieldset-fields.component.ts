@@ -9,7 +9,7 @@ import {
 import {
   DifferenceObject,
   isPatch,
-  MediaTypes,
+  MediaType,
   Patch,
 } from '@kotka/shared/models';
 import { ViewerFieldsetFieldComponent } from './viewer-fieldset-field.component';
@@ -91,7 +91,7 @@ export class ViewerFieldsetFieldsComponent {
     toObservable(this.vm).pipe(
       switchMap((vm) =>
         vm.imageIds?.length
-          ? this.apiClient.getMediaByIds(MediaTypes.images, vm.imageIds)
+          ? this.apiClient.getMediaByIds(MediaType.images, vm.imageIds)
           : of([]),
       ),
     ),

@@ -3,7 +3,7 @@ https://docs.nestjs.com/interceptors#interceptors
 */
 
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, UnsupportedMediaTypeException, PayloadTooLargeException, UnprocessableEntityException } from '@nestjs/common';
-import { MediaTypes } from '@kotka/shared/models';
+import { MediaType } from '@kotka/shared/models';
 import { Observable } from 'rxjs';
 
 @Injectable()
@@ -28,7 +28,7 @@ export class MediaTypeSizeValidatorInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = context.switchToHttp().getRequest();
 
-    const type: MediaTypes = req.params['type'];
+    const type: MediaType = req.params['type'];
     const file: Express.Multer.File = req.file;
 
     if (type !== 'pdf' && type !== 'images') {

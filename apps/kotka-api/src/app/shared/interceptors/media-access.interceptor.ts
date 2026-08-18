@@ -10,7 +10,7 @@ import {
   Person,
   Document,
   KotkaObjectFullType,
-  MediaTypes,
+  MediaType,
 } from '@kotka/shared/models';
 import { MediaApiService, LajiStoreService } from '@kotka/api/services';
 import { getId } from '@kotka/shared/utils';
@@ -30,7 +30,7 @@ export class MediaAccessInterceptor implements NestInterceptor {
       throw new HttpException('Missing user data', HttpStatus.FORBIDDEN);
     }
 
-    const type: MediaTypes = req.params['type'];
+    const type: MediaType = req.params['type'];
 
     if (!type) {
       throw new HttpException('Missing type parameter', HttpStatus.BAD_REQUEST);
@@ -70,25 +70,25 @@ export class MediaAccessInterceptor implements NestInterceptor {
     return next.handle();
   }
 
-  canGetMedia(type: MediaTypes, profile: Person, data: Pdf | Image) {
+  canGetMedia(type: MediaType, profile: Person, data: Pdf | Image) {
     if (this.canAccessByAdmin(profile)) return;
-    if (type === MediaTypes.images) return;
-    if (type === MediaTypes.pdf && profile.organisation?.includes(data.intellectualOwner)) return;
+    if (type === MediaType.images) return;
+    if (type === MediaType.pdf && profile.organisation?.includes(data.intellectualOwner)) return;
 
     throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 
-  async canDeleteMedia(type: MediaTypes, id: string, profile: Person) {
+  async canDeleteMedia(type: MediaType, id: string, profile: Person) {
     if (this.canAccessByAdmin(profile)) return;
 
-    if (type === MediaTypes.images && profile.roleKotka === 'MA.advanced') {
+    if (type === MediaType.images && profile.roleKotka === 'MA.advanced') {
       const meta = await this.getOldMetadata(type, id);
       const ids = meta.documentURI!.map(uri => getId(uri));
 
       return await this.canAccessAllDocumentsOrganization(profile, ids);
     }
 
-    if (type === MediaTypes.pdf) {
+    if (type === MediaType.pdf) {
       const meta = await this.getOldMetadata(type, id);
 
       if (this.canAccessByOrganization(profile, meta.intellectualOwner)) return;
@@ -97,13 +97,13 @@ export class MediaAccessInterceptor implements NestInterceptor {
     throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 
-  async canEditMedia(type: MediaTypes, id: string, newMeta: Pdf | Image, profile: Person) {
+  async canEditMedia(type: MediaType, id: string, newMeta: Pdf | Image, profile: Person) {
     if (this.canAccessByAdmin(profile)) return;
 
     const oldMeta = await this.getOldMetadata(type, id);
 
-    if (type === MediaTypes.pdf && this.canAccessByOrganization(profile, oldMeta.intellectualOwner)) { return; }
-    else if (type === MediaTypes.images) {
+    if (type === MediaType.pdf && this.canAccessByOrganization(profile, oldMeta.intellectualOwner)) { return; }
+    else if (type === MediaType.images) {
       const { all, removed, added } = this.getDiffOfSpecimenIDs((oldMeta as Image).documentURI?.map(uri => getId(uri)), (newMeta as Image).documentURI?.map(uri => getId(uri)));
 
       let docs: Partial<Document>[];
@@ -137,10 +137,10 @@ export class MediaAccessInterceptor implements NestInterceptor {
     }
   }
 
-  async canPostMedia(type: MediaTypes, profile: Person, meta: Image | Pdf) {
-    if (type === MediaTypes.pdf && (this.canAccessByAdmin(profile) || this.canAccessByOrganization(profile, meta.intellectualOwner))) { return; }
-    if (type === MediaTypes.images && this.canAccessByAdmin(profile)) { return; }
-    else if (type === MediaTypes.images) {
+  async canPostMedia(type: MediaType, profile: Person, meta: Image | Pdf) {
+    if (type === MediaType.pdf && (this.canAccessByAdmin(profile) || this.canAccessByOrganization(profile, meta.intellectualOwner))) { return; }
+    if (type === MediaType.images && this.canAccessByAdmin(profile)) { return; }
+    else if (type === MediaType.images) {
       const ids = meta.documentURI?.map(id => getId(id));
 
       return await this.canAccessAllDocumentsOrganization(profile, ids);
@@ -182,7 +182,7 @@ export class MediaAccessInterceptor implements NestInterceptor {
     }
   }
 
-  async getOldMetadata(type: MediaTypes, id: string): Promise<Pdf | Image> {
+  async getOldMetadata(type: MediaType, id: string): Promise<Pdf | Image> {
     const meta = await lastValueFrom(this.mediaApiService.getMedia(id, type).pipe(map(data => this.mediaApiService.metaToType(type, data))));
 
     if (!meta) {

@@ -28,15 +28,17 @@ export interface StoreQueryResult<T> {
   member: T[]
 }
 
-export enum MediaTypes {
+export enum MediaType {
   pdf = 'pdf',
   images = 'images'
 }
 
-export interface MediaMap {
-  [MediaTypes.pdf]: Pdf;
-  [MediaTypes.images]: Image;
+interface MediaMap {
+  [MediaType.pdf]: Pdf;
+  [MediaType.images]: Image;
 }
+
+export type Media<T extends MediaType = MediaType> = MediaMap[T];
 
 export interface ApiValidationError {
   errorCode: 'VALIDATION_EXCEPTION';

@@ -12,8 +12,8 @@ import {
   Person,
   StorePatch,
   StoreVersion,
-  MediaTypes,
-  MediaMap,
+  MediaType,
+  Media,
 } from '@kotka/shared/models';
 import { Observable, of, switchMap, forkJoin } from 'rxjs';
 import { apiBase, lajiApiBase} from './constants';
@@ -275,17 +275,17 @@ export class ApiClient {
     return this.httpClient.get<Person>(`${lajiApiPath}person/by-id/${id}`);
   }
 
-  getMedia<T extends MediaTypes>(
+  getMedia<T extends MediaType>(
     type: T,
     id: string,
-  ): Observable<MediaMap[T]> {
-    return this.httpClient.get<MediaMap[T]>(`${path}media/${type}/${id}`);
+  ): Observable<Media<T>> {
+    return this.httpClient.get<Media<T>>(`${path}media/${type}/${id}`);
   }
 
-  getMediaByIds<T extends MediaTypes>(
+  getMediaByIds<T extends MediaType>(
     type: T,
     ids: string[],
-  ): Observable<MediaMap[T][]> {
+  ): Observable<Media<T>[]> {
     if (!ids.length) return of([]);
     return forkJoin(ids.map((id) => this.getMedia<T>(type, id)));
   }

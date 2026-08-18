@@ -8,7 +8,7 @@ import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nes
 import { Reflector } from '@nestjs/core';
 import { Observable, of } from 'rxjs';
 import { catchError, map, mergeMap, retry } from 'rxjs/operators';
-import { MediaTypes } from '@kotka/shared/models';
+import { MediaType } from '@kotka/shared/models';
 
 const endpointTypes = ['pdf', 'image'] as const;
 type MediaTarget = {[key in KeyOfUnion<StoreObject>]: 'pdf' | 'image'};
@@ -60,7 +60,7 @@ export class MediaIntellectualOwnerInterceptor implements NestInterceptor {
       const medias: string[] = mediaIDs[key];
 
       medias.forEach(image => {
-        this.mediaApiService.getMedia(image, key as MediaTypes).pipe(
+        this.mediaApiService.getMedia(image, key as MediaType).pipe(
           mergeMap(media => {
             const meta = media.meta;
 
@@ -70,7 +70,7 @@ export class MediaIntellectualOwnerInterceptor implements NestInterceptor {
 
             meta.rightsOwner = owner;
 
-            return this.mediaApiService.putMetadata(image, key as MediaTypes, meta);
+            return this.mediaApiService.putMetadata(image, key as MediaType, meta);
           }),
           retry({ count: 5, delay: 10000, resetOnSuccess: true }),
           catchError(err => {

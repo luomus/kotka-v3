@@ -1,14 +1,16 @@
 <kui-main-content pageTitle="Branch search" containerClass="container-fluid">
-  <kui-document-datatable
-    style="height: calc(100vh - 255px)"
-    [dataType]="dataType"
-    [columns]="columns"
-    [enableFileExport]="true"
-    [enableColumnSelection]="true"
-    [extraSortModel]="[{
+  @if (columns$ | async; as columns) {
+    <kui-document-datatable
+      style="height: calc(100vh - 255px)"
+      [dataType]="dataType"
+      [columns]="columns"
+      [enableFileExport]="true"
+      [enableColumnSelection]="true"
+      [extraSortModel]="[{
       colId: 'id',
       sort:  'desc'
     }]"
-  >
-  </kui-document-datatable>
+    >
+    </kui-document-datatable>
+  }
 </kui-main-content>

@@ -8,7 +8,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import FormData from 'form-data';
 import { merge } from 'lodash';
 import { catchError, map } from 'rxjs';
-import { Person, Image, Pdf, MediaTypes } from '@kotka/shared/models';
+import { Person, Image, Pdf, MediaType } from '@kotka/shared/models';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Multer } from 'multer';
 import { Request, Response } from 'express';
@@ -92,7 +92,7 @@ export class MediaApiService {
   private urlBase = process.env['MEDIA_API_URL'];
   private baseConfig = { headers: { Authorization: 'Basic ' + process.env['MEDIA_API_AUTH'] }};
 
-  postMediaStreaming(type: MediaTypes, req: Request, res: Response) {
+  postMediaStreaming(type: MediaType, req: Request, res: Response) {
     const proxy = https.request(`${this.urlBase}api/fileUpload`, merge({
       method: 'post',
       params: {
@@ -113,7 +113,7 @@ export class MediaApiService {
     req.pipe(proxy);
   }
 
-  postMedia(type: MediaTypes, file: Express.Multer.File) {
+  postMedia(type: MediaType, file: Express.Multer.File) {
     const formData = new FormData();
 
     formData.append(file.originalname, file.buffer, file.originalname);
@@ -135,7 +135,7 @@ export class MediaApiService {
     );
   }
 
-  getMedia(id: string, type: MediaTypes) {
+  getMedia(id: string, type: MediaType) {
     return this.httpService.get<Media>(`${this.urlBase}api/${type}/${id}`, this.baseConfig).pipe(
       map(res => res.data),
       catchError(e => {
@@ -145,7 +145,7 @@ export class MediaApiService {
     );
   }
 
-  findMediaByDocumentId(id: string, type: MediaTypes) {
+  findMediaByDocumentId(id: string, type: MediaType) {
     return this.httpService.get<Media[]>(`${this.urlBase}api/${type}`, {...this.baseConfig, params: { documentIds: id }}).pipe(
       map(res => res.data),
       catchError(e => {
@@ -155,7 +155,7 @@ export class MediaApiService {
     );
   }
 
-  deleteMedia(id: string, type: MediaTypes) {
+  deleteMedia(id: string, type: MediaType) {
     return this.httpService.delete(`${this.urlBase}api/${type}/${id}`, this.baseConfig).pipe(
       map(res => res.data),
       catchError(e => {
@@ -165,7 +165,7 @@ export class MediaApiService {
     );
   }
 
-  postMetadata(type: MediaTypes, meta: NewMediaFile[]) {
+  postMetadata(type: MediaType, meta: NewMediaFile[]) {
     return this.httpService.post<Media[]>(`${this.urlBase}api/${type}`, meta, this.baseConfig).pipe(
       map(res => res.data),
       catchError(e => {
@@ -175,7 +175,7 @@ export class MediaApiService {
     );
   }
 
-  putMetadata(id: string, type: MediaTypes, meta: Meta) {
+  putMetadata(id: string, type: MediaType, meta: Meta) {
     return this.httpService.put<Media>(`${this.urlBase}api/${type}/${id}`, meta, this.baseConfig).pipe(
       catchError(e => {
         console.error(e);
@@ -184,7 +184,7 @@ export class MediaApiService {
     );
   }
 
-  typeToMeta(type: MediaTypes, profile: Person, media: Image | Pdf): Meta {
+  typeToMeta(type: MediaType, profile: Person, media: Image | Pdf): Meta {
     switch (type) {
       case 'pdf':
         return this.pdfToMeta(profile, media as Pdf);
@@ -224,7 +224,7 @@ export class MediaApiService {
     };
   }
 
-  metaToType(type: MediaTypes, media: Media) {
+  metaToType(type: MediaType, media: Media) {
     switch (type) {
       case 'pdf':
         return this.metaToPDF(media);

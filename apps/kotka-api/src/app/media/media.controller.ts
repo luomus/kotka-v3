@@ -8,7 +8,7 @@ import { MediaApiService, NewMediaFile } from '@kotka/api/services';
 import { map } from 'rxjs';
 import { Image, Pdf } from '@luomus/laji-schema';
 import { MediaAccessInterceptor } from '../shared/interceptors/media-access.interceptor';
-import { ErrorMessages, MediaTypes } from '@kotka/shared/models';
+import { ErrorMessages, MediaType } from '@kotka/shared/models';
 
 @Controller('media')
 @UseGuards(AuthenticateCookieGuard)
@@ -19,13 +19,13 @@ export class MediaController {
 
   @UseInterceptors(MediaAccessInterceptor)
   @Post(':type')
-  postMedia(@Param('type') type: MediaTypes, @Req() req, @Res() res) {
+  postMedia(@Param('type') type: MediaType, @Req() req, @Res() res) {
     return this.mediaService.postMediaStreaming(type, req, res);
   }
 
   @UseInterceptors(MediaAccessInterceptor)
   @Post(':type/:tempId')
-  postMetadata(@Req() request, @Param('type') type: MediaTypes, @Param('tempId') tempId: string, @Body() body: Image | Pdf) {
+  postMetadata(@Req() request, @Param('type') type: MediaType, @Param('tempId') tempId: string, @Body() body: Image | Pdf) {
     if (!body.intellectualOwner) {
       throw new BadRequestException(ErrorMessages.missingIntellectualOwner);
     }
@@ -44,21 +44,21 @@ export class MediaController {
 
   @UseInterceptors(MediaAccessInterceptor)
   @Get(':type/:id')
-  getMedia(@Param('type') type: MediaTypes, @Param('id') id: string) {
+  getMedia(@Param('type') type: MediaType, @Param('id') id: string) {
     return this.mediaService.getMedia(id, type).pipe(map(data => this.mediaService.metaToType(type, data)));
   }
 
   @UseInterceptors(MediaAccessInterceptor)
   @Delete(':type/:id')
   @HttpCode(204)
-  deleteMedia(@Param('type') type: MediaTypes, @Param('id') id: string) {
+  deleteMedia(@Param('type') type: MediaType, @Param('id') id: string) {
     return this.mediaService.deleteMedia(id, type);
   }
 
   @UseInterceptors(MediaAccessInterceptor)
   @Put(':type/:id')
   @HttpCode(200)
-  putMedia(@Req() request, @Param('type') type: MediaTypes, @Param('id') id: string, @Body() body: Image | Pdf) {
+  putMedia(@Req() request, @Param('type') type: MediaType, @Param('id') id: string, @Body() body: Image | Pdf) {
     if (!body.intellectualOwner) {
       throw new BadRequestException(ErrorMessages.missingIntellectualOwner);
     }
