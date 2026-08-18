@@ -9,7 +9,6 @@ import { cloneDeep } from 'lodash';
 export class DatatableSettingsStoreService {
   private storage = inject(LocalStorageService);
 
-
   getStoredColumnSettings(settingsKey: string|undefined, defaultSettings: ColumnSettings): ColumnSettings|undefined {
     if (settingsKey) {
       const settings = this.storage.retrieve(settingsKey + '-columns');

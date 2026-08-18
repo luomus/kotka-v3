@@ -8,7 +8,7 @@ import { ActivatedRoute } from '@angular/router';
 import { catchError, map, shareReplay, startWith, switchMap } from 'rxjs/operators';
 import { AsyncPipe } from '@angular/common';
 import { NotFoundComponent } from '@kotka/ui/base';
-import { Document, KotkaRootDocumentType, SpecimenDataType } from '@kotka/shared/models';
+import { Document, KotkaDocumentType, SpecimenDataType } from '@kotka/shared/models';
 import { combineLatest, Observable, of, Subject } from 'rxjs';
 import {
   ApiClient,
@@ -79,10 +79,10 @@ export class AccessionComponent
   constructor() {
     super();
 
-    const accession$: Observable<DocumentDataResult<KotkaRootDocumentType.specimen>> = this.uri$.pipe(
+    const accession$: Observable<DocumentDataResult<KotkaDocumentType.specimen>> = this.uri$.pipe(
       switchMap((uri) =>
         this.documentDataService
-          .getDocumentData(KotkaRootDocumentType.specimen, uri)
+          .getDocumentData(KotkaDocumentType.specimen, uri)
           .pipe(
             map((data) => {
               const accession: SpecimenDataType = 'accession';
@@ -107,7 +107,7 @@ export class AccessionComponent
       switchMap(([uri]) =>
         this.apiClient
           .getAllDocuments(
-            KotkaRootDocumentType.branch,
+            KotkaDocumentType.branch,
             1000,
             undefined,
             `accessionID:${getId(uri)}`,
@@ -185,13 +185,13 @@ export class AccessionComponent
           throw new Error('Branch is missing an id');
         }
         return this.apiClient.updateDocument(
-          KotkaRootDocumentType.branch,
+          KotkaDocumentType.branch,
           data.id,
           data,
         );
       } else {
         return this.apiClient.createDocument(
-          KotkaRootDocumentType.branch,
+          KotkaDocumentType.branch,
           data,
         );
       }

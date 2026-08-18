@@ -6,14 +6,13 @@ import {
 } from 'rxjs';
 import { FormViewComponent } from '../form-view/form-view.component';
 import { ActivatedRoute, Router } from '@angular/router';
-import { KotkaRootDocumentMap, KotkaMainDocumentType } from '@kotka/shared/models';
+import { KotkaDocument, KotkaMainDocumentType } from '@kotka/shared/models';
 import { getUri } from '@kotka/shared/utils';
 import { WithLeaveConfirmComponent } from '@kotka/ui/components';
 
 @Directive()
 export class FormViewContainerComponent<
     T extends KotkaMainDocumentType = KotkaMainDocumentType,
-    S extends KotkaRootDocumentMap[T] = KotkaRootDocumentMap[T],
   >
   extends WithLeaveConfirmComponent
   implements OnDestroy
@@ -21,10 +20,10 @@ export class FormViewContainerComponent<
   editMode = signal(false);
   dataURI = signal<string | undefined>(undefined);
 
-  copyData = signal<Partial<S> | undefined>(undefined);
+  copyData = signal<Partial<KotkaDocument<T>> | undefined>(undefined);
 
-  @ViewChild(FormViewComponent<T, S>, { static: true })
-  formViewComponent!: FormViewComponent<T, S>;
+  @ViewChild(FormViewComponent<T>, { static: true })
+  formViewComponent!: FormViewComponent<T>;
 
   private routeParamUpdateSub: Subscription;
 
@@ -50,7 +49,7 @@ export class FormViewContainerComponent<
     return this.formViewComponent.getFormHasChanges();
   }
 
-  onSaveSuccess(formData: S) {
+  onSaveSuccess(formData: KotkaDocument<T>) {
     this.router.navigate(['..', 'edit'], {
       relativeTo: this.activeRoute,
       queryParams: { uri: getUri(formData.id || '') },
@@ -61,7 +60,7 @@ export class FormViewContainerComponent<
     this.router.navigate(['..'], { relativeTo: this.activeRoute });
   }
 
-  onCopyData(formData: Partial<S>): void {
+  onCopyData(formData: Partial<KotkaDocument<T>>): void {
     from(
       this.router.navigate(['..', 'add'], {
         relativeTo: this.activeRoute,

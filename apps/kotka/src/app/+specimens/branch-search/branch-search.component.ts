@@ -7,7 +7,7 @@ import {
   DatatableColumn,
   DocumentDatatableComponent,
 } from '@kotka/ui/datatable';
-import { KotkaRootDocumentType } from '@kotka/shared/models';
+import { KotkaDocumentType } from '@kotka/shared/models';
 import { MainContentComponent } from '@kotka/ui/components';
 import { FormsModule } from '@angular/forms';
 import { getUri } from '@kotka/shared/utils';
@@ -21,7 +21,7 @@ import { Branch } from '@luomus/laji-schema';
   imports: [MainContentComponent, FormsModule, DocumentDatatableComponent],
 })
 export class BranchSearchComponent {
-  dataType: KotkaRootDocumentType.branch = KotkaRootDocumentType.branch;
+  dataType: KotkaDocumentType.branch = KotkaDocumentType.branch;
 
   columns: DatatableColumn[] = [
     {

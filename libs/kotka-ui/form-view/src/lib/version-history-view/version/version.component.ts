@@ -9,7 +9,7 @@ import {
   LajiForm,
   StoreVersion,
   KotkaMainDocumentType,
-  KotkaRootDocumentMap,
+  KotkaDocument
 } from '@kotka/shared/models';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { SpinnerComponent } from '@kotka/ui/components';
@@ -17,7 +17,6 @@ import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 import { MetaFieldsComponent } from '../../meta-fields/meta-fields.component';
 import { RouterLink } from '@angular/router';
 import { DataTypeNamePipePipe } from '@kotka/ui/core';
-
 
 @Component({
   selector: 'kotka-version',
@@ -34,8 +33,7 @@ import { DataTypeNamePipePipe } from '@kotka/ui/core';
   ],
 })
 export class VersionComponent<
-  T extends KotkaMainDocumentType = KotkaMainDocumentType,
-  S extends KotkaRootDocumentMap[T] = KotkaRootDocumentMap[T],
+  T extends KotkaMainDocumentType = KotkaMainDocumentType
 > implements OnChanges
 {
   @Input() dataType?: T;
@@ -44,14 +42,14 @@ export class VersionComponent<
   @Input() versionList?: StoreVersion[];
 
   @Input() form?: LajiForm.SchemaForm;
-  @Input() data?: S;
+  @Input() data?: KotkaDocument<T>;
 
   previousVersion?: number;
   nextVersion?: number;
 
   @Output() formInit = new EventEmitter<{
     lajiForm: LajiFormComponent;
-    formData: S;
+    formData: KotkaDocument<T>;
   }>();
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
@@ -71,7 +69,7 @@ export class VersionComponent<
     }
   }
 
-  onFormReady(formData: S) {
+  onFormReady(formData: KotkaDocument<T>) {
     if (this.lajiForm) {
       this.formInit.emit({ lajiForm: this.lajiForm, formData });
     }

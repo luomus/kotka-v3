@@ -2,7 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
 } from '@angular/core';
-import { KotkaRootDocumentType } from '@kotka/shared/models';
+import { KotkaDocumentType } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
 import {
   VersionHistoryViewComponent
@@ -22,5 +22,5 @@ import {
 })
 export class DatasetVersionHistoryComponent {
   formId = globals.datasetFormId;
-  dataType: KotkaRootDocumentType.dataset = KotkaRootDocumentType.dataset;
+  dataType: KotkaDocumentType.dataset = KotkaDocumentType.dataset;
 }

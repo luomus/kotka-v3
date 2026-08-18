@@ -10,12 +10,12 @@ import {
   AutocompleteComponent,
   FetchAutocompleteResultsFunc,
 } from '@kotka/ui/components';
-import { KotkaRootDocumentType } from '@kotka/shared/models';
+import { KotkaDocumentType } from '@kotka/shared/models';
 
 interface FilterExtraParams {
   type:
-    | KotkaRootDocumentType.dataset
-    | KotkaRootDocumentType.organization
+    | KotkaDocumentType.dataset
+    | KotkaDocumentType.organization
     | 'collection';
 }
 

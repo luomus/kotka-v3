@@ -20,7 +20,7 @@ import {
   DocumentDatatableComponent,
 } from '@kotka/ui/datatable';
 import { FormService } from '@kotka/ui/core';
-import { KotkaRootDocumentType, LajiForm } from '@kotka/shared/models';
+import { KotkaDocumentType, LajiForm } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
 import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
 
@@ -37,7 +37,7 @@ import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
 ],
 })
 export class TransactionTableComponent {
-  dataType = KotkaRootDocumentType.transaction;
+  dataType = KotkaDocumentType.transaction;
 
   columns?: DatatableColumn[];
 

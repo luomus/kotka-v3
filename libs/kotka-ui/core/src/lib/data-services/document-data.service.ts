@@ -2,17 +2,16 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, map, startWith } from 'rxjs/operators';
 import {
-  KotkaRootDocumentType,
-  KotkaRootDocumentMap,
-  SpecimenDataType,
-  KotkaRootDocument,
+  KotkaDocumentType,
+  KotkaDocument,
+  SpecimenDataType
 } from '@kotka/shared/models';
 import { ApiClient } from './api-client';
 import { getId } from '@kotka/shared/utils';
 import { isDocument } from '@luomus/laji-schema';
 
-export interface DocumentDataResult<T extends KotkaRootDocumentType = KotkaRootDocumentType> {
-  value?: KotkaRootDocumentMap[T];
+export interface DocumentDataResult<T extends KotkaDocumentType = KotkaDocumentType> {
+  value?: KotkaDocument<T>;
   title?: string;
   loading: boolean;
   error?: string;
@@ -22,7 +21,7 @@ export interface DocumentDataResult<T extends KotkaRootDocumentType = KotkaRootD
 export class DocumentDataService {
   private apiClient = inject(ApiClient);
 
-  getDocumentData<T extends KotkaRootDocumentType>(
+  getDocumentData<T extends KotkaDocumentType>(
     type: T,
     uri: string,
   ): Observable<DocumentDataResult<T>> {
@@ -54,7 +53,7 @@ export class DocumentDataService {
 
   private getTitle(
     uri: string,
-    document?: KotkaRootDocument
+    document?: KotkaDocument
   ) {
     if (isDocument(document)) {
       const dataType: SpecimenDataType | string | undefined = document.datatype;

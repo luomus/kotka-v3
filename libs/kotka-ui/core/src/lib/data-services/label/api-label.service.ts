@@ -14,8 +14,8 @@ import { UserService } from '../user.service';
 import { ApiClient } from '../api-client';
 import { Collection } from '@luomus/laji-schema/models';
 import {
-  KotkaRootDocument,
-  KotkaRootDocumentType,
+  KotkaDocument,
+  KotkaDocumentType,
 } from '@kotka/shared/models';
 import { JSONPath } from 'jsonpath-plus';
 import { getIdWithoutPrefix } from '@kotka/shared/utils';
@@ -190,7 +190,7 @@ export class ApiLabelService {
       );
     } else if (type === 'organization') {
       observable = this.apiCient
-        .getDocumentById(KotkaRootDocumentType.organization, key)
+        .getDocumentById(KotkaDocumentType.organization, key)
         .pipe(map((organization) => organization.fullName?.en || key));
     } else if (type === 'collection') {
       observable = this.apiCient
@@ -198,7 +198,7 @@ export class ApiLabelService {
         .pipe(map((collection) => collection.collectionName.en || key));
     } else {
       observable = this.apiCient
-        .getDocumentById(KotkaRootDocumentType.dataset, key)
+        .getDocumentById(KotkaDocumentType.dataset, key)
         .pipe(map((dataset) => dataset.datasetName.en || key));
     }
 
@@ -213,7 +213,7 @@ export class ApiLabelService {
       throw new Error('The method is missing an implementation for persons!');
     } else if (type === 'organization') {
       return this.fetchKotkaDocumentLabels(
-        KotkaRootDocumentType.organization,
+        KotkaDocumentType.organization,
         keys,
         'fullName.en',
       );
@@ -228,7 +228,7 @@ export class ApiLabelService {
       );
     } else {
       return this.fetchKotkaDocumentLabels(
-        KotkaRootDocumentType.dataset,
+        KotkaDocumentType.dataset,
         keys,
         'datasetName.en',
       );
@@ -236,7 +236,7 @@ export class ApiLabelService {
   }
 
   private fetchKotkaDocumentLabels(
-    type: KotkaRootDocumentType,
+    type: KotkaDocumentType,
     keys: string[],
     labelField: string,
   ): Observable<{ key: string; value: string }[]> {
@@ -244,7 +244,7 @@ export class ApiLabelService {
 
     return this.apiCient.getDocumentsById(type, keys, ['id', labelField]).pipe(
       map((docs) =>
-        docs.map((doc: Partial<KotkaRootDocument>) => ({
+        docs.map((doc: Partial<KotkaDocument>) => ({
           key: doc.id!,
           value:
             JSONPath({ path: labelField, json: doc, wrap: false }) || doc.id!,

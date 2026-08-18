@@ -2,9 +2,8 @@ import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import {
   Area,
-  KotkaRootDocument,
-  KotkaRootDocumentType,
-  KotkaRootDocumentMap,
+  KotkaDocument,
+  KotkaDocumentType,
   KotkaVersionDifference,
   KotkaVersionDifferenceObject,
   LajiForm,
@@ -33,7 +32,7 @@ const path = apiBase + '/';
 const authPath = apiBase + '/auth/';
 const lajiApiPath = lajiApiBase + '/';
 
-export interface DocumentListSearchParams<T extends KotkaRootDocumentType = KotkaRootDocumentType> {
+export interface DocumentListSearchParams<T extends KotkaDocumentType = KotkaDocumentType> {
   type: T,
   page?: number,
   pageSize?: number,
@@ -49,36 +48,41 @@ export interface DocumentListSearchParams<T extends KotkaRootDocumentType = Kotk
 export class ApiClient {
   private httpClient = inject(HttpClient);
 
-  getDocumentById<
-    T extends KotkaRootDocumentType,
-    S extends KotkaRootDocumentMap[T],
-  >(type: T, id: string): Observable<S> {
-    return this.httpClient.get<S>(path + type + '/' + id);
+  getDocumentById<T extends KotkaDocumentType>(
+    type: T,
+    id: string,
+  ): Observable<KotkaDocument<T>> {
+    return this.httpClient.get<KotkaDocument<T>>(path + type + '/' + id);
   }
 
-  createDocument<
-    T extends KotkaRootDocumentType,
-    S extends KotkaRootDocumentMap[T],
-  >(type: T, data: S): Observable<S> {
-    return this.httpClient.post<S>(path + type, data);
+  createDocument<T extends KotkaDocumentType>(
+    type: T,
+    data: KotkaDocument<T>,
+  ): Observable<KotkaDocument<T>> {
+    return this.httpClient.post<KotkaDocument<T>>(path + type, data);
   }
 
-  updateDocument<
-    T extends KotkaRootDocumentType,
-    S extends KotkaRootDocumentMap[T],
-  >(type: T, id: string, data: S): Observable<S> {
-    return this.httpClient.put<S>(path + type + '/' + id, data);
+  updateDocument<T extends KotkaDocumentType>(
+    type: T,
+    id: string,
+    data: KotkaDocument<T>,
+  ): Observable<KotkaDocument<T>> {
+    return this.httpClient.put<KotkaDocument<T>>(
+      path + type + '/' + id,
+      data,
+    );
   }
 
-  deleteDocument(type: KotkaRootDocumentType, id: string): Observable<null> {
+  deleteDocument(type: KotkaDocumentType, id: string): Observable<null> {
     return this.httpClient.delete<null>(path + type + '/' + id);
   }
 
   getDocumentList<
-    T extends KotkaRootDocumentType,
-    S extends KotkaRootDocumentMap[T],
+    T extends KotkaDocumentType,
     X extends string[] | undefined = undefined,
-    Y extends X extends string[] ? Partial<S> : S = S,
+    Y extends X extends string[]
+      ? Partial<KotkaDocument<T>>
+      : KotkaDocument<T> = KotkaDocument<T>,
   >(
     type: T,
     page = 1,
@@ -110,10 +114,11 @@ export class ApiClient {
   }
 
   getDocumentsById<
-    T extends KotkaRootDocumentType,
-    S extends KotkaRootDocumentMap[T],
+    T extends KotkaDocumentType,
     X extends string[] | undefined = undefined,
-    Y extends X extends string[] ? Partial<S> : S = S,
+    Y extends X extends string[]
+      ? Partial<KotkaDocument<T>>
+      : KotkaDocument<T> = KotkaDocument<T>,
   >(
     type: T,
     ids: string[],
@@ -134,7 +139,7 @@ export class ApiClient {
       },
     };
 
-    return this.getDocumentList<T, S, X, Y>(
+    return this.getDocumentList<T, X, Y>(
       type,
       1,
       idsPart.length,
@@ -161,10 +166,11 @@ export class ApiClient {
   }
 
   getAllDocuments<
-    T extends KotkaRootDocumentType,
-    S extends KotkaRootDocumentMap[T],
+    T extends KotkaDocumentType,
     X extends string[] | undefined = undefined,
-    Y extends X extends string[] ? Partial<S> : S = S,
+    Y extends X extends string[]
+      ? Partial<KotkaDocument<T>>
+      : KotkaDocument<T> = KotkaDocument<T>,
   >(
     type: T,
     pageSize = 100,
@@ -173,11 +179,20 @@ export class ApiClient {
     fields?: X,
     searchQueryObject?: ElasticsearchQuery,
   ): Observable<Y[]> {
-    return this.getAllDocumentsRecursively(type, 1, pageSize, [], sort, searchQueryString, fields, searchQueryObject);
+    return this.getAllDocumentsRecursively(
+      type,
+      1,
+      pageSize,
+      [],
+      sort,
+      searchQueryString,
+      fields,
+      searchQueryObject,
+    );
   }
 
   getDocumentVersionList(
-    type: KotkaRootDocumentType,
+    type: KotkaDocumentType,
     id: string,
   ): Observable<StoreVersion[]> {
     return this.httpClient.get<StoreVersion[]>(
@@ -185,33 +200,31 @@ export class ApiClient {
     );
   }
 
-  getDocumentVersionData<
-    T extends KotkaRootDocumentType,
-    S extends KotkaRootDocumentMap[T],
-  >(type: T, id: string, version: number): Observable<S> {
-    return this.httpClient.get<S>(path + type + '/' + id + '/_ver/' + version);
+  getDocumentVersionData<T extends KotkaDocumentType>(
+    type: T,
+    id: string,
+    version: number,
+  ): Observable<KotkaDocument<T>> {
+    return this.httpClient.get<KotkaDocument<T>>(
+      path + type + '/' + id + '/_ver/' + version,
+    );
   }
 
-  getDocumentVersionDifference<
-    T extends KotkaRootDocumentType,
-    S extends KotkaRootDocumentMap[T],
-  >(
+  getDocumentVersionDifference<T extends KotkaDocumentType>(
     type: T,
     id: string,
     version1: number,
     version2: number,
-  ): Observable<KotkaVersionDifferenceObject<S>> {
+  ): Observable<KotkaVersionDifferenceObject<KotkaDocument<T>>> {
     return this.httpClient
       .get<
-        KotkaVersionDifference<S>
+        KotkaVersionDifference<KotkaDocument<T>>
       >(path + type + '/' + id + '/_ver/' + version1 + '/diff/' + version2)
       .pipe(map((data) => this.convertVersionDifferenceFormat(data)));
   }
 
   getAutocomplete(
-    type:
-      | KotkaRootDocumentType.dataset
-      | KotkaRootDocumentType.organization,
+    type: KotkaDocumentType.dataset | KotkaDocumentType.organization,
     query = '',
   ): Observable<AutocompleteResult[]> {
     const params = new HttpParams().set('query', query);
@@ -262,13 +275,19 @@ export class ApiClient {
     return this.httpClient.get<Person>(`${lajiApiPath}person/by-id/${id}`);
   }
 
-  getMedia<T extends MediaTypes, S extends MediaMap[T]>(type: T, id: string): Observable<S> {
-    return this.httpClient.get<S>(`${path}media/${type}/${id}`);
+  getMedia<T extends MediaTypes>(
+    type: T,
+    id: string,
+  ): Observable<MediaMap[T]> {
+    return this.httpClient.get<MediaMap[T]>(`${path}media/${type}/${id}`);
   }
 
-  getMediaByIds<T extends MediaTypes, S extends MediaMap[T]>(type: T, ids: string[]): Observable<S[]> {
+  getMediaByIds<T extends MediaTypes>(
+    type: T,
+    ids: string[],
+  ): Observable<MediaMap[T][]> {
     if (!ids.length) return of([]);
-    return forkJoin(ids.map(id => this.getMedia<T, S>(type, id)));
+    return forkJoin(ids.map((id) => this.getMedia<T>(type, id)));
   }
 
   getCountryList(page = 1, pageSize = 1000): Observable<PagedResult<Area>> {
@@ -306,10 +325,13 @@ export class ApiClient {
     if (matchType) {
       params = params.set('matchType', matchType);
     }
-    return this.httpClient.get<PagedResult<any>>(`${lajiApiPath}autocomplete/taxa`, { params });
+    return this.httpClient.get<PagedResult<any>>(
+      `${lajiApiPath}autocomplete/taxa`,
+      { params },
+    );
   }
 
-  private convertVersionDifferenceFormat<S extends KotkaRootDocument>(
+  private convertVersionDifferenceFormat<S extends KotkaDocument>(
     data: KotkaVersionDifference<S>,
   ): KotkaVersionDifferenceObject<S> {
     const diff = {};
@@ -379,10 +401,9 @@ export class ApiClient {
   }
 
   private getAllDocumentsRecursively<
-    T extends KotkaRootDocumentType,
-    S extends KotkaRootDocumentMap[T],
+    T extends KotkaDocumentType,
     X extends string[] | undefined = undefined,
-    Y extends X extends string[] ? Partial<S> : S = S,
+    Y extends X extends string[] ? Partial<KotkaDocument<T>> : KotkaDocument<T> = KotkaDocument<T>,
   >(
     type: T,
     page = 1,
@@ -391,9 +412,9 @@ export class ApiClient {
     sort?: string,
     searchQueryString?: string,
     fields?: X,
-    searchQueryObject?: ElasticsearchQuery
+    searchQueryObject?: ElasticsearchQuery,
   ): Observable<Y[]> {
-    return this.getDocumentList<T, S, X, Y>(
+    return this.getDocumentList<T, X, Y>(
       type,
       page,
       pageSize,
@@ -414,7 +435,7 @@ export class ApiClient {
             sort,
             searchQueryString,
             fields,
-            searchQueryObject
+            searchQueryObject,
           );
         }
 

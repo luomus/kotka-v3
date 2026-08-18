@@ -5,14 +5,14 @@ https://docs.nestjs.com/providers#services
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { LajiApiService } from './laji-api.service';
-import { KotkaDocumentFullType } from '@kotka/shared/models';
+import { KotkaObjectFullType } from '@kotka/shared/models';
 
-const types: Partial<{ [type in KotkaDocumentFullType]: string }> = {
-  [KotkaDocumentFullType.dataset]: 'MHL.731',
-  [KotkaDocumentFullType.organization]: 'MHL.1152',
-  [KotkaDocumentFullType.transaction]: 'MHL.930',
-  [KotkaDocumentFullType.document]: 'MHL.1158',
-  [KotkaDocumentFullType.branch]: 'MHL.1230',
+const types: Partial<{ [type in KotkaObjectFullType]: string }> = {
+  [KotkaObjectFullType.dataset]: 'MHL.731',
+  [KotkaObjectFullType.organization]: 'MHL.1152',
+  [KotkaObjectFullType.transaction]: 'MHL.930',
+  [KotkaObjectFullType.document]: 'MHL.1158',
+  [KotkaObjectFullType.branch]: 'MHL.1230',
 };
 
 @Injectable()
@@ -24,7 +24,7 @@ export class FormService {
     private readonly lajiApiService: LajiApiService
   ) {}
 
-  async getForm(type: KotkaDocumentFullType) {
+  async getForm(type: KotkaObjectFullType) {
     if (!this.forms[type]) {
       await this.initForm(type);
     }
@@ -32,7 +32,7 @@ export class FormService {
     return this.forms[type];
   }
 
-  async getValidators(type: KotkaDocumentFullType) {
+  async getValidators(type: KotkaObjectFullType) {
     if (!this.forms[type]) {
       await this.initForm(type);
     }
@@ -40,7 +40,7 @@ export class FormService {
     return this.forms[type]['validators'];
   }
 
-  async getSchema(type: KotkaDocumentFullType) {
+  async getSchema(type: KotkaObjectFullType) {
     if (!this.forms[type]) {
       await this.initForm(type);
     }
@@ -48,7 +48,7 @@ export class FormService {
     return this.forms[type]['schema'];
   }
 
-  async initForm(type: KotkaDocumentFullType) {
+  async initForm(type: KotkaObjectFullType) {
     if (!types[type]) {
       throw new InternalServerErrorException(`Could not find formId for document of type ${type}`);
     }

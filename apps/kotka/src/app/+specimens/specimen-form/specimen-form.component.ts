@@ -5,7 +5,7 @@ import {
   DOCUMENT, inject
 } from '@angular/core';
 import {
-  KotkaRootDocumentType,
+  KotkaDocumentType,
   Document as KotkaDocument,
   Gathering,
   isDocument,
@@ -75,10 +75,10 @@ const unreliableDisabledForFields = ['/namespaceID', '/objectID', '/verification
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SpecimenFormComponent extends FormViewContainerComponent<KotkaRootDocumentType.specimen> {
+export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocumentType.specimen> {
   formId = globals.specimenFormId;
-  formDataType: KotkaRootDocumentType.specimen =
-    KotkaRootDocumentType.specimen;
+  formDataType: KotkaDocumentType.specimen =
+    KotkaDocumentType.specimen;
 
   dataType: Signal<DataType | undefined>;
   title: Signal<string>;
@@ -107,7 +107,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaRootD
   settingsStorageKey = signal<string | undefined>(undefined);
 
   @ViewChild(FormViewComponent, { static: true })
-  formView!: FormViewComponent<KotkaRootDocumentType.specimen>;
+  formView!: FormViewComponent<KotkaDocumentType.specimen>;
 
   private formDataDataType: Signal<string | undefined>;
   private unreliableFields: Signal<string[]>;

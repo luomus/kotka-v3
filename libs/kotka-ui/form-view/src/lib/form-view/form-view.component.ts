@@ -13,7 +13,7 @@ import {
 import {
   LajiForm,
   KotkaMainDocumentType,
-  KotkaRootDocumentMap,
+  KotkaDocument
 } from '@kotka/shared/models';
 import {
   Observable
@@ -54,13 +54,12 @@ import { FormViewFacade } from '../services/form-view.facade';
   ],
 })
 export class FormViewComponent<
-  T extends KotkaMainDocumentType = KotkaMainDocumentType,
-  S extends KotkaRootDocumentMap[T] = KotkaRootDocumentMap[T],
+  T extends KotkaMainDocumentType = KotkaMainDocumentType
 > {
   private notifier = inject(ToastService);
   private apiClient = inject(ApiClient);
   private dialogService = inject(DialogService);
-  private formViewFacade = inject<FormViewFacade<T, S>>(FormViewFacade);
+  private formViewFacade = inject<FormViewFacade<T>>(FormViewFacade);
   private cdr = inject(ChangeDetectorRef);
 
   formId = input.required<string>();
@@ -68,7 +67,7 @@ export class FormViewComponent<
 
   editMode = input.required<boolean>();
   dataURI = input.required<string | undefined>();
-  formData = input<Partial<S>>();
+  formData = input<Partial<KotkaDocument<T>>>();
   hasChanges = input<boolean>();
 
   augmentFormFunc =
@@ -92,15 +91,15 @@ export class FormViewComponent<
   customFooterButtonsTpl = input<TemplateRef<unknown>>();
 
   defaultPageTitle: Signal<string>;
-  formState: Signal<FormState<S>>;
+  formState: Signal<FormState<KotkaDocument<T>>>;
 
-  formDataChange = output<Partial<S | undefined>>();
+  formDataChange = output<Partial<KotkaDocument<T> | undefined>>();
   formInit = output<LajiFormComponent>();
   disabledChange = output<boolean | undefined>();
 
-  saveSuccess = output<S>();
+  saveSuccess = output<KotkaDocument<T>>();
   deleteSuccess = output<void>();
-  copyData = output<Partial<S>>();
+  copyData = output<Partial<KotkaDocument<T>>>();
   validationError = output<ErrorSchema>();
 
   @ViewChild(LajiFormComponent) lajiForm?: LajiFormComponent;
@@ -145,7 +144,7 @@ export class FormViewComponent<
     }
   }
 
-  onSubmit(data: S) {
+  onSubmit(data: KotkaDocument<T>) {
     this.lajiForm?.block();
 
     this.save$(data).subscribe({
@@ -160,7 +159,7 @@ export class FormViewComponent<
     });
   }
 
-  onDelete(data: Partial<S>) {
+  onDelete(data: Partial<KotkaDocument<T>>) {
     this.dialogService
       .confirm(
         `Are you sure you want to delete this ${getDataTypeName(this.dataType())}?`,
@@ -172,16 +171,16 @@ export class FormViewComponent<
       });
   }
 
-  onChange(data: Partial<S>) {
+  onChange(data: Partial<KotkaDocument<T>>) {
     this.formViewFacade.setFormData(data);
   }
 
-  onCopy(data: Partial<S>) {
+  onCopy(data: Partial<KotkaDocument<T>>) {
     const excludedFields = this.formState().disabled ? ['owner'] : [];
     this.copyAsNew(data, excludedFields);
   }
 
-  onSubmitAndCopy(data: S) {
+  onSubmitAndCopy(data: KotkaDocument<T>) {
     this.lajiForm?.block();
 
     this.save$(data).subscribe({
@@ -195,7 +194,7 @@ export class FormViewComponent<
     });
   }
 
-  setFormData(data: Partial<S>) {
+  setFormData(data: Partial<KotkaDocument<T>>) {
     this.formViewFacade.setFormData(data, true, true);
     this.formDataChange.emit(data);
   }
@@ -208,7 +207,7 @@ export class FormViewComponent<
     this.formViewFacade.setDisabledAlertDismissed(true);
   }
 
-  private delete(data: Partial<S>) {
+  private delete(data: Partial<KotkaDocument<T>>) {
     if (!data.id) {
       return;
     }
@@ -226,7 +225,7 @@ export class FormViewComponent<
     });
   }
 
-  private save$(data: S): Observable<S> {
+  private save$(data: KotkaDocument<T>): Observable<KotkaDocument<T>> {
     if (this.editMode()) {
       if (!data.id) {
         throw new Error('Document is missing an id');
@@ -237,12 +236,12 @@ export class FormViewComponent<
     }
   }
 
-  private copyAsNew(data: Partial<S>, excludedFields: string[] = []) {
+  private copyAsNew(data: Partial<KotkaDocument<T>>, excludedFields: string[] = []) {
     excludedFields = excludedFields.concat(
       this.formState().form?.excludeFromCopy || [],
     );
 
-    const newData = FormViewUtils.removeMetaAndExcludedFields<S>(
+    const newData = FormViewUtils.removeMetaAndExcludedFields<KotkaDocument<T>>(
       data,
       excludedFields,
     );

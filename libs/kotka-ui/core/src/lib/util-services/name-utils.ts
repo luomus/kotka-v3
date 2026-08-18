@@ -1,11 +1,11 @@
-import { KotkaRootDocumentType } from '@kotka/shared/models';
+import { KotkaDocumentType } from '@kotka/shared/models';
 import { capitalize } from 'lodash';
 
-const specialNameMap: Partial<Record<KotkaRootDocumentType, string>> = {
-  [KotkaRootDocumentType.dataset]: 'tag'
+const specialNameMap: Partial<Record<KotkaDocumentType, string>> = {
+  [KotkaDocumentType.dataset]: 'tag'
 };
 
-export const getDataTypeName = (type: KotkaRootDocumentType, capitalizeName?: boolean, plural?: boolean): string => {
+export const getDataTypeName = (type: KotkaDocumentType, capitalizeName?: boolean, plural?: boolean): string => {
   let name: string = specialNameMap[type] ? specialNameMap[type] : type.toString();
 
   if (capitalizeName) {

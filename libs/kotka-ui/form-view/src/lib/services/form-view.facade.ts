@@ -9,7 +9,7 @@ import {
 } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
-  KotkaRootDocumentMap,
+  KotkaDocument,
   KotkaMainDocumentType,
 } from '@kotka/shared/models';
 import {
@@ -24,23 +24,21 @@ import {
   getId,
 } from '@kotka/shared/utils';
 
-export interface FormViewInputs<
-  T extends KotkaMainDocumentType,
-  S extends KotkaRootDocumentMap[T],
-> extends Omit<FormInputs<S>, 'allowEdit' | 'allowDelete'> {
+export interface FormViewInputs<T extends KotkaMainDocumentType>
+  extends Omit<
+    FormInputs<KotkaDocument<T>>,
+    'allowEdit' | 'allowDelete'
+  > {
   dataType: T;
   dataURI?: string;
 }
 
 @Injectable()
-export class FormViewFacade<
-  T extends KotkaMainDocumentType,
-  S extends KotkaRootDocumentMap[T],
-> extends FormFacade<S, FormViewInputs<T, S>> {
+export class FormViewFacade<T extends KotkaMainDocumentType> extends FormFacade<KotkaDocument<T>, FormViewInputs<T>> {
   private userService = inject(UserService);
   private apiClient = inject(ApiClient);
 
-  protected override getStateForInputs$(inputs: FormViewInputs<T, S>): Observable<FormState<S>> {
+  protected override getStateForInputs$(inputs: FormViewInputs<T>): Observable<FormState<KotkaDocument<T>>> {
     return forkJoin([
       this.getAugmentedForm$(inputs),
       this.getInitialFormData$(inputs),
@@ -60,8 +58,8 @@ export class FormViewFacade<
   }
 
   private getInitialFormData$(
-    inputs: FormViewInputs<T, S>,
-  ): Observable<Partial<S>> {
+    inputs: FormViewInputs<T>,
+  ): Observable<Partial<KotkaDocument<T>>> {
     if (inputs.editMode) {
       if (inputs.formData) {
         return of(inputs.formData);
@@ -73,11 +71,11 @@ export class FormViewFacade<
   }
 
   private getEmptyFormData$(
-    prefilledFormData?: Partial<S>,
-  ): Observable<Partial<S>> {
+    prefilledFormData?: Partial<KotkaDocument<T>>,
+  ): Observable<Partial<KotkaDocument<T>>> {
     return this.userService.getCurrentLoggedInUser().pipe(
       map((user) => {
-        const formData: Partial<S> = {};
+        const formData: Partial<KotkaDocument<T>> = {};
 
         if (user?.organisation && user.organisation.length === 1) {
           formData.owner = user.organisation[0];
@@ -88,7 +86,7 @@ export class FormViewFacade<
     );
   }
 
-  private getFormData$(dataType: T, dataURI?: string): Observable<Partial<S>> {
+  private getFormData$(dataType: T, dataURI?: string): Observable<Partial<KotkaDocument<T>>> {
     const dataTypeName = getDataTypeName(dataType, true);
 
     if (!dataURI) {
@@ -96,7 +94,7 @@ export class FormViewFacade<
     }
 
     const id = getId(dataURI);
-    return this.apiClient.getDocumentById<T, S>(dataType, id).pipe(
+    return this.apiClient.getDocumentById<T>(dataType, id).pipe(
       catchError((err) => {
         err =
           err.status === 404

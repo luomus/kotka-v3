@@ -26,16 +26,7 @@ export const specimenTypeToNameMap: Record<SpecimenDataType, SpecimenDataTypeNam
   culture: 'culture',
 };
 
-export type KotkaRootDocument =
-  | Dataset
-  | Document
-  | Organization
-  | SpecimenTransaction
-  | Branch
-
-export type KotkaMainDocument = Exclude<KotkaRootDocument, Branch>;
-
-export enum KotkaRootDocumentType {
+export enum KotkaDocumentType {
   dataset = 'dataset',
   transaction = 'transaction',
   organization = 'organization',
@@ -44,19 +35,22 @@ export enum KotkaRootDocumentType {
 }
 
 export type KotkaMainDocumentType = Exclude<
-  KotkaRootDocumentType,
-  KotkaRootDocumentType.branch
+  KotkaDocumentType,
+  KotkaDocumentType.branch
 >;
 
-export interface KotkaRootDocumentMap {
-  [KotkaRootDocumentType.dataset]: Dataset;
-  [KotkaRootDocumentType.specimen]: Document;
-  [KotkaRootDocumentType.organization]: Organization;
-  [KotkaRootDocumentType.transaction]: SpecimenTransaction;
-  [KotkaRootDocumentType.branch]: Branch;
+interface KotkaDocumentMap {
+  [KotkaDocumentType.dataset]: Dataset;
+  [KotkaDocumentType.specimen]: Document;
+  [KotkaDocumentType.organization]: Organization;
+  [KotkaDocumentType.transaction]: SpecimenTransaction;
+  [KotkaDocumentType.branch]: Branch;
 }
 
-export enum KotkaDocumentFullType {
+export type KotkaDocument<T extends KotkaDocumentType = KotkaDocumentType> = KotkaDocumentMap[T];
+export type KotkaMainDocument = Exclude<KotkaDocument, Branch>;
+
+export enum KotkaObjectFullType {
   dataset = 'GX.dataset',
   organization = 'MOS.organization',
   transaction = 'HRX.specimenTransaction',
@@ -72,12 +66,12 @@ export enum KotkaDocumentFullType {
   event = 'PUU.event'
 }
 
-export const STORE_OBJECTS: KotkaDocumentFullType[] = [
-  KotkaDocumentFullType.dataset,
-  KotkaDocumentFullType.organization,
-  KotkaDocumentFullType.transaction,
-  KotkaDocumentFullType.document,
-  KotkaDocumentFullType.branch,
+export const STORE_OBJECTS: KotkaObjectFullType[] = [
+  KotkaObjectFullType.dataset,
+  KotkaObjectFullType.organization,
+  KotkaObjectFullType.transaction,
+  KotkaObjectFullType.document,
+  KotkaObjectFullType.branch,
 ];
 
 export interface MultiLanguage {
@@ -133,7 +127,7 @@ interface CoordinateResultBox {
   southwest: CoordinateResultPoint
 }
 
-export interface KotkaVersionDifference<S extends KotkaRootDocument = KotkaRootDocument> {
+export interface KotkaVersionDifference<S extends KotkaDocument = KotkaDocument> {
   original: S;
   patch: StorePatch[];
 }
@@ -144,7 +138,7 @@ export interface DifferenceObject {
 export type Patch = Omit<StorePatch, 'path'>;
 export type DifferenceObjectValue = DifferenceObject|DifferenceObject[]|Patch|Patch[];
 
-export interface KotkaVersionDifferenceObject<S extends KotkaRootDocument = KotkaRootDocument> {
+export interface KotkaVersionDifferenceObject<S extends KotkaDocument = KotkaDocument> {
   original: S;
   diff: DifferenceObject;
 }

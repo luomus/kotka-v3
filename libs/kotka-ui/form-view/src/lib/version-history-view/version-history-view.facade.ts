@@ -12,9 +12,8 @@ import {
 } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import {
-  KotkaRootDocument,
-  KotkaRootDocumentType,
-  KotkaRootDocumentMap,
+  KotkaDocument,
+  KotkaDocumentType,
   KotkaVersionDifferenceObject,
   LajiForm,
   StoreVersion,
@@ -32,7 +31,7 @@ export enum VersionHistoryViewEnum {
   versionComparison = 'versionComparison',
 }
 
-export interface VersionHistoryInputs<T extends KotkaRootDocumentType> {
+export interface VersionHistoryInputs<T extends KotkaDocumentType> {
   formId: string;
   dataType: T;
   dataURI?: string;
@@ -41,7 +40,7 @@ export interface VersionHistoryInputs<T extends KotkaRootDocumentType> {
   view?: VersionHistoryViewEnum;
 }
 
-export interface VersionHistoryState<S extends KotkaRootDocument> {
+export interface VersionHistoryState<S extends KotkaDocument> {
   versionList?: StoreVersion[];
   form?: LajiForm.SchemaForm;
   jsonForm?: LajiForm.JsonForm;
@@ -53,16 +52,16 @@ export interface ErrorViewModel {
   errorType: VersionHistoryErrorEnum;
 }
 
-export type ViewModel<S extends KotkaRootDocument> =
+export type ViewModel<S extends KotkaDocument> =
   | VersionHistoryState<S>
   | ErrorViewModel;
 
-export function isSuccessViewModel<S extends KotkaRootDocument>(
+export function isSuccessViewModel<S extends KotkaDocument>(
   viewModel: ViewModel<S>,
 ): viewModel is VersionHistoryState<S> {
   return !isErrorViewModel(viewModel);
 }
-export function isErrorViewModel<S extends KotkaRootDocument>(
+export function isErrorViewModel<S extends KotkaDocument>(
   viewModel: ViewModel<S>,
 ): viewModel is ErrorViewModel {
   return 'errorType' in viewModel;
@@ -70,8 +69,7 @@ export function isErrorViewModel<S extends KotkaRootDocument>(
 
 @Injectable()
 export class VersionHistoryViewFacade<
-  T extends KotkaRootDocumentType,
-  S extends KotkaRootDocumentMap[T],
+  T extends KotkaDocumentType
 > {
   private formService = inject(FormService);
   private apiClient = inject(ApiClient);
@@ -79,10 +77,10 @@ export class VersionHistoryViewFacade<
   versionList$: Observable<StoreVersion[] | undefined>;
   form$: Observable<LajiForm.SchemaForm | undefined>;
   jsonForm$: Observable<LajiForm.JsonForm | undefined>;
-  data$: Observable<S | undefined>;
+  data$: Observable<KotkaDocument<T> | undefined>;
   differenceData$: Observable<KotkaVersionDifferenceObject | undefined>;
 
-  vm$: Observable<ViewModel<S>>;
+  vm$: Observable<ViewModel<KotkaDocument<T>>>;
 
   private inputs$ = new ReplaySubject<VersionHistoryInputs<T>>(1);
 
@@ -100,10 +98,10 @@ export class VersionHistoryViewFacade<
     this.inputs$.next(inputs);
   }
 
-  private getVm$(): Observable<ViewModel<S>> {
+  private getVm$(): Observable<ViewModel<KotkaDocument<T>>> {
     return this.inputs$.pipe(
       switchMap((inputs: VersionHistoryInputs<T>) => {
-        let obs$: Observable<VersionHistoryState<S>>;
+        let obs$: Observable<VersionHistoryState<KotkaDocument<T>>>;
 
         if (inputs.view === VersionHistoryViewEnum.versionList) {
           obs$ = this.versionList$.pipe(
@@ -179,7 +177,7 @@ export class VersionHistoryViewFacade<
     );
   }
 
-  private getData$(): Observable<S | undefined> {
+  private getData$(): Observable<KotkaDocument<T> | undefined> {
     return this.inputs$.pipe(
       switchMap((inputs) =>
         startWithUndefined(
@@ -190,7 +188,7 @@ export class VersionHistoryViewFacade<
   }
 
   private getDifferenceData$(): Observable<
-    KotkaVersionDifferenceObject<S> | undefined
+    KotkaVersionDifferenceObject<KotkaDocument<T>> | undefined
   > {
     return this.inputs$.pipe(
       switchMap((inputs) =>
@@ -229,14 +227,14 @@ export class VersionHistoryViewFacade<
     dataType: T,
     dataURI?: string,
     version?: number,
-  ): Observable<S> {
+  ): Observable<KotkaDocument<T>> {
     if (!dataURI || version === undefined) {
       return throwError(() => new Error(VersionHistoryErrorEnum.dataNotFound));
     }
 
     const id = getId(dataURI);
     return this.apiClient
-      .getDocumentVersionData<T, S>(dataType, id, version)
+      .getDocumentVersionData<T>(dataType, id, version)
       .pipe(
         catchError((err) => {
           err =
@@ -252,7 +250,7 @@ export class VersionHistoryViewFacade<
     dataType: T,
     dataURI?: string,
     versions?: number[],
-  ): Observable<KotkaVersionDifferenceObject<S>> {
+  ): Observable<KotkaVersionDifferenceObject<KotkaDocument<T>>> {
     if (!dataURI || !versions || versions.length !== 2) {
       return throwError(() => new Error(VersionHistoryErrorEnum.dataNotFound));
     }

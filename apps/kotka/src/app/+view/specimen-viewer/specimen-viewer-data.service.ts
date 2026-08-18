@@ -9,7 +9,7 @@ import { combineLatest, Observable, of } from 'rxjs';
 import { catchError, map, shareReplay, startWith, switchMap } from 'rxjs/operators';
 import {
   Document,
-  KotkaRootDocumentType,
+  KotkaDocumentType,
   LajiForm,
   SpecimenDataType,
 } from '@kotka/shared/models';
@@ -49,7 +49,7 @@ export class SpecimenViewerDataService {
   getViewModel$(uri$: Observable<string>): Observable<SpecimenViewerViewModel> {
     const documentData$ = uri$.pipe(
       switchMap((uri) =>
-        this.documentDataService.getDocumentData(KotkaRootDocumentType.specimen, uri),
+        this.documentDataService.getDocumentData(KotkaDocumentType.specimen, uri),
       ),
       shareReplay(1),
     );

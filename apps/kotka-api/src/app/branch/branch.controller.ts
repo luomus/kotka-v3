@@ -6,7 +6,7 @@ import { LajiStoreService, TriplestoreService, ValidationService } from '@kotka/
 import { Body, Controller, Param, Post, Put, Req, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
 import { ApiMethodAccessGuard } from '../shared/guards/api-method-access.guard';
-import { KotkaDocumentFullType, KotkaRootDocumentType } from '@kotka/shared/models';
+import { KotkaObjectFullType, KotkaDocumentType } from '@kotka/shared/models';
 import { ControllerType } from '../shared/decorators/controller-type.decorator';
 import { LajiStoreController } from '../shared/controllers/laji-store.controller';
 import { TriplestoreMapperService } from '@kotka/api/services';
@@ -14,9 +14,9 @@ import { ValidatorInterceptor } from '../shared/interceptors/validator.intercept
 import { MediaIntellectualOwnerInterceptor } from '../shared/interceptors/media-intellectual-owner.interceptor';
 import { Branch } from '@luomus/laji-schema';
 
-const type = KotkaDocumentFullType.branch;
+const type = KotkaObjectFullType.branch;
 
-@Controller(KotkaRootDocumentType.branch)
+@Controller(KotkaDocumentType.branch)
 @ControllerType(type)
 @UseGuards(
   AuthenticateCookieGuard,

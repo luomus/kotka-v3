@@ -11,12 +11,12 @@ import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.gu
 import { ApiMethodAccessGuard } from '../shared/guards/api-method-access.guard';
 import { SpecimenTransaction } from '@luomus/laji-schema';
 import { IntellectualOwnerMedia } from '../shared/decorators/intellectualOwnerMedia.decorator';
-import { KotkaDocumentFullType, KotkaRootDocumentType } from '@kotka/shared/models';
+import { KotkaObjectFullType, KotkaDocumentType } from '@kotka/shared/models';
 
-const type = KotkaDocumentFullType.transaction;
+const type = KotkaObjectFullType.transaction;
 const useTriplestore = false;
 
-@Controller(KotkaRootDocumentType.transaction)
+@Controller(KotkaDocumentType.transaction)
 @ControllerType(type)
 @IntellectualOwnerMedia({ attachments: 'pdf', permitFile: 'pdf' })
 @UseGuards(

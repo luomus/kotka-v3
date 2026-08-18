@@ -3,7 +3,7 @@ import {
   Component,
   inject
 } from '@angular/core';
-import { KotkaRootDocumentType, SpecimenTransaction } from '@kotka/shared/models';
+import { KotkaDocumentType, SpecimenTransaction } from '@kotka/shared/models';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
 import { TransactionFormEmbedService } from '../transaction-form-embed/transaction-form-embed.service';
 import { globals } from '../../../environments/globals';
@@ -27,8 +27,8 @@ import {
 })
 export class TransactionVersionHistoryComponent {
   formId = globals.transactionFormId;
-  dataType: KotkaRootDocumentType.transaction =
-    KotkaRootDocumentType.transaction;
+  dataType: KotkaDocumentType.transaction =
+    KotkaDocumentType.transaction;
 
   private transactionFormEmbedService = inject(TransactionFormEmbedService);
 

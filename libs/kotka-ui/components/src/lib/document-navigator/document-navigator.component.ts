@@ -1,7 +1,7 @@
 import { Component, effect, inject, input, OnDestroy, signal } from '@angular/core';
 import {
-  KotkaRootDocumentMap,
-  KotkaRootDocumentType,
+  KotkaDocument,
+  KotkaDocumentType,
 } from '@kotka/shared/models';
 import { RouterLink } from '@angular/router';
 import { SpinnerComponent } from '../spinner/spinner.component';
@@ -17,8 +17,15 @@ interface NavigatorState {
 @Component({
   selector: 'kui-document-navigator',
   template: `
-    @if (navigatorState().loading || navigatorState().previousId || navigatorState().nextId) {
-      <kui-spinner [spinning]="navigatorState().loading" [hideContentWhileLoading]="true">
+    @if (
+      navigatorState().loading ||
+      navigatorState().previousId ||
+      navigatorState().nextId
+    ) {
+      <kui-spinner
+        [spinning]="navigatorState().loading"
+        [hideContentWhileLoading]="true"
+      >
         <div class="d-flex gap-0 d-sm-block">
           @if (navigatorState().previousId) {
             <a
@@ -53,13 +60,13 @@ interface NavigatorState {
   imports: [RouterLink, SpinnerComponent, ToFullUriPipe],
 })
 export class DocumentNavigatorComponent<
-  T extends KotkaRootDocumentType = KotkaRootDocumentType,
-  S extends KotkaRootDocumentMap[T] = KotkaRootDocumentMap[T],
-> implements OnDestroy {
+  T extends KotkaDocumentType = KotkaDocumentType,
+> implements OnDestroy
+{
   private searchResultIteratorService = inject(SearchResultIteratorService);
 
   dataType = input.required<T>();
-  data = input<S>();
+  data = input<KotkaDocument<T>>();
   buttonRouterLink = input.required<string>();
 
   navigatorState = signal<NavigatorState>({ loading: false });

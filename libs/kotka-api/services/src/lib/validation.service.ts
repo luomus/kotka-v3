@@ -11,7 +11,7 @@ import { defaultNamespaceID, NamespaceData, NamespaceService } from './namespace
 import {
   ApiValidationError,
   CoordinateLocationResponse,
-  KotkaDocumentFullType,
+  KotkaObjectFullType,
   SpecimenDataType,
   specimenTypeToNameMap,
 } from '@kotka/shared/models';
@@ -53,7 +53,7 @@ export class ValidationService {
     });
   }
 
-  async validate(data: StoreObject, type: KotkaDocumentFullType, schemaOnly = false) {
+  async validate(data: StoreObject, type: KotkaObjectFullType, schemaOnly = false) {
     const form = await this.formService.getForm(type);
 
     const errors = {};
@@ -208,7 +208,7 @@ export class ValidationService {
     const datasetName: string | undefined = parseJSONPointer(data, field);
     const datasetNameField: string = parseStoreSearchPath(field);
 
-    const members: Dataset[] = await lastValueFrom(this.lajiStoreService.search<Dataset>(KotkaDocumentFullType.dataset, { query: { match: { [datasetNameField]: datasetName } } }).pipe(map(res => res.data?.member)));
+    const members: Dataset[] = await lastValueFrom(this.lajiStoreService.search<Dataset>(KotkaObjectFullType.dataset, { query: { match: { [datasetNameField]: datasetName } } }).pipe(map(res => res.data?.member)));
 
     if (members.length !== 0 && !(members.length === 1 && members[0].id && members[0].id === data.id)) {
       return getError(field, 'Dataset name must be unique.');
@@ -325,7 +325,7 @@ export class ValidationService {
 
     const searchBody = `${storePath}: "${value}"`;
 
-    const docs = (await lastValueFrom(this.lajiStoreService.getAll<Document>(KotkaDocumentFullType.document, { q: searchBody }))).data;
+    const docs = (await lastValueFrom(this.lajiStoreService.getAll<Document>(KotkaObjectFullType.document, { q: searchBody }))).data;
 
     if (!docs.member.length || (data.id && docs.member.length === 1 && docs.member[0].id === data.id)) {
       return;

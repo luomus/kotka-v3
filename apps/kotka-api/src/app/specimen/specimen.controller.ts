@@ -7,7 +7,7 @@ import { Controller, Get, Param, UseGuards, UseInterceptors } from '@nestjs/comm
 import { lastValueFrom } from 'rxjs';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
 import { ApiMethodAccessGuard } from '../shared/guards/api-method-access.guard';
-import { KotkaDocumentFullType, KotkaRootDocumentType } from '@kotka/shared/models';
+import { KotkaObjectFullType, KotkaDocumentType } from '@kotka/shared/models';
 import { ControllerType } from '../shared/decorators/controller-type.decorator';
 import { LajiStoreController } from '../shared/controllers/laji-store.controller';
 import { TriplestoreMapperService } from '@kotka/api/services';
@@ -19,9 +19,9 @@ import { ClearUncertainFieldOrphansInterceptor } from './interceptors/clear-unce
 import { AssociatedTaxaToUnitInterceptor } from './interceptors/associated-taxa-to-unit.interceptor';
 import { CollectionAccessibleToUserInterceptor } from './interceptors/collection-accessible-to-user.interceptor';
 
-const type = KotkaDocumentFullType.document;
+const type = KotkaObjectFullType.document;
 
-@Controller(KotkaRootDocumentType.specimen)
+@Controller(KotkaDocumentType.specimen)
 @ControllerType(type)
 @UseGuards(
   AuthenticateCookieGuard,

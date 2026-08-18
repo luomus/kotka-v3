@@ -2,7 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
 } from '@angular/core';
-import { KotkaRootDocumentType } from '@kotka/shared/models';
+import { KotkaDocumentType } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
 import {
   VersionHistoryViewComponent
@@ -22,6 +22,6 @@ import {
 })
 export class SpecimenVersionHistoryComponent {
   formId = globals.specimenFormId;
-  dataType: KotkaRootDocumentType.specimen =
-    KotkaRootDocumentType.specimen;
+  dataType: KotkaDocumentType.specimen =
+    KotkaDocumentType.specimen;
 }

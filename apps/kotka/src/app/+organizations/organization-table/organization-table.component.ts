@@ -14,12 +14,12 @@ import {
   AutocompleteFloatingFilterComponent,
   DatatableColumn,
   DatatableFilter,
-  DatatableDataService,
+  DocumentDatatableDataService,
   DocumentDatatableComponent,
 } from '@kotka/ui/datatable';
 import { Organization } from '@luomus/laji-schema';
 import { debounceTime, Subject, Subscription } from 'rxjs';
-import { KotkaRootDocumentType } from '@kotka/shared/models';
+import { KotkaDocumentType } from '@kotka/shared/models';
 import { MainContentComponent } from '@kotka/ui/components';
 import { FormsModule } from '@angular/forms';
 
@@ -31,7 +31,7 @@ import { FormsModule } from '@angular/forms';
   imports: [MainContentComponent, FormsModule, DocumentDatatableComponent],
 })
 export class OrganizationTableComponent implements OnInit, OnDestroy {
-  dataType = KotkaRootDocumentType.organization;
+  dataType = KotkaDocumentType.organization;
 
   columns: DatatableColumn[] = [
     {
@@ -151,7 +151,7 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
   private nameFilterChangedSubject = new Subject<void>();
   private updateSearchQuerySub?: Subscription;
 
-  private dataService = inject(DatatableDataService);
+  private dataService = inject(DocumentDatatableDataService);
   private cdr = inject(ChangeDetectorRef);
 
   constructor() {

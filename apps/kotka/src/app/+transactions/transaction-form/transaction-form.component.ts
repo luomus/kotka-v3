@@ -5,7 +5,7 @@ import {
   ViewChild, inject
 } from '@angular/core';
 import {
-  KotkaRootDocumentType,
+  KotkaDocumentType,
   LajiForm,
   SpecimenTransaction,
   isSpecimenTransaction,
@@ -31,12 +31,12 @@ import { toSignal } from '@angular/core/rxjs-interop';
   providers: [TransactionFormEmbedService],
 })
 export class TransactionFormComponent
-  extends FormViewContainerComponent<KotkaRootDocumentType.transaction>
+  extends FormViewContainerComponent<KotkaDocumentType.transaction>
   implements OnDestroy
 {
   formId = globals.transactionFormId;
-  dataType: KotkaRootDocumentType.transaction =
-    KotkaRootDocumentType.transaction;
+  dataType: KotkaDocumentType.transaction =
+    KotkaDocumentType.transaction;
   augmentFormFunc = this.augmentForm.bind(this);
   mediaMetadata: Signal<FormMediaMetadata>;
 
@@ -45,7 +45,7 @@ export class TransactionFormComponent
   isSpecimenTransaction = isSpecimenTransaction;
 
   @ViewChild(FormViewComponent, { static: true })
-  formView!: FormViewComponent<KotkaRootDocumentType.transaction>;
+  formView!: FormViewComponent<KotkaDocumentType.transaction>;
 
   private userName: Signal<string | undefined>;
   private owner = signal<string | undefined>(undefined);

@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { KotkaRootDocument, KotkaRootDocumentMap, KotkaRootDocumentType } from '@kotka/shared/models';
+import { KotkaDocument, KotkaDocumentType } from '@kotka/shared/models';
 import { ApiClient, DocumentListSearchParams } from './api-client';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -23,34 +23,46 @@ export class SearchResultIteratorService {
   private apiClient = inject(ApiClient);
   private userService = inject(UserService);
 
-  private userId = toSignal(this.userService.user$.pipe(map(user => user?.id)));
-  private searchParamsByType: Partial<{ [ T in KotkaRootDocumentType ]: SearchParams }> = {};
+  private userId = toSignal(
+    this.userService.user$.pipe(map((user) => user?.id)),
+  );
+  private searchParamsByType: Partial<{
+    [T in KotkaDocumentType]: SearchParams;
+  }> = {};
 
-  setSearchParams(type: KotkaRootDocumentType, searchParams: SearchParams, store = true) {
+  setSearchParams(
+    type: KotkaDocumentType,
+    searchParams: SearchParams,
+    store = true,
+  ) {
     this.searchParamsByType[type] = searchParams;
     if (store) {
-      this.storage.store(this.getSearchParamsStorageKey(type, this.userId()), searchParams);
+      this.storage.store(
+        this.getSearchParamsStorageKey(type, this.userId()),
+        searchParams,
+      );
     }
   }
 
-  getPrevious<
-    T extends KotkaRootDocumentType,
-    S extends KotkaRootDocumentMap[T],
-  >(type: T, data: S): Observable<string | undefined> {
+  getPrevious<T extends KotkaDocumentType>(
+    type: T,
+    data: KotkaDocument<T>,
+  ): Observable<string | undefined> {
     return this.getFollowingDocument(type, data, true);
   }
 
-  getNext<
-    T extends KotkaRootDocumentType,
-    S extends KotkaRootDocumentMap[T],
-  >(type: T, data: S): Observable<string | undefined> {
+  getNext<T extends KotkaDocumentType>(
+    type: T,
+    data: KotkaDocument<T>,
+  ): Observable<string | undefined> {
     return this.getFollowingDocument(type, data);
   }
 
-  private getFollowingDocument<
-    T extends KotkaRootDocumentType,
-    S extends KotkaRootDocumentMap[T],
-  >(type: T, data: S, reverse = false): Observable<string | undefined> {
+  private getFollowingDocument<T extends KotkaDocumentType>(
+    type: T,
+    data: KotkaDocument<T>,
+    reverse = false,
+  ): Observable<string | undefined> {
     const searchParams = this.getSearchParams(type, this.userId());
     if (!searchParams || !searchParams.sort) {
       return of(undefined);
@@ -60,23 +72,30 @@ export class SearchResultIteratorService {
     const sort = this.sortsToString(sorts);
 
     const searchAfter = this.getSearchAfter(data, sorts);
-    const searchQueryObject = { ...searchParams.searchQueryObject || {}, search_after: searchAfter };
+    const searchQueryObject = {
+      ...(searchParams.searchQueryObject || {}),
+      search_after: searchAfter,
+    };
 
-    return this.apiClient.getDocumentList(
-      type,
-      1,
-      1,
-      sort,
-      searchParams.searchQueryString,
-      ['id'],
-      searchQueryObject
-    ).pipe(map(result => {
-      return result.member[0]?.id;
-    }));
+    return this.apiClient
+      .getDocumentList(
+        type,
+        1,
+        1,
+        sort,
+        searchParams.searchQueryString,
+        ['id'],
+        searchQueryObject,
+      )
+      .pipe(
+        map((result) => {
+          return result.member[0]?.id;
+        }),
+      );
   }
 
   private sortsFromString(sort: string, reverse = false): Sort[] {
-    return sort.split(',').map(sort => {
+    return sort.split(',').map((sort) => {
       const parts = sort.trim().split(' ');
 
       const field = parts[0];
@@ -85,27 +104,35 @@ export class SearchResultIteratorService {
         direction = direction === 'desc' ? 'asc' : 'desc';
       }
 
-      return {field, direction};
+      return { field, direction };
     });
   }
 
   private sortsToString(sorts: Sort[]): string {
-    return sorts.map(sort => sort.field + ' ' + sort.direction).join(',');
+    return sorts.map((sort) => sort.field + ' ' + sort.direction).join(',');
   }
 
-  private getSearchAfter(data: KotkaRootDocument, sorts: Sort[]): (string | number | boolean | null)[] {
-    return sorts.map(sort => {
-      let result = isKeyOfObject(sort.field, data) ? data[sort.field] : undefined;
+  private getSearchAfter(
+    data: KotkaDocument,
+    sorts: Sort[],
+  ): (string | number | boolean | null)[] {
+    return sorts.map((sort) => {
+      let result = isKeyOfObject(sort.field, data)
+        ? data[sort.field]
+        : undefined;
 
       if (result == undefined) {
         return null;
       }
 
       if (typeof result === 'object') {
-        throw new Error(`Can't handle field ${sort.field}, handling of array and object fields is not implemented`);
+        throw new Error(
+          `Can't handle field ${sort.field}, handling of array and object fields is not implemented`,
+        );
       }
 
-      if (sort.field === 'id') { // TODO determine if the value needs to be in lowercase from es-mapping
+      if (sort.field === 'id') {
+        // TODO determine if the value needs to be in lowercase from es-mapping
         result = result.toLowerCase();
       }
 
@@ -113,13 +140,21 @@ export class SearchResultIteratorService {
     });
   }
 
-  private getSearchParams(type: KotkaRootDocumentType, userId: string | undefined): SearchParams {
-    const result = this.searchParamsByType[type] || this.storage.retrieve(this.getSearchParamsStorageKey(type, userId));
+  private getSearchParams(
+    type: KotkaDocumentType,
+    userId: string | undefined,
+  ): SearchParams {
+    const result =
+      this.searchParamsByType[type] ||
+      this.storage.retrieve(this.getSearchParamsStorageKey(type, userId));
     this.searchParamsByType[type] = result;
     return result;
   }
 
-  private getSearchParamsStorageKey(type: KotkaRootDocumentType, userId: string | undefined): string {
+  private getSearchParamsStorageKey(
+    type: KotkaDocumentType,
+    userId: string | undefined,
+  ): string {
     if (!userId) {
       throw new Error('Missing user id!');
     }

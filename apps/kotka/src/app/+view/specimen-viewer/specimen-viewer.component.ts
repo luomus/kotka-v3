@@ -9,7 +9,7 @@ import {
   MainContentComponent,
   MainContentHeaderDirective,
 } from '@kotka/ui/components';
-import { KotkaRootDocumentType } from '@kotka/shared/models';
+import { KotkaDocumentType } from '@kotka/shared/models';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { SpecimenViewerHeaderComponent } from './specimen-viewer-header/specimen-viewer-header.component';
 import { SpecimenViewerContentComponent } from './specimen-viewer-content/specimen-viewer-content.component';
@@ -35,7 +35,7 @@ export class SpecimenViewerComponent {
 
   uri = input.required<string>();
 
-  dataType = KotkaRootDocumentType.specimen;
+  dataType = KotkaDocumentType.specimen;
 
   vm$ = this.specimenViewerDataService.getViewModel$(toObservable(this.uri));
 }

@@ -12,7 +12,7 @@ import {
   SpinnerComponent,
 } from '@kotka/ui/components';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
-import { Document, KotkaRootDocumentType, LajiForm } from '@kotka/shared/models';
+import { Document, KotkaDocumentType, LajiForm } from '@kotka/shared/models';
 import { ToFullUriPipe } from '@kotka/ui/core';
 
 @Component({
@@ -33,7 +33,7 @@ export class SpecimenViewerContentComponent {
   fields = input<LajiForm.Field[]>();
   document = input<Document>();
 
-  dataType = KotkaRootDocumentType.specimen;
+  dataType = KotkaDocumentType.specimen;
 
   private filteredFields = [
     'datatype',

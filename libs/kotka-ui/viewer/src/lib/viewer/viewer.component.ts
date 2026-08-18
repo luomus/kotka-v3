@@ -6,7 +6,7 @@ import {
 } from '@angular/core';
 import {
   DifferenceObject,
-  KotkaRootDocument,
+  KotkaDocument,
 } from '@kotka/shared/models';
 import { ViewerFieldsetFieldsComponent } from '../components/viewer-fieldset-fields.component';
 import { ViewerField } from '../models/models';
@@ -21,6 +21,6 @@ import { ViewerField } from '../models/models';
 })
 export class ViewerComponent {
   fields = input<ViewerField[]>([]);
-  data = input<KotkaRootDocument | undefined>();
+  data = input<KotkaDocument | undefined>();
   differenceData = input<DifferenceObject>();
 }

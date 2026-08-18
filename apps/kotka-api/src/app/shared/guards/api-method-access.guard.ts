@@ -3,7 +3,7 @@ https://docs.nestjs.com/guards#guards
 */
 
 import { LajiStoreService } from '@kotka/api/services';
-import { KotkaRootDocument } from '@kotka/shared/models';
+import { KotkaDocument } from '@kotka/shared/models';
 import { allowEditForUser, allowDeleteForUser } from '@kotka/shared/utils';
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException, InternalServerErrorException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
@@ -29,7 +29,7 @@ export class ApiMethodAccessGuard implements CanActivate {
         throw new ForbiddenException(`User may only ${req.method} a ${type} with one of their own organizations as owner.`);
       }
     } else if (req.method === 'PUT') {
-      const res = await lastValueFrom(this.lajiStoreService.get<KotkaRootDocument>(type, req.params.id));
+      const res = await lastValueFrom(this.lajiStoreService.get<KotkaDocument>(type, req.params.id));
 
       if (!allowEditForUser(res.data, req.user.profile)) {
         throw new ForbiddenException(`Uset may only ${req.method} a ${type} which belongs to one of their own organizations.`);
@@ -41,7 +41,7 @@ export class ApiMethodAccessGuard implements CanActivate {
         throw new InternalServerErrorException('Missing expected id in url.');
       }
 
-      const res = await lastValueFrom(this.lajiStoreService.get<KotkaRootDocument>(type, req.params.id));
+      const res = await lastValueFrom(this.lajiStoreService.get<KotkaDocument>(type, req.params.id));
 
       if (!allowEditForUser(res.data, req.user.profile)) {
         throw new ForbiddenException(`Uset may only ${req.method} a ${type} which belongs to one of their own organizations.`);

@@ -9,15 +9,24 @@ import {
   BasicFilterModel,
   CombinedFilterModel,
 } from '../models/models';
-import { Injectable } from '@angular/core';
-import { DocumentListSearchParams } from '@kotka/ui/core';
-import { KotkaRootDocumentType } from '@kotka/shared/models';
+import { inject, Injectable } from '@angular/core';
+import { ApiClient, DocumentListSearchParams } from '@kotka/ui/core';
+import { KotkaDocument, KotkaDocumentType } from '@kotka/shared/models';
+import { ListResponse } from '@luomus/laji-schema';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
-export class DatatableDataService {
-  getSearchParams<T extends KotkaRootDocumentType>(
+export class DocumentDatatableDataService {
+  private apiClient = inject(ApiClient);
+
+  getRows<T extends KotkaDocumentType>(searchParams: DocumentListSearchParams<T>): Observable<ListResponse<KotkaDocument<T>>> {
+    return this.apiClient
+      .getDocumentList(searchParams.type, searchParams.page, searchParams.pageSize, searchParams.sort, searchParams.searchQueryString);
+  }
+
+  getSearchParams<T extends KotkaDocumentType>(
     type: T,
     columns: DatatableColumn[],
     startRow: number,
@@ -77,7 +86,9 @@ export class DatatableDataService {
     colIdFieldMap: Record<string, string>,
   ): string {
     return sortModel
-      .map((sort) => (colIdFieldMap[sort.colId] || sort.colId) + ' ' + sort.sort)
+      .map(
+        (sort) => (colIdFieldMap[sort.colId] || sort.colId) + ' ' + sort.sort,
+      )
       .join(',');
   }
 

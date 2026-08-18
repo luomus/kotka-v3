@@ -7,19 +7,21 @@ import {
   DatatableFilter, DatatableSort
 } from '../models/models';
 import { DatatableComponent } from '../datatable/datatable.component';
-import { DatatableDataService } from './datatable-data.service';
+import { DocumentDatatableDataService } from '../services/document-datatable-data.service';
 import {
-  KotkaRootDocumentMap,
-  KotkaRootDocumentType,
+  KotkaDocument,
+  KotkaDocumentType,
   ListResponse
 } from '@kotka/shared/models';
-import { ApiClient, DataTypeNamePipePipe, DocumentListSearchParams, UserService } from '@kotka/ui/core';
+import { DataTypeNamePipePipe, DocumentListSearchParams, UserService } from '@kotka/ui/core';
 import { map, switchMap } from 'rxjs';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 
-export interface DatatableLoadedData<T extends KotkaRootDocumentType = KotkaRootDocumentType, S extends KotkaRootDocumentMap[T] = KotkaRootDocumentMap[T]> {
+export interface DatatableLoadedData<
+  T extends KotkaDocumentType = KotkaDocumentType,
+> {
   searchParams: DocumentListSearchParams<T>;
-  result: ListResponse<S>;
+  result: ListResponse<KotkaDocument<T>>;
 }
 
 @Component({
@@ -28,12 +30,8 @@ export interface DatatableLoadedData<T extends KotkaRootDocumentType = KotkaRoot
   styleUrls: ['./document-datatable.component.scss'],
   imports: [CommonModule, DatatableComponent, DataTypeNamePipePipe],
 })
-export class DocumentDatatableComponent<
-  T extends KotkaRootDocumentType = KotkaRootDocumentType,
-  S extends KotkaRootDocumentMap[T] = KotkaRootDocumentMap[T],
-> {
-  private apiClient = inject(ApiClient);
-  private dataService = inject(DatatableDataService);
+export class DocumentDatatableComponent<T extends KotkaDocumentType = KotkaDocumentType> {
+  private dataService = inject(DocumentDatatableDataService);
   private userService = inject(UserService);
 
   @ViewChild(DatatableComponent, { static: true })
@@ -53,7 +51,7 @@ export class DocumentDatatableComponent<
   datasource: DatatableSource;
   settingsKey: Signal<string | undefined>;
 
-  loadData = output<DatatableLoadedData<T, S>>();
+  loadData = output<DatatableLoadedData<T>>();
 
   constructor() {
     this.datasource = {
@@ -68,15 +66,10 @@ export class DocumentDatatableComponent<
           this.extraSearchQuery(),
         );
 
-        this.apiClient
-          .getDocumentList<
-            T,
-            S
-          >(searchParams.type, searchParams.page, searchParams.pageSize, searchParams.sort, searchParams.searchQueryString)
-          .subscribe((result) => {
-            params.successCallback(result.member, result.totalItems);
-            this.loadData.emit({ searchParams, result });
-          });
+        this.dataService.getRows(searchParams).subscribe((result) => {
+          params.successCallback(result.member, result.totalItems);
+          this.loadData.emit({ searchParams, result });
+        });
       },
     };
 

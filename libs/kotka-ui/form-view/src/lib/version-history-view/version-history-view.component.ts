@@ -11,7 +11,7 @@ import {
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
-import { KotkaMainDocumentType, KotkaRootDocumentMap } from '@kotka/shared/models';
+import { KotkaMainDocumentType, KotkaDocument } from '@kotka/shared/models';
 import { isEqual } from 'lodash';
 import { DataTypeNamePipePipe, navigationEnd$ } from '@kotka/ui/core';
 import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
@@ -39,12 +39,11 @@ import { CommonModule } from '@angular/common';
   providers: [VersionHistoryViewFacade],
 })
 export class VersionHistoryViewComponent<
-    T extends KotkaMainDocumentType = KotkaMainDocumentType,
-    S extends KotkaRootDocumentMap[T] = KotkaRootDocumentMap[T],
+    T extends KotkaMainDocumentType = KotkaMainDocumentType
   >
   implements OnChanges, OnDestroy
 {
-  private versionHistoryFacade = inject<VersionHistoryViewFacade<T, S>>(
+  private versionHistoryFacade = inject<VersionHistoryViewFacade<T>>(
     VersionHistoryViewFacade,
   );
   private router = inject(Router);
@@ -58,7 +57,7 @@ export class VersionHistoryViewComponent<
   versions?: number[];
   view?: VersionHistoryViewEnum;
 
-  vm$: Observable<VersionHistoryState<S> | ErrorViewModel>;
+  vm$: Observable<VersionHistoryState<KotkaDocument<T>> | ErrorViewModel>;
 
   isErrorViewModel = isErrorViewModel;
   isSuccessViewModel = isSuccessViewModel;
@@ -68,7 +67,7 @@ export class VersionHistoryViewComponent<
 
   @Output() formInit = new EventEmitter<{
     lajiForm: LajiFormComponent;
-    formData: S;
+    formData: KotkaDocument<T>;
   }>();
 
   private routeSub: Subscription;

@@ -1,10 +1,10 @@
 import { JSONPath } from 'jsonpath-plus';
 import { cloneDeep } from 'lodash';
-import { ApiValidationError, KotkaRootDocument } from '@kotka/shared/models';
+import { ApiValidationError, KotkaDocument } from '@kotka/shared/models';
 import { ErrorSchema } from '@rjsf/utils';
 
 export class FormViewUtils {
-  static removeMetaAndExcludedFields<S extends KotkaRootDocument>(
+  static removeMetaAndExcludedFields<S extends KotkaDocument>(
     data: Partial<S>,
     excludedFields: string[] = [],
   ): Partial<S> {
