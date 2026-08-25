@@ -49,7 +49,7 @@ class LajiFormComponent<T extends FormData = FormData>
   static BOTTOM_OFFSET = 50;
 
   form = input<LajiFormModel.SchemaForm | null>(null);
-  formData = input<Partial<T>>({});
+  formData = input<T | Partial<T>>({});
 
   editMode = input<boolean>();
   hasChanges = input<boolean>();
