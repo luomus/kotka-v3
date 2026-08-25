@@ -5,15 +5,26 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { catchError, map, shareReplay, startWith, switchMap } from 'rxjs/operators';
+import {
+  catchError,
+  map,
+  shareReplay,
+  startWith,
+  switchMap,
+} from 'rxjs/operators';
 import { AsyncPipe } from '@angular/common';
 import { NotFoundComponent } from '@kotka/ui/base';
-import { Document, KotkaDocumentType, SpecimenDataType } from '@kotka/shared/models';
+import {
+  Document,
+  KotkaDocumentType,
+  SpecimenDataType,
+} from '@kotka/shared/models';
 import { combineLatest, Observable, of, Subject } from 'rxjs';
 import {
   ApiClient,
   DocumentDataResult,
   DocumentDataService,
+  UserService,
 } from '@kotka/ui/core';
 import {
   MainContentComponent,
@@ -21,13 +32,16 @@ import {
   SpinnerComponent,
   WithLeaveConfirmComponent,
 } from '@kotka/ui/components';
-import { NgbAlert, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbAlert, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { SpecimenViewerModalComponent } from './specimen-viewer-modal/specimen-viewer-modal.component';
 import { FormModalComponent } from '@kotka/ui/form-view';
 import { globals } from '../../../environments/globals';
-import { getId } from '@kotka/shared/utils';
-import { Branch } from '@luomus/laji-schema';
+import {
+  allowDeleteForUser,
+  allowEditForUser,
+  getId,
+} from '@kotka/shared/utils';
+import { Branch, Person } from '@luomus/laji-schema';
 import { BranchTableComponent } from './branch-table/branch-table.component';
 
 interface BranchesResult {
@@ -40,8 +54,11 @@ interface ViewModel {
   title?: string;
   document?: Document;
   branches?: Branch[];
+  allowEdit?: boolean;
+  defaultBranchData?: Partial<Branch>;
   loading: boolean;
   error?: string;
+  user?: Person;
 }
 
 @Component({
@@ -66,6 +83,7 @@ export class AccessionComponent
   private route = inject(ActivatedRoute);
   private apiClient = inject(ApiClient);
   private documentDataService = inject(DocumentDataService);
+  private userService = inject(UserService);
   private modalService = inject(NgbModal);
 
   showDepleted = true;
@@ -79,7 +97,9 @@ export class AccessionComponent
   constructor() {
     super();
 
-    const accession$: Observable<DocumentDataResult<KotkaDocumentType.specimen>> = this.uri$.pipe(
+    const accession$: Observable<
+      DocumentDataResult<KotkaDocumentType.specimen>
+    > = this.uri$.pipe(
       switchMap((uri) =>
         this.documentDataService
           .getDocumentData(KotkaDocumentType.specimen, uri)
@@ -129,17 +149,27 @@ export class AccessionComponent
       shareReplay(1),
     );
 
-    this.vm$ = combineLatest([accession$, branches$]).pipe(
-      map(([accession, branches]) => {
+    this.vm$ = combineLatest([
+      accession$,
+      branches$,
+      this.userService.getCurrentLoggedInUser(),
+    ]).pipe(
+      map(([accession, branches, user]) => {
         const loading = accession.loading || branches.loading;
         const error = accession.error || branches.error;
+        const document = accession.value;
 
         return {
           title: accession.title,
-          document: accession.value,
+          document,
           branches: branches.value,
+          allowEdit: document ? allowEditForUser(document, user) : false,
+          defaultBranchData: document
+            ? { accessionID: document.id }
+            : undefined,
           loading,
           error,
+          user
         };
       }),
       startWith({ loading: true }),
@@ -167,8 +197,12 @@ export class AccessionComponent
     this.activeModalRef = modalRef;
   }
 
-  openBranchForm(uri: string, branch?: Branch) {
-    const editMode = !!branch;
+  openBranchForm(
+    editMode: boolean,
+    allowEdit?: boolean,
+    user?: Person,
+    formData?: Partial<Branch>,
+  ) {
     const modalRef = this.modalService.open(FormModalComponent, {
       backdrop: 'static',
       size: 'lg',
@@ -176,8 +210,8 @@ export class AccessionComponent
 
     modalRef.componentInstance.formId = globals.branchFormId;
     modalRef.componentInstance.editMode = editMode;
-    modalRef.componentInstance.allowEdit = true; // TODO
-    modalRef.componentInstance.allowDelete = true; // TODO
+    modalRef.componentInstance.allowEdit = allowEdit;
+    modalRef.componentInstance.allowDelete = formData && user && allowDeleteForUser(formData, user);
     modalRef.componentInstance.title = editMode ? 'Edit Branch' : 'Add Branch';
     modalRef.componentInstance.save$ = (data: Branch) => {
       if (editMode) {
@@ -190,20 +224,11 @@ export class AccessionComponent
           data,
         );
       } else {
-        return this.apiClient.createDocument(
-          KotkaDocumentType.branch,
-          data,
-        );
+        return this.apiClient.createDocument(KotkaDocumentType.branch, data);
       }
     };
 
-    if (editMode) {
-      modalRef.componentInstance.formData = branch;
-    } else {
-      modalRef.componentInstance.formData = {
-        accessionID: getId(uri),
-      };
-    }
+    modalRef.componentInstance.formData = formData;
 
     modalRef.closed.subscribe(() => {
       this.refreshBranches$.next();

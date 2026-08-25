@@ -3,15 +3,8 @@ import { AuthenticationService } from '../authentication/authentication.service'
 import { createProxyMiddleware, RequestHandler, fixRequestBody } from 'http-proxy-middleware';
 import { Request, Response } from 'express';
 import { ClientRequest } from 'http';
-import { ErrorMessages, Person } from '@kotka/shared/models';
+import { ErrorMessages } from '@kotka/shared/models';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
-
-interface UserRequest extends Request {
-  user?: {
-    profile: Person,
-    personToken: string
-  }
-}
 
 @Controller('laji')
 @UseGuards(AuthenticateCookieGuard)
@@ -46,7 +39,7 @@ export class LajiApiController {
     });
   }
 
-  private proxyReq(proxyReq: ClientRequest, req: UserRequest) {
+  private proxyReq(proxyReq: ClientRequest, req: Request) {
     proxyReq.setHeader('API-Version', 1);
     proxyReq.setHeader('Authorization', process.env['LAJI_API_TOKEN']);
     proxyReq.setHeader('Accept-Language', 'en');
@@ -58,7 +51,7 @@ export class LajiApiController {
     fixRequestBody(proxyReq, req);
   }
 
-  private proxyRes(proxyRes: Request, req: UserRequest, res: Response) {
+  private proxyRes(proxyRes: Request, req: Request, res: Response) {
     // check if responses with status code 400 contain the person token expired error message, process other responses normally
     if (
       req.path !== '/forms/MHL.1158' && // TODO remove after specimen schema changes

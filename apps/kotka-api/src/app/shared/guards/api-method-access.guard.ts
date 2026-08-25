@@ -3,11 +3,23 @@ https://docs.nestjs.com/guards#guards
 */
 
 import { LajiStoreService } from '@kotka/api/services';
-import { KotkaDocument } from '@kotka/shared/models';
+import {
+  KotkaDocument,
+  KotkaObjectFullType,
+} from '@kotka/shared/models';
 import { allowEditForUser, allowDeleteForUser } from '@kotka/shared/utils';
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+  InternalServerErrorException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { lastValueFrom } from 'rxjs';
+import { Request } from 'express';
+import { Branch } from '@luomus/laji-schema';
 
 @Injectable()
 export class ApiMethodAccessGuard implements CanActivate {
@@ -19,20 +31,21 @@ export class ApiMethodAccessGuard implements CanActivate {
   async canActivate(
     context: ExecutionContext
   ): Promise<boolean> {
-    const req = context.switchToHttp().getRequest();
-    const type: string = this.reflector.get('controllerType', context.getClass());
+    const req = context.switchToHttp().getRequest<Request>();
+    const type = this.reflector.get<KotkaObjectFullType>('controllerType', context.getClass());
 
     if (req.method === 'POST' && !req.path?.endsWith('_search')) {
-      const doc = req.body;
+      const doc = await this.getDocForEditAccessCheck(type, req.body);
 
       if (!allowEditForUser(doc, req.user.profile)) {
         throw new ForbiddenException(`User may only ${req.method} a ${type} with one of their own organizations as owner.`);
       }
     } else if (req.method === 'PUT') {
       const res = await lastValueFrom(this.lajiStoreService.get<KotkaDocument>(type, req.params.id));
+      const doc = await this.getDocForEditAccessCheck(type, res.data);
 
-      if (!allowEditForUser(res.data, req.user.profile)) {
-        throw new ForbiddenException(`Uset may only ${req.method} a ${type} which belongs to one of their own organizations.`);
+      if (!allowEditForUser(doc, req.user.profile)) {
+        throw new ForbiddenException(`User may only ${req.method} a ${type} which belongs to one of their own organizations.`);
       }
 
       req['oldDoc'] = res.data;
@@ -42,9 +55,10 @@ export class ApiMethodAccessGuard implements CanActivate {
       }
 
       const res = await lastValueFrom(this.lajiStoreService.get<KotkaDocument>(type, req.params.id));
+      const doc = await this.getDocForEditAccessCheck(type, res.data);
 
-      if (!allowEditForUser(res.data, req.user.profile)) {
-        throw new ForbiddenException(`Uset may only ${req.method} a ${type} which belongs to one of their own organizations.`);
+      if (!allowEditForUser(doc, req.user.profile)) {
+        throw new ForbiddenException(`User may only ${req.method} a ${type} which belongs to one of their own organizations.`);
       }
 
       if (!allowDeleteForUser(res.data, req.user.profile)) {
@@ -53,5 +67,19 @@ export class ApiMethodAccessGuard implements CanActivate {
     }
 
     return true;
+  }
+
+  private async getDocForEditAccessCheck(type: KotkaObjectFullType, source: Partial<KotkaDocument>): Promise<Partial<KotkaDocument> | undefined> {
+    if (type === KotkaObjectFullType.branch) {
+      const accessionID = (<Partial<Branch>>source).accessionID;
+      if (!accessionID) {
+        throw new UnprocessableEntityException('Branch document must contain accessionID.');
+      }
+      return (await lastValueFrom(
+        this.lajiStoreService.get<KotkaDocument>(KotkaObjectFullType.document, accessionID),
+      )).data;
+    }
+
+    return source;
   }
 }

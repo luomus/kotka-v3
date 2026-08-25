@@ -1,8 +1,9 @@
 import {
   KotkaObjectFullType,
   KotkaMainDocument,
+  KotkaDocument,
 } from '@kotka/shared/models';
-import { Person } from '@luomus/laji-schema';
+import { isBranch, Person } from '@luomus/laji-schema';
 import moment from 'moment';
 import { MARoleKotkaEnum } from '@luomus/laji-schema';
 
@@ -10,7 +11,8 @@ const deleteAllowedForTypes = [
   KotkaObjectFullType.dataset,
   KotkaObjectFullType.transaction,
   KotkaObjectFullType.organization,
-  KotkaObjectFullType.document
+  KotkaObjectFullType.document,
+  KotkaObjectFullType.branch
 ];
 
 export function isAdmin(user: Person): boolean {
@@ -35,14 +37,12 @@ export function allowEditForUser(document: Partial<KotkaMainDocument>, user: Per
   return true;
 }
 
-export function allowDeleteForUser(document: Partial<KotkaMainDocument>, user: Person): boolean {
-  const type = document['@type'] as KotkaObjectFullType;
-
-  if (!type) {
+export function allowDeleteForUser(document: Partial<KotkaDocument>, user: Person): boolean {
+  if (!isFullDocument(document)) {
     return false;
   }
 
-  if (!deleteAllowedForTypes.includes(type)) {
+  if (!deleteAllowedForTypes.includes(document['@type'] as KotkaObjectFullType)) {
     return false;
   }
 
@@ -50,12 +50,14 @@ export function allowDeleteForUser(document: Partial<KotkaMainDocument>, user: P
     return true;
   }
 
-  if (!document.dateCreated) {
-    return false;
-  }
+  if (!isBranch(document)) {
+    if (!document.dateCreated) {
+      return false;
+    }
 
-  if (moment(document.dateCreated).add({ d: 14 }).isBefore(moment())) {
-    return false;
+    if (moment(document.dateCreated).add({ d: 14 }).isBefore(moment())) {
+      return false;
+    }
   }
 
   return true;
@@ -65,4 +67,8 @@ export function allowAllImageDeleteForUser(user: Person): boolean {
   const allowedKotkaRoles: MARoleKotkaEnum[] = ['MA.admin', 'MA.advanced'];
 
   return user.role?.includes('MA.admin') || (!!user.roleKotka && allowedKotkaRoles.includes(user.roleKotka));
+}
+
+function isFullDocument(document: Partial<KotkaDocument> | KotkaDocument): document is KotkaDocument {
+  return !!document['@type'];
 }

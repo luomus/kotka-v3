@@ -9,7 +9,8 @@
           @if (vm.document) {
             <button
               class="btn btn-success"
-              (click)="openBranchForm(uri)"
+              [disabled]="!vm.allowEdit"
+              (click)="openBranchForm(false, vm.allowEdit, vm.user, vm.defaultBranchData)"
             >
               <i class="fa fa-circle-plus"></i> Add branch
             </button>
@@ -40,7 +41,7 @@
         <kotka-branch-table
           [branches]="vm.branches"
           [showDepleted]="showDepleted"
-          (editBranch)="openBranchForm(uri, $event)"
+          (editBranch)="openBranchForm(true, vm.allowEdit, vm.user, $event)"
         ></kotka-branch-table>
       }
     </kui-main-content>

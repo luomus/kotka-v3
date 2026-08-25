@@ -240,4 +240,98 @@ describe('ApiMethodAccessGuard', () => {
     expect(mockLajistoreGet.mock.calls[0][0]).toBe('GX.dataset');
     expect(mockLajistoreGet.mock.calls[0][1]).toBe('GX.1');
   });
+
+  it('POST request for branch type uses accessionID to fetch specimen for access check', async () => {
+    jest.spyOn(reflector, 'get').mockImplementation(() => 'PUU.branch');
+    const mockContext = createMock<ExecutionContext>();
+
+    mockContext.switchToHttp().getRequest.mockReturnValue({ method: 'POST', user: { profile: { organisation: ['MOS.1'] }}, body: { accessionID: 'HT.123' }});
+    const mockLajistoreGet = jest.spyOn(lajiStoreService, 'get').mockImplementation(() => of({ data: { id: 'HT.123', owner: 'MOS.1' }, status: 200, statusText: '', headers: {}, config: {}} as AxiosResponse));
+
+    const canActivate = await apiMethodAccessGuard.canActivate(mockContext);
+    expect(canActivate).toBe(true);
+    expect(mockLajistoreGet).toBeCalledTimes(1);
+    expect(mockLajistoreGet.mock.calls[0][0]).toBe('MY.document');
+    expect(mockLajistoreGet.mock.calls[0][1]).toBe('HT.123');
+  });
+
+  it('POST request for branch type with specimen owned by different organization results in access denied', async () => {
+    jest.spyOn(reflector, 'get').mockImplementation(() => 'PUU.branch');
+    const mockContext = createMock<ExecutionContext>();
+
+    mockContext.switchToHttp().getRequest.mockReturnValue({ method: 'POST', user: { profile: { organisation: ['MOS.1'] }}, body: { accessionID: 'HT.123' }});
+    jest.spyOn(lajiStoreService, 'get').mockImplementation(() => of({ data: { id: 'HT.123', owner: 'MOS.2' }, status: 200, statusText: '', headers: {}, config: {}} as AxiosResponse));
+
+    await expect(apiMethodAccessGuard.canActivate(mockContext)).rejects.toThrow(ForbiddenException);
+  });
+
+  it('PUT request for branch type uses accessionID from stored document to fetch specimen for access check', async () => {
+    jest.spyOn(reflector, 'get').mockImplementation(() => 'PUU.branch');
+    const mockContext = createMock<ExecutionContext>();
+
+    mockContext.switchToHttp().getRequest.mockReturnValue({ params: { id: 'P.1' }, method: 'PUT', user: { profile: { organisation: ['MOS.1'] }}, body: { accessionID: 'HT.123' }});
+    const mockLajistoreGet = jest.spyOn(lajiStoreService, 'get').mockImplementation((type: string) => {
+      if (type === 'PUU.branch') {
+        return of({ data: { id: 'P.1', accessionID: 'HT.123' }, status: 200, statusText: '', headers: {}, config: {}} as AxiosResponse);
+      }
+      return of({ data: { id: 'HT.123', owner: 'MOS.1' }, status: 200, statusText: '', headers: {}, config: {}} as AxiosResponse);
+    });
+
+    const canActivate = await apiMethodAccessGuard.canActivate(mockContext);
+    expect(canActivate).toBe(true);
+    expect(mockLajistoreGet).toBeCalledTimes(2);
+    expect(mockLajistoreGet.mock.calls[0][0]).toBe('PUU.branch');
+    expect(mockLajistoreGet.mock.calls[0][1]).toBe('P.1');
+    expect(mockLajistoreGet.mock.calls[1][0]).toBe('MY.document');
+    expect(mockLajistoreGet.mock.calls[1][1]).toBe('HT.123');
+  });
+
+  it('PUT request for branch type with specimen owned by different organization results in access denied', async () => {
+    jest.spyOn(reflector, 'get').mockImplementation(() => 'PUU.branch');
+    const mockContext = createMock<ExecutionContext>();
+
+    mockContext.switchToHttp().getRequest.mockReturnValue({ params: { id: 'P.1' }, method: 'PUT', user: { profile: { organisation: ['MOS.1'] }}, body: { accessionID: 'HT.123' }});
+    jest.spyOn(lajiStoreService, 'get').mockImplementation((type: string) => {
+      if (type === 'PUU.branch') {
+        return of({ data: { id: 'P.1', accessionID: 'HT.123' }, status: 200, statusText: '', headers: {}, config: {}} as AxiosResponse);
+      }
+      return of({ data: { id: 'HT.123', owner: 'MOS.2' }, status: 200, statusText: '', headers: {}, config: {}} as AxiosResponse);
+    });
+
+    await expect(apiMethodAccessGuard.canActivate(mockContext)).rejects.toThrow(ForbiddenException);
+  });
+
+  it('DELETE request for branch type uses accessionID from stored document to fetch specimen for access check', async () => {
+    jest.spyOn(reflector, 'get').mockImplementation(() => 'PUU.branch');
+    const mockContext = createMock<ExecutionContext>();
+
+    mockContext.switchToHttp().getRequest.mockReturnValue({ params: { id: 'P.1' }, method: 'DELETE', user: { profile: { organisation: ['MOS.1'] }}, body: {}});
+    const mockLajistoreGet = jest.spyOn(lajiStoreService, 'get').mockImplementation((type: string) => {
+      if (type === 'PUU.branch') {
+        return of({ data: { '@type': 'PUU.branch', id: 'P.1', accessionID: 'HT.123' }, status: 200, statusText: '', headers: {}, config: {}} as AxiosResponse);
+      }
+      return of({ data: { id: 'HT.123', owner: 'MOS.1' }, status: 200, statusText: '', headers: {}, config: {}} as AxiosResponse);
+    });
+
+    const canActivate = await apiMethodAccessGuard.canActivate(mockContext);
+    expect(canActivate).toBe(true);
+    expect(mockLajistoreGet).toBeCalledTimes(2);
+    expect(mockLajistoreGet.mock.calls[1][0]).toBe('MY.document');
+    expect(mockLajistoreGet.mock.calls[1][1]).toBe('HT.123');
+  });
+
+  it('DELETE request for branch type with specimen owned by different organization results in access denied', async () => {
+    jest.spyOn(reflector, 'get').mockImplementation(() => 'PUU.branch');
+    const mockContext = createMock<ExecutionContext>();
+
+    mockContext.switchToHttp().getRequest.mockReturnValue({ params: { id: 'P.1' }, method: 'DELETE', user: { profile: { organisation: ['MOS.1'] }}, body: {}});
+    jest.spyOn(lajiStoreService, 'get').mockImplementation((type: string) => {
+      if (type === 'PUU.branch') {
+        return of({ data: { '@type': 'PUU.branch', id: 'P.1', accessionID: 'HT.123' }, status: 200, statusText: '', headers: {}, config: {}} as AxiosResponse);
+      }
+      return of({ data: { id: 'HT.123', owner: 'MOS.2' }, status: 200, statusText: '', headers: {}, config: {}} as AxiosResponse);
+    });
+
+    await expect(apiMethodAccessGuard.canActivate(mockContext)).rejects.toThrow(ForbiddenException);
+  });
 });
