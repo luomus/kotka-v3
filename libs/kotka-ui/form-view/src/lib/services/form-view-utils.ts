@@ -2,6 +2,8 @@ import { JSONPath } from 'jsonpath-plus';
 import { cloneDeep } from 'lodash';
 import { ApiValidationError, KotkaDocument } from '@kotka/shared/models';
 import { ErrorSchema } from '@rjsf/utils';
+import { LajiFormComponent } from '@kotka/ui/laji-form';
+import { ToastService } from '@kotka/ui/core';
 
 export class FormViewUtils {
   static removeMetaAndExcludedFields<S extends KotkaDocument>(
@@ -34,26 +36,26 @@ export class FormViewUtils {
     return data;
   }
 
-  static apiValidationErrorsToRJSFErrorSchema = (error: ApiValidationError): ErrorSchema => {
-    const errorSchema: ErrorSchema = {};
-
-    for (const property of Object.keys(error.details)) {
-      const segments = property.replace(/^\//, '').split('/');
-      let current: ErrorSchema = errorSchema;
-
-      for (let i = 0; i < segments.length; i++) {
-        const segment = segments[i];
-        if (i === segments.length - 1) {
-          current[segment] = { ...current[segment], __errors: error.details[property] } as ErrorSchema;
-        } else {
-          current[segment] = current[segment] || {};
-          current = current[segment];
-        }
-      }
+  static handleErrorResponse(
+    err: any,
+    lajiForm: LajiFormComponent | undefined,
+    notifier: ToastService,
+    generalErrorMessage = 'Save failed!',
+  ) {
+    if (err.error?.errorCode === 'VALIDATION_EXCEPTION') {
+      lajiForm?.showErrors(
+        FormViewUtils.apiValidationErrorsToRJSFErrorSchema(err.error),
+      );
+    } else if (err.status === 413) {
+      lajiForm?.showErrors({
+        __errors: ['Content is too large.'],
+      } as ErrorSchema);
+    } else {
+      notifier.showError(generalErrorMessage);
     }
 
-    return errorSchema;
-  };
+    lajiForm?.unBlock();
+  }
 
   private static removeMetaFieldsRecursively(data: unknown): unknown {
     if (Array.isArray(data)) {
@@ -71,4 +73,30 @@ export class FormViewUtils {
 
     return data;
   }
+
+  private static apiValidationErrorsToRJSFErrorSchema = (
+    error: ApiValidationError,
+  ): ErrorSchema => {
+    const errorSchema: ErrorSchema = {};
+
+    for (const property of Object.keys(error.details)) {
+      const segments = property.replace(/^\//, '').split('/');
+      let current: ErrorSchema = errorSchema;
+
+      for (let i = 0; i < segments.length; i++) {
+        const segment = segments[i];
+        if (i === segments.length - 1) {
+          current[segment] = {
+            ...current[segment],
+            __errors: error.details[property],
+          } as ErrorSchema;
+        } else {
+          current[segment] = current[segment] || {};
+          current = current[segment];
+        }
+      }
+    }
+
+    return errorSchema;
+  };
 }

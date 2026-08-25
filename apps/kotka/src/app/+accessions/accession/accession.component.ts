@@ -19,7 +19,7 @@ import {
   KotkaDocumentType,
   SpecimenDataType,
 } from '@kotka/shared/models';
-import { combineLatest, Observable, of, Subject } from 'rxjs';
+import { combineLatest, Observable, of, Subject, throwError } from 'rxjs';
 import {
   ApiClient,
   DocumentDataResult,
@@ -216,7 +216,7 @@ export class AccessionComponent
     modalRef.componentInstance.save$ = (data: Branch) => {
       if (editMode) {
         if (!data.id) {
-          throw new Error('Branch is missing an id');
+          return throwError(() => new Error('Branch is missing an id'));
         }
         return this.apiClient.updateDocument(
           KotkaDocumentType.branch,
@@ -226,6 +226,12 @@ export class AccessionComponent
       } else {
         return this.apiClient.createDocument(KotkaDocumentType.branch, data);
       }
+    };
+    modalRef.componentInstance.delete$ = (data: Partial<Branch>) => {
+      if (!data.id) {
+        return throwError(() => new Error('Branch is missing an id'));
+      }
+      return this.apiClient.deleteDocument(KotkaDocumentType.branch, data.id);
     };
 
     modalRef.componentInstance.formData = formData;

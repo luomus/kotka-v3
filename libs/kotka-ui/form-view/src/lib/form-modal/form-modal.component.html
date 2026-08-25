@@ -25,6 +25,9 @@
   }
 
   <ng-container kuiModalFooter>
+    @if (vm.showDeleteButton) {
+      <button class="btn btn-danger me-auto" (click)="delete()" [disabled]="vm.disabled">Delete</button>
+    }
     <button class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
     <button class="btn btn-success" (click)="save()" [disabled]="vm.disabled">Save</button>
   </ng-container>

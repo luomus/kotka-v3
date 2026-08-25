@@ -1,6 +1,5 @@
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   ViewChild,
   TemplateRef,
@@ -8,7 +7,8 @@ import {
   output,
   effect,
   Signal,
-  inject, computed,
+  inject,
+  computed,
 } from '@angular/core';
 import {
   LajiForm,
@@ -60,7 +60,6 @@ export class FormViewComponent<
   private apiClient = inject(ApiClient);
   private dialogService = inject(DialogService);
   private formViewFacade = inject<FormViewFacade<T>>(FormViewFacade);
-  private cdr = inject(ChangeDetectorRef);
 
   formId = input.required<string>();
   dataType = input.required<T>();
@@ -154,7 +153,7 @@ export class FormViewComponent<
         this.saveSuccess.emit(formData);
       },
       error: (err) => {
-        this.onErrorResponse(err);
+        FormViewUtils.handleErrorResponse(err, this.lajiForm, this.notifier);
       },
     });
   }
@@ -189,7 +188,7 @@ export class FormViewComponent<
         this.copyAsNew(data);
       },
       error: (err) => {
-        this.onErrorResponse(err);
+        FormViewUtils.handleErrorResponse(err, this.lajiForm, this.notifier);
       },
     });
   }
@@ -216,11 +215,11 @@ export class FormViewComponent<
     this.apiClient.deleteDocument(this.dataType(), data.id).subscribe({
       next: () => {
         this.onSuccessResponse();
-        this.notifier.showSuccess('Success!');
+        this.notifier.showSuccess('Delete success!');
         this.deleteSuccess.emit();
       },
       error: (err) => {
-        this.onErrorResponse(err, 'Delete failed!');
+        FormViewUtils.handleErrorResponse(err, this.lajiForm, this.notifier, 'Delete failed!');
       },
     });
   }
@@ -252,23 +251,5 @@ export class FormViewComponent<
   private onSuccessResponse() {
     this.formViewFacade.setFormHasChanges(false);
     this.lajiForm?.unBlock();
-  }
-
-  private onErrorResponse(err: any, generalErrorMessage = 'Save failed!') {
-    if (err.error?.errorCode === 'VALIDATION_EXCEPTION') {
-      this.lajiForm?.showErrors(
-        FormViewUtils.apiValidationErrorsToRJSFErrorSchema(err.error),
-      );
-    } else if (err.status === 413) {
-      this.lajiForm?.showErrors({
-        __errors: ['Content is too large.'],
-      } as ErrorSchema);
-    } else {
-      this.notifier.showError(generalErrorMessage);
-    }
-
-    this.lajiForm?.unBlock();
-
-    this.cdr.markForCheck();
   }
 }

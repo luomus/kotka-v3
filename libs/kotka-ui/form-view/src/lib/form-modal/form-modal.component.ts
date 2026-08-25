@@ -1,7 +1,6 @@
 import {
   afterNextRender,
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   inject,
   Signal,
@@ -9,7 +8,7 @@ import {
 } from '@angular/core';
 import { NgbActiveModal, NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 import { LajiFormComponent } from '@kotka/ui/laji-form';
-import { ToastService } from '@kotka/ui/core';
+import { ToastService, DialogService } from '@kotka/ui/core';
 import {
   ModalComponent,
   ModalFooterDirective,
@@ -18,7 +17,6 @@ import {
 } from '@kotka/ui/components';
 import { FormState, FormFacade } from '../services/form.facade';
 import { FormViewUtils } from '../services/form-view-utils';
-import { ErrorSchema } from '@rjsf/utils';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -33,7 +31,7 @@ export class FormModalComponent<T extends FormData> {
 
   private facade = inject<FormFacade<T>>(FormFacade);
   private notifier = inject(ToastService);
-  private cdr = inject(ChangeDetectorRef);
+  private dialogService = inject(DialogService);
 
   formId!: string;
   editMode = false;
@@ -43,6 +41,7 @@ export class FormModalComponent<T extends FormData> {
 
   title = '';
   save$!: (data: T) => Observable<T>;
+  delete$!: (data: Partial<T>) => Observable<void>;
 
   formState: Signal<FormState<T>>;
 
@@ -81,26 +80,34 @@ export class FormModalComponent<T extends FormData> {
         this.modal.close(result);
       },
       error: (err) => {
-        this.onErrorResponse(err);
+        FormViewUtils.handleErrorResponse(err, this.lajiForm, this.notifier);
       },
     });
   }
 
-  private onErrorResponse(err: any) {
-    if (err.error?.errorCode === 'VALIDATION_EXCEPTION') {
-      this.lajiForm?.showErrors(
-        FormViewUtils.apiValidationErrorsToRJSFErrorSchema(err.error),
-      );
-    } else if (err.status === 413) {
-      this.lajiForm?.showErrors({
-        __errors: ['Content is too large.'],
-      } as ErrorSchema);
-    } else {
-      this.notifier.showError('Save failed!');
-    }
+  delete() {
+    this.dialogService.confirm('Are you sure you want to delete this?').subscribe((confirm) => {
+      if (!confirm) {
+        return;
+      }
 
-    this.lajiForm?.unBlock();
-    this.cdr.markForCheck();
+      const formData = this.formState().formData;
+      if (!formData) {
+        return;
+      }
+
+      this.lajiForm?.block();
+
+      this.delete$(formData).subscribe({
+        next: () => {
+          this.notifier.showSuccess('Delete success!');
+          this.modal.close('delete');
+        },
+        error: (err) => {
+          FormViewUtils.handleErrorResponse(err, this.lajiForm, this.notifier, 'Delete failed!');
+        },
+      });
+    });
   }
 }
 

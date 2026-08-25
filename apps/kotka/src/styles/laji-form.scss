@@ -4,6 +4,10 @@
 @import "node_modules/@fortawesome/fontawesome-free/scss/functions";
 
 .laji-form {
+  &.blocking-loader {
+    z-index: 1060;
+  }
+
   label:not(.btn) {
     font-weight: 700;
   }
