@@ -1,21 +1,12 @@
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component, inject,
-  OnDestroy,
-  OnInit
-} from '@angular/core';
-import {
-  DateCellRendererComponent,
-  LabelCellRendererComponent,
-  URICellRendererComponent,
-  BooleanFilterComponent,
-  BooleanFloatingFilterComponent,
-  AutocompleteFloatingFilterComponent,
   DatatableColumn,
   DatatableFilter,
-  DocumentDatatableDataService,
   DocumentDatatableComponent,
+  DocumentDatatableDataService,
+  getAutocompleteColumnOptions,
+  getBooleanColumnOptions,
+  getDateColumnOptions, getUriColumnOptions,
 } from '@kotka/ui/datatable';
 import { Organization } from '@luomus/laji-schema';
 import { debounceTime, Subject, Subscription } from 'rxjs';
@@ -37,24 +28,16 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
     {
       headerName: 'URI',
       field: 'id',
-      cellRenderer: URICellRendererComponent,
-      width: 145,
-      flex: 0,
+      ...getUriColumnOptions(),
       lockPosition: 'left',
-      defaultSelected: true
+      defaultSelected: true,
     },
     {
       headerName: 'Owner',
       field: 'owner',
+      ...getAutocompleteColumnOptions(KotkaDocumentType.organization),
       flex: 2,
-      cellRenderer: LabelCellRendererComponent,
-      floatingFilterComponent: AutocompleteFloatingFilterComponent,
-      floatingFilterComponentParams: {
-        type: 'organization',
-      },
-      suppressFloatingFilterButton: true,
-      suppressHeaderFilterButton: true,
-      sortable: false
+      sortable: false,
     },
     {
       headerName: 'Organization',
@@ -62,19 +45,19 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
       flex: 3,
       sort: 'asc',
       minWidth: 145,
-      defaultSelected: true
+      defaultSelected: true,
     },
     {
       headerName: 'Suborganization',
       field: 'organizationLevel2.en',
       flex: 2,
-      defaultSelected: true
+      defaultSelected: true,
     },
     {
       headerName: 'Department',
       field: 'organizationLevel3.en',
       flex: 2,
-      defaultSelected: true
+      defaultSelected: true,
     },
     {
       headerName: 'Section, team',
@@ -102,37 +85,20 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
     {
       headerName: 'Tags',
       field: 'datasetID',
-      cellRenderer: LabelCellRendererComponent,
-      floatingFilterComponent: AutocompleteFloatingFilterComponent,
-      floatingFilterComponentParams: {
-        type: 'dataset',
-      },
-      suppressFloatingFilterButton: true,
-      suppressHeaderFilterButton: true,
+      ...getAutocompleteColumnOptions(KotkaDocumentType.dataset),
       sortable: false,
     },
     {
       headerName: 'Orders Due',
       field: 'dateOrdersDue',
-      cellRenderer: DateCellRendererComponent,
-      filter: 'agDateColumnFilter',
-      filterParams: {
-        inRangeFloatingFilterDateFormat: 'DD.MM.YYYY',
-      },
+      ...getDateColumnOptions()
     },
     {
       headerName: 'Hidden',
       field: 'hidden',
-      cellRenderer: LabelCellRendererComponent,
-      filter: BooleanFilterComponent,
-      floatingFilterComponent: BooleanFloatingFilterComponent,
-      suppressFloatingFilterButton: true,
-      suppressHeaderFilterButton: true,
-      width: 100,
-      minWidth: 100,
-      flex: 0,
+      ...getBooleanColumnOptions(),
       defaultSelected: true,
-    }
+    },
   ];
 
   defaultFilterModel: DatatableFilter = {

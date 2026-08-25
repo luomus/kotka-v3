@@ -12,7 +12,7 @@ import {
 } from '@kotka/ui/components';
 import { KotkaDocumentType } from '@kotka/shared/models';
 
-interface FilterExtraParams {
+export interface AutocompleteFilterParams {
   type:
     | KotkaDocumentType.dataset
     | KotkaDocumentType.organization
@@ -37,7 +37,7 @@ export class AutocompleteFloatingFilterComponent
 {
   private apiClient = inject(ApiClient);
 
-  params!: IFloatingFilterParams & FilterExtraParams;
+  params!: IFloatingFilterParams & AutocompleteFilterParams;
 
   currentFilter?: string;
   fetchResultsFunc: FetchAutocompleteResultsFunc;
@@ -46,7 +46,7 @@ export class AutocompleteFloatingFilterComponent
     this.fetchResultsFunc = this.getAutocompleteResults.bind(this);
   }
 
-  agInit(params: IFloatingFilterParams<TextFilter> & FilterExtraParams): void {
+  agInit(params: IFloatingFilterParams<TextFilter> & AutocompleteFilterParams): void {
     this.params = params;
   }
 

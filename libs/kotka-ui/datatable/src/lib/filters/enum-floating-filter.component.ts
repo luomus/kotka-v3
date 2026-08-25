@@ -5,12 +5,11 @@ import {
   TextFilterModel,
 } from '@ag-grid-community/core';
 import { IFloatingFilterAngularComp } from '@ag-grid-community/angular';
-import { LajiForm } from '@kotka/shared/models';
 import { KeyValuePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 interface FilterExtraParams {
-  field: LajiForm.Field;
+  valueMap?: Record<string, string>;
 }
 
 @Component({
@@ -58,7 +57,7 @@ export class EnumFloatingFilterComponent
 
   agInit(params: IFloatingFilterParams<TextFilter> & FilterExtraParams): void {
     this.params = params;
-    this.valueOptions = { ...params.field.options?.value_options, '': '' };
+    this.valueOptions = { ...params.valueMap, '': '' };
   }
 
   onParentModelChanged(parentModel?: TextFilterModel | null) {

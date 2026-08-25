@@ -14,3 +14,4 @@ export * from './lib/models/models';
 export * from './lib/document-datatable/document-datatable.component';
 export * from './lib/services/document-datatable-data.service';
 export * from './lib/services/document-datatable-column.service';
+export * from './lib/services/document-datatable-column-utils';

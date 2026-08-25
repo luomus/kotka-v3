@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { DatatableColumn, URICellRendererComponent, DocumentDatatableComponent } from '@kotka/ui/datatable';
+import { DatatableColumn, DocumentDatatableComponent, getUriColumnOptions } from '@kotka/ui/datatable';
 import { KotkaDocumentType } from '@kotka/shared/models';
 import { MainContentComponent } from '@kotka/ui/components';
 
@@ -17,7 +17,7 @@ export class DatasetTableComponent {
     {
       headerName: 'URI',
       field: 'id',
-      cellRenderer: URICellRendererComponent,
+      ...getUriColumnOptions(),
       lockPosition: 'left',
     },
     {

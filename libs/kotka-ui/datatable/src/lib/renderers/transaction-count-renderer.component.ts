@@ -33,7 +33,18 @@ export class TransactionCountRendererComponent extends CellRendererComponent<Ren
     );
   }
 
-  static getTransactionCount(
+  static override getExportValue(
+    value: undefined,
+    row: SpecimenTransaction,
+    params: RendererExtraParams,
+  ): string {
+    return (
+      '' +
+      TransactionCountRendererComponent.getTransactionCount(row, params.type)
+    );
+  }
+
+  private static getTransactionCount(
     transaction: SpecimenTransaction,
     countType: TransactionCountType,
   ) {
@@ -51,16 +62,5 @@ export class TransactionCountRendererComponent extends CellRendererComponent<Ren
     } else {
       return returnedCount;
     }
-  }
-
-  static override getExportValue(
-    value: undefined,
-    row: SpecimenTransaction,
-    params: RendererExtraParams,
-  ): string {
-    return (
-      '' +
-      TransactionCountRendererComponent.getTransactionCount(row, params.type)
-    );
   }
 }

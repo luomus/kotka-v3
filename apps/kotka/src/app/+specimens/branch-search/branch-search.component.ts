@@ -3,10 +3,10 @@ import {
   Component, inject
 } from '@angular/core';
 import {
-  URICellRendererComponent,
   DatatableColumn,
   DocumentDatatableComponent,
   DocumentDatatableColumnService,
+  SpecialColumns, getUriColumnOptions,
 } from '@kotka/ui/datatable';
 import { KotkaDocumentType } from '@kotka/shared/models';
 import { MainContentComponent } from '@kotka/ui/components';
@@ -41,26 +41,31 @@ export class BranchSearchComponent {
     {
       headerName: 'URI',
       field: 'id',
-      cellRenderer: URICellRendererComponent,
-      cellRendererParams: {
+      ...getUriColumnOptions({
         showEditLink: false,
         showViewLink: true,
         viewRouterLink: ['/accessions'],
         getViewRouterQueryParams: (data: Branch) => ({
           uri: getUri(data.accessionID),
         }),
-      },
-      width: 145,
-      flex: 0,
+      }),
       lockPosition: 'left',
       defaultSelected: true,
-      cellStyle: { lineHeight: 'normal' },
     },
   ];
+  private specialColumns: SpecialColumns = {
+    'accessionID': {
+      type: 'uri',
+      params: { showEditLink: false, showViewLink: true, viewRouterLink: ['/view'] },
+    },
+    'collectionID': { type: 'autocomplete', params: { type: 'collection' } },
+    'exists': 'boolean',
+    'events.date': 'date'
+  };
 
   constructor() {
-    this.columns$ = this.columnService.getColumnsFromFormSchema(globals.branchFormId).pipe(
-      map(columns => ([...this.customColumns, ...columns])),
+    this.columns$ = this.columnService.getColumnsFromFormSchema(globals.branchFormId, this.specialColumns).pipe(
+      map(columns => ([...this.customColumns, ...columns]))
     );
   }
 }

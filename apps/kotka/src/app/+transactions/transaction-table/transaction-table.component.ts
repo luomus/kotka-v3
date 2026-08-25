@@ -1,23 +1,14 @@
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
 import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  inject
-} from '@angular/core';
-import {
-  LabelCellRendererComponent,
-  DateCellRendererComponent,
-  TransactionCountRendererComponent,
-  DueDaysRendererComponent,
-  EnumFloatingFilterComponent,
-  YearFloatingFilterComponent,
   DatatableColumn,
-} from '@kotka/ui/datatable';
-import {
-  URICellRendererComponent,
-  EnumCellRendererComponent,
-  AutocompleteFloatingFilterComponent,
+  DateCellRendererComponent,
   DocumentDatatableComponent,
+  DueDaysRendererComponent,
+  getAutocompleteColumnOptions,
+  getDateColumnOptions,
+  getEnumColumnOptions, getUriColumnOptions,
+  TransactionCountRendererComponent,
+  YearFloatingFilterComponent
 } from '@kotka/ui/datatable';
 import { FormService } from '@kotka/ui/core';
 import { KotkaDocumentType, LajiForm } from '@kotka/shared/models';
@@ -60,21 +51,14 @@ export class TransactionTableComponent {
       {
         headerName: 'URI',
         field: 'id',
-        cellRenderer: URICellRendererComponent,
+        ...getUriColumnOptions(),
         defaultSelected: true,
         lockPosition: 'left',
       },
       {
         headerName: 'Owner',
         field: 'owner',
-        cellRenderer: LabelCellRendererComponent,
-        floatingFilterComponent: AutocompleteFloatingFilterComponent,
-        floatingFilterComponentParams: {
-          type: 'organization',
-        },
-        suppressFloatingFilterButton: true,
-        suppressHeaderFilterButton: true,
-        sortable: false,
+        ...getAutocompleteColumnOptions(KotkaDocumentType.organization),
         defaultSelected: true,
         rememberFilters: true,
         lockPosition: 'left',
@@ -82,41 +66,19 @@ export class TransactionTableComponent {
       {
         headerName: 'Transaction status',
         field: 'status',
-        cellRenderer: EnumCellRendererComponent,
-        cellRendererParams: {
-          field: fieldData['status'],
-        },
-        floatingFilterComponent: EnumFloatingFilterComponent,
-        floatingFilterComponentParams: {
-          field: fieldData['status'],
-        },
-        suppressFloatingFilterButton: true,
-        suppressHeaderFilterButton: true,
+        ...getEnumColumnOptions(fieldData['status'].options?.value_options),
         defaultSelected: true,
       },
       {
         headerName: 'Transaction type',
         field: 'type',
-        cellRenderer: EnumCellRendererComponent,
-        cellRendererParams: {
-          field: fieldData['type'],
-        },
-        floatingFilterComponent: EnumFloatingFilterComponent,
-        floatingFilterComponentParams: {
-          field: fieldData['type'],
-        },
-        suppressFloatingFilterButton: true,
-        suppressHeaderFilterButton: true,
+        ...getEnumColumnOptions(fieldData['type'].options?.value_options),
         defaultSelected: true,
       },
       {
         headerName: 'Outgoing sent',
         field: 'outgoingSent',
-        cellRenderer: DateCellRendererComponent,
-        filter: 'agDateColumnFilter',
-        filterParams: {
-          inRangeFloatingFilterDateFormat: 'DD.MM.YYYY',
-        },
+        ...getDateColumnOptions()
       },
       {
         colId: 'outgoingSentYear',
@@ -134,11 +96,7 @@ export class TransactionTableComponent {
       {
         headerName: 'Incoming received',
         field: 'incomingReceived',
-        cellRenderer: DateCellRendererComponent,
-        filter: 'agDateColumnFilter',
-        filterParams: {
-          inRangeFloatingFilterDateFormat: 'DD.MM.YYYY',
-        },
+        ...getDateColumnOptions()
       },
       {
         colId: 'incomingReceivedYear',
@@ -156,27 +114,13 @@ export class TransactionTableComponent {
       {
         headerName: 'Counterparty organization',
         field: 'correspondentOrganization',
-        cellRenderer: LabelCellRendererComponent,
-        floatingFilterComponent: AutocompleteFloatingFilterComponent,
-        floatingFilterComponentParams: {
-          type: 'organization',
-        },
-        suppressFloatingFilterButton: true,
-        suppressHeaderFilterButton: true,
-        sortable: false,
+        ...getAutocompleteColumnOptions(KotkaDocumentType.organization),
         defaultSelected: true,
       },
       {
         headerName: 'Collection',
         field: 'collectionID',
-        cellRenderer: LabelCellRendererComponent,
-        floatingFilterComponent: AutocompleteFloatingFilterComponent,
-        floatingFilterComponentParams: {
-          type: 'collection',
-        },
-        suppressFloatingFilterButton: true,
-        suppressHeaderFilterButton: true,
-        sortable: false,
+        ...getAutocompleteColumnOptions('collection')
       },
       {
         headerName: 'Counterparty researcher',

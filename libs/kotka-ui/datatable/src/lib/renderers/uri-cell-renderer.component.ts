@@ -5,7 +5,7 @@ import { getDomainAndIdWithoutPrefix, getUri } from '@kotka/shared/utils';
 import { RouterLink } from '@angular/router';
 
 
-interface RendererExtraParams {
+export interface URICellRendererParams {
   showEditLink?: boolean;
   editRouterLink?: string[];
   getEditRouterQueryParams?: (data: any) => Record<string, string>;
@@ -14,7 +14,7 @@ interface RendererExtraParams {
   getViewRouterQueryParams?: (data: any) => Record<string, string>;
 }
 
-type RendererParams = ICellRendererParams & RendererExtraParams;
+type RendererParams = ICellRendererParams & URICellRendererParams;
 
 @Component({
   selector: 'kui-uri-cell-renderer',
