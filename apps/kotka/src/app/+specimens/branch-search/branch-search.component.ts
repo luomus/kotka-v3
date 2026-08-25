@@ -6,6 +6,7 @@ import {
   URICellRendererComponent,
   DatatableColumn,
   DocumentDatatableComponent,
+  DocumentDatatableColumnService,
 } from '@kotka/ui/datatable';
 import { KotkaDocumentType } from '@kotka/shared/models';
 import { MainContentComponent } from '@kotka/ui/components';
@@ -13,10 +14,9 @@ import { FormsModule } from '@angular/forms';
 import { getUri } from '@kotka/shared/utils';
 import { Branch } from '@luomus/laji-schema';
 import { globals } from '../../../environments/globals';
-import { map, Observable } from 'rxjs';
-import { ApiClient } from '@kotka/ui/core';
-import { SchemaService } from '@luomus/label-designer';
+import { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'kotka-branch-search',
@@ -31,12 +31,13 @@ import { AsyncPipe } from '@angular/common';
   ],
 })
 export class BranchSearchComponent {
-  private apiClient = inject(ApiClient);
-  private schemaService = inject(SchemaService);
+  private columnService = inject(DocumentDatatableColumnService);
 
   dataType: KotkaDocumentType.branch = KotkaDocumentType.branch;
 
-  columns: DatatableColumn[] = [
+  columns$: Observable<DatatableColumn[]>;
+
+  private customColumns: DatatableColumn[] = [
     {
       headerName: 'URI',
       field: 'id',
@@ -55,30 +56,11 @@ export class BranchSearchComponent {
       defaultSelected: true,
       cellStyle: { lineHeight: 'normal' },
     },
-    {
-      headerName: 'Location',
-      field: 'location',
-      defaultSelected: true,
-    },
   ];
 
-  columns$: Observable<DatatableColumn[]>;
-
   constructor() {
-    this.columns$ = this.apiClient.getForm(globals.branchFormId).pipe(
-      map((form) =>
-        form
-          ? this.schemaService.schemaToAvailableFields(form.schema, [], {
-              skip: [],
-            })
-          : [],
-      ),
-      map((fields) =>
-        fields.map((field) => ({
-          headerName: field.label,
-          field: field.field,
-        })),
-      ),
+    this.columns$ = this.columnService.getColumnsFromFormSchema(globals.branchFormId).pipe(
+      map(columns => ([...this.customColumns, ...columns])),
     );
   }
 }

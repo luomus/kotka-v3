@@ -13,3 +13,4 @@ export * from './lib/filters/boolean-floating-filter.component';
 export * from './lib/models/models';
 export * from './lib/document-datatable/document-datatable.component';
 export * from './lib/services/document-datatable-data.service';
+export * from './lib/services/document-datatable-column.service';
