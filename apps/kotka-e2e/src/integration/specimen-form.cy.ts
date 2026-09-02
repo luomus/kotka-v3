@@ -106,7 +106,7 @@ describe('specimen form', () => {
       cy.get('[data-cy=confirm-ok]').click();
       cy.get('[data-cy=toast]', { timeout: 10000 })
         .should('be.visible')
-        .should('contain.text', 'Success!');
+        .should('contain.text', 'Delete success!');
       cy.get('[data-cy=toast-close]').click();
       cy.url().should('equal', Cypress.config('baseUrl') + '/specimens/search');
     });

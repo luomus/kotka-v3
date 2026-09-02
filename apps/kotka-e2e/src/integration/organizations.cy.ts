@@ -60,7 +60,7 @@ describe('organizations', () => {
       cy.get('[data-cy=form-delete]').click();
       cy.get('[data-cy=confirm-ok]').click();
 
-      cy.get('[data-cy=toast]', { timeout: 10000 }).should('be.visible').should('contain.text', 'Success!');
+      cy.get('[data-cy=toast]', { timeout: 10000 }).should('be.visible').should('contain.text', 'Delete success!');
       cy.get('[data-cy=toast-close]').click();
       cy.url().should('equal', Cypress.config('baseUrl') + '/organizations');
     });
