@@ -4,64 +4,85 @@ import { ExtractorInterface } from './extractor.interface';
 import { StoreObject } from '@luomus/laji-schema/models';
 import { BulkRequest, IndicesIndexSettings, MappingTypeMapping, SearchRequest } from '@elastic/elasticsearch/lib/api/types';
 
+interface SearchQuery {
+  index: string;
+  query?: string;
+  sort?: string;
+  body?: any;
+  page?: number;
+  pageSize?: number;
+  fields?: string;
+}
+
 @Injectable()
 export class EsClientService {
   constructor(private readonly elasticsearchService: ElasticsearchService) {}
 
-  async search(search: SearchRequest) {
-    return await this.elasticsearchService.search({...search, allow_no_indices: true, ignore_unavailable: true});
+  getSearchBody(base: any, query: SearchQuery, size: number, page: number) {
+    base.size = size;
+    base.from = (page - 1) * size;
+
+    if (query.query) {
+      if (!base.query) {
+        base.query = {};
+      }
+
+      if (!base.query.bool) {
+        base.query.bool = {};
+      }
+
+      if (!base.query.bool.must) {
+        base.query.bool.must = [];
+      }
+
+      base.query.bool.must.push({query_string: {query: query.query}});
+    }
+
+    if (query.sort && typeof query.sort === 'string') {
+      base.sort = query.sort.split(',').map((sortBy) => {
+        const field = sortBy.trim().split(' ');
+
+        return { [field[0]]: { order: field[1] ?? 'asc' } };
+      });
+    }
+
+    if (!base.sort) {
+      base.sort = [];
+    }
+
+    base.track_total_hits = true;
+
+    if (query.fields) {
+      if (!base._source || typeof base._source === 'boolean') {
+        base._source = {};
+      }
+      if (!base._source.includes) {
+        base._source.includes = [];
+      }
+      base._source.includes.push(...query.fields.split(','))
+    } else if (!base._source) {
+      base._source = false;
+    }
+
+    return base;
   }
 
-  async searchQuery(index: string, query: any) {
+  async _search(query: SearchQuery) {
+    const size = query.body?.size ?? query.pageSize ?? 20;
+    const page = Math.max(
+      query.body?.from && size ?
+        Math.floor(query.body.from / size) + 1 :
+        query.page ?? 1,
+      1);
+
     return await this.search({
-      index,
-      query: query
+      index: query.index,
+      body: this.getSearchBody(query.body ?? {}, query, size, page)
     });
   }
 
-  async searchQueryString(index: string, queryString: string, limit = 25, page = 0, sort?: any, fields?: string[]) {
-    const query: SearchRequest = {
-      index,
-      query: { bool: { must: [{ query_string: { query: queryString }}]}},
-      size: limit,
-    };
-
-    if (fields) {
-      query['_source'] = fields;
-    }
-
-    if (sort) {
-      query['sort'] = sort;
-    }
-
-    if (page !== 0) {
-      query['from'] = page * limit;
-    }
-
-    return await this.search(query);
-  }
-
-  async searchAndAggregate(index: string, queryString: any, filters: {[key: string]: string | string[] | boolean | number },  agg: string[], fields: string[], limit = 10) {
-    const query: SearchRequest = {
-      index,
-    }
-
-    if (query) {
-      query['query'] = { bool: { must: [{ query_string: { query: queryString }}]}};
-    }
-
-    if (filters) {
-      if (!query['query']) {
-        query['query'] = { bool: { must: []}};
-      }
-
-      const searchFilters = [];
-
-      Object.keys(filters).forEach(key => {
-        searchFilters.push({ term: { [key]: filters[key] }});
-      });
-
-    }
+  async search(search: SearchRequest) {
+    return await this.elasticsearchService.search({...search, allow_no_indices: true, ignore_unavailable: true});
   }
 
   async hasIndex(index: string) {
@@ -146,31 +167,6 @@ export class EsClientService {
     if (bulk.body?.length) {
       await this.indexBulk(bulk);
     }
-  }
-
-  async getAggregate(index: string, fields: string[], queryString = '', limit = 10) {
-    const aggs: any = {};
-    fields.forEach(field => (aggs[field] = { terms: { field: `${field}.raw`, size: limit }}));
-    const query = { bool: { must: [{ query_string: { query: queryString }}]}};
-
-    const aggregations = (await this.search({
-      index,
-      size: 0,
-      aggs,
-      query
-    })).aggregations;
-
-    if (!aggregations) {
-      return;
-    }
-
-    const result: any = {};
-
-    Object.keys(aggregations).forEach(field => {
-      result[field] = (aggregations[field] as any).buckets;
-    });
-
-    return result;
   }
 
   async getMappedFields(index: string) {

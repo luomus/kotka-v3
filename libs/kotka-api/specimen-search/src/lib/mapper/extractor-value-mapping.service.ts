@@ -6,7 +6,7 @@ import { Collection, Dataset, Organization, Person } from '@kotka/shared/models'
 import { lastValueFrom, map } from 'rxjs';
 import { PerStoreTtl } from 'cacheable';
 
-const EXTRACTOR_TTL: PerStoreTtl = { primary:  '10s', secondary: '24h' };
+const EXTRACTOR_TTL: PerStoreTtl = { primary:  '10m', secondary: '24h' };
 const EXTRACTOR_ENUM_ROOT = 'extractor_enum';
 const EXTRACTOR_DATASET_ROOT = 'extractor_dataset';
 const EXTRACTOR_ORGANIZATION_ROOT = 'extractor_organization';
@@ -75,7 +75,7 @@ export class ExtractorValueMappingService {
   }
 
   async getOrganizationLabel(key: string) {
-    const name = await this.cacheService.getLookupValue<string>(
+    const name = await this.cacheService.getValueWithMultiSet<string>(
       EXTRACTOR_ORGANIZATION_ROOT,
       key,
       EXTRACTOR_TTL,
@@ -108,7 +108,7 @@ export class ExtractorValueMappingService {
   }
 
   async getDatasetLabel(key: string) {
-    const name = await this.cacheService.getLookupValue<string>(
+    const name = await this.cacheService.getValueWithMultiSet<string>(
       EXTRACTOR_DATASET_ROOT,
       key,
       EXTRACTOR_TTL,
@@ -172,7 +172,7 @@ export class ExtractorValueMappingService {
   }
 
   async getCollection(key: string): Promise<CollectionTreeNode | undefined> {
-    const collection = await this.cacheService.getLookupValue<CollectionTreeNode>(
+    const collection = await this.cacheService.getValueWithMultiSet<CollectionTreeNode>(
       EXTRACTOR_COLLECTION_ROOT,
       key,
       EXTRACTOR_TTL,
@@ -251,7 +251,7 @@ export class ExtractorValueMappingService {
   }
 
   async getSchemaEnum(key: string, field: string) {
-    const values = await this.cacheService.getLookupValue<{ [value: string]: string }>(
+    const values = await this.cacheService.getValueWithMultiSet<{ [value: string]: string }>(
       `${EXTRACTOR_ENUM_ROOT}`,
       field,
       EXTRACTOR_TTL,
@@ -274,6 +274,40 @@ export class ExtractorValueMappingService {
     }
 
     return key;
+  }
+
+  async getAltEnum(key: string, field: string) {
+    const values = await this.cacheService.getValue<{ [value: string]: string }>(
+      `${EXTRACTOR_ENUM_ROOT}_${field}`,
+      EXTRACTOR_TTL,
+      async () => {
+        return await this.getMetadataAlt(field);
+      }
+    );
+
+    if (values?.[key]) {
+      return values[key];
+    }
+
+
+    if (!values[field]) {
+      console.warn(`ElasticExtract: value ${key} not found in metadata enums for alt ${field}`);
+    }
+
+    return key;
+  }
+
+  async getMetadataAlt(field: string) {
+    return await lastValueFrom(this.lajiApiService.get<{ results: { id: string, value: string }[] }>(`metadata/alts/${field}`).pipe(
+      map(res => res.data),
+      map(res => res.results),
+      map(res => {
+        const map: Record<string, string> = {}
+        res.forEach(entry => map[entry.id] = entry.value)
+
+        return map;
+      })
+    ));
   }
 
   async getUser(userId: string) {
@@ -317,6 +351,8 @@ export class ExtractorValueMappingService {
         return await this.getDatasetLabel(value);
       case 'collectionID':
         return await this.getCollectionLabel(value);
+      case 'endangeredStatus':
+        return await this.getAltEnum(value, 'MX.iucnStatuses');
       default:
         return await this.getSchemaEnum(value, field);
     }

@@ -9,6 +9,6 @@ import { CacheModule } from '@kotka/api/cache';
   imports: [ ElasticModule, HttpModule, CacheModule ],
   controllers: [],
   providers: [ TaxonExtractorService, TaxonLinkingService ],
-  exports: [ TaxonLinkingService]
+  exports: [ TaxonLinkingService ]
 })
 export class TaxonLinkingModule {}

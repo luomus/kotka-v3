@@ -9,7 +9,6 @@ import { MXTaxonRankEnum } from 'libs/shared/models/src/lib/lajistore-extended-m
 export class TaxonUpdateCommand {
   constructor (
     private readonly taxonLinkingService: TaxonLinkingService,
-    private readonly esClientService: EsClientService
   ) {}
 
 
@@ -38,7 +37,7 @@ export class TaxonUpdateCommand {
   async getTaxon(name: string, author?: string, taxonRank?: MXTaxonRankEnum) {
     const result = await this.taxonLinkingService.getTaxon(name, author, taxonRank);
 
-    return;
+    return console.log(JSON.stringify(result, null, 2));
   }
 }
 

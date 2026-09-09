@@ -1,13 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom, map } from 'rxjs';
-import { MXTaxonRankEnum } from '@luomus/laji-schema/models';
+import { MXIucnStatuses, MXTaxonRankEnum } from '@luomus/laji-schema/models';
 import { TaxonExtractorService } from './taxon-extractor.service';
 import { EsClientService } from '@kotka/api/elasticsearch';
 import { BulkRequest } from '@elastic/elasticsearch/lib/api/types';
-import { Cached, CacheService } from '@kotka/api/cache';
+import { CacheService } from '@kotka/api/cache';
 
 const TAXON_NOT_FOUND = 'TAXON_NOT_FOUND';
+
+export type EndangeredStatus = 'MX.iucnEX' | 'MX.iucnEW' | 'MX.iucnRE' | 'MX.iucnCR' | 'MX.iucnEN' | 'MX.iucnVU' | 'MX.iucnNT';
 
 export interface TaxonName {
   scientificName: string;
@@ -28,6 +30,8 @@ export interface LinkableTaxon {
   class?: TaxonName;
   family?: TaxonName;
   species?: TaxonName;
+  redListStatus?: MXIucnStatuses;
+  endangeredStatus?: EndangeredStatus;
   names: string[];
 }
 
@@ -96,10 +100,12 @@ export class TaxonLinkingService {
   public async getTaxon(name: string, author?: string, taxonRank?: MXTaxonRankEnum): Promise<LinkableTaxon[] | undefined> {
     let taxonSearchQuery: any;
 
+    let lowerName = name.toLowerCase();
+
     if (name.indexOf('MX.') === 0) {
       taxonSearchQuery = {
         match: {
-          id: name
+          id: lowerName
         }
       };
     } else {
@@ -109,7 +115,7 @@ export class TaxonLinkingService {
           query: {
             bool: {
               must: [
-                { match: { 'taxonSearch.scientificName': name }}
+                { match: { 'taxonSearch.scientificName': lowerName }}
               ]
             }
           }
@@ -117,7 +123,7 @@ export class TaxonLinkingService {
       };
 
       if (author) {
-        taxonSearchQuery.nested.query.bool.should = [{ match: { 'taxonSearch.author': author }}];
+        taxonSearchQuery.nested.query.bool.must.push({ match: { 'taxonSearch.author': author.toLowerCase() }});
       }
     }
 
@@ -128,10 +134,14 @@ export class TaxonLinkingService {
     };
 
     if (taxonRank) {
-      query.bool.must.push({ match: { taxonRank } });
+      query.bool.must.push({ match: { taxonRank: taxonRank.toLowerCase() }});
     }
 
-    const result = await this.esClientService.searchQuery(this.taxonExtractorService.getIndex(), query);
+    const result = await this.esClientService.search({
+      index: this.taxonExtractorService.getIndex(),
+      query
+    });
+
     return result?.hits?.hits?.map(hit => hit._source) as LinkableTaxon[];
   }
 }

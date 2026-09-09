@@ -37,6 +37,7 @@ describe('AssociatedTaxaToUnitInterceptor', () => {
       switchToHttp: () => ({
         getRequest: () => ({
           method: 'POST',
+          path: '/_search',
         }),
       }),
       getHandler: () => ({ name: 'search' })

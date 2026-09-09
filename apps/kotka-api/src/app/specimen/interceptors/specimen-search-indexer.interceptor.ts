@@ -18,14 +18,18 @@ export class SpecimenIndexerInterceptor implements NestInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
-      tap((data: any) => {
+      tap(async (data: any) => {
         const req = context.switchToHttp().getRequest();
 
-        if (!((req.method === 'POST' && context.getHandler().name !== 'search') || req.method === 'PUT')) {
+        if (!((req.method === 'POST' && !req.path?.includes('_search')) || req.method === 'PUT')) {
           return;
         }
 
-        this.elasticClient.indexSingle(data as Document, this.specimenExtractorService);
+        try {
+          await this.elasticClient.indexSingle(data as Document, this.specimenExtractorService);
+        } catch (error) {
+          console.error('Error indexing specimen:', error);
+        }
       })
     );
   }

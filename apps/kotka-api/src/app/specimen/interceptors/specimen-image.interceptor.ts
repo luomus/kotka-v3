@@ -17,7 +17,7 @@ export class SpecimenImageInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = context.switchToHttp().getRequest();
 
-    if (req.method === 'PUT' || (req.method === 'POST' && context.getHandler().name !== 'search')) {
+    if (req.method === 'PUT' || (req.method === 'POST' && !req.path?.includes('_search'))) {
       const { images, ...body} = req.body;
 
       if (images) req.body = body;

@@ -30,12 +30,16 @@ export class SpecimenSearchService {
     return await this.autocompleteExtractorService.getAutocompleteSuggestion(field, query, limit);
   }
 
-  async getAggregateSearch(type: IndexTypes, fields: string[], query?: string, limit?: number) {
-    return await this.esClientService.getAggregate(this.getSearchIndex(type), fields, query, limit);
-  }
-
-  async getSearchResults(type: IndexTypes, query: string, limit?: number, page?: number, sort?: any, fields?: string[]) {
-    return await this.esClientService.searchQueryString(this.getSearchIndex(type), query, limit, page, sort, fields);
+  async getSearchResults(type: IndexTypes, query?: string, pageSize?: number, page?: number, sort?: any, fields?: string, body?: any) {
+    return await this.esClientService._search({
+      index: this.getSearchIndex(type),
+      query,
+      sort,
+      body,
+      page,
+      pageSize,
+      fields,
+    });
   }
 
   getSearchIndex(type?: IndexTypes) {

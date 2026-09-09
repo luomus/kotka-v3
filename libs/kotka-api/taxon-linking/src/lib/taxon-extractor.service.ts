@@ -3,6 +3,9 @@ import { ExtractorInterface, SHARDS, REPLICAS } from '@kotka/api/elasticsearch';
 import { LinkableTaxon } from './taxon-linking.service';
 
 export const TAXON_INDEX = 'taxon';
+export const ENDANGERED_STATUS = [
+  'MX.iucnEX', 'MX.iucnEW', 'MX.iucnRE', 'MX.iucnCR', 'MX.iucnEN','MX.iucnVU','MX.iucnNT'
+];
 
 @Injectable()
 export class TaxonExtractorService implements ExtractorInterface {
@@ -24,47 +27,23 @@ export class TaxonExtractorService implements ExtractorInterface {
       ],
       properties: {
         id: {
-          type: 'text',
-          fields: {
-            normalize: {
-              type: 'keyword',
-              normalizer: 'lowercase_normalizer'
-            },
-            raw: {type: 'keyword'}
-          }
+          type: 'keyword',
+          normalizer: 'lowercase_normalizer'
         },
         taxonRank: {
-          type: 'text',
-          fields: {
-            normalize: {
-              type: 'keyword',
-              normalizer: 'lowercase_normalizer'
-            },
-            raw: {type: 'keyword'}
-          }
+          type: 'keyword',
+          normalizer: 'lowercase_normalizer'
         },
         taxonSearch: {
           type: 'nested',
           properties: {
             scientificName: {
-              type: 'text',
-              fields: {
-                normalize: {
-                  type: 'keyword',
-                  normalizer: 'lowercase_normalizer'
-                },
-                raw: {type: 'keyword'}
-              },
+              type: 'keyword',
+              normalizer: 'lowercase_normalizer'
             },
             author: {
-              type: 'text',
-              fields: {
-                normalize: {
-                  type: 'keyword',
-                  normalizer: 'lowercase_normalizer'
-                },
-                raw: {type: 'keyword'}
-              },
+              type: 'keyword',
+              normalizer: 'lowercase_normalizer'
             },
           }
         }
@@ -104,6 +83,10 @@ export class TaxonExtractorService implements ExtractorInterface {
 
     if (data.synonyms) {
       searchableTaxons.push(...data.synonyms)
+    }
+
+    if (data.redListStatus && ENDANGERED_STATUS.includes(data.redListStatus)) {
+      data.endangeredStatus = data.redListStatus as LinkableTaxon['endangeredStatus'];
     }
 
     const searchData = { ...data, taxonSearch: searchableTaxons};

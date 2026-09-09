@@ -57,7 +57,7 @@ export class CacheService {
     }
   }
 
-  async getLookupValue<T>(cacheKeyRoot: string, cacheKey: string, ttl: string | number | PerStoreTtl, getDataFunc: () => Promise<{ [key: string]: T }>, forceUpdate = false): Promise<T | undefined> {
+  async getValueWithMultiSet<T>(cacheKeyRoot: string, cacheKey: string, ttl: string | number | PerStoreTtl, getDataFunc: () => Promise<{ [key: string]: T }>, forceUpdate = false): Promise<T | undefined> {
     if (!forceUpdate) {
       const cachedData = await this.cacheService.get<T>(`${cacheKeyRoot}_${cacheKey}`);
 

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { BaseExtractorService } from './base-extractor.service';
-import { BulkRequest, IndicesIndexSettingsKeys, MappingTypeMapping } from '@elastic/elasticsearch/lib/api/types';
+import { BulkRequest } from '@elastic/elasticsearch/lib/api/types';
 import { ExtractorValueMappingService } from '../mapper/extractor-value-mapping.service';
-import { ElasticUnitRow, ElasticIdentification, ElasticIdentificationRow } from '../elastic-document.interface';
+import { ElasticUnitRow, ElasticIdentificationRow } from '../elastic-document.interface';
 import { Identification } from '@kotka/shared/models';
 import { identificationSort } from '@kotka/shared/utils';
 import { TaxonLinkingService } from '@kotka/api/taxon-linking';
@@ -12,6 +12,7 @@ const open = [
   'infraRank',
   'publicityRestrictions',
   'taxonRank',
+  'endangeredStatus',
 ]
 
 const removeNewLine = [
@@ -91,7 +92,7 @@ export class IdentificationExtractorService extends BaseExtractorService {
     if (identification.taxon) {
       const taxon = await this.taxonLinkingService.getTaxonCached(identification.taxon, identification.author, identification.taxonRank);
 
-      if (taxon) {
+      if (taxon && taxon.length === 1) {
         row.acceptedTaxon = taxon[0].scientificName;
         row.taxa = taxon[0].names;
         row.initialLetterOfGenus = taxon[0].scientificName.charAt(0).toUpperCase();
@@ -102,6 +103,10 @@ export class IdentificationExtractorService extends BaseExtractorService {
 
         if (taxon[0].family) {
           row.family = taxon[0].family.scientificName;
+        }
+
+        if (taxon[0].endangeredStatus) {
+          row.endangeredStatus = taxon[0].endangeredStatus;
         }
       }
     }

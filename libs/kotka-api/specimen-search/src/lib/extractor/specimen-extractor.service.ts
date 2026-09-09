@@ -177,7 +177,6 @@ export class SpecimenExtractorService extends BaseExtractorService {
     } else {
       const media = await lastValueFrom(this.mediaApiService.findMediaByDocumentId(document.documentURI, MediaTypes.images));
 
-      console.log(id, media);
       document.hasPicture = media?.length ? true : false;
       document.pictureCount = media?.length || 0;
     }

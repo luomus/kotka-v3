@@ -3,7 +3,18 @@ https://docs.nestjs.com/controllers#controllers
 */
 
 import { LajiStoreService, OldKotkaApiService, TriplestoreService, ValidationService } from '@kotka/api/services';
-import { Controller, Get, Param, UseGuards, UseInterceptors, Query, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  UseGuards,
+  UseInterceptors,
+  Query,
+  Post,
+  Body,
+  ParseIntPipe,
+  DefaultValuePipe
+} from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
 import { ApiMethodAccessGuard } from '../shared/guards/api-method-access.guard';
@@ -18,8 +29,8 @@ import { CoordinateMatchInterceptor } from './interceptors/coordinate-match.inte
 import { ClearUncertainFieldOrphansInterceptor } from './interceptors/clear-uncertain-field-orphans.interceptor';
 import { AssociatedTaxaToUnitInterceptor } from './interceptors/associated-taxa-to-unit.interceptor';
 import { CollectionAccessibleToUserInterceptor } from './interceptors/collection-accessible-to-user.interceptor';
-import { SpecimenIndexerInterceptor } from './interceptors/sspecimen-search-indexer.interceptor';
-import { SpecimenSearchService } from '@kotka/api/specimen-search';
+import { SpecimenIndexerInterceptor } from './interceptors/specimen-search-indexer.interceptor';
+import { IndexTypes, SpecimenSearchService } from '@kotka/api/specimen-search';
 
 const type = KotkaDocumentFullType.document;
 
@@ -64,13 +75,30 @@ export class SpecimenController extends LajiStoreController<Document> {
     return await lastValueFrom(this.oldKotkaApiService.getRange(range));
   }
 
+  @Get(':type/fields')
+  async getFields(@Param('type') type: IndexTypes) {
+    return await this.specimenSearchService.getIndexedFields(type);
+  }
+
   @Get('autocomplete')
-  async getAutocomplete(@Query('field') field?: string = 'unit', @Query('q') query: string, @Query('limit') limit?: number = 10) {
+  async getAutocomplete(
+    @Query('field') field: string,
+    @Query('q') query: string,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number
+  ) {
     return await this.specimenSearchService.getAutocompleteSuggestions(field, query, limit);
   }
 
-  @Post('esSearch')
-  async esSearch(@Body() body: any) {
-    return await this.specimenSearchService.getSearchResults(body.type, body.query, body.limit, body.page, body.sort, body.fields);
+  @Post(':type/_search')
+  async esSearch(
+    @Param('type') type: IndexTypes,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('page_size', new DefaultValuePipe(20), ParseIntPipe) pageSize: number,
+    @Query('q') query?: string,
+    @Query('sort') sort?: string,
+    @Query('fields') fields?: string,
+    @Body() body?: any
+  ) {
+    return await this.specimenSearchService.getSearchResults(type, query, pageSize, page, sort, fields, body);
   }
 }
