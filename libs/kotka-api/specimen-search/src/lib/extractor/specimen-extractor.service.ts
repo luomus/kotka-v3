@@ -18,7 +18,7 @@ import { ExtractorValueMappingService } from '../mapper/extractor-value-mapping.
 import { ExtractorInterface } from '@kotka/api/elasticsearch';
 import { TypeExtractorService } from './type-extractor.service';
 import { SampleExtractorService } from './sample-extractor.service';
-import { Identification, Sample, TypeSpecimen, MediaTypes } from '@kotka/shared/models';
+import { Identification, Sample, TypeSpecimen, MediaType } from '@kotka/shared/models';
 import { MediaApiService } from '@kotka/api/services';
 import { lastValueFrom } from 'rxjs';
 import { AutocompleteExtractorService } from '../../../../elasticsearch/src/lib/autocomplet-extractor.service';
@@ -175,7 +175,7 @@ export class SpecimenExtractorService extends BaseExtractorService {
 
       delete document.images;
     } else {
-      const media = await lastValueFrom(this.mediaApiService.findMediaByDocumentId(document.documentURI, MediaTypes.images));
+      const media = await lastValueFrom(this.mediaApiService.findMediaByDocumentId(document.documentURI, MediaType.images));
 
       document.hasPicture = media?.length ? true : false;
       document.pictureCount = media?.length || 0;

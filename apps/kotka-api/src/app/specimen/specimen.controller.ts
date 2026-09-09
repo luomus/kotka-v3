@@ -13,7 +13,8 @@ import {
   Post,
   Body,
   ParseIntPipe,
-  DefaultValuePipe
+  DefaultValuePipe,
+  HttpCode,
 } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
@@ -90,6 +91,7 @@ export class SpecimenController extends LajiStoreController<Document> {
   }
 
   @Post(':type/_search')
+  @HttpCode(200)
   async esSearch(
     @Param('type') type: IndexTypes,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
