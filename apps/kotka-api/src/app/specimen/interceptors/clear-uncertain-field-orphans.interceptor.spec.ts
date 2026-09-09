@@ -36,6 +36,7 @@ describe('ClearUncertainFieldOrphansInterceptor', () => {
       switchToHttp: () => ({
         getRequest: () => ({
           method: 'POST',
+          path: '/_search',
         }),
       }),
       getHandler: () => ({ name: 'search' })

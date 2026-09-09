@@ -16,6 +16,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { LajiApiModule } from './laji-api/laji-api.module';
 import { SequenceModule } from './sequence/sequence.module';
 import { BranchModule } from './branch/branch.module';
+import { SpecimenSearchModule } from '@kotka/api/specimen-search';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { BranchModule } from './branch/branch.module';
     SequenceModule,
     BranchModule,
     LajiApiModule,
+    SpecimenSearchModule,
   ],
   controllers: [],
   providers: [],

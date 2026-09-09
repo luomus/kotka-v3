@@ -112,6 +112,7 @@ describe('CollectionAccessibleToUserInterceptor', () => {
       switchToHttp: () => ({
         getRequest: () => ({
           method: 'POST',
+          path: '/_search',
         }),
       }),
       getHandler: () => ({ name: 'search' })

@@ -1,7 +1,6 @@
 /*
 https://docs.nestjs.com/guards#guards
 */
-
 import { LajiStoreService } from '@kotka/api/services';
 import {
   KotkaDocument,
@@ -34,7 +33,7 @@ export class ApiMethodAccessGuard implements CanActivate {
     const req = context.switchToHttp().getRequest<Request>();
     const type = this.reflector.get<KotkaObjectFullType>('controllerType', context.getClass());
 
-    if (req.method === 'POST' && !req.path?.endsWith('_search')) {
+    if (req.method === 'POST' && !req.path?.includes('_search')) {
       const doc = await this.getDocForEditAccessCheck(type, req.body);
 
       if (!allowEditForUser(doc, req.user.profile)) {

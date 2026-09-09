@@ -1,0 +1,19 @@
+{
+  "name": "api-taxon-linking",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/kotka-api/taxon-linking/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/kotka-api/taxon-linking"],
+      "options": {
+        "jestConfig": "libs/kotka-api/taxon-linking/jest.config.ts"
+      }
+    }
+  }
+}

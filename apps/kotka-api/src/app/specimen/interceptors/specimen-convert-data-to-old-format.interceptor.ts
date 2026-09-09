@@ -12,7 +12,7 @@ export class SpecimenConvertDataToOldFormatInterceptor implements NestIntercepto
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = context.switchToHttp().getRequest();
 
-    if ((req.method === 'POST' && !req.path?.endsWith('_search') ) || req.method === 'PUT') {
+    if ((req.method === 'POST' && !req.path?.includes('_search') ) || req.method === 'PUT') {
       const document = req.body as Document;
 
       if (Array.isArray(document.unreliableFields)) {

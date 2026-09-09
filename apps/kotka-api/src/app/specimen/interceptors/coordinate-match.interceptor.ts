@@ -17,7 +17,7 @@ export class CoordinateMatchInterceptor implements NestInterceptor {
     const req = context.switchToHttp().getRequest();
     const body: Document = req.body;
 
-    if (!((req.method === 'POST' && context.getHandler().name !== 'search') || req.method === 'PUT')) {
+    if (!((req.method === 'POST' && !req.path?.includes('_search')) || req.method === 'PUT')) {
       return next.handle();
     }
 
