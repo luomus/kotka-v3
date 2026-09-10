@@ -1,8 +1,6 @@
 services:
   elastic:
-    build:
-      context: ./tools/docker/elasticsearch
-      dockerfile: Dockerfile
+    image: luomus/elasticsearch:9.3.3
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false

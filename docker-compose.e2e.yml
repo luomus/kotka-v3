@@ -1,5 +1,19 @@
 version: '3.8'
 services:
+  elastic:
+    image: luomus/elasticsearch:9.3.3
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - 9200:9200
+    volumes:
+      - elastic:/usr/share/elasticsearch/data
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --silent --fail http://localhost:9200 || exit 1" ]
+      interval: 10s
+      timeout: 10s
+      retries: 7
   redis:
     image: redis
     environment:
@@ -16,8 +30,8 @@ services:
     depends_on:
       redis:
         condition: service_healthy
-    env_file:
-      - .env.e2e
+      elastic:
+        condition: service_healthy
     build:
       context: ./
       dockerfile: ./tools/docker/kotka/dev/kotka-api/Dockerfile
@@ -46,3 +60,4 @@ services:
 volumes:
   shared-volume:
   redis:
+  elastic:
