@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { BaseExtractorService } from './base-extractor.service';
 
 @Injectable()
 export class BranchExtractorService {
@@ -12,5 +11,5 @@ export class BranchExtractorService {
     'acquiredFromOrganization',
     'provenance',
     'seedsExchangedInstitution',
-  ]
+  ];
 }

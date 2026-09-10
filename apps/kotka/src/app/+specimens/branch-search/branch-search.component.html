@@ -1,5 +1,10 @@
 <kui-main-content pageTitle="Branch search" containerClass="container-fluid">
   @if (columns$ | async; as columns) {
+    <kui-search
+      [columns]="columns"
+      (search)="onSearch($event)"
+    >
+    </kui-search>
     <kui-document-datatable
       style="height: calc(100vh - 255px)"
       [dataType]="dataType"
@@ -7,9 +12,10 @@
       [enableFileExport]="true"
       [enableColumnSelection]="true"
       [extraSortModel]="[{
-      colId: 'id',
-      sort:  'desc'
-    }]"
+        colId: 'id',
+        sort:  'desc'
+      }]"
+      [extraSearchQuery]="searchQuery"
     >
     </kui-document-datatable>
   }

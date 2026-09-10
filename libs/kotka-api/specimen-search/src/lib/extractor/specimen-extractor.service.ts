@@ -5,14 +5,8 @@ import {
   ElasticDocument,
   ElasticGathering,
   ElasticUnit,
-  ElasticIdentification,
-  //ElasticSample,
-  ElasticType,
-  //ElasticBranch,
   ElasticUnitRow,
-  ElasticSample
 } from '../elastic-document.interface';
-//import { BranchExtractorService } from './branch-extractor.service';
 import { IdentificationExtractorService } from './identification-extractor.service';
 import { ExtractorValueMappingService } from '../mapper/extractor-value-mapping.service';
 import { ExtractorInterface } from '@kotka/api/elasticsearch';
@@ -21,7 +15,7 @@ import { SampleExtractorService } from './sample-extractor.service';
 import { Identification, Sample, TypeSpecimen, MediaType } from '@kotka/shared/models';
 import { MediaApiService } from '@kotka/api/services';
 import { lastValueFrom } from 'rxjs';
-import { AutocompleteExtractorService } from '../../../../elasticsearch/src/lib/autocomplet-extractor.service';
+import { AutocompleteExtractorService } from '@kotka/api/elasticsearch';
 
 const open = [
   'acquiredFromOrganization',
@@ -55,7 +49,7 @@ const open = [
 const mapOpenedIdsTo = {
   'owner': 'ownerID',
   'acquiredFromOrganization': 'acquiredFromOrganizationID'
-}
+};
 
 const mapOpenedValuesTo = {
   'datasetID': 'dataset',
@@ -183,14 +177,14 @@ export class SpecimenExtractorService extends BaseExtractorService {
 
     if (document.gatherings?.length) {
       document.gatheringCount = document.gatherings.length;
-      for (let gathering of document.gatherings as ElasticGathering[]) {
+      for (const gathering of document.gatherings as ElasticGathering[]) {
         id = gathering.id!;
 
         if (gathering.units?.length) {
           document.unitCount = gathering.units.length;
 
           let first = false;
-          for (let unit of gathering.units as ElasticUnit[]) {
+          for (const unit of gathering.units as ElasticUnit[]) {
             id = unit.id!;
             const identifications = unit.identifications as Identification[];
             const typeSpecimens = unit.typeSpecimens as TypeSpecimen[];
@@ -201,7 +195,7 @@ export class SpecimenExtractorService extends BaseExtractorService {
               first = true;
             }
 
-            unit.identificationCount = identifications?.length || 0
+            unit.identificationCount = identifications?.length || 0;
             unit.typeCount = typeSpecimens?.length || 0;
             unit.sampleCount = samples?.length || 0;
 
@@ -226,7 +220,7 @@ export class SpecimenExtractorService extends BaseExtractorService {
         } else {
           await this.createSpecimenRow(bulk, id, document, gathering);
         }
-      };
+      }
 
     } else {
       await this.createSpecimenRow(bulk, id, document);

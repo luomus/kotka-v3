@@ -49,7 +49,7 @@ export class AutocompleteExtractorService implements ExtractorInterface {
     return {
       number_of_replicas: REPLICAS,
       number_of_shards: SHARDS,
-    }
+    };
   }
 
   async addToBulk(esRow: { [key: string]: any }, bulk: BulkRequest, fields: string[] = []) {
@@ -63,7 +63,7 @@ export class AutocompleteExtractorService implements ExtractorInterface {
       if (esRow[field as any]) {
         this.getInputSuggestion(esRow[field as any], field, suggestions);
       }
-    })
+    });
 
     Object.values(suggestions).forEach((fieldValues) => {
       Object.values(fieldValues).forEach((suggestion) => {
@@ -173,7 +173,7 @@ export class AutocompleteExtractorService implements ExtractorInterface {
     } catch (error) {
       if ((error as any).meta?.body?.error?.root_cause?.[0]?.reason?.includes('no mapping found for field')) {
         return [];
-      };
+      }
 
       throw error;
     }

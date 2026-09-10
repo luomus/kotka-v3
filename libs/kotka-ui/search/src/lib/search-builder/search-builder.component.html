@@ -1,0 +1,109 @@
+@if (query(); as query) {
+  @for (group of query.groups; track $index; let groupIdx = $index) {
+    @if (groupIdx > 0) {
+      <div class="btn-group mb-3" role="group" aria-label="Group join operator">
+        <button
+          class="btn btn-sm btn-outline-secondary"
+          [class.active]="query.joinOperator === 'AND'"
+          [attr.aria-pressed]="query.joinOperator === 'AND'"
+          (click)="setGroupsOperator('AND')"
+        >
+          AND
+        </button>
+        <button
+          class="btn btn-sm btn-outline-secondary"
+          [class.active]="query.joinOperator === 'OR'"
+          [attr.aria-pressed]="query.joinOperator === 'OR'"
+          (click)="setGroupsOperator('OR')"
+        >
+          OR
+        </button>
+      </div>
+    }
+
+    <div class="search-group" [class.bordered]="query.groups.length > 1">
+      <div class="container ms-0 ps-0">
+        @for (criteria of group.criteria; track $index; let critIdx = $index; let last = $last) {
+          <div class="row g-2 mb-2">
+            <div class="col">
+              <kui-field-typeahead
+                placeholder="Any field"
+                [columns]="columns()"
+                [value]="criteria.field"
+                (valueChange)="setField(groupIdx, critIdx, $event)"
+              ></kui-field-typeahead>
+            </div>
+
+            <div class="col">
+              <select
+                class="form-select"
+                [ngModel]="criteria.operator"
+                (ngModelChange)="setOperator(groupIdx, critIdx, $event)"
+              >
+                @for (operator of operators; track operator.id) {
+                  <option [value]="operator.id">{{ operator.label }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="col">
+              @if (criteria | criteriaCanHaveValue) {
+                <input
+                  class="form-control"
+                  placeholder="Value"
+                  [ngModel]="criteria.value"
+                  (ngModelChange)="setValue(groupIdx, critIdx, $event)"
+                />
+              }
+            </div>
+
+            <div class="col col-auto align-self-center me-3">
+              <button
+                type="button"
+                class="btn btn-danger btn-sm"
+                [disabled]="group.criteria.length === 1 && query.groups.length === 1"
+                (click)="group.criteria.length > 1 ? removeCriteria(groupIdx, critIdx) : removeGroup(groupIdx)"
+                aria-label="Close"
+              >
+                <i class="fa fa-xmark"></i>
+              </button>
+            </div>
+
+            <div class="col col-auto align-self-center">
+              <div class="btn-group" [class.invisible]="last" role="group" aria-label="Join operator">
+                <button
+                  class="btn btn-sm btn-outline-secondary"
+                  [class.active]="group.joinOperator === 'AND'"
+                  [attr.aria-pressed]="group.joinOperator === 'AND'"
+                  (click)="setGroupOperator(groupIdx, 'AND')"
+                >
+                  AND
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-secondary"
+                  [class.active]="group.joinOperator === 'OR'"
+                  [attr.aria-pressed]="group.joinOperator === 'OR'"
+                  (click)="setGroupOperator(groupIdx, 'OR')"
+                >
+                  OR
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div>
+        <button class="btn btn-sm btn-outline-secondary me-2" (click)="addCriteria(groupIdx)">+ Add criteria</button>
+        @if (query.groups.length === 1) {
+          <button class="btn btn-sm btn-outline-secondary" (click)="addGroup()">+ Add group</button>
+        }
+      </div>
+    </div>
+  }
+
+  @if (query.groups.length !== 1) {
+    <button class="btn btn-sm btn-outline-secondary" (click)="addGroup()">+ Add group</button>
+  }
+}
+

@@ -7,9 +7,9 @@ import { BaseExtractorService } from './extractor/base-extractor.service';
 import { IdentificationExtractorService } from './extractor/identification-extractor.service';
 import { SampleExtractorService } from './extractor/sample-extractor.service';
 import { SpecimenExtractorService } from './extractor/specimen-extractor.service';
-import { CacheModule } from 'libs/kotka-api/cache/src';
+import { CacheModule } from '@kotka/api/cache';
 import { ApiServicesModule } from '@kotka/api/services';
-import { TaxonLinkingModule } from 'libs/kotka-api/taxon-linking/src/lib/taxon-linking.module';
+import { TaxonLinkingModule } from '@kotka/api/taxon-linking';
 
 @Module({
   imports: [

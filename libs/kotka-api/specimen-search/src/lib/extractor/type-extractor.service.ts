@@ -21,7 +21,7 @@ const autocomplete = [
   'typeSubspecies',
   'typeSubspeciesAuthor',
   'typif',
-]
+];
 
 @Injectable()
 export class TypeExtractorService extends BaseExtractorService {

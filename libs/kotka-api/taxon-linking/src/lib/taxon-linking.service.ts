@@ -44,13 +44,13 @@ export class TaxonLinkingService {
     private readonly cacheService: CacheService
   ) {}
 
-  public async updateTaxonLinking(batchSize: number = 1000) {
+  public async updateTaxonLinking(batchSize = 1000) {
     const taxonString = await lastValueFrom(this.httpService.get<string>(process.env['TAXON_LINKING_URL']!).pipe(map(response => response.data)));
 
     let lineStart = 0;
     let lineEnd = taxonString.indexOf('\n');
     let cnt = 0;
-    let batchCnt = 0
+    let batchCnt = 0;
     let bulk: BulkRequest = {};
 
     await this.esClientService.prepareIndex(this.taxonExtractorService);
@@ -67,7 +67,7 @@ export class TaxonLinkingService {
       if (batchCnt >= batchSize) {
         cnt += batchCnt;
         await this.esClientService.indexBulk(bulk);
-        bulk = {}
+        bulk = {};
       }
 
       lineStart = lineEnd + 1;
@@ -100,7 +100,7 @@ export class TaxonLinkingService {
   public async getTaxon(name: string, author?: string, taxonRank?: MXTaxonRankEnum): Promise<LinkableTaxon[] | undefined> {
     let taxonSearchQuery: any;
 
-    let lowerName = name.toLowerCase();
+    const lowerName = name.toLowerCase();
 
     if (name.indexOf('MX.') === 0) {
       taxonSearchQuery = {

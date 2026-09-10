@@ -13,7 +13,7 @@ const open = [
   'publicityRestrictions',
   'taxonRank',
   'endangeredStatus',
-]
+];
 
 const removeNewLine = [
   'identificationNotes',
@@ -34,7 +34,7 @@ const autocomplete = [
   'speciesQualifier',
   'taxon',
   'taxonVerbatim',
-]
+];
 
 @Injectable()
 export class IdentificationExtractorService extends BaseExtractorService {
@@ -123,7 +123,7 @@ export class IdentificationExtractorService extends BaseExtractorService {
       return '';
     }
 
-    let taxon = [identification.taxon || identification.taxonVerbatim];
+    const taxon = [identification.taxon || identification.taxonVerbatim];
 
     if (identification.infraRank) {
       const rank = await this.valueMappingService.getValueMapping(identification.infraRank, 'infraRank');

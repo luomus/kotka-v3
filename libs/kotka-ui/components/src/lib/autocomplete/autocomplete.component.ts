@@ -1,11 +1,24 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  inject,
+  TemplateRef,
+} from '@angular/core';
 import { AutocompleteResult } from '@kotka/shared/models';
 import {
   debounceTime,
   distinctUntilChanged,
+  merge,
   Observable,
   of,
   OperatorFunction,
+  Subject,
   switchMap,
 } from 'rxjs';
 import { NgbTypeahead, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
@@ -20,17 +33,19 @@ export type FetchAutocompleteResultsFunc = (
   template: `
     <input
       type="text"
-      placeholder="Search..."
+      [placeholder]="placeholder"
       [className]="inputClassName"
       [(ngModel)]="typeaheadValue"
       [disabled]="loading"
       [ngbTypeahead]="search"
       [inputFormatter]="formatter"
       [resultFormatter]="formatter"
+      [resultTemplate]="resultTemplate!"
       [container]="'body'"
       (selectItem)="onSelectItem($event)"
       (blur)="onBlur()"
       (ngModelChange)="onChange()"
+      (focus)="onFocus($event)"
     />
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,13 +56,17 @@ export class AutocompleteComponent implements OnChanges {
 
   @Input() value?: string;
   @Input({ required: true }) fetchResultsFunc!: FetchAutocompleteResultsFunc;
+  @Input() placeholder = 'Search...';
   @Input() inputClassName = 'form-control';
   @Input() minCharacters = 1;
+  @Input() resultTemplate?: TemplateRef<any>;
 
   loading = false;
   typeaheadValue: string | AutocompleteResult = '';
 
   @Output() valueChange = new EventEmitter<string | undefined>();
+
+  private focus$ = new Subject<string>();
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['value']) {
@@ -94,18 +113,28 @@ export class AutocompleteComponent implements OnChanges {
     }
   }
 
+  onFocus(event: FocusEvent) {
+    const target = event.target;
+    if (target instanceof HTMLInputElement) {
+      this.focus$.next(target.value);
+    }
+  }
+
   formatter = (result: AutocompleteResult) => result.value;
 
   search: OperatorFunction<string, readonly AutocompleteResult[]> = (
     text$: Observable<string>,
-  ) =>
-    text$.pipe(
+  ) => {
+    const debouncedText$ = text$.pipe(
       debounceTime(200),
-      distinctUntilChanged(),
+      distinctUntilChanged()
+    );
+    return merge(debouncedText$, this.focus$).pipe(
       switchMap((term) =>
         term.length < this.minCharacters ? of([]) : this.fetchResultsFunc(term),
       ),
     );
+  };
 
   private clearValue() {
     this.value = undefined;

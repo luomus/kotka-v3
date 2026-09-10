@@ -1,7 +1,7 @@
 import { JSONSchema4 } from 'json-schema';
 import { Injectable } from '@nestjs/common';
 import { LajiApiService, LajiStoreService, OldKotkaDataService } from '@kotka/api/services';
-import { CacheService, MultiSetEntry } from 'libs/kotka-api/cache/src';
+import { CacheService, MultiSetEntry } from '@kotka/api/cache';
 import { Collection, Dataset, Organization, Person } from '@kotka/shared/models';
 import { lastValueFrom, map } from 'rxjs';
 import { PerStoreTtl } from 'cacheable';
@@ -125,7 +125,7 @@ export class ExtractorValueMappingService {
   }
 
   async initCollectionTree() {
-    const collections = await this.oldKotkaDataService.getAllCollections()
+    const collections = await this.oldKotkaDataService.getAllCollections();
 
     const roots: Collection[] = [];
     const childLookup: { [key: string]: Collection[] } = {};
@@ -218,7 +218,7 @@ export class ExtractorValueMappingService {
     return schemaEnums;
   }
 
-  async parseSchemaEnums(schema: JSONSchema4, schemaEnums: { [key: string]: {[value: string]: string }}, parent = 'document') {
+  async parseSchemaEnums(schema: JSONSchema4, schemaEnums: { [key: string]: {[value: string]: string }}) {
     if (extratedLevels.includes(schema.subject) && schema.properties) {
 
       if (!schema.properties) {
@@ -235,7 +235,7 @@ export class ExtractorValueMappingService {
           items?.subject &&
           extratedLevels.includes(items?.subject)
         ) {
-          this.parseSchemaEnums(val.items as JSONSchema4, schemaEnums, property);
+          this.parseSchemaEnums(val.items as JSONSchema4, schemaEnums);
         } else if (
           val.type === 'array' &&
           items?.enum &&
@@ -266,7 +266,7 @@ export class ExtractorValueMappingService {
 
     if (!values) {
       console.warn(`ElasticExtract: field ${field} not found in schema enums`);
-      return
+      return;
     }
 
     if (!values[field]) {
@@ -302,8 +302,8 @@ export class ExtractorValueMappingService {
       map(res => res.data),
       map(res => res.results),
       map(res => {
-        const map: Record<string, string> = {}
-        res.forEach(entry => map[entry.id] = entry.value)
+        const map: Record<string, string> = {};
+        res.forEach(entry => map[entry.id] = entry.value);
 
         return map;
       })
