@@ -36,24 +36,26 @@ spec:
           env:
             - name: ES_HOME
               value: "/usr/share/elasticsearch"
+            - name: xpack.security.enabled
+              value: 'false'
             - name: ES_JAVA_OPTS
-              value: "-Xms1024m -Xmx1024m"
+              value: "-Xms1g -Xmx1g"
             - name: node.store.allow_mmap
               value: "false"
             - name: cluster.name
               value: "kotka-es-cluster"
-            - name: discovery.seed_hosts
-              value: "es-transport"
             - name: action.auto_create_index
               value: ".kibana*,.logstash*,.management*,.monitoring*,.security*,.triggered_watches*,.watcher-history*,.watches*"
             - name: index.store.type
               value: "niofs"
             - name: node.roles
-              value: "master,data,transform"
+              value: "master,data"
             - name: NAMESPACE
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+            - name: cluster.initial_master_nodes
+              value: elastic-0
             - name: node.name
               valueFrom:
                 fieldRef:
@@ -66,6 +68,9 @@ spec:
             - containerPort: 9200
               protocol: TCP
               name: http
+            - containerPort: 9300
+              protocol: TCP
+              name: transport
           resources: {}
           volumeMounts:
             - name: storage
@@ -92,17 +97,10 @@ spec:
       resources:
         requests:
           cpu: "0.1"
-          memory: 3Gi
+          memory: 2Gi
         limits:
           cpu: "0.5"
           memory: 3Gi
-      initContainers:
-        - name: elasticsearch-plugin
-          command:
-            - sh
-            - -c
-            - |
-              elasticsearch-plugin install analysis-icu
       restartPolicy: Always
   persistentVolumeClaimRetentionPolicy:
     whenDeleted: Retain

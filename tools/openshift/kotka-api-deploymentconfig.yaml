@@ -117,6 +117,11 @@ spec:
                 configMapKeyRef:
                   name: kotka-config
                   key: NAMESPACE_URL
+            - name: ELASTIC_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: kotka-config
+                  key: ELASTIC_URL
           resources: {}
           imagePullPolicy: Always
       restartPolicy: Always
