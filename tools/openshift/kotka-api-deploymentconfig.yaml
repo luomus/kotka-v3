@@ -122,6 +122,11 @@ spec:
                 configMapKeyRef:
                   name: kotka-config
                   key: ELASTIC_URL
+            - name: TAXON_LINKING_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: kotka-config
+                  key: TAXON_LINKING_URL
           resources: {}
           imagePullPolicy: Always
       restartPolicy: Always
