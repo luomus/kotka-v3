@@ -17,6 +17,7 @@ import { globals } from '../../../environments/globals';
 import { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { map } from 'rxjs/operators';
+import { SearchComponent } from '@kotka/ui/search';
 
 @Component({
   selector: 'kotka-branch-search',
@@ -28,6 +29,7 @@ import { map } from 'rxjs/operators';
     FormsModule,
     DocumentDatatableComponent,
     AsyncPipe,
+    SearchComponent,
   ],
 })
 export class BranchSearchComponent {
@@ -36,6 +38,7 @@ export class BranchSearchComponent {
   dataType: KotkaDocumentType.branch = KotkaDocumentType.branch;
 
   columns$: Observable<DatatableColumn[]>;
+  searchQuery?: string;
 
   private customColumns: DatatableColumn[] = [
     {
@@ -54,18 +57,26 @@ export class BranchSearchComponent {
     },
   ];
   private specialColumns: SpecialColumns = {
-    'accessionID': {
+    accessionID: {
       type: 'uri',
-      params: { showEditLink: false, showViewLink: true, viewRouterLink: ['/view'] },
+      params: {
+        showEditLink: false,
+        showViewLink: true,
+        viewRouterLink: ['/view'],
+      },
     },
-    'collectionID': { type: 'autocomplete', params: { type: 'collection' } },
-    'exists': 'boolean',
-    'events.date': 'date'
+    collectionID: { type: 'autocomplete', params: { type: 'collection' } },
+    exists: 'boolean',
+    'events.date': 'date',
   };
 
   constructor() {
-    this.columns$ = this.columnService.getColumnsFromFormSchema(globals.branchFormId, this.specialColumns).pipe(
-      map(columns => ([...this.customColumns, ...columns]))
-    );
+    this.columns$ = this.columnService
+      .getColumnsFromFormSchema(globals.branchFormId, this.specialColumns)
+      .pipe(map((columns) => [...this.customColumns, ...columns]));
+  }
+
+  onSearch(searchQuery: string) {
+    this.searchQuery = searchQuery;
   }
 }

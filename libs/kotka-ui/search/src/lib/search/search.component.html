@@ -1,0 +1,50 @@
+<div class="card mb-2">
+  <div class="card-header">
+    <div class="btn-group" role="group" aria-label="Search mode">
+      <button
+        class="btn btn-outline-secondary"
+        [class.active]="mode() === 'builder'"
+        [attr.aria-pressed]="mode() === 'builder'"
+        (click)="setMode('builder')"
+      >
+        Search builder
+      </button>
+      <button
+        class="btn btn-outline-secondary"
+        [class.active]="mode() === 'text'"
+        [attr.aria-pressed]="mode() === 'text'"
+        (click)="setMode('text')"
+      >
+        Advanced search
+      </button>
+    </div>
+  </div>
+
+  <div class="card-body">
+    @if (mode() === 'builder') {
+      <kui-search-builder
+        [columns]="columns()"
+        [(text)]="text"
+      ></kui-search-builder>
+    } @else {
+      <kui-text-search
+        [columns]="columns()"
+        [(text)]="text"
+      ></kui-text-search>
+    }
+  </div>
+  <div class="card-footer">
+    <button
+      class="btn btn-primary me-1"
+      (click)="onSearchClick()"
+    >
+      Search
+    </button>
+    <button
+      class="btn btn-outline-secondary"
+      (click)="onClearClick()"
+    >
+      Clear all
+    </button>
+  </div>
+</div>

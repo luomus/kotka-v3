@@ -1,0 +1,21 @@
+@use "sass:map";
+@import "styles/bootstrap";
+
+.search-group.bordered {
+  border-left: map.get($border-widths, 2) solid $gray-300;
+  padding-left: map.get($spacers, 3);
+  margin-bottom: map.get($spacers, 3);
+
+  .row {
+    margin-top: 0;
+
+    .col {
+      margin-top: 0;
+    }
+  }
+}
+
+.search-group-criteria {
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+}
