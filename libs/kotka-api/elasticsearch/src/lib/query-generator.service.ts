@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-type SearchParameters = {
+/**type SearchParameters = {
   target?: string,
   accepted?: true,
   pic?: true,
@@ -13,7 +13,7 @@ type SearchParameters = {
   page?: number,
   perPage?: number,
   aggrSize?: number,
-}
+}*/
 @Injectable()
 export class QueryGeneratorService {
   /**

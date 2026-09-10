@@ -83,7 +83,7 @@ function criteriaToQueryString(criteria: SearchCriteria): string {
     return result;
   }
 
-  let prefix = field ? `${field}:` : '';
+  const prefix = field ? `${field}:` : '';
 
   switch (criteria.operator) {
     case 'contains': {

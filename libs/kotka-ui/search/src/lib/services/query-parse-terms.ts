@@ -170,7 +170,7 @@ function getValueAndType(value: string): { value: string, valueType: Exclude<Val
     valueType = 'startsWith';
   }
 
-  return { value: unescapeValue(innerValue), valueType}
+  return { value: unescapeValue(innerValue), valueType};
 }
 
 function unescapeValue(value: string): string {

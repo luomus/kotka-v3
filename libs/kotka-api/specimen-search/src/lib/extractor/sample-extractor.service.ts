@@ -26,7 +26,7 @@ const open = [
 
 const remove = [
   'preparations',
-]
+];
 const removeNewLine = [
   'sampleHistory',
 ];
@@ -39,7 +39,7 @@ const mapOpenedValuesTo = {
 const autocomplete: string[] = [
   'sampleDataset',
   'sampleCollection',
-]
+];
 
 @Injectable()
 export class SampleExtractorService extends BaseExtractorService {
@@ -82,7 +82,7 @@ export class SampleExtractorService extends BaseExtractorService {
         'type': 'date',
         'format': this.FORMAT_DATETIME + '||date||yyyy-MM-dd\'T\'HH:mm:ss||yyyy'
       },
-    }
+    };
 
     baseMapping.properties = { ...baseMapping.properties, ...sampleProperties };
 
@@ -136,7 +136,7 @@ export class SampleExtractorService extends BaseExtractorService {
     const newRow: ElasticSample = {};
 
     for (const key in row) {
-      let newKey= (key.startsWith('sample') ? key : `sample${key.charAt(0).toUpperCase()}${key.slice(1)}`) as keyof ElasticSample;
+      const newKey= (key.startsWith('sample') ? key : `sample${key.charAt(0).toUpperCase()}${key.slice(1)}`) as keyof ElasticSample;
 
       (newRow[newKey] as any) = row[key as keyof Omit<Sample, 'preparations'>];
     }
@@ -153,7 +153,7 @@ export class SampleExtractorService extends BaseExtractorService {
           flattened[key] = [];
         }
 
-        let value = preparation[key as keyof Preparation];
+        const value = preparation[key as keyof Preparation];
 
         if (value === undefined || value === null) {
           return;

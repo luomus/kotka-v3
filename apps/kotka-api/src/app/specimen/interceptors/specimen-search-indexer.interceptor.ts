@@ -5,7 +5,7 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { Observable, tap } from 'rxjs';
-import { Document } from '@kotka/shared/models'
+import { Document } from '@kotka/shared/models';
 import { EsClientService } from '@kotka/api/elasticsearch';
 import { SpecimenExtractorService } from '@kotka/api/specimen-search';
 

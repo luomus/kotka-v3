@@ -59,7 +59,7 @@ export class EsClientService {
       if (!base._source.includes) {
         base._source.includes = [];
       }
-      base._source.includes.push(...query.fields.split(','))
+      base._source.includes.push(...query.fields.split(','));
     } else if (!base._source) {
       base._source = false;
     }
@@ -170,7 +170,7 @@ export class EsClientService {
   }
 
   async getMappedFields(index: string) {
-    let mapping = (await this.elasticsearchService.indices.getMapping({
+    const mapping = (await this.elasticsearchService.indices.getMapping({
       index,
       allow_no_indices: true,
       ignore_unavailable: true,

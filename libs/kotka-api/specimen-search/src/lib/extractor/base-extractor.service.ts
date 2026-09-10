@@ -23,8 +23,6 @@ export class BaseExtractorService implements ExtractorInterface {
   keyValueFields: { [k: string]: string } = {};
   autocompleteFields: string[] = [];
 
-  constructor() {}
-
   protected readonly FORMAT_DATETIME = 'yyyy-MM-dd HH:mm:ss';
   protected readonly INDEX_PREFIX = 'specimen';
   protected readonly DEFAULT_INDEX = 'unit';
@@ -38,18 +36,17 @@ export class BaseExtractorService implements ExtractorInterface {
     row.documentID = documentID;
     row.documentQName = prefix + ':' + documentID;
 
-    let [ namespace, objectId ] = documentID.split('.');
+    const [ namespacePart, objectIdPart ] = documentID.split('.');
 
-    row.namespace = namespace;
+    row.namespace = namespacePart;
 
-    objectId = objectId.replace(/\D/g, '');
+    const objectId = objectIdPart.replace(/\D/g, '');
 
     row.objectID = isNaN(Number(objectId)) ? 0 : Number(objectId);
   }
 
-  async addToBulk(document: any, bulk: BulkRequest, parent?: any): Promise<void> {
-
-  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/no-empty-function
+  async addToBulk(document: any, bulk: BulkRequest, parent?: any): Promise<void> {}
 
   getIndex(): string {
     return `${this.INDEX_PREFIX}_${this.type || this.DEFAULT_INDEX}`;
@@ -269,7 +266,7 @@ export class BaseExtractorService implements ExtractorInterface {
     if (value) {
       const newValue: { [k: string]: string[] } = {};
 
-      (value as string[]).forEach((val, idx) => {
+      (value as string[]).forEach((val) => {
         const parts = val.split(delimiter!);
 
         if (parts.length === 2 && parts[1] !== '') {
@@ -296,7 +293,7 @@ export class BaseExtractorService implements ExtractorInterface {
   }
 
   async openValues<T>(row: T) {
-    for (let key of this.open) {
+    for (const key of this.open) {
       if (row[key as keyof T]) {
         const value = row[key as keyof T];
 
@@ -325,7 +322,7 @@ export class BaseExtractorService implements ExtractorInterface {
           (row[key as keyof T] as any) = newValue as any;
         }
       }
-    };
+    }
   }
 
 
@@ -342,12 +339,12 @@ export class BaseExtractorService implements ExtractorInterface {
       let splitDate = date.split('.');
 
       if (splitDate.length === 3) {
-        return `${splitDate[2]}-${splitDate[1].padStart(2, '0')}-${splitDate[0].padStart(2, '0')}`
+        return `${splitDate[2]}-${splitDate[1].padStart(2, '0')}-${splitDate[0].padStart(2, '0')}`;
       } else {
         splitDate = date.split('-');
 
         if (splitDate.length === 3) {
-          return `${splitDate[0]}-${splitDate[1].padStart(2, '0')}-${splitDate[2].padStart(2, '0')}`
+          return `${splitDate[0]}-${splitDate[1].padStart(2, '0')}-${splitDate[2].padStart(2, '0')}`;
         } else {
           const parsedDate = new Date(date);
 

@@ -18,7 +18,7 @@ export class TaxonExtractorService implements ExtractorInterface {
       dynamic_templates: [
         {
           generic: {
-            match: "*",
+            match: '*',
             mapping: {
               index: false,
             }
@@ -48,7 +48,7 @@ export class TaxonExtractorService implements ExtractorInterface {
           }
         }
       }
-    }
+    };
   }
 
   getSettings(): any {
@@ -64,7 +64,7 @@ export class TaxonExtractorService implements ExtractorInterface {
           }
         }
       }
-    }
+    };
   }
 
   async addToBulk(data: LinkableTaxon, bulk: any): Promise<void> {
@@ -82,7 +82,7 @@ export class TaxonExtractorService implements ExtractorInterface {
     const searchableTaxons: { scientificName: string; author?: string }[] = [{ scientificName: data.scientificName, author: data.author }];
 
     if (data.synonyms) {
-      searchableTaxons.push(...data.synonyms)
+      searchableTaxons.push(...data.synonyms);
     }
 
     if (data.redListStatus && ENDANGERED_STATUS.includes(data.redListStatus)) {

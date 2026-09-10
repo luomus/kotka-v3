@@ -1,8 +1,7 @@
 import { Command, Console } from 'nestjs-console';
 import ora from 'ora';
 import { TaxonLinkingService } from '@kotka/api/taxon-linking';
-import { EsClientService } from '@kotka/api/elasticsearch';
-import { MXTaxonRankEnum } from 'libs/shared/models/src/lib/lajistore-extended-models';
+import { MXTaxonRankEnum } from '@kotka/shared/models';
 
 
 @Console()

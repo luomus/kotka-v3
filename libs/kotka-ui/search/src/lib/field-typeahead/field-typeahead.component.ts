@@ -42,7 +42,7 @@ import { HighlightMatchPipe } from '../pipes/highlight-match.pipe';
 export class FieldTypeaheadComponent {
   columns = input.required<DatatableColumn[]>();
   value = model<string>('');
-  placeholder = input('Search...')
+  placeholder = input('Search...');
 
   fetchResultsFunc = this.fetchResults.bind(this);
 

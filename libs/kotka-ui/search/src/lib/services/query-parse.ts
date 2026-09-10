@@ -18,7 +18,7 @@ const groupLevelAllowedPreviousTypes: Record<
   negation: ['joinOperator'],
   value: [],
   group: [null, 'joinOperator'],
-}
+};
 const criteriaLevelAllowedPreviousTypes: Record<
   Exclude<TermType, null>,
   TermType[]
