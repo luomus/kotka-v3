@@ -13,7 +13,6 @@ export class BaseExtractorService implements ExtractorInterface {
   mapOpenedIdsTo: { [key: string]: string } = {};
   mapOpenedValuesTo: { [key: string]: string } = {};
   remove = [
-    'id',
     'notes',
     '@type',
     '@context',
@@ -69,6 +68,9 @@ export class BaseExtractorService implements ExtractorInterface {
       ],
       'date_detection': false,
       'properties': {
+        'id': {
+          'type': 'keyword'
+        },
         'accepted': {
           'type': 'boolean'
         },

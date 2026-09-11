@@ -18,6 +18,10 @@ interface SearchQuery {
 export class EsClientService {
   constructor(private readonly elasticsearchService: ElasticsearchService) {}
 
+  hasSelectedFields(query: SearchQuery): boolean {
+    return !!(query.fields || query?.body?._source)
+  }
+
   getSearchBody(base: any, query: SearchQuery, size: number, page: number) {
     base.size = size;
     base.from = (page - 1) * size;
@@ -67,6 +71,24 @@ export class EsClientService {
     return base;
   }
 
+  getResponse(size: number, page: number, query: SearchQuery, res: Record<string, any>) {
+    const total = res.hits.total.value ?? 0;
+    const lastPage = size > 0 ? Math.ceil(total / size) : 1;
+
+    const members = this.hasSelectedFields(query) ?
+      res.hits.hits.map((hit: Record<string, any>) => hit._source) ?? [] :
+      res.hits.hits.map((hit: Record<string, any>) => hit._id) ?? [];
+
+    return {
+      totalItems: total,
+      pageSize: size,
+      currentPage: page,
+      lastPage: lastPage,
+      member: members,
+      aggregations: res.aggregations ?? {}
+    };
+  }
+
   async _search(query: SearchQuery) {
     const size = query.body?.size ?? query.pageSize ?? 20;
     const page = Math.max(
@@ -78,7 +100,7 @@ export class EsClientService {
     return await this.search({
       index: query.index,
       body: this.getSearchBody(query.body ?? {}, query, size, page)
-    });
+    }).then(res => this.getResponse(size, page, query, res));
   }
 
   async search(search: SearchRequest) {
