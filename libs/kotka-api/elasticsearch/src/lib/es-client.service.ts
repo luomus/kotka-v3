@@ -181,23 +181,23 @@ export class EsClientService {
       return [];
     }
 
-    const fields: string[] = [];
+    const fields: {field: string, type: string}[] = [];
 
     this.traverseMapping(mapping, fields);
 
     return fields;
   }
 
-  traverseMapping(mapping: MappingTypeMapping, path: string[], parent?: string) {
+  traverseMapping(mapping: MappingTypeMapping, path: {field: string, type: string}[], parent?: string) {
     if (mapping.properties) {
       Object.keys(mapping.properties).forEach(key => {
         const field = mapping.properties![key];
 
-        if (field.type) {
-          return path.push(parent ? `${parent}.${key}` : key);
+        if (field.type && field.type !== 'object') {
+          return path.push({ field: parent ? `${parent}.${key}` : key, type: field.type });
+        } else {
+          this.traverseMapping(field as MappingTypeMapping, path, parent ? `${parent}.${key}` : key);
         }
-
-        this.traverseMapping(field as MappingTypeMapping, path, parent ? `${parent}.${key}` : key);
       });
     }
   }
