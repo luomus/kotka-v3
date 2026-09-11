@@ -101,3 +101,19 @@ export type ElasticUnitRow = WithAutocompleteFields<Omit<ElasticDocument, 'gathe
 export type ElasticIdentificationRow = ElasticUnitRow & WithAutocompleteFields<ElasticIdentification>;
 export type ElasticTypeRow = ElasticUnitRow & WithAutocompleteFields<ElasticType>;
 export type ElasticSampleRow = ElasticUnitRow & WithAutocompleteFields<ElasticSample>;
+
+export type IndexType = 'unit' | 'identification' | 'typeSpecimen' | 'sample';
+
+interface SearchResultMap {
+  unit: ElasticUnitRow;
+  identification: ElasticIdentificationRow;
+  typeSpecimen: ElasticTypeRow;
+  sample: ElasticSampleRow;
+}
+
+export type SearchResult<T extends IndexType = IndexType> = SearchResultMap[T];
+
+export interface SearchField {
+  field: string,
+  type: string
+}

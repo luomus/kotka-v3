@@ -3,6 +3,7 @@ import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { ExtractorInterface } from './extractor.interface';
 import { StoreObject } from '@luomus/laji-schema/models';
 import { BulkRequest, IndicesIndexSettings, MappingTypeMapping, SearchRequest } from '@elastic/elasticsearch/lib/api/types';
+import { SearchField } from '@kotka/shared/models';
 
 interface SearchQuery {
   index: string;
@@ -19,7 +20,7 @@ export class EsClientService {
   constructor(private readonly elasticsearchService: ElasticsearchService) {}
 
   hasSelectedFields(query: SearchQuery): boolean {
-    return !!(query.fields || query?.body?._source)
+    return !!(query.fields || query?.body?._source);
   }
 
   getSearchBody(base: any, query: SearchQuery, size: number, page: number) {
@@ -203,14 +204,14 @@ export class EsClientService {
       return [];
     }
 
-    const fields: {field: string, type: string}[] = [];
+    const fields: SearchField[] = [];
 
     this.traverseMapping(mapping, fields);
 
     return fields;
   }
 
-  traverseMapping(mapping: MappingTypeMapping, path: {field: string, type: string}[], parent?: string) {
+  traverseMapping(mapping: MappingTypeMapping, path: SearchField[], parent?: string) {
     if (mapping.properties) {
       Object.keys(mapping.properties).forEach(key => {
         const field = mapping.properties![key];

@@ -6,7 +6,7 @@ import {
   ElasticGathering,
   ElasticUnit,
   ElasticUnitRow,
-} from '../elastic-document.interface';
+} from '@kotka/shared/models';
 import { IdentificationExtractorService } from './identification-extractor.service';
 import { ExtractorValueMappingService } from '../mapper/extractor-value-mapping.service';
 import { ExtractorInterface } from '@kotka/api/elasticsearch';

@@ -13,7 +13,7 @@ import {
   StorePatch,
   StoreVersion,
   MediaType,
-  Media,
+  Media, IndexType, SearchResult, SearchField
 } from '@kotka/shared/models';
 import { Observable, of, switchMap, forkJoin } from 'rxjs';
 import { apiBase, lajiApiBase} from './constants';
@@ -83,40 +83,6 @@ export class ApiClient {
 
   deleteDocument(type: KotkaDocumentType, id: string): Observable<null> {
     return this.httpClient.delete<null>(path + type + '/' + id);
-  }
-
-  searchDocuments<
-    T extends KotkaDocumentType,
-    X extends string[] | undefined = undefined,
-    Y extends X extends string[]
-      ? Partial<KotkaDocument<T>>
-      : KotkaDocument<T> = KotkaDocument<T>,
-  >(
-    type: T,
-    index: string,
-    searchQuery?: string | ElasticsearchQuery,
-    page = 1,
-    pageSize = 100,
-    sort?: string,
-    fields?: X,
-  ): Observable<ListResponse<Y>> {
-    let params = new HttpParams().set('page', page).set('page_size', pageSize);
-    if (sort) {
-      params = params.set('sort', sort);
-    }
-    if (fields) {
-      params = params.set('fields', fields.join(','));
-    }
-
-    if (typeof searchQuery === 'string') {
-      searchQuery = searchQueryStringToObject(searchQuery);
-    }
-
-    return this.httpClient.post<ListResponse<Y>>(
-      `${path}${type}/${index}/_search`,
-      searchQuery,
-      { params },
-    );
   }
 
   getDocumentList<
@@ -232,6 +198,53 @@ export class ApiClient {
       sort,
       fields
     );
+  }
+
+  searchDocuments<
+    T extends IndexType,
+    X extends string[] | undefined = undefined,
+    Y extends X extends string[]
+      ? Partial<SearchResult<T>>
+      : SearchResult<T> = SearchResult<T>,
+  >(
+    type: KotkaDocumentType.specimen,
+    index: T,
+    searchQuery?: string | ElasticsearchQuery,
+    page = 1,
+    pageSize = 100,
+    sort?: string,
+    fields?: X,
+  ): Observable<ListResponse<Y>> {
+    let params = new HttpParams().set('page', page).set('page_size', pageSize);
+    if (sort) {
+      params = params.set('sort', sort);
+    }
+    if (fields) {
+      params = params.set('fields', fields.join(','));
+    }
+
+    if (typeof searchQuery === 'string') {
+      searchQuery = searchQueryStringToObject(searchQuery);
+    }
+
+    return this.httpClient.post<ListResponse<Y>>(
+      `${path}${type}/${index}/_search`,
+      { ...searchQuery, _source: true },
+      { params },
+    );
+  }
+
+  getSearchFields(type: KotkaDocumentType.specimen, index: IndexType): Observable<SearchField[]> {
+    return this.httpClient.get<SearchField[]>(`${path}${type}/${index}/fields`);
+  }
+
+  getSearchAutocomplete(type: KotkaDocumentType.specimen, field: string, query: string, limit?: number): Observable<string[]> {
+    let params = new HttpParams().set('field', field).set('q', query);
+    if (limit) {
+      params = params.set('limit', limit);
+    }
+
+    return this.httpClient.get<string[]>(`${path}${type}/autocomplete`, { params });
   }
 
   getDocumentVersionList(

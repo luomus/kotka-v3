@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { getPrefixAndId, getUri } from '@kotka/shared/utils';
-import { ElasticDocumentRow, ElasticUnitRow, EsMeasurement, MeasurementsStrings, NonPrefixedElasticSample } from '../elastic-document.interface';
+import { ElasticDocumentRow, ElasticUnitRow, EsMeasurement, MeasurementsStrings, NonPrefixedElasticSample } from '@kotka/shared/models';
 import { BulkRequest, IndicesIndexSettingsKeys, MappingTypeMapping } from '@elastic/elasticsearch/lib/api/types';
 import { ExtractorInterface, REPLICAS, SHARDS } from '@kotka/api/elasticsearch';
 import { ExtractorValueMappingService } from '../mapper/extractor-value-mapping.service';

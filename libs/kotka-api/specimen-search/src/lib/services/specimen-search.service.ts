@@ -1,10 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { SpecimenExtractorService } from '../extractor/specimen-extractor.service';
 import { EsClientService, AutocompleteExtractorService } from '@kotka/api/elasticsearch';
-import { ElasticDocument } from '../elastic-document.interface';
-import { Document } from '@kotka/shared/models';
-
-export type IndexTypes = 'unit' | 'identification' | 'typeSpecimen' | 'sample';
+import { Document, ElasticDocument, IndexType } from '@kotka/shared/models';
 
 @Injectable()
 export class SpecimenSearchService {
@@ -22,7 +19,7 @@ export class SpecimenSearchService {
     return await this.esClientService.indexMany(specimens as ElasticDocument[], this.specimenExtractorService);
   }
 
-  async getIndexedFields(type: IndexTypes) {
+  async getIndexedFields(type: IndexType) {
     return await this.esClientService.getMappedFields(this.getSearchIndex(type));
   }
 
@@ -30,7 +27,7 @@ export class SpecimenSearchService {
     return await this.autocompleteExtractorService.getAutocompleteSuggestion(field, query, limit);
   }
 
-  async getSearchResults(type: IndexTypes, query?: string, pageSize?: number, page?: number, sort?: any, fields?: string, body?: any) {
+  async getSearchResults(type: IndexType, query?: string, pageSize?: number, page?: number, sort?: any, fields?: string, body?: any) {
     return await this.esClientService._search({
       index: this.getSearchIndex(type),
       query,
@@ -42,7 +39,7 @@ export class SpecimenSearchService {
     });
   }
 
-  getSearchIndex(type?: IndexTypes) {
+  getSearchIndex(type?: IndexType) {
     return type ? `specimen_${type.toLowerCase()}` : 'specimen_unit';
   }
 }

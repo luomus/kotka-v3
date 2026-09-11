@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BaseExtractorService } from './base-extractor.service';
-import { ElasticUnitRow, ElasticSampleRow, ElasticSample, PreparationArrayed, NonPrefixedElasticSample } from '../elastic-document.interface';
+import { ElasticUnitRow, ElasticSampleRow, ElasticSample, PreparationArrayed, NonPrefixedElasticSample } from '@kotka/shared/models';
 import { BulkRequest } from '@elastic/elasticsearch/lib/api/types';
 import { Preparation, Sample } from '@kotka/shared/models';
 import { ExtractorValueMappingService } from '../mapper/extractor-value-mapping.service';

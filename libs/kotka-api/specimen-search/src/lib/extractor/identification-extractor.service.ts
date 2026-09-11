@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { BaseExtractorService } from './base-extractor.service';
 import { BulkRequest } from '@elastic/elasticsearch/lib/api/types';
 import { ExtractorValueMappingService } from '../mapper/extractor-value-mapping.service';
-import { ElasticUnitRow, ElasticIdentificationRow } from '../elastic-document.interface';
+import { ElasticUnitRow, ElasticIdentificationRow } from '@kotka/shared/models';
 import { Identification } from '@kotka/shared/models';
 import { identificationSort } from '@kotka/shared/utils';
 import { TaxonLinkingService } from '@kotka/api/taxon-linking';

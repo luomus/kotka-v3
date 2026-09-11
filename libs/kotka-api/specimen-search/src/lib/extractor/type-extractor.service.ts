@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BaseExtractorService } from './base-extractor.service';
-import { ElasticUnitRow, ElasticTypeRow } from '../elastic-document.interface';
+import { ElasticUnitRow, ElasticTypeRow } from '@kotka/shared/models';
 import { BulkRequest } from '@elastic/elasticsearch/lib/api/types';
 import { TypeSpecimen } from '@luomus/laji-schema/models';
 import { ExtractorValueMappingService } from '../mapper/extractor-value-mapping.service';

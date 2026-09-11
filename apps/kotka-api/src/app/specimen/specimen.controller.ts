@@ -19,7 +19,7 @@ import {
 import { lastValueFrom } from 'rxjs';
 import { AuthenticateCookieGuard } from '../authentication/authenticateCookie.guard';
 import { ApiMethodAccessGuard } from '../shared/guards/api-method-access.guard';
-import { KotkaObjectFullType, KotkaDocumentType } from '@kotka/shared/models';
+import { KotkaObjectFullType, KotkaDocumentType, IndexType } from '@kotka/shared/models';
 import { ControllerType } from '../shared/decorators/controller-type.decorator';
 import { LajiStoreController } from '../shared/controllers/laji-store.controller';
 import { TriplestoreMapperService } from '@kotka/api/services';
@@ -31,7 +31,7 @@ import { ClearUncertainFieldOrphansInterceptor } from './interceptors/clear-unce
 import { AssociatedTaxaToUnitInterceptor } from './interceptors/associated-taxa-to-unit.interceptor';
 import { CollectionAccessibleToUserInterceptor } from './interceptors/collection-accessible-to-user.interceptor';
 import { SpecimenIndexerInterceptor } from './interceptors/specimen-search-indexer.interceptor';
-import { IndexTypes, SpecimenSearchService } from '@kotka/api/specimen-search';
+import { SpecimenSearchService } from '@kotka/api/specimen-search';
 
 const type = KotkaObjectFullType.document;
 
@@ -77,7 +77,7 @@ export class SpecimenController extends LajiStoreController<Document> {
   }
 
   @Get(':type/fields')
-  async getFields(@Param('type') type: IndexTypes) {
+  async getFields(@Param('type') type: IndexType) {
     return await this.specimenSearchService.getIndexedFields(type);
   }
 
@@ -93,7 +93,7 @@ export class SpecimenController extends LajiStoreController<Document> {
   @Post(':type/_search')
   @HttpCode(200)
   async esSearch(
-    @Param('type') type: IndexTypes,
+    @Param('type') type: IndexType,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('page_size', new DefaultValuePipe(20), ParseIntPipe) pageSize: number,
     @Query('q') query?: string,
