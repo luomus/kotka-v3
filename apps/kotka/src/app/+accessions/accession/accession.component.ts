@@ -128,9 +128,9 @@ export class AccessionComponent
         this.apiClient
           .getAllDocuments(
             KotkaDocumentType.branch,
+            `accessionID:${getId(uri)}`,
             1000,
             undefined,
-            `accessionID:${getId(uri)}`,
           )
           .pipe(
             map((value) => ({

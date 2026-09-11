@@ -32,15 +32,26 @@ const path = apiBase + '/';
 const authPath = apiBase + '/auth/';
 const lajiApiPath = lajiApiBase + '/';
 
-export interface DocumentListSearchParams<T extends KotkaDocumentType = KotkaDocumentType> {
-  type: T,
-  page?: number,
-  pageSize?: number,
-  sort?: string,
-  searchQueryString?: string,
-  fields?: string[],
-  searchQueryObject?: ElasticsearchQuery,
+export interface DocumentListSearchParams<
+  T extends KotkaDocumentType = KotkaDocumentType,
+> {
+  type: T;
+  searchQuery?: string | ElasticsearchQuery;
+  page?: number;
+  pageSize?: number;
+  sort?: string;
+  fields?: string[];
 }
+
+export const searchQueryStringToObject = (searchQuery: string): ElasticsearchQuery => {
+  return {
+    query: {
+      query_string: {
+        query: searchQuery,
+      },
+    }
+  };
+};
 
 @Injectable({
   providedIn: 'root',
@@ -67,14 +78,45 @@ export class ApiClient {
     id: string,
     data: KotkaDocument<T>,
   ): Observable<KotkaDocument<T>> {
-    return this.httpClient.put<KotkaDocument<T>>(
-      path + type + '/' + id,
-      data,
-    );
+    return this.httpClient.put<KotkaDocument<T>>(path + type + '/' + id, data);
   }
 
   deleteDocument(type: KotkaDocumentType, id: string): Observable<null> {
     return this.httpClient.delete<null>(path + type + '/' + id);
+  }
+
+  searchDocuments<
+    T extends KotkaDocumentType,
+    X extends string[] | undefined = undefined,
+    Y extends X extends string[]
+      ? Partial<KotkaDocument<T>>
+      : KotkaDocument<T> = KotkaDocument<T>,
+  >(
+    type: T,
+    index: string,
+    searchQuery?: string | ElasticsearchQuery,
+    page = 1,
+    pageSize = 100,
+    sort?: string,
+    fields?: X,
+  ): Observable<ListResponse<Y>> {
+    let params = new HttpParams().set('page', page).set('page_size', pageSize);
+    if (sort) {
+      params = params.set('sort', sort);
+    }
+    if (fields) {
+      params = params.set('fields', fields.join(','));
+    }
+
+    if (typeof searchQuery === 'string') {
+      searchQuery = searchQueryStringToObject(searchQuery);
+    }
+
+    return this.httpClient.post<ListResponse<Y>>(
+      `${path}${type}/${index}/_search`,
+      searchQuery,
+      { params },
+    );
   }
 
   getDocumentList<
@@ -85,27 +127,32 @@ export class ApiClient {
       : KotkaDocument<T> = KotkaDocument<T>,
   >(
     type: T,
+    searchQuery?: string | ElasticsearchQuery,
     page = 1,
     pageSize = 100,
     sort?: string,
-    searchQueryString?: string,
     fields?: X,
-    searchQueryObject?: ElasticsearchQuery,
   ): Observable<ListResponse<Y>> {
     let params = new HttpParams().set('page', page).set('page_size', pageSize);
     if (sort) {
       params = params.set('sort', sort);
     }
-    if (searchQueryString) {
-      params = params.set('q', searchQueryString);
-    }
     if (fields) {
       params = params.set('fields', fields.join(','));
     }
-    if (searchQueryObject) {
+
+    if (searchQuery && typeof searchQuery === 'string') {
+      if (searchQuery.length > 500) {
+        searchQuery = searchQueryStringToObject(searchQuery);
+      } else {
+        params = params.set('q', searchQuery);
+      }
+    }
+
+    if (searchQuery && typeof searchQuery !== 'string') {
       return this.httpClient.post<ListResponse<Y>>(
         path + type + '/_search',
-        searchQueryObject,
+        searchQuery,
         { params },
       );
     } else {
@@ -131,7 +178,7 @@ export class ApiClient {
     const endIdx = startIdx + pageSize;
     const idsPart = ids.slice(startIdx, endIdx);
 
-    const searchQueryObject: ElasticsearchQuery = {
+    const searchQuery: ElasticsearchQuery = {
       query: {
         terms: {
           id: idsPart,
@@ -141,12 +188,11 @@ export class ApiClient {
 
     return this.getDocumentList<T, X, Y>(
       type,
+      searchQuery,
       1,
       idsPart.length,
       undefined,
-      undefined,
       fields,
-      searchQueryObject,
     ).pipe(
       switchMap((result) => {
         results = results.concat(result.member);
@@ -173,21 +219,18 @@ export class ApiClient {
       : KotkaDocument<T> = KotkaDocument<T>,
   >(
     type: T,
+    searchQuery?: string | ElasticsearchQuery,
     pageSize = 100,
     sort?: string,
-    searchQueryString?: string,
-    fields?: X,
-    searchQueryObject?: ElasticsearchQuery,
+    fields?: X
   ): Observable<Y[]> {
     return this.getAllDocumentsRecursively(
       type,
+      searchQuery,
       1,
       pageSize,
-      [],
       sort,
-      searchQueryString,
-      fields,
-      searchQueryObject,
+      fields
     );
   }
 
@@ -275,10 +318,7 @@ export class ApiClient {
     return this.httpClient.get<Person>(`${lajiApiPath}person/by-id/${id}`);
   }
 
-  getMedia<T extends MediaType>(
-    type: T,
-    id: string,
-  ): Observable<Media<T>> {
+  getMedia<T extends MediaType>(type: T, id: string): Observable<Media<T>> {
     return this.httpClient.get<Media<T>>(`${path}media/${type}/${id}`);
   }
 
@@ -403,25 +443,25 @@ export class ApiClient {
   private getAllDocumentsRecursively<
     T extends KotkaDocumentType,
     X extends string[] | undefined = undefined,
-    Y extends X extends string[] ? Partial<KotkaDocument<T>> : KotkaDocument<T> = KotkaDocument<T>,
+    Y extends X extends string[]
+      ? Partial<KotkaDocument<T>>
+      : KotkaDocument<T> = KotkaDocument<T>,
   >(
     type: T,
+    searchQuery?: string | ElasticsearchQuery,
     page = 1,
     pageSize = 100,
-    results: Y[] = [],
     sort?: string,
-    searchQueryString?: string,
     fields?: X,
-    searchQueryObject?: ElasticsearchQuery,
+    results: Y[] = [],
   ): Observable<Y[]> {
     return this.getDocumentList<T, X, Y>(
       type,
+      searchQuery,
       page,
       pageSize,
       sort,
-      searchQueryString,
       fields,
-      searchQueryObject,
     ).pipe(
       switchMap((result) => {
         results = results.concat(result.member);
@@ -429,13 +469,12 @@ export class ApiClient {
         if (page < result.lastPage) {
           return this.getAllDocumentsRecursively(
             type,
+            searchQuery,
             page + 1,
             pageSize,
-            results,
             sort,
-            searchQueryString,
             fields,
-            searchQueryObject,
+            results,
           );
         }
 

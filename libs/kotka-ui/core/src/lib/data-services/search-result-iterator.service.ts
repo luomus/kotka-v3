@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { KotkaDocument, KotkaDocumentType } from '@kotka/shared/models';
-import { ApiClient, DocumentListSearchParams } from './api-client';
+import { ApiClient, DocumentListSearchParams, searchQueryStringToObject } from './api-client';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { LocalStorageService } from 'ngx-webstorage';
@@ -8,7 +8,7 @@ import { UserService } from './index';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { isKeyOfObject } from '../util-services';
 
-export type SearchParams = Pick<DocumentListSearchParams, 'sort'|'searchQueryString'|'searchQueryObject'>;
+export type SearchParams = Pick<DocumentListSearchParams, 'sort'|'searchQuery'>;
 
 interface Sort {
   field: string;
@@ -71,21 +71,21 @@ export class SearchResultIteratorService {
     const sorts = this.sortsFromString(searchParams.sort, reverse);
     const sort = this.sortsToString(sorts);
 
+    let searchQuery = typeof searchParams.searchQuery === 'string' ? searchQueryStringToObject(searchParams.searchQuery) : searchParams.searchQuery;
     const searchAfter = this.getSearchAfter(data, sorts);
-    const searchQueryObject = {
-      ...(searchParams.searchQueryObject || {}),
+    searchQuery = {
+      ...(searchQuery || {}),
       search_after: searchAfter,
     };
 
     return this.apiClient
       .getDocumentList(
         type,
+        searchQuery,
         1,
         1,
         sort,
-        searchParams.searchQueryString,
-        ['id'],
-        searchQueryObject,
+        ['id']
       )
       .pipe(
         map((result) => {

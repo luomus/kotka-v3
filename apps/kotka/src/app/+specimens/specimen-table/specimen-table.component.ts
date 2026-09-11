@@ -71,11 +71,10 @@ export class SpecimenTableComponent {
         this.labelDesignerData$ = this.apiClient
           .getAllDocuments(
             this.dataType,
+            searchParams?.searchQuery,
             1000,
             searchParams?.sort,
-            searchParams?.searchQueryString,
-            undefined,
-            searchParams?.searchQueryObject,
+            undefined
           );
       } else {
         this.labelDesignerData$ = undefined;
@@ -86,8 +85,7 @@ export class SpecimenTableComponent {
   onDataLoad(data: DatatableLoadedData) {
     const searchParams: SearchParams = {
       sort: data.searchParams.sort,
-      searchQueryString: data.searchParams.searchQueryString,
-      searchQueryObject: data.searchParams.searchQueryObject,
+      searchQuery: data.searchParams.searchQuery
     };
 
     this.searchParams = searchParams;

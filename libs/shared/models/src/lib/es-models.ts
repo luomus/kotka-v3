@@ -33,7 +33,13 @@ interface BooleanQuery {
   bool: Bool;
 }
 
-type Query = TermQuery|TermsQuery|WildcardQuery|BooleanQuery;
+interface QueryStringQuery {
+  query_string: {
+    query: string;
+  }
+}
+
+type Query = TermQuery|TermsQuery|WildcardQuery|BooleanQuery|QueryStringQuery;
 
 export interface ElasticsearchQuery {
   query?: Query;

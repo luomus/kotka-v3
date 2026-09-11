@@ -22,8 +22,13 @@ export class DocumentDatatableDataService {
   private apiClient = inject(ApiClient);
 
   getRows<T extends KotkaDocumentType>(searchParams: DocumentListSearchParams<T>): Observable<ListResponse<KotkaDocument<T>>> {
-    return this.apiClient
-      .getDocumentList(searchParams.type, searchParams.page, searchParams.pageSize, searchParams.sort, searchParams.searchQueryString);
+    return this.apiClient.getDocumentList(
+      searchParams.type,
+      searchParams.searchQuery,
+      searchParams.page,
+      searchParams.pageSize,
+      searchParams.sort,
+    );
   }
 
   getSearchParams<T extends KotkaDocumentType>(
@@ -51,10 +56,10 @@ export class DocumentDatatableDataService {
 
     return {
       type,
+      searchQuery,
       page,
       pageSize,
       sort,
-      searchQueryString: searchQuery,
     };
   }
 
