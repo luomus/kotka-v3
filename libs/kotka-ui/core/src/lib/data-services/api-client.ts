@@ -32,10 +32,7 @@ const path = apiBase + '/';
 const authPath = apiBase + '/auth/';
 const lajiApiPath = lajiApiBase + '/';
 
-export interface DocumentListSearchParams<
-  T extends KotkaDocumentType = KotkaDocumentType,
-> {
-  type: T;
+export interface SearchParams {
   searchQuery?: string | ElasticsearchQuery;
   page?: number;
   pageSize?: number;
@@ -44,6 +41,10 @@ export interface DocumentListSearchParams<
 }
 
 export const searchQueryStringToObject = (searchQuery: string): ElasticsearchQuery => {
+  if (!searchQuery) {
+    return {};
+  }
+
   return {
     query: {
       query_string: {

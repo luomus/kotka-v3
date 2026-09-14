@@ -11,17 +11,25 @@ import {
   DatatableLoadedData,
   DocumentDatatableComponent,
 } from '@kotka/ui/datatable';
-import { KotkaDocumentType, Document } from '@kotka/shared/models';
+import { KotkaDocumentType, Document, IndexType } from '@kotka/shared/models';
 import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
 import { FormsModule } from '@angular/forms';
 import {
   ApiClient,
-  SearchParams,
+  IteratorSearchParams,
   SearchResultIteratorService,
 } from '@kotka/ui/core';
 import { SpecimenLabelDesignerComponent } from '../specimen-label-designer/specimen-label-designer.component';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
+import { map, startWith, switchMap } from 'rxjs/operators';
+import { toObservable } from '@angular/core/rxjs-interop';
+
+interface ViewModel {
+  index: IndexType | undefined;
+  columns: DatatableColumn[];
+  columnsLoading: boolean;
+}
 
 @Component({
   selector: 'kotka-specimen-table',
@@ -42,27 +50,16 @@ export class SpecimenTableComponent {
   private searchResultIteratorService = inject(SearchResultIteratorService);
 
   dataType: KotkaDocumentType.specimen = KotkaDocumentType.specimen;
+  index = signal<IndexType | undefined>('unit');
 
-  columns: DatatableColumn[] = [
-    {
-      headerName: 'URI',
-      field: 'id',
-      cellRenderer: URICellRendererComponent,
-      cellRendererParams: {
-        editRouterLink: ['..', 'edit'],
-        showViewLink: true,
-      },
-      width: 145,
-      flex: 0,
-      lockPosition: 'left',
-      defaultSelected: true,
-    },
-  ];
+  indexOptions: (IndexType | undefined)[] = [undefined, 'unit', 'identification', 'typeSpecimen', 'sample'];
+
+  vm$: Observable<ViewModel>;
 
   showLabelDesigner = signal(false);
   labelDesignerData$?: Observable<Document[]>;
 
-  private searchParams?: SearchParams;
+  private searchParams?: IteratorSearchParams;
 
   constructor() {
     effect(() => {
@@ -80,10 +77,53 @@ export class SpecimenTableComponent {
         this.labelDesignerData$ = undefined;
       }
     });
+
+    this.vm$ = toObservable(this.index).pipe(
+      switchMap((index) => {
+        if (!index) {
+          const columns: DatatableColumn[] = [
+            {
+              headerName: 'URI',
+              field: 'id',
+              cellRenderer: URICellRendererComponent,
+              cellRendererParams: {
+                editRouterLink: ['..', 'edit'],
+                showViewLink: true,
+              },
+              width: 145,
+              flex: 0,
+              lockPosition: 'left',
+              defaultSelected: true,
+            },
+          ];
+          return of({ index, columns, columnsLoading: false });
+        }
+
+        return this.apiClient.getSearchFields(this.dataType, index).pipe(
+          map((fields) => {
+            const columns: DatatableColumn[] = fields.map((field) => ({
+              headerName: field.field[0].toUpperCase() + field.field.slice(1),
+              field: field.field,
+              defaultSelected: true,
+            }));
+            return {
+              index,
+              columns,
+              columnsLoading: false,
+            };
+          }),
+          startWith({
+            index,
+            columns: [],
+            columnsLoading: true,
+          })
+        );
+      })
+    );
   }
 
   onDataLoad(data: DatatableLoadedData) {
-    const searchParams: SearchParams = {
+    const searchParams: IteratorSearchParams = {
       sort: data.searchParams.sort,
       searchQuery: data.searchParams.searchQuery
     };

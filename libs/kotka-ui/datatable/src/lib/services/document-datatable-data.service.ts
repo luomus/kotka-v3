@@ -1,19 +1,29 @@
 import {
-  DatatableColumn,
-  FilterModel,
-  isBasicFilterModel,
-  isTextFilterModel,
-  isDateFilterModel,
-  DatatableFilter,
-  DatatableSort,
   BasicFilterModel,
   CombinedFilterModel,
+  DatatableColumn,
+  DatatableFilter,
+  DatatableSort,
+  FilterModel,
+  isBasicFilterModel,
+  isDateFilterModel,
+  isTextFilterModel,
 } from '../models/models';
 import { inject, Injectable } from '@angular/core';
-import { ApiClient, DocumentListSearchParams } from '@kotka/ui/core';
-import { KotkaDocument, KotkaDocumentType } from '@kotka/shared/models';
+import { ApiClient, SearchParams } from '@kotka/ui/core';
+import {
+  IndexType,
+  KotkaDocument,
+  KotkaDocumentType,
+  SearchResult,
+} from '@kotka/shared/models';
 import { ListResponse } from '@luomus/laji-schema';
 import { Observable } from 'rxjs';
+
+export type DatatableRow<
+  T extends KotkaDocumentType = KotkaDocumentType,
+  S extends IndexType | undefined = IndexType | undefined
+> = S extends IndexType ? ListResponse<SearchResult<S>> : ListResponse<KotkaDocument<T>>;
 
 @Injectable({
   providedIn: 'root',
@@ -21,9 +31,30 @@ import { Observable } from 'rxjs';
 export class DocumentDatatableDataService {
   private apiClient = inject(ApiClient);
 
-  getRows<T extends KotkaDocumentType>(searchParams: DocumentListSearchParams<T>): Observable<ListResponse<KotkaDocument<T>>> {
+  getRows<
+    T extends KotkaDocumentType,
+    S extends IndexType | undefined
+  >(type: T, index: S | undefined, searchParams: SearchParams): Observable<DatatableRow<T, S>>;
+  getRows(type: KotkaDocumentType, index: IndexType | undefined, searchParams: SearchParams): Observable<DatatableRow> {
+    if (index) {
+      if (type !== KotkaDocumentType.specimen) {
+        throw new Error(
+          'Index can only be specified for specimen document type!',
+        );
+      }
+
+      return this.apiClient.searchDocuments(
+        type,
+        index,
+        searchParams.searchQuery,
+        searchParams.page,
+        searchParams.pageSize,
+        searchParams.sort,
+      );
+    }
+
     return this.apiClient.getDocumentList(
-      searchParams.type,
+      type,
       searchParams.searchQuery,
       searchParams.page,
       searchParams.pageSize,
@@ -31,15 +62,14 @@ export class DocumentDatatableDataService {
     );
   }
 
-  getSearchParams<T extends KotkaDocumentType>(
-    type: T,
+  getSearchParams(
     columns: DatatableColumn[],
     startRow: number,
     endRow: number,
     sortModel: DatatableSort,
     filterModel: DatatableFilter,
     extraSearchQuery?: string,
-  ): DocumentListSearchParams<T> {
+  ): SearchParams {
     const pageSize = endRow - startRow;
     const page = startRow / pageSize + 1;
 
@@ -55,7 +85,6 @@ export class DocumentDatatableDataService {
       .join(' AND ');
 
     return {
-      type,
       searchQuery,
       page,
       pageSize,

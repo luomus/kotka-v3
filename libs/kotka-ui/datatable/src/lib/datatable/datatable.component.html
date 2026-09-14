@@ -20,6 +20,7 @@
     @if (enableColumnSelection()) {
       <button
         class="btn btn-secondary"
+        [disabled]="columnsLoading()"
         (click)="openColumnSettingsModal()"
         data-cy="select-columns"
       >

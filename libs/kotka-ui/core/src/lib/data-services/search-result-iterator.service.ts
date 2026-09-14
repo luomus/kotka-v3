@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { KotkaDocument, KotkaDocumentType } from '@kotka/shared/models';
-import { ApiClient, DocumentListSearchParams, searchQueryStringToObject } from './api-client';
+import { ApiClient, SearchParams, searchQueryStringToObject } from './api-client';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { LocalStorageService } from 'ngx-webstorage';
@@ -8,7 +8,7 @@ import { UserService } from './index';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { isKeyOfObject } from '../util-services';
 
-export type SearchParams = Pick<DocumentListSearchParams, 'sort'|'searchQuery'>;
+export type IteratorSearchParams = Pick<SearchParams, 'sort'|'searchQuery'>;
 
 interface Sort {
   field: string;
@@ -27,12 +27,12 @@ export class SearchResultIteratorService {
     this.userService.user$.pipe(map((user) => user?.id)),
   );
   private searchParamsByType: Partial<{
-    [T in KotkaDocumentType]: SearchParams;
+    [T in KotkaDocumentType]: IteratorSearchParams;
   }> = {};
 
   setSearchParams(
     type: KotkaDocumentType,
-    searchParams: SearchParams,
+    searchParams: IteratorSearchParams,
     store = true,
   ) {
     this.searchParamsByType[type] = searchParams;
@@ -143,7 +143,7 @@ export class SearchResultIteratorService {
   private getSearchParams(
     type: KotkaDocumentType,
     userId: string | undefined,
-  ): SearchParams {
+  ): IteratorSearchParams {
     const result =
       this.searchParamsByType[type] ||
       this.storage.retrieve(this.getSearchParamsStorageKey(type, userId));

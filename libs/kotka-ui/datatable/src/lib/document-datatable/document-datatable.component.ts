@@ -1,4 +1,4 @@
-import { Component, ViewChild, inject, output, input, effect, Signal } from '@angular/core';
+import { Component, ViewChild, inject, output, input, effect, Signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   DatatableSource,
@@ -7,21 +7,22 @@ import {
   DatatableFilter, DatatableSort
 } from '../models/models';
 import { DatatableComponent } from '../datatable/datatable.component';
-import { DocumentDatatableDataService } from '../services/document-datatable-data.service';
+import { DatatableRow, DocumentDatatableDataService } from '../services/document-datatable-data.service';
 import {
-  KotkaDocument,
+  IndexType,
   KotkaDocumentType,
-  ListResponse
 } from '@kotka/shared/models';
-import { DataTypeNamePipePipe, DocumentListSearchParams, UserService } from '@kotka/ui/core';
-import { map, switchMap } from 'rxjs';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { DataTypeNamePipePipe, SearchParams, UserService } from '@kotka/ui/core';
+import { map } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+
 
 export interface DatatableLoadedData<
   T extends KotkaDocumentType = KotkaDocumentType,
+  S extends IndexType | undefined = IndexType | undefined,
 > {
-  searchParams: DocumentListSearchParams<T>;
-  result: ListResponse<KotkaDocument<T>>;
+  searchParams: SearchParams;
+  result: DatatableRow<T, S>;
 }
 
 @Component({
@@ -30,7 +31,10 @@ export interface DatatableLoadedData<
   styleUrls: ['./document-datatable.component.scss'],
   imports: [CommonModule, DatatableComponent, DataTypeNamePipePipe],
 })
-export class DocumentDatatableComponent<T extends KotkaDocumentType = KotkaDocumentType> {
+export class DocumentDatatableComponent<
+  T extends KotkaDocumentType = KotkaDocumentType,
+  S extends T extends KotkaDocumentType.specimen ? IndexType : never = never
+> {
   private dataService = inject(DocumentDatatableDataService);
   private userService = inject(UserService);
 
@@ -38,7 +42,9 @@ export class DocumentDatatableComponent<T extends KotkaDocumentType = KotkaDocum
   datatableComponent!: DatatableComponent;
 
   dataType = input.required<T>();
+  index = input<S>();
   columns = input<DatatableColumn[]>([]);
+  columnsLoading = input<boolean>(false);
 
   enableFileExport = input<boolean>();
   enableColumnSelection = input<boolean>();
@@ -51,13 +57,14 @@ export class DocumentDatatableComponent<T extends KotkaDocumentType = KotkaDocum
   datasource: DatatableSource;
   settingsKey: Signal<string | undefined>;
 
-  loadData = output<DatatableLoadedData<T>>();
+  loadData = output<DatatableLoadedData<T, S>>();
+
+  private userId: Signal<string | undefined>;
 
   constructor() {
     this.datasource = {
       getRows: (params: GetRowsParams) => {
         const searchParams = this.dataService.getSearchParams(
-          this.dataType(),
           this.columns(),
           params.startRow,
           params.endRow,
@@ -66,25 +73,27 @@ export class DocumentDatatableComponent<T extends KotkaDocumentType = KotkaDocum
           this.extraSearchQuery(),
         );
 
-        this.dataService.getRows(searchParams).subscribe((result) => {
-          params.successCallback(result.member, result.totalItems);
-          this.loadData.emit({ searchParams, result });
-        });
+        const dataType = this.dataType();
+        const index = this.index();
+
+        return this.dataService
+          .getRows<T, S>(dataType, index, searchParams)
+          .subscribe((result) => {
+            params.successCallback(result.member, result.totalItems);
+            this.loadData.emit({ searchParams, result });
+          });
       },
     };
 
-    this.settingsKey = toSignal(
-      toObservable(this.dataType).pipe(
-        switchMap((dataType) =>
-          this.userService
-            .getCurrentLoggedInUser()
-            .pipe(map((user) => `${dataType}-table-${user.id}`)),
-        ),
-      ),
-    );
+    this.userId = toSignal(this.userService.getCurrentLoggedInUser().pipe(map(user => user.id)));
+
+    this.settingsKey = computed(() => (
+      `${this.dataType()}${this.index() ? '-' + this.index() : ''}-table-${this.userId()}`
+    ));
 
     effect(() => {
       this.dataType(); // trigger refresh when any of these inputs change
+      this.index();
       this.columns();
       this.extraSortModel();
       this.extraSearchQuery();

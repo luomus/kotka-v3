@@ -1,27 +1,39 @@
 @if (!showLabelDesigner()) {
   <kui-main-content pageTitle="Search specimens" containerClass="container-fluid">
-    <button
+    <label>
+      Result type
+      <select class="form-select" [(ngModel)]="index">
+        @for (indexOption of indexOptions; track $index) {
+          <option [ngValue]="indexOption">{{ indexOption }}</option>
+        }
+      </select>
+    </label>
+    <!--button
       class="btn btn-light"
       (click)="showLabelDesigner.set(true)"
     >
       Print labels
-    </button>
-    <kui-document-datatable
-      style="height: calc(100vh - 255px)"
-      [dataType]="dataType"
-      [columns]="columns"
-      [enableFileExport]="true"
-      [enableColumnSelection]="true"
-      [extraSortModel]="[{
-        colId: 'dateCreated',
-        sort:  'desc'
-      }, {
-        colId: 'id',
-        sort:  'desc'
-      }]"
-      (loadData)="onDataLoad($event)"
-    >
-    </kui-document-datatable>
+    </button-->
+    @if (vm$ | async; as vm) {
+      <kui-document-datatable
+        style="height: calc(100vh - 255px)"
+        [dataType]="dataType"
+        [index]="vm.index"
+        [columns]="vm.columns"
+        [columnsLoading]="vm.columnsLoading"
+        [enableFileExport]="true"
+        [enableColumnSelection]="true"
+        [extraSortModel]="[{
+          colId: 'dateCreated',
+          sort:  'desc'
+        }, {
+          colId: 'id',
+          sort:  'desc'
+        }]"
+        (loadData)="onDataLoad($event)"
+      >
+      </kui-document-datatable>
+    }
   </kui-main-content>
 } @else {
   @if (labelDesignerData$ | async; as labelDesignerData) {

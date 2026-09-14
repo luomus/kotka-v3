@@ -65,6 +65,7 @@ export class DatatableComponent implements OnDestroy {
   private dialogService = inject(DialogService);
 
   columns = input<DatatableColumn[]>([]);
+  columnsLoading = input<boolean|undefined>(false);
   datasource = input<DatatableSource>();
 
   enableFileExport = input<boolean|undefined>(false);
@@ -104,6 +105,8 @@ export class DatatableComponent implements OnDestroy {
   private columnSettings: WritableSignal<ColumnSettings> = signal({ selected: [], order: []}, {equal: isEqual});
 
   private gridDataSource: Signal<DatatableSource|undefined>;
+  private dataLoading = signal(false);
+  private loading: Signal<boolean>;
 
   private sortModel: WritableSignal<DatatableSort> = signal([], {equal: isEqual});
   private filterModel: WritableSignal<DatatableFilter> = signal({}, {equal: isEqual});
@@ -143,6 +146,8 @@ export class DatatableComponent implements OnDestroy {
         : undefined
     ));
 
+    this.loading = computed(() => (this.columnsLoading() || this.dataLoading()));
+
     this.initEffects();
   }
 
@@ -157,6 +162,7 @@ export class DatatableComponent implements OnDestroy {
     this.gridApi = params.api;
     this.gridApi.setFilterModel(this.filterModel());
     this.gridApi.setGridOption('datasource', this.gridDataSource());
+    this.gridApi.setGridOption('loading', this.loading());
   }
 
   dragStopped(e: DragStoppedEvent) {
@@ -244,7 +250,7 @@ export class DatatableComponent implements OnDestroy {
     });
 
     effect(() => {
-      if (this.enableColumnSelection()) {
+      if (this.enableColumnSelection() && !this.columnsLoading()) {
         this.settingsStoreService.storeColumnSettings(
           this.settingsKey(),
           this.columnSettings()
@@ -257,7 +263,7 @@ export class DatatableComponent implements OnDestroy {
         ...this.defaultFilterModel(),
         ...this.settingsStoreService.getStoredFilters(this.settingsKey())
       });
-      this.gridApi?.setFilterModel(this.filterModel);
+      this.gridApi?.setFilterModel(this.filterModel());
     });
 
     effect(() => {
@@ -269,7 +275,13 @@ export class DatatableComponent implements OnDestroy {
     });
 
     effect(() => {
-      this.gridApi?.setGridOption('datasource', this.gridDataSource());
+      const datasource = this.gridDataSource();
+      this.gridApi?.setGridOption('datasource', datasource);
+    });
+
+    effect(() => {
+      const loading = this.loading();
+      this.gridApi?.setGridOption('loading', loading);
     });
   }
 
@@ -298,18 +310,14 @@ export class DatatableComponent implements OnDestroy {
     this.filterModel.set(params.filterModel);
 
     this.totalCount.set(undefined);
-    this.updateLoading(true);
+    this.dataLoading.set(true);
   }
 
   private afterFetchRows(results: unknown[], totalItems: number) {
     this.loadCellRendererDataToCache(results);
 
     this.totalCount.set(totalItems);
-    this.updateLoading(false);
-  }
-
-  private updateLoading(loading: boolean) {
-    this.gridApi?.setGridOption('loading', loading);
+    this.dataLoading.set(false);
   }
 
   private loadCellRendererDataToCache(rowData: unknown[]) {
