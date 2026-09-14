@@ -1,4 +1,4 @@
-import { Component, Injector, OnDestroy, input, computed, signal, Signal, effect, WritableSignal, inject } from '@angular/core';
+import { Component, Injector, OnDestroy, input, computed, signal, Signal, effect, WritableSignal, inject, untracked } from '@angular/core';
 import {
   ColDef as AgGridColDef,
   DragStoppedEvent,
@@ -263,7 +263,7 @@ export class DatatableComponent implements OnDestroy {
         ...this.defaultFilterModel(),
         ...this.settingsStoreService.getStoredFilters(this.settingsKey())
       });
-      this.gridApi?.setFilterModel(this.filterModel());
+      this.gridApi?.setFilterModel(untracked(this.filterModel));
     });
 
     effect(() => {
