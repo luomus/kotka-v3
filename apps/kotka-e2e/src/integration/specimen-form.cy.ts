@@ -58,9 +58,9 @@ describe('specimen form', () => {
     const testTaxon = 'Parus major';
 
     before(() => {
-      cy.removeTestDataIfExists('/specimens/search', [
+      /*cy.removeTestDataIfExists('/specimens/search', [
         { colIndex: 1, value: testId }
-      ]);
+      ]);*/ // TODO after search page is finished
     });
 
     beforeEach(() => {
