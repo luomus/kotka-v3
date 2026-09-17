@@ -41,7 +41,13 @@ interface QueryStringQuery {
 
 type Query = TermQuery|TermsQuery|WildcardQuery|BooleanQuery|QueryStringQuery;
 
+export type Aggs = { [key: string]: {
+  terms?: { field: string, size?: number };
+  cardinality?: { field: string, precision_threshold?: number };
+} };
+
 export interface ElasticsearchQuery {
   query?: Query;
   search_after?: (Value|null)[];
+  aggs?: Aggs;
 }

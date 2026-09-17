@@ -15,6 +15,7 @@ import {
   IndexType,
   KotkaDocument,
   KotkaDocumentType,
+  SearchResponse,
   SearchResult,
 } from '@kotka/shared/models';
 import { ListResponse } from '@luomus/laji-schema';
@@ -23,7 +24,7 @@ import { Observable } from 'rxjs';
 export type DatatableRow<
   T extends KotkaDocumentType = KotkaDocumentType,
   S extends IndexType | undefined = IndexType | undefined
-> = S extends IndexType ? ListResponse<SearchResult<S>> : ListResponse<KotkaDocument<T>>;
+> = S extends IndexType ? SearchResponse<SearchResult<S>> : ListResponse<KotkaDocument<T>>;
 
 @Injectable({
   providedIn: 'root',
@@ -34,8 +35,8 @@ export class DocumentDatatableDataService {
   getRows<
     T extends KotkaDocumentType,
     S extends IndexType | undefined
-  >(type: T, index: S | undefined, searchParams: SearchParams): Observable<DatatableRow<T, S>>;
-  getRows(type: KotkaDocumentType, index: IndexType | undefined, searchParams: SearchParams): Observable<DatatableRow> {
+  >(type: T, index: S | undefined, searchParams: SearchParams, aggregateBy?: string[]): Observable<DatatableRow<T, S>>;
+  getRows(type: KotkaDocumentType, index: IndexType | undefined, searchParams: SearchParams, aggregateBy?: string[]): Observable<DatatableRow> {
     if (index) {
       if (type !== KotkaDocumentType.specimen) {
         throw new Error(
@@ -50,6 +51,8 @@ export class DocumentDatatableDataService {
         searchParams.page,
         searchParams.pageSize,
         searchParams.sort,
+        undefined,
+        aggregateBy
       );
     }
 

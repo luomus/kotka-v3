@@ -43,6 +43,7 @@ export class DocumentDatatableComponent<
 
   dataType = input.required<T>();
   index = input<S>();
+
   columns = input<DatatableColumn[]>([]);
   columnsLoading = input<boolean>(false);
 
@@ -53,6 +54,7 @@ export class DocumentDatatableComponent<
 
   extraSortModel = input<DatatableSort>([]);
   extraSearchQuery = input<string>();
+  aggregateBy = input<S extends IndexType ? string[] : never>();
 
   datasource: DatatableSource;
   settingsKey: Signal<string | undefined>;
@@ -77,7 +79,7 @@ export class DocumentDatatableComponent<
         const index = this.index();
 
         return this.dataService
-          .getRows<T, S>(dataType, index, searchParams)
+          .getRows<T, S>(dataType, index, searchParams, this.aggregateBy())
           .subscribe((result) => {
             params.successCallback(result.member, result.totalItems);
             this.loadData.emit({ searchParams, result });

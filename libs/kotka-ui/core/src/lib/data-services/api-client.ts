@@ -13,7 +13,7 @@ import {
   StorePatch,
   StoreVersion,
   MediaType,
-  Media, IndexType, SearchResult, SearchField
+  Media, IndexType, SearchResult, SearchField, Aggs, SearchResponse
 } from '@kotka/shared/models';
 import { Observable, of, switchMap, forkJoin } from 'rxjs';
 import { apiBase, lajiApiBase} from './constants';
@@ -28,10 +28,6 @@ import { get, set } from 'lodash';
 import { LOGIN_REDIRECT_ENABLED } from '../interceptors';
 import { ElasticsearchQuery } from '@kotka/shared/models';
 
-const path = apiBase + '/';
-const authPath = apiBase + '/auth/';
-const lajiApiPath = lajiApiBase + '/';
-
 export interface SearchParams {
   searchQuery?: string | ElasticsearchQuery;
   page?: number;
@@ -39,6 +35,12 @@ export interface SearchParams {
   sort?: string;
   fields?: string[];
 }
+
+export const COUNT_PRECISION_THRESHOLD = 10000;
+
+const path = apiBase + '/';
+const authPath = apiBase + '/auth/';
+const lajiApiPath = lajiApiBase + '/';
 
 export const searchQueryStringToObject = (searchQuery: string): ElasticsearchQuery => {
   if (!searchQuery) {
@@ -215,7 +217,9 @@ export class ApiClient {
     pageSize = 100,
     sort?: string,
     fields?: X,
-  ): Observable<ListResponse<Y>> {
+    aggregateBy?: string[],
+    aggregateSize = 10
+  ): Observable<SearchResponse<Y>> {
     let params = new HttpParams().set('page', page).set('page_size', pageSize);
     if (sort) {
       params = params.set('sort', sort);
@@ -226,9 +230,31 @@ export class ApiClient {
 
     if (typeof searchQuery === 'string') {
       searchQuery = searchQueryStringToObject(searchQuery);
+    } else {
+      searchQuery = searchQuery || {};
     }
 
-    return this.httpClient.post<ListResponse<Y>>(
+    if (aggregateBy && aggregateBy.length > 0) {
+      const aggs: Aggs = {};
+      aggregateBy.forEach(field => {
+        aggs[field] = {
+          terms: {
+            field: `${field}.raw`,
+            size: aggregateSize,
+          },
+        };
+        aggs[`${field}_count`] = {
+          cardinality: {
+            field: `${field}.raw`,
+            precision_threshold: COUNT_PRECISION_THRESHOLD
+          }
+        };
+      });
+
+      searchQuery = { ...searchQuery, aggs };
+    }
+
+    return this.httpClient.post<SearchResponse<Y>>(
       `${path}${type}/${index}/_search`,
       { ...searchQuery, _source: true },
       { params },

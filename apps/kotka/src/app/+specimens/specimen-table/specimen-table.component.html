@@ -1,39 +1,51 @@
 @if (!showLabelDesigner()) {
   <kui-main-content pageTitle="Search specimens" containerClass="container-fluid">
-    <label>
-      Result type
-      <select class="form-select" [(ngModel)]="index">
-        @for (indexOption of indexOptions; track $index) {
-          <option [ngValue]="indexOption">{{ indexOption }}</option>
+    <div class="row">
+      <div class="col col-auto">
+        <label>
+          Result type
+          <select class="form-select" [(ngModel)]="index">
+            @for (indexOption of indexOptions; track $index) {
+              <option [ngValue]="indexOption">{{ indexOption }}</option>
+            }
+          </select>
+        </label>
+
+        <kotka-aggregations
+          [aggregations]="aggregations"
+          [aggregateFields]="aggregateFields"
+        ></kotka-aggregations>
+      </div>
+      <div class="col">
+        <!--button
+          class="btn btn-light"
+          (click)="showLabelDesigner.set(true)"
+        >
+          Print labels
+        </button-->
+        @if (vm$ | async; as vm) {
+          <kui-document-datatable
+            style="height: calc(100vh - 255px)"
+            [dataType]="dataType"
+            [index]="vm.index"
+            [columns]="vm.columns"
+            [columnsLoading]="vm.columnsLoading"
+            [enableFileExport]="true"
+            [enableColumnSelection]="true"
+            [extraSortModel]="[{
+              colId: 'dateCreated',
+              sort:  'desc'
+            }, {
+              colId: 'id',
+              sort:  'desc'
+            }]"
+            [aggregateBy]="aggregateFields"
+            (loadData)="onDataLoad($event)"
+          >
+          </kui-document-datatable>
         }
-      </select>
-    </label>
-    <!--button
-      class="btn btn-light"
-      (click)="showLabelDesigner.set(true)"
-    >
-      Print labels
-    </button-->
-    @if (vm$ | async; as vm) {
-      <kui-document-datatable
-        style="height: calc(100vh - 255px)"
-        [dataType]="dataType"
-        [index]="vm.index"
-        [columns]="vm.columns"
-        [columnsLoading]="vm.columnsLoading"
-        [enableFileExport]="true"
-        [enableColumnSelection]="true"
-        [extraSortModel]="[{
-          colId: 'dateCreated',
-          sort:  'desc'
-        }, {
-          colId: 'id',
-          sort:  'desc'
-        }]"
-        (loadData)="onDataLoad($event)"
-      >
-      </kui-document-datatable>
-    }
+      </div>
+    </div>
   </kui-main-content>
 } @else {
   @if (labelDesignerData$ | async; as labelDesignerData) {

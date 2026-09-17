@@ -1,4 +1,4 @@
-import { Document, Gathering, Identification, Sample, TypeSpecimen, Unit, Measurement, Preparation } from '@luomus/laji-schema/models';
+import { Document, Gathering, Identification, Sample, TypeSpecimen, Unit, Measurement, Preparation, ListResponse } from '@luomus/laji-schema/models';
 
 type StoreKeys = 'isPartOf' | '@type' | '@context';
 type EsIdFields = {
@@ -112,6 +112,15 @@ interface SearchResultMap {
 }
 
 export type SearchResult<T extends IndexType = IndexType> = SearchResultMap[T];
+
+export type Aggregations = { [key: string]: {
+  buckets?: { key: string, doc_count: number }[];
+  value?: number;
+} };
+
+export interface SearchResponse<T extends SearchResult | Partial<SearchResult> = SearchResult> extends ListResponse<T> {
+  aggregations: Aggregations;
+}
 
 export interface SearchField {
   field: string,

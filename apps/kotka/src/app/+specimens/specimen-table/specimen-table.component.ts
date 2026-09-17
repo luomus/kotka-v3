@@ -11,7 +11,7 @@ import {
   DatatableLoadedData,
   DocumentDatatableComponent,
 } from '@kotka/ui/datatable';
-import { KotkaDocumentType, Document, IndexType } from '@kotka/shared/models';
+import { KotkaDocumentType, Document, IndexType, SearchResponse, Aggregations } from '@kotka/shared/models';
 import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
 import { FormsModule } from '@angular/forms';
 import {
@@ -20,6 +20,7 @@ import {
   SearchResultIteratorService,
 } from '@kotka/ui/core';
 import { SpecimenLabelDesignerComponent } from '../specimen-label-designer/specimen-label-designer.component';
+import { AggregationsComponent } from './aggregations.component';
 import { Observable, of } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { map, startWith, switchMap } from 'rxjs/operators';
@@ -43,6 +44,7 @@ interface ViewModel {
     SpecimenLabelDesignerComponent,
     AsyncPipe,
     SpinnerComponent,
+    AggregationsComponent,
   ],
 })
 export class SpecimenTableComponent {
@@ -53,6 +55,9 @@ export class SpecimenTableComponent {
   index = signal<IndexType | undefined>('unit');
 
   indexOptions: (IndexType | undefined)[] = [undefined, 'unit', 'identification', 'typeSpecimen', 'sample'];
+  aggregateFields: string[] = ['editor', 'leg', 'taxon', 'taxonRank', 'typeStatus'];
+
+  aggregations?: Aggregations;
 
   vm$: Observable<ViewModel>;
 
@@ -123,6 +128,8 @@ export class SpecimenTableComponent {
   }
 
   onDataLoad(data: DatatableLoadedData) {
+    this.aggregations = (<SearchResponse>data.result).aggregations;
+
     const searchParams: IteratorSearchParams = {
       sort: data.searchParams.sort,
       searchQuery: data.searchParams.searchQuery
