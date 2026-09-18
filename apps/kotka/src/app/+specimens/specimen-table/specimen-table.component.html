@@ -1,22 +1,30 @@
 @if (!showLabelDesigner()) {
-  <kui-main-content pageTitle="Search specimens" containerClass="container-fluid">
-    <div class="row">
-      <div class="col col-auto">
-        <label>
-          Result type
-          <select class="form-select" [(ngModel)]="index">
-            @for (indexOption of indexOptions; track $index) {
-              <option [ngValue]="indexOption">{{ indexOption }}</option>
-            }
-          </select>
-        </label>
+  <kui-main-content
+    pageTitle="Search specimens"
+    containerClass="container-fluid"
+  >
+    <div class="row g-3 content-row">
+      <div class="col-12 col-md-3 col-lg-2 content-column">
+        <aside class="specimen-sidebar">
+          <div>
+            <label class="form-label sidebar-label" for="specimen-result-type">Result type</label>
+            <select id="specimen-result-type" class="form-select form-select-sm" [(ngModel)]="index">
+              @for (indexOption of indexOptions; track $index) {
+                <option [ngValue]="indexOption">{{ indexOption }}</option>
+              }
+            </select>
+          </div>
 
-        <kotka-aggregations
-          [aggregations]="aggregations"
-          [aggregateFields]="aggregateFields"
-        ></kotka-aggregations>
+          <hr class="sidebar-divider">
+
+          <kotka-aggregations
+            class="sidebar-aggregations"
+            [aggregations]="aggregations"
+            [aggregateFields]="aggregateFields"
+          ></kotka-aggregations>
+        </aside>
       </div>
-      <div class="col">
+      <div class="col-12 col-md-9 col-lg-10 content-column main-content-column">
         <!--button
           class="btn btn-light"
           (click)="showLabelDesigner.set(true)"
@@ -24,21 +32,29 @@
           Print labels
         </button-->
         @if (vm$ | async; as vm) {
+          <kui-search
+            class="specimen-search"
+            [columns]="vm.columns"
+            (search)="onSearch($event)"
+          >
+          </kui-search>
           <kui-document-datatable
-            style="height: calc(100vh - 255px)"
+            class="specimen-datatable"
             [dataType]="dataType"
             [index]="vm.index"
             [columns]="vm.columns"
             [columnsLoading]="vm.columnsLoading"
             [enableFileExport]="true"
             [enableColumnSelection]="true"
-            [extraSortModel]="[{
-              colId: 'dateCreated',
-              sort:  'desc'
-            }, {
-              colId: 'id',
-              sort:  'desc'
-            }]"
+            [disableFilter]="true"
+            [extraSearchQuery]="searchQuery"
+            [extraSortModel]="vm.index ? [] : [{
+                colId: 'dateCreated',
+                sort:  'desc'
+              }, {
+                colId: 'id',
+                sort:  'desc'
+              }]"
             [aggregateBy]="aggregateFields"
             (loadData)="onDataLoad($event)"
           >

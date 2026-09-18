@@ -70,6 +70,7 @@ export class DatatableComponent implements OnDestroy {
 
   enableFileExport = input<boolean|undefined>(false);
   enableColumnSelection = input<boolean|undefined>(false);
+  disableFilter = input<boolean|undefined>(false);
 
   settingsKey = input<string>();
 
@@ -126,8 +127,8 @@ export class DatatableComponent implements OnDestroy {
       resizable: true,
       minWidth: 120,
       sortable: true,
-      filter: true,
-      floatingFilter: true,
+      filter: !this.disableFilter(),
+      floatingFilter: !this.disableFilter(),
       suppressHeaderMenuButton: true,
       lockVisible: !this.enableColumnSelection()
     }));

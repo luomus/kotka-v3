@@ -49,6 +49,7 @@ export class DocumentDatatableComponent<
 
   enableFileExport = input<boolean>();
   enableColumnSelection = input<boolean>();
+  disableFilter = input<boolean>();
 
   defaultFilterModel = input<DatatableFilter>({});
 

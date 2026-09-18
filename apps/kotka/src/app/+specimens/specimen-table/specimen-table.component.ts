@@ -25,6 +25,7 @@ import { Observable, of } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { map, startWith, switchMap } from 'rxjs/operators';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { SearchComponent } from '@kotka/ui/search';
 
 interface ViewModel {
   index: IndexType | undefined;
@@ -45,6 +46,7 @@ interface ViewModel {
     AsyncPipe,
     SpinnerComponent,
     AggregationsComponent,
+    SearchComponent,
   ],
 })
 export class SpecimenTableComponent {
@@ -53,6 +55,7 @@ export class SpecimenTableComponent {
 
   dataType: KotkaDocumentType.specimen = KotkaDocumentType.specimen;
   index = signal<IndexType | undefined>('unit');
+  searchQuery?: string;
 
   indexOptions: (IndexType | undefined)[] = [undefined, 'unit', 'identification', 'typeSpecimen', 'sample'];
   aggregateFields: string[] = ['editor', 'leg', 'taxon', 'taxonRank', 'typeStatus'];
@@ -125,6 +128,10 @@ export class SpecimenTableComponent {
         );
       })
     );
+  }
+
+  onSearch(searchQuery: string) {
+    this.searchQuery = searchQuery;
   }
 
   onDataLoad(data: DatatableLoadedData) {
