@@ -19,8 +19,8 @@
 
           <kotka-aggregations
             class="sidebar-aggregations"
-            [aggregations]="aggregations"
-            [aggregateFields]="aggregateFields"
+            [aggregates]="aggregates || []"
+            (selectedChange)="onAggregationFiltersChange($event)"
           ></kotka-aggregations>
         </aside>
       </div>
@@ -47,7 +47,7 @@
             [enableFileExport]="true"
             [enableColumnSelection]="true"
             [disableFilter]="true"
-            [extraSearchQuery]="searchQuery"
+            [extraSearchQuery]="searchQuery()"
             [extraSortModel]="vm.index ? [] : [{
                 colId: 'dateCreated',
                 sort:  'desc'

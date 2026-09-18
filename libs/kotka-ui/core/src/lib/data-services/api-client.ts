@@ -13,7 +13,7 @@ import {
   StorePatch,
   StoreVersion,
   MediaType,
-  Media, IndexType, SearchResult, SearchField, Aggs, SearchResponse
+  Media, IndexType, SearchResult, SearchField, Aggs, SearchResponse, RawSearchResponse, Aggregations, FieldAggregate
 } from '@kotka/shared/models';
 import { Observable, of, switchMap, forkJoin } from 'rxjs';
 import { apiBase, lajiApiBase} from './constants';
@@ -234,30 +234,20 @@ export class ApiClient {
       searchQuery = searchQuery || {};
     }
 
-    if (aggregateBy && aggregateBy.length > 0) {
-      const aggs: Aggs = {};
-      aggregateBy.forEach(field => {
-        aggs[field] = {
-          terms: {
-            field: `${field}.raw`,
-            size: aggregateSize,
-          },
-        };
-        aggs[`${field}_count`] = {
-          cardinality: {
-            field: `${field}.raw`,
-            precision_threshold: COUNT_PRECISION_THRESHOLD
-          }
-        };
-      });
+    searchQuery = this.addAggregationsToSearchQuery(searchQuery, aggregateBy, aggregateSize);
 
-      searchQuery = { ...searchQuery, aggs };
-    }
-
-    return this.httpClient.post<SearchResponse<Y>>(
+    return this.httpClient.post<RawSearchResponse<Y>>(
       `${path}${type}/${index}/_search`,
       { ...searchQuery, _source: true },
       { params },
+    ).pipe(
+      map(response => {
+        const { aggregations, ...rest } = response;
+        return {
+          ...rest,
+          aggregates: this.convertAggregations(aggregations, aggregateBy),
+        };
+      }),
     );
   }
 
@@ -409,6 +399,53 @@ export class ApiClient {
       `${lajiApiPath}autocomplete/taxa`,
       { params },
     );
+  }
+
+  private addAggregationsToSearchQuery(searchQuery: ElasticsearchQuery, aggregateBy?: string[], aggregateSize = 10): ElasticsearchQuery {
+    if (aggregateBy && aggregateBy.length > 0) {
+      const aggs: Aggs = {};
+      aggregateBy.forEach(field => {
+        aggs[field] = {
+          terms: {
+            field: `${field}.raw`,
+            size: aggregateSize,
+          },
+        };
+        aggs[`${field}_count`] = {
+          cardinality: {
+            field: `${field}.raw`,
+            precision_threshold: COUNT_PRECISION_THRESHOLD
+          }
+        };
+      });
+
+      searchQuery = { ...searchQuery, aggs };
+    }
+
+    return searchQuery;
+  }
+
+  private convertAggregations(
+    aggregations?: Aggregations,
+    aggregateBy?: string[],
+  ): FieldAggregate[] {
+    if (!aggregations || !aggregateBy?.length) {
+      return [];
+    }
+
+    return aggregateBy.map(field => {
+      const count = aggregations[`${field}_count`]?.value || 0;
+
+      return {
+        field,
+        count,
+        countUnprecise: count > COUNT_PRECISION_THRESHOLD,
+        values: (aggregations[field]?.buckets || []).map(bucket => ({
+          value: bucket.key,
+          docCount: bucket.doc_count,
+        })),
+      };
+    });
   }
 
   private convertVersionDifferenceFormat<S extends KotkaDocument>(

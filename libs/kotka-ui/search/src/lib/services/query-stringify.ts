@@ -1,5 +1,5 @@
 import {
-  BuilderQuery,
+  BuilderQuery, JoinOperator,
   SearchCriteria,
   SearchGroup,
   SearchOperator,
@@ -50,7 +50,7 @@ export function builderQueryToQueryString(query: BuilderQuery): string {
   }
 }
 
-function groupToQueryString(group: SearchGroup): { result: string, hasMultiple: boolean} {
+export function groupToQueryString(group: SearchGroup): { result: string, hasMultiple: boolean} {
   const results = group.criteria
     .map((criteria) => criteriaToQueryString(criteria))
     .filter((queryString) => !!queryString);
@@ -62,7 +62,7 @@ function groupToQueryString(group: SearchGroup): { result: string, hasMultiple: 
   }
 }
 
-function criteriaToQueryString(criteria: SearchCriteria): string {
+export function criteriaToQueryString(criteria: SearchCriteria): string {
   const field = criteria.field;
 
   const operatorInfo = SEARCH_OPERATOR_MAP[criteria.operator];
@@ -130,4 +130,8 @@ export function escapeFilterString(
   });
 
   return value;
+}
+
+export function joinQueryStrings(query1: string, query2: string, joinOperator: JoinOperator = 'AND'): string {
+  return [query1, query2].filter(Boolean).map(query => `(${query})`).join(` ${joinOperator} `);
 }

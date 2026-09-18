@@ -113,13 +113,31 @@ interface SearchResultMap {
 
 export type SearchResult<T extends IndexType = IndexType> = SearchResultMap[T];
 
+export type AggregationBucketKey = string | number | boolean;
+
 export type Aggregations = { [key: string]: {
-  buckets?: { key: string, doc_count: number }[];
+  buckets?: { key: AggregationBucketKey, doc_count: number }[];
   value?: number;
 } };
 
+export interface AggregateValue {
+  value: AggregationBucketKey;
+  docCount: number;
+}
+
+export interface FieldAggregate {
+  field: string;
+  count: number;
+  countUnprecise: boolean;
+  values: AggregateValue[];
+}
+
+export interface RawSearchResponse<T extends SearchResult | Partial<SearchResult> = SearchResult> extends ListResponse<T> {
+  aggregations?: Aggregations;
+}
+
 export interface SearchResponse<T extends SearchResult | Partial<SearchResult> = SearchResult> extends ListResponse<T> {
-  aggregations: Aggregations;
+  aggregates: FieldAggregate[];
 }
 
 export interface SearchField {
