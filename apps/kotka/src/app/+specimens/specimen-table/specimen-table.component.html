@@ -34,7 +34,7 @@
         @if (vm$ | async; as vm) {
           <kui-search
             class="specimen-search"
-            [columns]="vm.columns"
+            [fields]="vm.fields"
             (search)="onSearch($event)"
           >
           </kui-search>

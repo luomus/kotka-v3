@@ -4,11 +4,11 @@ import {
   input, output,
   signal, viewChild,
 } from '@angular/core';
-import { DatatableColumn } from '@kotka/ui/datatable';
 import { SearchBuilderComponent } from '../search-builder/search-builder.component';
 import { TextSearchComponent } from '../text-search/text-search.component';
 import { queryStringToBuilderQuery } from '../services/query-parse';
 import { DialogService } from '@kotka/ui/core';
+import { SearchField } from '@kotka/shared/models';
 
 type SearchMode = 'builder' | 'text';
 
@@ -22,7 +22,7 @@ type SearchMode = 'builder' | 'text';
 export class SearchComponent {
   private dialogService = inject(DialogService);
 
-  columns = input<DatatableColumn[]>([]);
+  fields = input<SearchField[]>([]);
 
   mode = signal<SearchMode>('builder');
   text = signal<string>('');

@@ -4,8 +4,8 @@ import {
   input,
   model,
 } from '@angular/core';
-import { DatatableColumn } from '@kotka/ui/datatable';
 import { FormsModule } from '@angular/forms';
+import { SearchField } from '@kotka/shared/models';
 
 @Component({
   selector: 'kui-text-search',
@@ -15,7 +15,7 @@ import { FormsModule } from '@angular/forms';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TextSearchComponent {
-  columns = input<DatatableColumn[]>([]);
+  columns = input<SearchField[]>([]);
 
   text = model<string>('');
 }

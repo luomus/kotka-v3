@@ -4,10 +4,9 @@ import {
   input,
   model,
 } from '@angular/core';
-import { DatatableColumn } from '@kotka/ui/datatable';
 import { AutocompleteComponent } from '@kotka/ui/components';
 import { Observable, of } from 'rxjs';
-import { AutocompleteResult } from '@kotka/shared/models';
+import { AutocompleteResult, SearchField } from '@kotka/shared/models';
 import { HighlightMatchPipe } from '../pipes/highlight-match.pipe';
 
 @Component({
@@ -40,7 +39,7 @@ import { HighlightMatchPipe } from '../pipes/highlight-match.pipe';
   imports: [AutocompleteComponent, HighlightMatchPipe],
 })
 export class FieldTypeaheadComponent {
-  columns = input.required<DatatableColumn[]>();
+  fields = input.required<SearchField[]>();
   value = model<string>('');
   placeholder = input('Search...');
 
@@ -49,15 +48,15 @@ export class FieldTypeaheadComponent {
   private fetchResults(term: string): Observable<AutocompleteResult[]> {
     term = term.trim().toLowerCase();
 
-    const results: AutocompleteResult[] = this.columns()
+    const results: AutocompleteResult[] = this.fields()
       .filter(
-        (column) =>
-          column.field?.toLowerCase().includes(term) ||
-          column.headerName?.toLowerCase().includes(term),
+        (field) =>
+          field.field?.toLowerCase().includes(term)
+          // || field.label?.toLowerCase().includes(term), TODO when label exists
       )
-      .map((column) => ({
-        key: column.field!,
-        value: column.headerName || column.field!,
+      .map((field) => ({
+        key: field.field,
+        value: field.field,
       }))
       .sort((a, b) => this.scoreMatch(a, term) - this.scoreMatch(b, term));
 

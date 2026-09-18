@@ -8,7 +8,7 @@ import {
   DocumentDatatableColumnService,
   SpecialColumns, getUriColumnOptions,
 } from '@kotka/ui/datatable';
-import { KotkaDocumentType } from '@kotka/shared/models';
+import { KotkaDocumentType, SearchField } from '@kotka/shared/models';
 import { MainContentComponent } from '@kotka/ui/components';
 import { FormsModule } from '@angular/forms';
 import { getUri } from '@kotka/shared/utils';
@@ -78,5 +78,12 @@ export class BranchSearchComponent {
 
   onSearch(searchQuery: string) {
     this.searchQuery = searchQuery;
+  }
+
+  columnsToFields(columns: DatatableColumn[]): SearchField[] {
+    return columns.map(col => ({
+      type: 'text',
+      field: col.field!
+    }));
   }
 }

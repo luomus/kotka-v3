@@ -1,7 +1,7 @@
 <kui-main-content pageTitle="Branch search" containerClass="container-fluid">
   @if (columns$ | async; as columns) {
     <kui-search
-      [columns]="columns"
+      [fields]="columnsToFields(columns)"
       (search)="onSearch($event)"
     >
     </kui-search>

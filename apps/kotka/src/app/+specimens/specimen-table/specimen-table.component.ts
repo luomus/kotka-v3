@@ -11,7 +11,7 @@ import {
   DatatableLoadedData,
   DocumentDatatableComponent,
 } from '@kotka/ui/datatable';
-import { KotkaDocumentType, Document, IndexType, SearchResponse, FieldAggregate } from '@kotka/shared/models';
+import { KotkaDocumentType, Document, IndexType, SearchResponse, FieldAggregate, SearchField } from '@kotka/shared/models';
 import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
 import { FormsModule } from '@angular/forms';
 import {
@@ -29,6 +29,7 @@ import { groupToQueryString, joinQueryStrings, SearchComponent, SearchGroup } fr
 
 interface ViewModel {
   index: IndexType | undefined;
+  fields: SearchField[];
   columns: DatatableColumn[];
   columnsLoading: boolean;
 }
@@ -110,7 +111,7 @@ export class SpecimenTableComponent {
               defaultSelected: true,
             },
           ];
-          return of({ index, columns, columnsLoading: false });
+          return of({ index, fields: [{ type: 'keyword', field: 'id' }], columns, columnsLoading: false });
         }
 
         return this.apiClient.getSearchFields(this.dataType, index).pipe(
@@ -122,12 +123,14 @@ export class SpecimenTableComponent {
             }));
             return {
               index,
+              fields,
               columns,
               columnsLoading: false,
             };
           }),
           startWith({
             index,
+            fields: [],
             columns: [],
             columnsLoading: true,
           })
