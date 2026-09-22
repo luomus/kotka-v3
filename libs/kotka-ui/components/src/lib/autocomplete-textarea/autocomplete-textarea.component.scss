@@ -1,0 +1,28 @@
+@supports (field-sizing: content) {
+  .autocomplete-textarea-input {
+    field-sizing: content;
+    resize: none;
+  }
+}
+
+.textarea-mirror {
+  position: absolute;
+  visibility: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  top: 0;
+  left: 0;
+}
+
+.suggestions-loading {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.6rem;
+  pointer-events: none;
+}
+
+.suggestions-dropdown {
+  width: auto;
+  min-width: 10rem;
+  max-width: 100%;
+}

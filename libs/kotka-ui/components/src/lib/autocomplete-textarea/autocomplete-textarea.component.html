@@ -1,0 +1,53 @@
+<div class="position-relative">
+  <textarea
+    #textarea
+    class="form-control autocomplete-textarea-input"
+    [rows]="3"
+    spellcheck="false"
+    autocomplete="off"
+    aria-autocomplete="list"
+    [(ngModel)]="text"
+    (ngModelChange)="updateSuggestions()"
+    (focus)="updateSuggestions()"
+    (keyup)="onKeyup($event)"
+    (keydown)="onKeydown($event)"
+    (blur)="hideSuggestions()"
+  ></textarea>
+
+  <div #mirror class="form-control textarea-mirror">
+    <span></span>
+    <span>.</span>
+  </div>
+
+  @if (loading()) {
+    <div class="suggestions-loading">
+      <span class="spinner-border spinner-border-sm text-secondary" role="status" aria-live="polite">
+        <span class="visually-hidden">Loading suggestions...</span>
+      </span>
+    </div>
+  }
+
+  @if (showSuggestions() && suggestions().length > 0) {
+    <div
+      class="dropdown-menu show suggestions-dropdown"
+      role="listbox"
+      [style.top.px]="dropdownPosition().top"
+      [style.left.px]="dropdownPosition().left"
+    >
+      @for (suggestion of suggestions(); track suggestion.value; let i = $index) {
+        <button
+          type="button"
+          class="dropdown-item text-truncate"
+          role="option"
+          [class.active]="i === activeSuggestionIndex()"
+          [attr.aria-selected]="i === activeSuggestionIndex()"
+          (mousedown)="$event.preventDefault()"
+          (click)="applySuggestion(suggestion)"
+        >
+          <span [innerHTML]="suggestion.value | highlightMatch: token()"></span>
+        </button>
+      }
+    </div>
+  }
+</div>
+

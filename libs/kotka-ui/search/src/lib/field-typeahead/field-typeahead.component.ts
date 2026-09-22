@@ -7,7 +7,7 @@ import {
 import { AutocompleteComponent } from '@kotka/ui/components';
 import { Observable, of } from 'rxjs';
 import { AutocompleteResult, SearchField } from '@kotka/shared/models';
-import { HighlightMatchPipe } from '../pipes/highlight-match.pipe';
+import { HighlightMatchPipe } from '@kotka/ui/core';
 
 @Component({
   selector: 'kui-field-typeahead',
