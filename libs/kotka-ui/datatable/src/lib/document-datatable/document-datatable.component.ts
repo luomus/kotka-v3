@@ -13,7 +13,7 @@ import {
   KotkaDocumentType,
 } from '@kotka/shared/models';
 import { DataTypeNamePipePipe, SearchParams, UserService } from '@kotka/ui/core';
-import { map } from 'rxjs';
+import { catchError, map, of } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 
@@ -61,6 +61,7 @@ export class DocumentDatatableComponent<
   settingsKey: Signal<string | undefined>;
 
   loadData = output<DatatableLoadedData<T, S>>();
+  invalidQueryError = output<any>();
 
   private userId: Signal<string | undefined>;
 
@@ -80,10 +81,20 @@ export class DocumentDatatableComponent<
         const index = this.index();
 
         return this.dataService
-          .getRows<T, S>(dataType, index, searchParams, this.aggregateBy())
+          .getRows<T, S>(dataType, index, searchParams, this.aggregateBy()).pipe(
+            catchError((err) => {
+              if (err.status === 400) {
+                this.invalidQueryError.emit(err);
+                return of(undefined);
+              }
+              throw err;
+            }),
+          )
           .subscribe((result) => {
-            params.successCallback(result.member, result.totalItems);
-            this.loadData.emit({ searchParams, result });
+            params.successCallback(result?.member || [], result?.totalItems || 0);
+            if (result) {
+              this.loadData.emit({ searchParams, result });
+            }
           });
       },
     };

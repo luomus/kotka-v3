@@ -38,6 +38,11 @@
             (search)="onSearch($event)"
           >
           </kui-search>
+          @if (searchError) {
+            <ngb-alert type="danger" [dismissible]="false">
+              <strong>Error:</strong> {{ searchError }}
+            </ngb-alert>
+          }
           <kui-document-datatable
             class="specimen-datatable"
             [dataType]="dataType"
@@ -57,6 +62,7 @@
               }]"
             [aggregateBy]="aggregateFields"
             (loadData)="onDataLoad($event)"
+            (invalidQueryError)="onInvalidQueryError()"
           >
           </kui-document-datatable>
         }
