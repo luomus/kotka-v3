@@ -33,19 +33,21 @@
     @if (isSpecialAutocomplete(currentSuggestions)) {
       @if (currentSuggestions.type === 'datepicker') {
         <ngb-datepicker
+          #datepicker
           class="datepicker-dropdown"
-          [style.top.px]="dropdownPosition().top"
-          [style.left.px]="dropdownPosition().left"
+          [style.top.px]="fixedDropdownPosition().top"
+          [style.left.px]="fixedDropdownPosition().left"
           (mousedown)="$event.preventDefault()"
           (dateSelect)="applyDateSuggestion($event, currentSuggestions.suffix)"
         ></ngb-datepicker>
       }
     } @else if (currentSuggestions.length > 0) {
       <div
+        #dropdown
         class="dropdown-menu show suggestions-dropdown"
         role="listbox"
-        [style.top.px]="dropdownPosition().top"
-        [style.left.px]="dropdownPosition().left"
+        [style.top.px]="fixedDropdownPosition().top"
+        [style.left.px]="fixedDropdownPosition().left"
       >
         @for (suggestion of currentSuggestions; track suggestion.value; let i = $index) {
           <button

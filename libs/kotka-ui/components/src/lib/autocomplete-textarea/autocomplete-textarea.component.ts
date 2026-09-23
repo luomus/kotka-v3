@@ -1,7 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed, effect,
+  computed, DOCUMENT, effect,
   ElementRef,
   inject,
   input,
@@ -40,6 +40,7 @@ export const isSpecialAutocomplete = (suggestions: AutocompleteSuggestion[] | Sp
 })
 export class AutocompleteTextareaComponent {
   private window = inject(WINDOW);
+  private document = inject(DOCUMENT);
 
   text = model<string>('');
 
@@ -51,15 +52,18 @@ export class AutocompleteTextareaComponent {
 
   showSuggestions = signal(false);
   activeSuggestionIndex = signal(0);
-  dropdownPosition: Signal<{ top: number; left: number }>;
+  fixedDropdownPosition = signal<{ top: number; left: number }>({ top: 0, left: 0});
 
   isSpecialAutocomplete = isSpecialAutocomplete;
 
   private textareaRef = viewChild<ElementRef<HTMLTextAreaElement>>('textarea');
   private mirrorRef = viewChild<ElementRef<HTMLDivElement>>('mirror');
+  private datepickerRef = viewChild<NgbDatepicker, ElementRef<HTMLElement>>('datepicker', { read: ElementRef });
+  private dropdownRef = viewChild<ElementRef<HTMLDivElement>>('dropdown');
 
   private cursorPosition = signal(0);
   private dropdownTargetPosition: Signal<number>;
+  private dropdownPosition: Signal<{ top: number; left: number }>;
 
   private textBeforeCursor = signal('');
 
@@ -73,6 +77,24 @@ export class AutocompleteTextareaComponent {
         this.dropdownTargetPosition()
       ),
     );
+
+    effect(() => {
+      let fixedPosition = this.dropdownPosition();
+
+      setTimeout(() => {
+        const elem = this.datepickerRef()?.nativeElement || this.dropdownRef()?.nativeElement;
+        const textareaLeft = this.textareaRef()?.nativeElement.getBoundingClientRect().left;
+
+        if (elem && textareaLeft !== undefined) {
+          const width = elem.getBoundingClientRect().width;
+
+          const maxLeft = this.document.documentElement.clientWidth - textareaLeft - width;
+          fixedPosition = { ...fixedPosition, left: Math.min(fixedPosition.left, maxLeft) };
+        }
+
+        this.fixedDropdownPosition.set(fixedPosition);
+      });
+    });
 
     effect(() => {
       this.suggestions();
@@ -188,14 +210,9 @@ export class AutocompleteTextareaComponent {
 
     const coordinates = this.getCursorCoordinates(mirror, textarea, position);
 
-    const minDropdownWidth = 160;
-    const textareaLeft = textarea.getBoundingClientRect().left;
-    const maxLeft = this.window.innerWidth - textareaLeft - minDropdownWidth;
-    const left = Math.max(0, Math.min(coordinates.left - textarea.scrollLeft, maxLeft));
-
     return {
       top: coordinates.top + coordinates.lineHeight - textarea.scrollTop,
-      left,
+      left: coordinates.left - textarea.scrollLeft,
     };
   }
 
