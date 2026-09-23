@@ -27,27 +27,40 @@
     </div>
   }
 
-  @if (showSuggestions() && suggestions().length > 0) {
-    <div
-      class="dropdown-menu show suggestions-dropdown"
-      role="listbox"
-      [style.top.px]="dropdownPosition().top"
-      [style.left.px]="dropdownPosition().left"
-    >
-      @for (suggestion of suggestions(); track suggestion.value; let i = $index) {
-        <button
-          type="button"
-          class="dropdown-item text-truncate"
-          role="option"
-          [class.active]="i === activeSuggestionIndex()"
-          [attr.aria-selected]="i === activeSuggestionIndex()"
+  @if (showSuggestions()) {
+    @let currentSuggestions = suggestions();
+
+    @if (isSpecialAutocomplete(currentSuggestions)) {
+      @if (currentSuggestions.type === 'datepicker') {
+        <ngb-datepicker
+          class="datepicker-dropdown"
+          [style.top.px]="dropdownPosition().top"
+          [style.left.px]="dropdownPosition().left"
           (mousedown)="$event.preventDefault()"
-          (click)="applySuggestion(suggestion)"
-        >
-          <span [innerHTML]="suggestion.value | highlightMatch: token()"></span>
-        </button>
+          (dateSelect)="applyDateSuggestion($event, currentSuggestions.suffix)"
+        ></ngb-datepicker>
       }
-    </div>
+    } @else if (currentSuggestions.length > 0) {
+      <div
+        class="dropdown-menu show suggestions-dropdown"
+        role="listbox"
+        [style.top.px]="dropdownPosition().top"
+        [style.left.px]="dropdownPosition().left"
+      >
+        @for (suggestion of currentSuggestions; track suggestion.value; let i = $index) {
+          <button
+            type="button"
+            class="dropdown-item text-truncate"
+            role="option"
+            [class.active]="i === activeSuggestionIndex()"
+            [attr.aria-selected]="i === activeSuggestionIndex()"
+            (mousedown)="$event.preventDefault()"
+            (click)="applySuggestion(suggestion)"
+          >
+            <span [innerHTML]="suggestion.value | highlightMatch: token()"></span>
+          </button>
+        }
+      </div>
+    }
   }
 </div>
-

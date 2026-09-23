@@ -27,6 +27,10 @@ export function isKeyOfObject<T extends object>(key: string | number | symbol, o
   return key in obj;
 }
 
+export function padDayOrMonth(value: number): string {
+  return value < 10 ? `0${value}` : `${value}`;
+}
+
 export function getEnumValue(value: string | undefined, field: any, fieldType: 'json'|'schema' = 'json'): string {
   const valueOptions = fieldType === 'schema' ? getValueOptionsFromSchemaField(field) : field.options?.value_options;
   return valueOptions?.[value || ''] || '';

@@ -11,7 +11,9 @@ import {
 import { KotkaDocumentType, SearchField } from '@kotka/shared/models';
 import {
   AutocompleteTextareaComponent,
-  AutocompleteTextareaSuggestion,
+  AutocompleteSuggestion,
+  AutocompleteSuggestions,
+  isSpecialAutocomplete,
 } from '@kotka/ui/components';
 import { ApiClient } from '@kotka/ui/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -32,27 +34,45 @@ interface FieldValueContext {
   query: string;
 }
 
-interface TokenInfo {
+type BasicTokenDataItem = {
   token: string;
-  isInsideQuotes: boolean;
+  isBetween?: 'quotes' | 'regex';
 }
 
-interface CurrentTokenInfo {
-  previous?: TokenInfo;
-  current: TokenInfo;
-  separator?: string;
+interface RangeTokenDataItem {
+  token: string;
+  isBetween?: 'brackets' | 'curlyBrackets';
+  childData: TokenData
 }
 
-const JOIN_OPERATOR_SUGGESTIONS: AutocompleteTextareaSuggestion[] = [
+type TokenDataItem = BasicTokenDataItem | RangeTokenDataItem;
+
+interface TokenData {
+  previous: TokenDataItem[];
+  current: TokenDataItem;
+  separator?: ' ' | '(' | ')';
+}
+
+interface ParsedField extends SearchField {
+  type: SearchField['type'] | 'exists' | 'unknown';
+}
+
+const JOIN_OPERATOR_SUGGESTIONS: AutocompleteSuggestion[] = [
   { value: 'AND', suffix: ' ' },
   { value: 'OR', suffix: ' ' },
 ];
 
-const SPECIAL_OPERATOR_SUGGESTIONS: AutocompleteTextareaSuggestion[] = [
+const TO_OPERATOR_SUGGESTIONS: AutocompleteSuggestion[] = [
+  { value: 'TO', suffix: ' ' }
+];
+
+const SPECIAL_OPERATOR_SUGGESTIONS: AutocompleteSuggestion[] = [
   { value: '_exists_', suffix: ': "' },
 ];
 
 const SUGGESTION_LIMIT = 10;
+
+const isRangeTokenDataItem = (item: TokenDataItem): item is RangeTokenDataItem => (item.isBetween === 'brackets' || item.isBetween === 'curlyBrackets');
 
 @Component({
   selector: 'kui-text-search',
@@ -68,26 +88,29 @@ export class TextSearchComponent {
   text = model<string>('');
 
   currentToken = signal('');
-  suggestions = signal<AutocompleteTextareaSuggestion[]>([]);
+  suggestions = signal<AutocompleteSuggestions>([]);
   suggestionsLoading = signal(false);
 
-  private fieldNames: Signal<string[]>;
-  private fieldFilterSuggestions: Signal<AutocompleteTextareaSuggestion[]>;
-  private fieldValueSuggestions: Signal<AutocompleteTextareaSuggestion[]>;
+  private fieldMap: Signal<Record<string, SearchField>>;
+  private fieldFilterSuggestions: Signal<AutocompleteSuggestion[]>;
+  private fieldValueSuggestions: Signal<AutocompleteSuggestion[]>;
 
   private fieldValueContext$ = new Subject<FieldValueContext | null>();
 
   constructor() {
-    this.fieldNames = computed(() => this.fields().map((field) => field.field));
+    this.fieldMap = computed(() => this.fields().reduce((map, field) => {
+      map[field.field] = field;
+      return map;
+    }, <Record<string, SearchField>>{}));
 
-    this.fieldFilterSuggestions = computed<AutocompleteTextareaSuggestion[]>(() =>
+    this.fieldFilterSuggestions = computed<AutocompleteSuggestion[]>(() =>
       this.fields().map((field) => ({
         value: field.field,
-        suffix: ': "',
+        suffix: field.type === 'date' ? ': [' : ': "',
       })),
     );
 
-    this.fieldValueSuggestions = computed<AutocompleteTextareaSuggestion[]>(() =>
+    this.fieldValueSuggestions = computed<AutocompleteSuggestion[]>(() =>
       this.fields().map((field) => ({
         value: field.field,
         suffix: '" ',
@@ -101,7 +124,7 @@ export class TextSearchComponent {
         ),
         tap(context => (this.suggestionsLoading.set(!!context))),
         debounceTime(200),
-        switchMap((context): Observable<AutocompleteTextareaSuggestion[] | null> => {
+        switchMap((context): Observable<AutocompleteSuggestion[] | null> => {
           if (!context) {
             return of(null);
           }
@@ -121,11 +144,14 @@ export class TextSearchComponent {
   }
 
   updateSuggestions(textBeforeCursor: string) {
-    const { current, previous, separator } = this.getCurrentTokenInfo(textBeforeCursor);
+    const tokenData = this.getTokenData(textBeforeCursor);
+    const current = tokenData.current;
 
-    this.currentToken.set(current.token);
+    const currentToken = isRangeTokenDataItem(current) ? current.childData.current.token : current.token;
 
-    const suggestions = this.getSuggestions(current, previous, separator);
+    this.currentToken.set(currentToken);
+
+    const suggestions = this.getSuggestions(tokenData);
 
     if (suggestions === null) {
       this.suggestions.set([]);
@@ -133,100 +159,153 @@ export class TextSearchComponent {
     }
 
     this.fieldValueContext$.next(null);
-    this.suggestions.set(this.filterAndSort(suggestions, current.token));
+    this.suggestions.set(this.filterAndSort(suggestions, currentToken));
   }
 
-  private getSuggestions(
-    tokenInfo: TokenInfo,
-    previousTokenInfo?: TokenInfo,
-    separator?: string
-  ): AutocompleteTextareaSuggestion[] | null {
-    const token = tokenInfo.token;
-    const previousToken = previousTokenInfo?.token;
+  private getSuggestions({ current, previous, separator }: TokenData): AutocompleteSuggestions | null {
+    const parseFieldToken = (item?: TokenDataItem): ParsedField | undefined => {
+      if (item?.token.endsWith(':') && !item.isBetween) {
+        const fieldName = item.token.slice(0, -1);
 
-    if (token.startsWith('_')) {
-      return SPECIAL_OPERATOR_SUGGESTIONS;
-    }
+        if (fieldName === '_exists_') {
+          return { field: fieldName, type: 'exists' };
+        }
 
-    if (previousToken?.endsWith(':') && !previousTokenInfo?.isInsideQuotes) {
-      if (tokenInfo.isInsideQuotes) {
-        const field = previousToken?.slice(0, -1);
-        if (field === '_exists_') {
+        const field = this.fieldMap()[fieldName];
+        return field ? field : { field: fieldName, type: 'unknown' };
+      }
+
+      return undefined;
+    };
+
+    const token = current.token;
+    const lastItem = previous[previous.length - 1];
+
+    const field = parseFieldToken(lastItem);
+
+    if (current.isBetween === 'quotes') {
+      if (field && field.type !== 'unknown') {
+        if (field.type === 'exists') {
           return this.fieldValueSuggestions();
         }
 
-        if (!this.fieldNames().includes(field)) {
-          return [];
+        if (field.type === 'date') {
+          return { type: 'datepicker', suffix: '" ' };
         }
 
-        this.fieldValueContext$.next({ field, query: token });
+        this.fieldValueContext$.next({ field: field.field, query: token });
         return null;
       }
 
       return [];
     }
 
-    const hasSpaceSeparator = !!separator && /\s/.test(separator);
+    if (isRangeTokenDataItem(current)) {
+      const childData = current.childData;
+      const lastChildItem = childData.previous[childData.previous.length - 1];
+
+      if (childData.previous.length === 1 && childData.separator === ' ') {
+        return TO_OPERATOR_SUGGESTIONS;
+      }
+
+      if (field?.type === 'date') {
+        if (childData.previous.length === 0) {
+          return { type: 'datepicker', suffix: ' TO ' };
+        } else if (childData.previous.length === 2 && childData.separator === ' ' && lastChildItem.token === 'TO' && !lastChildItem.isBetween) {
+          return { type: 'datepicker', suffix: current.isBetween === 'brackets' ? '] ' : '} ' };
+        }
+
+        return [];
+      }
+    }
+
+    if (field || current.isBetween) {
+      return [];
+    }
 
     if (
-      !previousTokenInfo ||
-      ((hasSpaceSeparator || separator === '(') && ['AND', 'OR', 'NOT'].includes(previousTokenInfo.token))
+      !lastItem ||
+      ((separator === ' ' || separator === '(') && ['AND', 'OR', 'NOT'].includes(lastItem.token) && !lastItem.isBetween)
     ) {
+      if (token.startsWith('_')) {
+        return SPECIAL_OPERATOR_SUGGESTIONS;
+      }
+
       return token.length > 0 ? this.fieldFilterSuggestions() : [];
     }
 
-    return hasSpaceSeparator ? JOIN_OPERATOR_SUGGESTIONS : [];
+    return separator === ' ' ? JOIN_OPERATOR_SUGGESTIONS : [];
   }
 
-  private getCurrentTokenInfo(textBeforeCursor: string): CurrentTokenInfo {
-    let tokenAfterQuote = '';
-    let otherToken = '';
+  private getTokenData(textBeforeCursor: string): TokenData {
+    let token = '';
+    const previousData: TokenDataItem[] = [];
 
-    let isInsideQuotes = false;
+    let isBetween: TokenDataItem['isBetween'] = undefined;
+    let separator: TokenData['separator'] = undefined;
     let nextIsEscaped = false;
 
-    let previousTokenInfo: TokenInfo | undefined = undefined;
-    let separator: string | undefined = undefined;
+    const startCharacter: Record<string, Exclude<TokenDataItem['isBetween'], undefined>> = {
+      '"': 'quotes',
+      '[': 'brackets',
+      '{': 'curlyBrackets',
+      '/': 'regex'
+    };
+
+    const endCharacter: Record<Exclude<TokenDataItem['isBetween'], undefined>, string> = {
+      quotes: '"',
+      brackets: ']',
+      curlyBrackets: '}',
+      regex: '/',
+    };
 
     const reset = () => {
-      if (isInsideQuotes) {
-        previousTokenInfo = { token: tokenAfterQuote, isInsideQuotes: true };
-      } else if (otherToken) {
-        previousTokenInfo = { token: otherToken, isInsideQuotes: false };
+      if (isBetween) {
+        if (isBetween === 'brackets' || isBetween === 'curlyBrackets') {
+          previousData.push({ token, isBetween, childData: this.getTokenData(token) });
+        } else {
+          previousData.push({ token, isBetween });
+        }
+      } else if (token) {
+        previousData.push({ token });
       }
 
-      tokenAfterQuote = '';
-      otherToken = '';
+      token = '';
+      isBetween = undefined;
       separator = undefined;
     };
 
     for (const char of textBeforeCursor) {
-      if (!nextIsEscaped && char === '"') {
+      if (!nextIsEscaped && !isBetween && startCharacter[char]) {
         reset();
-        isInsideQuotes = !isInsideQuotes;
-      } else if (isInsideQuotes) {
-        tokenAfterQuote += char;
-      } else if (!nextIsEscaped && /[\s()]/.test(char)) {
+        isBetween = startCharacter[char];
+      } else if (!nextIsEscaped && isBetween && endCharacter[isBetween] === char) {
         reset();
-        separator = char;
+      } else if (!nextIsEscaped && !isBetween && /[\s()]/.test(char)) {
+        reset();
+        separator = char === '(' ? '(' : (char === ')' ? ')' : ' ');
       } else {
-        otherToken += char;
+        token += char;
       }
 
       nextIsEscaped = char === '\\' && !nextIsEscaped;
     }
 
-    if (isInsideQuotes) {
-      return { previous: previousTokenInfo, current: { token: tokenAfterQuote, isInsideQuotes: true }, separator };
-    } else {
-      return { previous: previousTokenInfo, current: { token: otherToken, isInsideQuotes: false }, separator };
-    }
+    const currentData = isBetween === 'brackets' || isBetween === 'curlyBrackets' ?
+      { token, isBetween, childData: this.getTokenData(token) } :
+      { token, isBetween };
+
+    return { previous: previousData, current: currentData, separator };
   }
 
   private filterAndSort(
-    candidates: AutocompleteTextareaSuggestion[],
+    candidates: AutocompleteSuggestions,
     token: string,
-  ): AutocompleteTextareaSuggestion[] {
+  ): AutocompleteSuggestions {
+    if (isSpecialAutocomplete(candidates)) {
+      return candidates;
+    }
+
     const term = token.toLowerCase();
 
     return candidates
@@ -237,7 +316,7 @@ export class TextSearchComponent {
       .slice(0, SUGGESTION_LIMIT);
   }
 
-  private scoreMatch(suggestion: AutocompleteTextareaSuggestion, term: string): number {
+  private scoreMatch(suggestion: AutocompleteSuggestion, term: string): number {
     return suggestion.value.toLowerCase().startsWith(term) ? 0 : 1;
   }
 

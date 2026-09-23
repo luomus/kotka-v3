@@ -12,16 +12,28 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { WINDOW, HighlightMatchPipe } from '@kotka/ui/core';
+import { WINDOW, HighlightMatchPipe, padDayOrMonth } from '@kotka/ui/core';
+import { NgbDate, NgbDatepicker } from '@ng-bootstrap/ng-bootstrap';
 
-export interface AutocompleteTextareaSuggestion {
+export interface AutocompleteSuggestion {
   value: string;
   suffix?: string;
 }
 
+export interface SpecialAutocomplete {
+  type: 'datepicker';
+  suffix?: string;
+}
+
+export type AutocompleteSuggestions = AutocompleteSuggestion[] | SpecialAutocomplete;
+
+export const isSpecialAutocomplete = (suggestions: AutocompleteSuggestion[] | SpecialAutocomplete): suggestions is SpecialAutocomplete => {
+  return 'type' in suggestions;
+};
+
 @Component({
   selector: 'kui-autocomplete-textarea',
-  imports: [FormsModule, HighlightMatchPipe],
+  imports: [FormsModule, HighlightMatchPipe, NgbDatepicker],
   templateUrl: './autocomplete-textarea.component.html',
   styleUrl: './autocomplete-textarea.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,7 +43,7 @@ export class AutocompleteTextareaComponent {
 
   text = model<string>('');
 
-  suggestions = input<AutocompleteTextareaSuggestion[]>([]);
+  suggestions = input<AutocompleteSuggestions>([]);
   token = input<string>('');
   loading = input<boolean>(false);
 
@@ -40,6 +52,8 @@ export class AutocompleteTextareaComponent {
   showSuggestions = signal(false);
   activeSuggestionIndex = signal(0);
   dropdownPosition: Signal<{ top: number; left: number }>;
+
+  isSpecialAutocomplete = isSpecialAutocomplete;
 
   private textareaRef = viewChild<ElementRef<HTMLTextAreaElement>>('textarea');
   private mirrorRef = viewChild<ElementRef<HTMLDivElement>>('mirror');
@@ -71,32 +85,40 @@ export class AutocompleteTextareaComponent {
   }
 
   onKeydown(event: KeyboardEvent) {
-    if (this.suggestions().length === 0) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.hideSuggestions();
+      return;
+    }
+
+    const suggestions = this.suggestions();
+
+    if (this.isSpecialAutocomplete(suggestions)) {
+      return;
+    }
+
+    if (suggestions.length === 0) {
       return;
     }
 
     switch (event.key) {
       case 'ArrowDown':
         event.preventDefault();
-        this.moveActive(1);
+        this.moveActive(suggestions, 1);
         break;
       case 'ArrowUp':
         event.preventDefault();
-        this.moveActive(-1);
+        this.moveActive(suggestions, -1);
         break;
       case 'Enter':
       case 'Tab': {
-        const suggestion = this.suggestions()[this.activeSuggestionIndex()];
+        const suggestion = suggestions[this.activeSuggestionIndex()];
         if (suggestion) {
           event.preventDefault();
           this.applySuggestion(suggestion);
         }
         break;
       }
-      case 'Escape':
-        event.preventDefault();
-        this.hideSuggestions();
-        break;
     }
   }
 
@@ -121,7 +143,12 @@ export class AutocompleteTextareaComponent {
     this.showSuggestions.set(false);
   }
 
-  applySuggestion(suggestion: AutocompleteTextareaSuggestion) {
+  applyDateSuggestion(date: NgbDate, suffix?: string) {
+    const formattedDate = `${date.year}-${padDayOrMonth(date.month)}-${padDayOrMonth(date.day)}`;
+    this.applySuggestion({ value: formattedDate, suffix });
+  }
+
+  applySuggestion(suggestion: AutocompleteSuggestion) {
     const textarea = this.textareaRef()?.nativeElement;
     if (!textarea) {
       return;
@@ -144,8 +171,8 @@ export class AutocompleteTextareaComponent {
     });
   }
 
-  private moveActive(delta: number) {
-    const count = this.suggestions().length;
+  private moveActive(suggestions: AutocompleteSuggestion[], delta: number) {
+    const count = suggestions.length;
     const newIndex = Math.min(Math.max(this.activeSuggestionIndex() + delta, 0), count - 1);
     this.activeSuggestionIndex.set(newIndex);
   }
