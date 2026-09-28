@@ -1,8 +1,8 @@
 import {
   ChangeDetectionStrategy,
-  Component,
+  Component, computed,
   effect,
-  inject,
+  inject, Signal,
   signal,
 } from '@angular/core';
 import {
@@ -11,7 +11,7 @@ import {
   DatatableLoadedData,
   DocumentDatatableComponent,
 } from '@kotka/ui/datatable';
-import { KotkaDocumentType, Document, IndexType, SearchResponse, Aggregations } from '@kotka/shared/models';
+import { KotkaDocumentType, Document, IndexType, SearchResponse, FieldAggregate, SearchField } from '@kotka/shared/models';
 import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
 import { FormsModule } from '@angular/forms';
 import {
@@ -20,14 +20,17 @@ import {
   SearchResultIteratorService,
 } from '@kotka/ui/core';
 import { SpecimenLabelDesignerComponent } from '../specimen-label-designer/specimen-label-designer.component';
-import { AggregationsComponent } from './aggregations.component';
+import { AggregationsComponent, FieldValue } from './aggregations.component';
 import { Observable, of } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { map, startWith, switchMap } from 'rxjs/operators';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { groupToQueryString, joinQueryStrings, SearchComponent, SearchGroup } from '@kotka/ui/search';
+import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 
 interface ViewModel {
   index: IndexType | undefined;
+  fields: SearchField[];
   columns: DatatableColumn[];
   columnsLoading: boolean;
 }
@@ -45,6 +48,8 @@ interface ViewModel {
     AsyncPipe,
     SpinnerComponent,
     AggregationsComponent,
+    SearchComponent,
+    NgbAlert,
   ],
 })
 export class SpecimenTableComponent {
@@ -53,23 +58,32 @@ export class SpecimenTableComponent {
 
   dataType: KotkaDocumentType.specimen = KotkaDocumentType.specimen;
   index = signal<IndexType | undefined>('unit');
+  searchQuery: Signal<string>;
+
+  searchError?: string;
 
   indexOptions: (IndexType | undefined)[] = [undefined, 'unit', 'identification', 'typeSpecimen', 'sample'];
   aggregateFields: string[] = ['editor', 'leg', 'taxon', 'taxonRank', 'typeStatus'];
 
-  aggregations?: Aggregations;
+  aggregates?: FieldAggregate[];
 
   vm$: Observable<ViewModel>;
 
   showLabelDesigner = signal(false);
   labelDesignerData$?: Observable<Document[]>;
 
-  private searchParams?: IteratorSearchParams;
+  private filtersSearchQuery = signal('');
+  private inputSearchQuery = signal('');
+  private activeSearchParams?: IteratorSearchParams;
 
   constructor() {
+    this.searchQuery = computed(() => (
+      joinQueryStrings(this.filtersSearchQuery(), this.inputSearchQuery())
+    ));
+
     effect(() => {
       if (this.showLabelDesigner()) {
-        const searchParams = this.searchParams;
+        const searchParams = this.activeSearchParams;
         this.labelDesignerData$ = this.apiClient
           .getAllDocuments(
             this.dataType,
@@ -101,7 +115,7 @@ export class SpecimenTableComponent {
               defaultSelected: true,
             },
           ];
-          return of({ index, columns, columnsLoading: false });
+          return of({ index, fields: [{ type: 'keyword', field: 'id' }], columns, columnsLoading: false });
         }
 
         return this.apiClient.getSearchFields(this.dataType, index).pipe(
@@ -113,12 +127,14 @@ export class SpecimenTableComponent {
             }));
             return {
               index,
+              fields,
               columns,
               columnsLoading: false,
             };
           }),
           startWith({
             index,
+            fields: [],
             columns: [],
             columnsLoading: true,
           })
@@ -127,20 +143,43 @@ export class SpecimenTableComponent {
     );
   }
 
+  onAggregationFiltersChange(fieldValues: FieldValue[] = []) {
+    const searchGroup: SearchGroup = {
+      criteria: fieldValues.map(fieldValue => ({
+        field: fieldValue.field,
+        operator: 'equals',
+        value: `${fieldValue.value}`
+      })),
+      joinOperator: 'AND'
+    };
+
+    this.filtersSearchQuery.set(groupToQueryString(searchGroup).result);
+  }
+
+  onSearch(searchQuery: string) {
+    this.inputSearchQuery.set(searchQuery);
+  }
+
   onDataLoad(data: DatatableLoadedData) {
-    this.aggregations = (<SearchResponse>data.result).aggregations;
+    this.aggregates = (<SearchResponse>data.result).aggregates;
 
     const searchParams: IteratorSearchParams = {
       sort: data.searchParams.sort,
       searchQuery: data.searchParams.searchQuery
     };
 
-    this.searchParams = searchParams;
+    this.activeSearchParams = searchParams;
 
     this.searchResultIteratorService.setSearchParams(
       this.dataType,
       searchParams,
       true,
     );
+
+    this.searchError = undefined;
+  }
+
+  onInvalidQueryError() {
+    this.searchError = 'Invalid query!';
   }
 }

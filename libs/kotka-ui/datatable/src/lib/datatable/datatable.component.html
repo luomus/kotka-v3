@@ -1,10 +1,11 @@
-<kui-total-count
-  [value]="totalCount()"
-  [dataTypeName]="dataTypeName()"
-  [dataTypeNamePlural]="dataTypeNamePlural()"
-></kui-total-count>
-<div class="clearfix mb-1">
-  <div class="float-sm-end">
+<div class="d-flex flex-wrap mb-1">
+  <kui-total-count
+    class="align-self-end"
+    [value]="totalCount()"
+    [dataTypeName]="dataTypeName()"
+    [dataTypeNamePlural]="dataTypeNamePlural()"
+  ></kui-total-count>
+  <div class="ms-auto">
     @if (enableFileExport()) {
       <button
         class="btn btn-secondary position-relative"

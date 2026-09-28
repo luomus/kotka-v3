@@ -1,6 +1,8 @@
-<textarea
-  class="form-control"
-  rows="3"
-  spellcheck="false"
-  [(ngModel)]="text"
-></textarea>
+<kui-autocomplete-textarea
+  [(text)]="text"
+  [suggestions]="suggestions()"
+  [token]="currentToken()"
+  [loading]="suggestionsLoading()"
+  (contextChange)="updateSuggestions($event)"
+></kui-autocomplete-textarea>
+

@@ -7,7 +7,6 @@ import {
   signal,
   untracked,
 } from '@angular/core';
-import { DatatableColumn } from '@kotka/ui/datatable';
 import { FormsModule } from '@angular/forms';
 import { FieldTypeaheadComponent } from '../field-typeahead/field-typeahead.component';
 import { builderQueryToQueryString } from '../services/query-stringify';
@@ -21,6 +20,7 @@ import {
 } from '../models';
 import { SEARCH_OPERATORS } from '../constants';
 import { CriteriaCanHaveValuePipe } from '../pipes/criteria-can-have-value.pipe';
+import { SearchField } from '@kotka/shared/models';
 
 
 function createCriteria(): SearchCriteria {
@@ -48,7 +48,7 @@ function createBuilderQuery(): BuilderQuery {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchBuilderComponent {
-  columns = input<DatatableColumn[]>([]);
+  fields = input<SearchField[]>([]);
   text = model<string>('');
 
   query = signal<BuilderQuery | null>(null);

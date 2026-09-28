@@ -8,6 +8,7 @@ import {
   NgbInputDatepicker,
 } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
+import { padDayOrMonth } from '@kotka/ui/core';
 
 /**
  * This Service handles how the date is represented in scripts i.e. ngModel.
@@ -52,9 +53,9 @@ export class CustomDateParserFormatter extends NgbDateParserFormatter {
   format(date: NgbDateStruct | null): string {
     if (date) {
       return (
-        ('0' + date.day).slice(-2) +
+        padDayOrMonth(date.day) +
         this.DELIMITER +
-        ('0' + date.month).slice(-2) +
+        padDayOrMonth(date.month) +
         this.DELIMITER +
         date.year
       );

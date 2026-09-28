@@ -28,7 +28,7 @@
             <div class="col">
               <kui-field-typeahead
                 placeholder="Any field"
-                [columns]="columns()"
+                [fields]="fields()"
                 [value]="criteria.field"
                 (valueChange)="setField(groupIdx, critIdx, $event)"
               ></kui-field-typeahead>

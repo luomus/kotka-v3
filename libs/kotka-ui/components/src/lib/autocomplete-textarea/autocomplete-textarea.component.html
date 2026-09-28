@@ -1,0 +1,68 @@
+<div class="position-relative">
+  <textarea
+    #textarea
+    class="form-control autocomplete-textarea-input"
+    [rows]="3"
+    spellcheck="false"
+    autocomplete="off"
+    aria-autocomplete="list"
+    [(ngModel)]="text"
+    (ngModelChange)="updateSuggestions()"
+    (focus)="updateSuggestions()"
+    (keyup)="onKeyup($event)"
+    (keydown)="onKeydown($event)"
+    (blur)="hideSuggestions()"
+  ></textarea>
+
+  <div #mirror class="form-control textarea-mirror">
+    <span></span>
+    <span>.</span>
+  </div>
+
+  @if (loading()) {
+    <div class="suggestions-loading">
+      <span class="spinner-border spinner-border-sm text-secondary" role="status" aria-live="polite">
+        <span class="visually-hidden">Loading suggestions...</span>
+      </span>
+    </div>
+  }
+
+  @if (showSuggestions()) {
+    @let currentSuggestions = suggestions();
+
+    @if (isSpecialAutocomplete(currentSuggestions)) {
+      @if (currentSuggestions.type === 'datepicker') {
+        <ngb-datepicker
+          #datepicker
+          class="datepicker-dropdown"
+          [style.top.px]="fixedDropdownPosition().top"
+          [style.left.px]="fixedDropdownPosition().left"
+          (mousedown)="$event.preventDefault()"
+          (dateSelect)="applyDateSuggestion($event, currentSuggestions.suffix)"
+        ></ngb-datepicker>
+      }
+    } @else if (currentSuggestions.length > 0) {
+      <div
+        #dropdown
+        class="dropdown-menu show suggestions-dropdown"
+        role="listbox"
+        [style.top.px]="fixedDropdownPosition().top"
+        [style.left.px]="fixedDropdownPosition().left"
+      >
+        @for (suggestion of currentSuggestions; track suggestion.value; let i = $index) {
+          <button
+            type="button"
+            class="dropdown-item text-truncate"
+            role="option"
+            [class.active]="i === activeSuggestionIndex()"
+            [attr.aria-selected]="i === activeSuggestionIndex()"
+            (mousedown)="$event.preventDefault()"
+            (click)="applySuggestion(suggestion)"
+          >
+            <span [innerHTML]="suggestion.value | highlightMatch: token()"></span>
+          </button>
+        }
+      </div>
+    }
+  }
+</div>

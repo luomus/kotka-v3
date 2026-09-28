@@ -1,33 +1,94 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { Aggregations } from '@kotka/shared/models';
-import { COUNT_PRECISION_THRESHOLD } from '@kotka/ui/core';
+import { ChangeDetectionStrategy, Component, computed, input, model, Signal } from '@angular/core';
+import { AggregationBucketKey, AggregateValue, FieldAggregate } from '@kotka/shared/models';
+
+export interface FieldValue {
+  field: string;
+  value: AggregationBucketKey;
+}
+
+interface AggregateValueWithSelected extends AggregateValue {
+  selected: boolean;
+}
+
+interface FieldAggregatesWithSelected extends FieldAggregate {
+  values: AggregateValueWithSelected[];
+}
 
 @Component({
   selector: 'kotka-aggregations',
   template: `
-    @if (aggregations(); as aggregations) {
-      @for (aggregateField of aggregateFields(); track $index) {
-        <div class="mt-2">
-          <strong>
-            {{ aggregateField }}
-            @let count = aggregations[aggregateField + '_count']?.value || 0;
-            ({{ count > countPrecisionThreshold ? '~' : '' }}{{ count }})
-          </strong>
-          @for (aggregation of aggregations[aggregateField]?.buckets; track $index) {
-            <button class="btn btn-link d-block p-0 text-decoration-none">
-              {{ aggregation.key }} ({{ aggregation.doc_count }})
+    @for (aggregate of aggregatesWithSelected(); track $index) {
+      <div class="mt-2">
+        <strong>
+          {{ aggregate.field }}
+          ({{ aggregate.countUnprecise ? '~' : '' }}{{ aggregate.count }})
+        </strong>
+        @for (value of aggregate.values; track $index) {
+          @if (value.selected) {
+            <div class="d-flex align-items-center">
+              <span class="me-2">{{ value.value }} ({{ value.docCount }})</span>
+              <button
+                type="button"
+                class="btn btn-danger btn-sm"
+                aria-label="Remove selection"
+                (click)="onRemove(aggregate.field, value.value)"
+              >
+                <i class="fa fa-xmark"></i>
+              </button>
+            </div>
+          } @else {
+            <button
+              class="btn btn-link d-block p-0 text-decoration-none border-0"
+              (click)="onSelect(aggregate.field, value.value)"
+            >
+              {{ value.value }} ({{ value.docCount }})
             </button>
           }
-        </div>
-      }
+        }
+      </div>
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AggregationsComponent {
-  aggregations = input<Aggregations | undefined>(undefined);
-  aggregateFields = input<string[]>([]);
+  selected = model<FieldValue[]>();
 
-  countPrecisionThreshold = COUNT_PRECISION_THRESHOLD;
+  aggregates = input<FieldAggregate[]>([]);
+
+  aggregatesWithSelected: Signal<FieldAggregatesWithSelected[]>;
+
+  constructor() {
+    this.aggregatesWithSelected = computed(() =>
+      this.aggregates().map(result => ({
+        ...result,
+        values: result.values.map(value => ({
+          ...value,
+          selected: this.isSelected(result.field, value.value),
+        }))
+      }))
+    );
+  }
+
+  onSelect(field: string, value: AggregationBucketKey) {
+    if (this.isSelected(field, value)) {
+      return;
+    }
+
+    this.selected.set([...(this.selected() || []), { field, value }]);
+  }
+
+  onRemove(field: string, value: AggregationBucketKey) {
+    this.selected.set(
+      (this.selected() || []).filter(
+        (selection) =>
+          !(selection.field === field && selection.value === value),
+      ),
+    );
+  }
+
+  private isSelected(field: string, value: AggregationBucketKey): boolean {
+    return (this.selected() || []).some(
+      (selection) => selection.field === field && selection.value === value,
+    );
+  }
 }
-
