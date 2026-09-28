@@ -36,7 +36,7 @@ services:
     ports:
       - 4200:4200
     links:
-     - kotka-api
+      - kotka-api
 volumes:
   shared-volume:
   redis:

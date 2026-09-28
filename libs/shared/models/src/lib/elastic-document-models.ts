@@ -8,22 +8,21 @@ type EsIdFields = {
   domain: string;
   namespace: string;
   objectID: number;
+  id: string;
 };
 
-type AsArray<T> = T extends Array<any> ? T : (T extends undefined ? T : T[]);
-type WithAutocompleteFields<T> = T & {
-  [k in keyof T as NonNullable<T[k]> extends string | string[] ? `${string & k}_auto_${number}` : never]?: string[];
-}
+type AsArray<T> = [T] extends [Array<any>] ? T : ([T] extends [undefined] ? T : T[]);
 
 export type EsMeasurement = Omit<Measurement, StoreKeys | 'id'>;
 
 export type MeasurementsStrings = {
   [k in keyof EsMeasurement]?: string[];
 }
+export type PreparationArrayed = ArrayedObjects<Preparation>;
 
-export type PreparationArrayed = {
-  [k in Exclude<keyof Preparation, StoreKeys> as k]?: AsArray<Preparation[k]>;
-};
+export type ArrayedObjects<T> = {
+  [k in Exclude<keyof T, StoreKeys | keyof EsIdFields> as k]?: AsArray<T[k]>;
+}
 
 export type ElasticDocument  = Omit<Document, StoreKeys> & {
   gatheringCount: number;
@@ -43,12 +42,12 @@ export type ElasticDocument  = Omit<Document, StoreKeys> & {
   acquiredFromOrganizationID?: string;
 } & EsIdFields;
 
-export interface ElasticGathering extends Omit<Gathering, StoreKeys> {
+export interface ElasticGathering extends Omit<Gathering, StoreKeys | 'publicityRestrictions'> {
   gatheringNotes?: string;
   wgs84Location?: { lat: number; lon: number };
 }
 
-export type ElasticUnit = Omit<Unit, StoreKeys> & {
+export type ElasticUnit = Omit<Unit, StoreKeys | 'publicityRestrictions'> & {
   sampleExists: boolean;
   sampleCount: number;
   unitNotes?: string;
@@ -58,7 +57,7 @@ export type ElasticUnit = Omit<Unit, StoreKeys> & {
   measurement?: MeasurementsStrings;
 }
 
-export interface ElasticIdentification extends Omit<Identification, StoreKeys> {
+export interface ElasticIdentification extends Omit<Identification, StoreKeys | 'publicityRestrictions'> {
   taxonAndInfra: string;
   accepted: boolean;
   identificationNotes?: string;
@@ -70,7 +69,7 @@ export interface ElasticIdentification extends Omit<Identification, StoreKeys> {
   initialLetterOfGenus?: string;
 }
 
-export interface ElasticType extends Omit<TypeSpecimen, StoreKeys> {
+export interface ElasticType extends Omit<TypeSpecimen, StoreKeys | 'publicityRestrictions'> {
   isType: boolean;
 }
 
@@ -91,18 +90,29 @@ export type ElasticSample =
     [k in keyof Omit<NonPrefixedElasticSample, `sample${string}`> as `sample${Capitalize<string & k>}`]?: NonPrefixedElasticSample[k];
   };
 
-export type NonPrefixedElasticSample = Omit<Sample, StoreKeys> & PreparationArrayed & EsIdFields & {
+export type NonPrefixedElasticSample = Omit<Sample, StoreKeys> & ArrayedObjects<Preparation> & EsIdFields & {
   measurement?: MeasurementsStrings;
 };
 
-export type ElasticDocumentRow = (ElasticUnitRow | ElasticIdentificationRow | ElasticTypeRow | ElasticSampleRow)
+export type ElasticRowBases = ElasticBaseUnit | ElasticIdentification | ElasticType | ElasticSample;
+export type ElasticDocumentRow = ElasticUnitRow | ElasticIdentificationRow | ElasticTypeRow | ElasticSampleRow;
 
-export type ElasticUnitRow = WithAutocompleteFields<Omit<ElasticDocument, 'gatherings'> & Omit<ElasticGathering, 'units'> & Omit<ElasticUnit, 'identifications' | 'typeSpecimens' | 'samples'>>;
-export type ElasticIdentificationRow = ElasticUnitRow & WithAutocompleteFields<ElasticIdentification>;
-export type ElasticTypeRow = ElasticUnitRow & WithAutocompleteFields<ElasticType>;
-export type ElasticSampleRow = ElasticUnitRow & WithAutocompleteFields<ElasticSample>;
-
+export type ElasticBaseUnit =
+  Omit<ElasticDocument, 'gatherings'> &
+  Omit<ElasticGathering, 'units'> &
+  Omit<ElasticUnit, 'identifications' | 'typeSpecimens' | 'samples'>;
+export type ElasticUnitRow =
+  ElasticBaseUnit &
+  ElasticIdentification &
+  Omit<ArrayedObjects<ElasticType & ElasticSample>, 'id'>;
+export type ElasticIdentificationRow = ElasticBaseUnit & ElasticIdentification;
+export type ElasticTypeRow = ElasticBaseUnit & ElasticType;
+export type ElasticSampleRow = ElasticBaseUnit & ElasticSample;
 export type IndexType = 'unit' | 'identification' | 'typeSpecimen' | 'sample';
+
+export type ElasticIndex = `specimen_${Lowercase<IndexType>}` | 'autocomplete' | 'taxon';
+export const specimenIndices: ElasticIndex[] = ['specimen_unit', 'specimen_identification', 'specimen_typespecimen', 'specimen_sample'];
+export const indices: ElasticIndex[] = ['specimen_unit', 'specimen_identification', 'specimen_typespecimen', 'specimen_sample', 'autocomplete', 'taxon'];
 
 interface SearchResultMap {
   unit: ElasticUnitRow;

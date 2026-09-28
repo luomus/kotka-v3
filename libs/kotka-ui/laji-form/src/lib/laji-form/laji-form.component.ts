@@ -278,7 +278,7 @@ class LajiFormComponent<T extends FormData = FormData>
           });
         });
       } catch (err) {
-        console.log('Failed to load LajiForm', { error: err });
+        console.error('Failed to load LajiForm', { error: err });
       }
     }
   }

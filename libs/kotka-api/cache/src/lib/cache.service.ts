@@ -22,7 +22,7 @@ export class CacheService {
     @Inject(REDIS) private readonly redisClient: Redis
   ) {}
 
-  async setValue<T>(
+  async setValueWithFunc<T>(
     cacheKey: string,
     getDataFunc: () => Promise<any>,
     ttl: string | number | PerStoreTtl,
@@ -66,7 +66,7 @@ export class CacheService {
       }
     }
 
-    const data = await this.setValue<T>(cacheKeyRoot, getDataFunc, ttl, true);
+    const data = await this.setValueWithFunc<T>(cacheKeyRoot, getDataFunc, ttl, true);
 
     return data[cacheKey];
   }
@@ -80,7 +80,7 @@ export class CacheService {
       }
     }
 
-    return await this.setValue<T>(cacheKey, getDataFunc, ttl);
+    return await this.setValueWithFunc<T>(cacheKey, getDataFunc, ttl);
   }
 
   private async acquireLock(cacheKey: string): Promise<Redlock.Lock|undefined> {
@@ -88,7 +88,7 @@ export class CacheService {
       this.redlock = new Redlock([this.redisClient as any], { retryCount: 10, retryDelay: 1000 });
     }
     try {
-      return await this.redlock.acquire(['lock:' + cacheKey], 10 * 60 * 1000);
+      return await this.redlock.acquire(['lock:' + cacheKey], 10 * 1000);
     } catch (err) {
       console.warn(err);
     }

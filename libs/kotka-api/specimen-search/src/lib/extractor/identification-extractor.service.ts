@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { BaseExtractorService } from './base-extractor.service';
-import { BulkRequest } from '@elastic/elasticsearch/lib/api/types';
+import { BulkRequest, MappingTypeMapping } from '@elastic/elasticsearch/lib/api/types';
 import { ExtractorValueMappingService } from '../mapper/extractor-value-mapping.service';
-import { ElasticUnitRow, ElasticIdentificationRow } from '@kotka/shared/models';
+import { ElasticBaseUnit, ElasticIdentification } from '@kotka/shared/models';
 import { Identification } from '@kotka/shared/models';
 import { identificationSort } from '@kotka/shared/utils';
 import { TaxonLinkingService } from '@kotka/api/taxon-linking';
@@ -36,6 +36,10 @@ const autocomplete = [
   'taxonVerbatim',
 ];
 
+const remove = [
+  'publicityRestrictions'
+];
+
 @Injectable()
 export class IdentificationExtractorService extends BaseExtractorService {
   constructor (
@@ -48,9 +52,18 @@ export class IdentificationExtractorService extends BaseExtractorService {
     this.removeNewLine = removeNewLine;
     this.type = 'identification';
     this.autocompleteFields = autocomplete;
+    this.remove = [...this.remove, ...remove];
   }
 
-  async addToBulk(document: ElasticUnitRow & { identifications?: Identification[] }, bulk: BulkRequest): Promise<void> {
+  getMapping(): MappingTypeMapping {
+    const baseMapping = super.getMapping();
+
+    baseMapping.properties = { ...baseMapping.properties, accepted: { 'type': 'boolean' }};
+
+    return baseMapping;
+  }
+
+  async addToBulk(document: ElasticBaseUnit & { identifications?: Identification[] }, bulk: BulkRequest): Promise<undefined | ElasticIdentification[]> {
     if (!document.identifications?.length) {
       return;
     }
@@ -61,6 +74,8 @@ export class IdentificationExtractorService extends BaseExtractorService {
 
     let hasPreferred = false;
 
+    const identificationRows: ElasticIdentification[] = [];
+
     for (const identification of identifications) {
       const identificationRow = await this.createIdentificationRow(row, identification, bulk, !hasPreferred);
 
@@ -69,11 +84,14 @@ export class IdentificationExtractorService extends BaseExtractorService {
       if (!hasPreferred) {
         hasPreferred = !hasPreferred;
       }
+
+      identificationRows.push(identificationRow);
     }
 
+    return identificationRows;
   }
 
-  async createIdentificationRow(parent: ElasticUnitRow, identification: Identification, bulk: BulkRequest, prefered?: boolean) {
+  async createIdentificationRow(parent: ElasticBaseUnit, identification: Identification, bulk: BulkRequest, prefered?: boolean) {
     if (!bulk.body || !Array.isArray(bulk.body)) {
       bulk.body = [];
     }
@@ -87,7 +105,7 @@ export class IdentificationExtractorService extends BaseExtractorService {
 
     const taxonAndInfra = await this.getTaxonAndInfra(identification);
 
-    const row: ElasticIdentificationRow = {...parent, ...identification, accepted: prefered || false, taxonAndInfra};
+    const row: ElasticIdentification = { ...identification, accepted: prefered || false, taxonAndInfra};
 
     if (identification.taxon) {
       const taxon = await this.taxonLinkingService.getTaxonCached(identification.taxon, identification.author, identification.taxonRank);
@@ -111,9 +129,9 @@ export class IdentificationExtractorService extends BaseExtractorService {
       }
     }
 
-    await this.extract<ElasticIdentificationRow>(row);
+    await this.extract<ElasticIdentification>(row);
 
-    bulk.body.push(row);
+    bulk.body.push({ ...parent, ...row });
 
     return row;
   }

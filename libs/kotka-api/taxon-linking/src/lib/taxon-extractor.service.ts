@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ExtractorInterface, SHARDS, REPLICAS } from '@kotka/api/elasticsearch';
+import type { ElasticIndex } from '@kotka/shared/models';
 import { LinkableTaxon } from './taxon-linking.service';
 
 export const TAXON_INDEX = 'taxon';
@@ -9,7 +10,7 @@ export const ENDANGERED_STATUS = [
 
 @Injectable()
 export class TaxonExtractorService implements ExtractorInterface {
-  getIndex(): string {
+  getIndex(): ElasticIndex {
     return TAXON_INDEX;
   }
 
@@ -67,7 +68,7 @@ export class TaxonExtractorService implements ExtractorInterface {
     };
   }
 
-  async addToBulk(data: LinkableTaxon, bulk: any): Promise<void> {
+  async addToBulk(data: LinkableTaxon, bulk: any): Promise<undefined> {
     if (bulk.body === undefined) {
       bulk.body = [];
     }

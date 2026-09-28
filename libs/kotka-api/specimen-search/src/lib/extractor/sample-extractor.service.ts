@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BaseExtractorService } from './base-extractor.service';
-import { ElasticUnitRow, ElasticSampleRow, ElasticSample, PreparationArrayed, NonPrefixedElasticSample } from '@kotka/shared/models';
+import { ElasticSample, NonPrefixedElasticSample, ElasticBaseUnit } from '@kotka/shared/models';
 import { BulkRequest } from '@elastic/elasticsearch/lib/api/types';
 import { Preparation, Sample } from '@kotka/shared/models';
 import { ExtractorValueMappingService } from '../mapper/extractor-value-mapping.service';
@@ -26,7 +26,9 @@ const open = [
 
 const remove = [
   'preparations',
+  'publicityRestrictions'
 ];
+
 const removeNewLine = [
   'sampleHistory',
 ];
@@ -40,6 +42,28 @@ const autocomplete: string[] = [
   'sampleDataset',
   'sampleCollection',
 ];
+
+const sampleProperties: Record<string, any> = {
+  'sampleMeasurement': {
+    'type': 'object',
+  },
+  'sampleDocumentURI': {
+    'type': 'keyword'
+  },
+  'sampleDocumentID': {
+    'type': 'keyword'
+  },
+  'sampleDocumentQName': {
+    'type': 'keyword'
+  },
+  'sampleObjectID': {
+    'type': 'long',
+  },
+  'sampleDateCreated': {
+    'type': 'date',
+    'format': 'yyyy-MM-dd\'T\'HH:mm:ss||date||yyyy-MM-dd\'T\'HH:mm:ss||yyyy'
+  },
+};
 
 @Injectable()
 export class SampleExtractorService extends BaseExtractorService {
@@ -56,54 +80,43 @@ export class SampleExtractorService extends BaseExtractorService {
     this.autocompleteFields = autocomplete;
   }
 
-  getIndex(): string {
+  getIndex() {
     return super.getIndex();
   }
 
   getMapping() {
     const baseMapping = super.getMapping();
-    const sampleProperties: Record<string, any> = {
-      'sampleMeasurement': {
-        'type': 'object',
-      },
-      'sampleDocumentURI': {
-        'type': 'keyword'
-      },
-      'sampleDocumentID': {
-        'type': 'keyword'
-      },
-      'sampleDocumentQName': {
-        'type': 'keyword'
-      },
-      'sampleObjectID': {
-        'type': 'long',
-      },
-      'sampleDateCreated': {
-        'type': 'date',
-        'format': this.FORMAT_DATETIME + '||date||yyyy-MM-dd\'T\'HH:mm:ss||yyyy'
-      },
-    };
 
     baseMapping.properties = { ...baseMapping.properties, ...sampleProperties };
 
     return baseMapping;
   }
 
-  async addToBulk(document: ElasticUnitRow & { samples?: Sample[] }, bulk: BulkRequest): Promise<void> {
+  getProperties() {
+    return sampleProperties;
+  }
+
+  async addToBulk(document: ElasticBaseUnit & { samples?: Sample[] }, bulk: BulkRequest): Promise<undefined | ElasticSample[]> {
     const { samples, ...row } = document;
 
     if (!samples?.length) {
       return;
     }
 
+    const sampleRows: ElasticSample[] = [];
+
     for (const sample of samples) {
       const sampleRow = await this.createSampleRow(row, sample, bulk);
 
       await this.autocompleteExtractorService.addToBulk(sampleRow, bulk, this.autocompleteFields);
+
+      sampleRows.push(sampleRow);
     }
+
+    return sampleRows;
   }
 
-  async createSampleRow(parent: ElasticUnitRow, sample: Sample, bulk: BulkRequest) {
+  async createSampleRow(parent: ElasticBaseUnit, sample: Sample, bulk: BulkRequest) {
     if (!bulk.body || !Array.isArray(bulk.body)) {
       bulk.body = [];
     }
@@ -121,7 +134,7 @@ export class SampleExtractorService extends BaseExtractorService {
 
     this.extractIDs(row);
 
-    row = {...row, ...this.flattenPreparations(preparations || [])} as NonPrefixedElasticSample;
+    row = {...row, ...this.flattenObjectArray<Preparation>(preparations || [])} as NonPrefixedElasticSample;
 
     await this.extract<NonPrefixedElasticSample>(row);
 
@@ -129,7 +142,7 @@ export class SampleExtractorService extends BaseExtractorService {
 
     bulk.body.push({ ...parent, ...prefixedRow });
 
-    return prefixedRow as ElasticSampleRow;
+    return prefixedRow;
   }
 
   prefixFields(row: Omit<Sample, 'preparations'>): ElasticSample {
@@ -142,38 +155,6 @@ export class SampleExtractorService extends BaseExtractorService {
     }
 
     return newRow as ElasticSample;
-  }
-
-  flattenPreparations(preparations: Preparation[]): PreparationArrayed {
-    const flattened: Record<string, any> = {};
-
-    preparations.forEach((preparation) => {
-      Object.keys(preparation).forEach((key) => {
-        if (!flattened[key]) {
-          flattened[key] = [];
-        }
-
-        const value = preparation[key as keyof Preparation];
-
-        if (value === undefined || value === null) {
-          return;
-        }
-
-        if (Array.isArray(value)) {
-          value.forEach(v => {
-            if (!flattened[key].includes(v)) {
-              flattened[key].push(v);
-            }
-          });
-        } else {
-          if (!flattened[key].includes(value)) {
-            flattened[key].push(value);
-          }
-        }
-      });
-    });
-
-    return flattened as PreparationArrayed;
   }
 
   getRelatedExtracts(): ExtractorInterface[] {

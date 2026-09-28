@@ -3,7 +3,7 @@ import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { ExtractorInterface } from './extractor.interface';
 import { StoreObject } from '@luomus/laji-schema/models';
 import { BulkRequest, IndicesIndexSettings, MappingTypeMapping, SearchRequest } from '@elastic/elasticsearch/lib/api/types';
-import { SearchField } from '@kotka/shared/models';
+import { ElasticIndex, SearchField } from '@kotka/shared/models';
 
 interface SearchQuery {
   index: string;
@@ -65,8 +65,8 @@ export class EsClientService {
         base._source.includes = [];
       }
       base._source.includes.push(...query.fields.split(','));
-    } else if (!base._source) {
-      base._source = false;
+    } else if (base._source === undefined) {
+      base._source = true;
     }
 
     return base;
@@ -114,13 +114,13 @@ export class EsClientService {
     });
   }
 
-  async deleteIndex(index: string) {
+  async deleteIndex(index: ElasticIndex | ElasticIndex[]) {
     await this.elasticsearchService.indices.delete({
       index
     });
   }
 
-  async createIndex(index: string, mappings: MappingTypeMapping, settings: IndicesIndexSettings) {
+  async createIndex(index: ElasticIndex, mappings: MappingTypeMapping, settings: IndicesIndexSettings) {
     await this.elasticsearchService.indices.create({
       index,
       mappings,
@@ -147,26 +147,43 @@ export class EsClientService {
 
   async indexSingle(result: StoreObject, extractor: ExtractorInterface) {
     const bulk: BulkRequest = {};
-    this.prepareIndex(extractor);
+    await this.prepareIndex(extractor);
 
     await extractor.addToBulk(result, bulk);
 
     return await this.indexBulk(bulk);
   }
 
-  indexMany(results: StoreObject[], extractor: ExtractorInterface) {
+  async indexMany(results: StoreObject[], extractor: ExtractorInterface) {
     const bulk: BulkRequest = {};
-    this.prepareIndex(extractor);
+    await this.prepareIndex(extractor);
 
     for (const result of results) {
-      extractor.addToBulk(result, bulk);
+      await extractor.addToBulk(result, bulk);
     }
 
-    return this.indexBulk(bulk);
+    return await this.indexBulk(bulk);
   }
 
   async indexBulk(bulk: BulkRequest) {
     return await this.elasticsearchService.bulk(bulk);
+  }
+
+  async deleteByQueryString(query: string, indices: ElasticIndex[]) {
+    return await this.elasticsearchService.deleteByQuery({
+      index: indices.join(','),
+      query: {
+        bool: {
+          must: [
+            {
+              query_string: {
+                query
+              }
+            }
+          ]
+        }
+      }
+    });
   }
 
   async indexResults(results: any[], extractor: ExtractorInterface, batchSize = 100000) {

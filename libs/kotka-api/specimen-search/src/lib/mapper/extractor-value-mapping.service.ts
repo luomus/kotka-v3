@@ -41,19 +41,19 @@ export class ExtractorValueMappingService {
   }
 
   async intLabelCaches() {
-    await this.cacheService.setValue(EXTRACTOR_DATASET_ROOT, async () => {
+    await this.cacheService.setValueWithFunc(EXTRACTOR_DATASET_ROOT, async () => {
       return await this.initDatasets();
     }, EXTRACTOR_TTL, true);
 
-    await this.cacheService.setValue(EXTRACTOR_ORGANIZATION_ROOT, async () => {
+    await this.cacheService.setValueWithFunc(EXTRACTOR_ORGANIZATION_ROOT, async () => {
       return await this.initOrganizations();
     }, EXTRACTOR_TTL, true);
 
-    await this.cacheService.setValue(EXTRACTOR_COLLECTION_ROOT, async () => {
+    await this.cacheService.setValueWithFunc(EXTRACTOR_COLLECTION_ROOT, async () => {
       return await this.initCollectionTree();
     }, EXTRACTOR_TTL, true);
 
-    await this.cacheService.setValue(EXTRACTOR_ENUM_ROOT, async () => {
+    await this.cacheService.setValueWithFunc(EXTRACTOR_ENUM_ROOT, async () => {
       return await this.initSchemaEnums();
     }, EXTRACTOR_TTL, true);
   }
@@ -85,7 +85,7 @@ export class ExtractorValueMappingService {
     );
 
     if (!name) {
-      console.warn(`ElasticExtract: organization ${key} not found`);
+      console.warn(`ElasticExtract: organization ${key} not found, using ${key} as fallback name.`);
     }
 
     return name || key;
@@ -118,7 +118,7 @@ export class ExtractorValueMappingService {
     );
 
     if (!name) {
-      console.warn(`ElasticExtract: dataset ${key} not found`);
+      console.warn(`ElasticExtract: dataset ${key} not found, using ${key} as fallback name.`);
     }
 
     return name || key;
@@ -164,11 +164,11 @@ export class ExtractorValueMappingService {
         collectionName: node.collectionName.en!,
         collectionTree: [node.id!, ...parent.collectionTree]
       };
-
-      childLookup[node.id!]?.forEach((collection) => {
-          this.parseCollectionTree(collection, childLookup, treeLookup);
-      });
     }
+
+    childLookup[node.id!]?.forEach((collection) => {
+      this.parseCollectionTree(collection, childLookup, treeLookup);
+    });
   }
 
   async getCollection(key: string): Promise<CollectionTreeNode | undefined> {
@@ -182,7 +182,7 @@ export class ExtractorValueMappingService {
     );
 
     if (!collection) {
-      console.warn(`ElasticExtract: collection ${key} not found`);
+      console.warn(`ElasticExtract: collection ${key} not found, using ${key} as fallback.`);
     }
 
     return collection;
@@ -270,7 +270,7 @@ export class ExtractorValueMappingService {
     }
 
     if (!values[field]) {
-      console.warn(`ElasticExtract: value ${key} not found in schema enums for field ${field}`);
+      console.warn(`ElasticExtract: value ${key} not found in schema enums for field ${field}, using ${key} as fallback.`);
     }
 
     return key;
@@ -345,6 +345,7 @@ export class ExtractorValueMappingService {
       case 'creator':
       case 'editor':
         return await this.getUserLabel(value);
+      case 'acquiredFromOrganization':
       case 'owner':
         return await this.getOrganizationLabel(value);
       case 'datasetID':

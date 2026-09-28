@@ -2,8 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { BaseExtractorService } from './base-extractor.service';
 import { BulkRequest } from '@elastic/elasticsearch/lib/api/types';
 import {
+  ElasticBaseUnit,
   ElasticDocument,
   ElasticGathering,
+  ElasticSample,
+  ElasticType,
   ElasticUnit,
   ElasticUnitRow,
 } from '@kotka/shared/models';
@@ -16,6 +19,7 @@ import { Identification, Sample, TypeSpecimen, MediaType } from '@kotka/shared/m
 import { MediaApiService } from '@kotka/api/services';
 import { lastValueFrom } from 'rxjs';
 import { AutocompleteExtractorService } from '@kotka/api/elasticsearch';
+import { assignWith } from 'lodash'
 
 const open = [
   'acquiredFromOrganization',
@@ -58,6 +62,7 @@ const mapOpenedValuesTo = {
 
 const remove = [
   'gatherings',
+  'gatheringEvent',
   'units',
   'identifications',
   'typeSpecimens',
@@ -149,7 +154,16 @@ export class SpecimenExtractorService extends BaseExtractorService {
     this.autocompleteFields = autocomplete;
   }
 
-  async addToBulk(document: ElasticDocument, bulk: BulkRequest): Promise<void> {
+  getMapping() {
+    const baseMapping = super.getMapping();
+    const sampleProperties = this.sampleExtractor.getProperties();
+
+    baseMapping.properties = { ...baseMapping.properties, ...sampleProperties };
+
+    return baseMapping;
+  }
+
+  async addToBulk(document: ElasticDocument, bulk: BulkRequest): Promise<undefined | ElasticBaseUnit[]> {
     if (!document.id) {
       return;
     }
@@ -201,20 +215,36 @@ export class SpecimenExtractorService extends BaseExtractorService {
 
             unit.sampleExists = !!unit.samples?.length;
 
-            const unitRow = await this.createSpecimenRow(bulk, id, document, gathering, unit);
+            let unitRow: ElasticBaseUnit = await this.createSpecimenRow(bulk, id, document, gathering, unit);
 
             await this.autocompleteExtractorService.addToBulk(unitRow, bulk, this.autocompleteFields);
 
             if (identifications?.length) {
-              await this.identificationExtractor.addToBulk({ ...unitRow, identifications }, bulk);
+              const identificationsRows = await this.identificationExtractor.addToBulk({ ...unitRow, identifications }, bulk);
+
+              if (identificationsRows?.length) {
+                this.mergeToUnitRow(unitRow, identificationsRows[0]);
+              }
             }
 
             if (typeSpecimens?.length) {
-              await this.typeSpecimenExtractor.addToBulk({...unitRow, typeSpecimens}, bulk);
+              const typeRows = await this.typeSpecimenExtractor.addToBulk({...unitRow, typeSpecimens}, bulk);
+
+              if (typeRows?.length) {
+                const flattenedTypes = this.flattenObjectArray<Omit<ElasticType, 'id'>>(typeRows);
+
+                this.mergeToUnitRow(unitRow, flattenedTypes);
+              }
             }
 
             if (samples?.length) {
-              await this.sampleExtractor.addToBulk({...unitRow, samples}, bulk);
+              const sampleRows = await this.sampleExtractor.addToBulk({...unitRow, samples}, bulk);
+
+              if (sampleRows?.length) {
+                const flattenedSamples = this.flattenObjectArray<Omit<ElasticSample, 'id'>>(sampleRows);
+
+                this.mergeToUnitRow(unitRow, flattenedSamples);
+              }
             }
           }
         } else {
@@ -225,8 +255,14 @@ export class SpecimenExtractorService extends BaseExtractorService {
     } else {
       await this.createSpecimenRow(bulk, id, document);
     }
+  }
 
-    //console.log(JSON.stringify(bulk, null, 2))
+  merger(objVal: any, mergeVal: any) {
+    return objVal === undefined ? mergeVal : objVal;
+  }
+
+  mergeToUnitRow(unitRow: ElasticBaseUnit, additionalData: Partial<ElasticUnitRow>) {
+    return assignWith(unitRow, additionalData, this.merger);
   }
 
   async createSpecimenRow(bulk: BulkRequest, id: string, document: ElasticDocument, gathering?: ElasticGathering, unit?: ElasticUnit) {
@@ -256,7 +292,7 @@ export class SpecimenExtractorService extends BaseExtractorService {
       delete unit.notes;
     }
 
-    const row = {...document, ...gathering, ...unit} as ElasticUnitRow;
+    const row = {...document, ...gathering, ...unit} as ElasticBaseUnit;
 
     if (row.collectionID) {
       row.collectionTree = await this.valueMappingService.getCollectionTree(row.collectionID);
@@ -265,16 +301,14 @@ export class SpecimenExtractorService extends BaseExtractorService {
     this.extractDates(row);
     this.extractWGSLocation(row);
 
-    await this.extract<ElasticUnitRow>(row);
+    await this.extract<ElasticBaseUnit>(row);
 
     bulk.body.push(row);
 
     return row;
-
-    //No need to handle measurement with lajistore units anymore.
   }
 
-  extractWGSLocation(row: ElasticUnitRow) {
+  extractWGSLocation(row: ElasticBaseUnit) {
     const wgs84Latitude = row.wgs84Latitude ? parseFloat(row.wgs84Latitude) : undefined;
     const wgs84Longitude = row.wgs84Longitude ? parseFloat(row.wgs84Longitude) : undefined;
 
@@ -305,15 +339,15 @@ export class SpecimenExtractorService extends BaseExtractorService {
     }
   }
 
-  extractBold(row: ElasticUnitRow) {
+  extractBold(row: ElasticBaseUnit) {
     this.extractIDDescription(row, 'bold');
   }
 
-  extractGenbank(row: ElasticUnitRow) {
+  extractGenbank(row: ElasticBaseUnit) {
     this.extractIDDescription(row, 'genbank');
   }
 
-  extractIDDescription(row: ElasticUnitRow, source: 'bold' | 'genbank') {
+  extractIDDescription(row: ElasticBaseUnit, source: 'bold' | 'genbank') {
     const idField: 'boldID' | 'genbankID' = source + 'ID' as 'boldID' | 'genbankID';
     const descriptionField: 'boldDescription' | 'genbankDescription' = source + 'Description' as 'boldDescription' | 'genbankDescription';
 
@@ -338,7 +372,7 @@ export class SpecimenExtractorService extends BaseExtractorService {
     }
   }
 
-  extractDates(row: ElasticUnitRow) {
+  extractDates(row: ElasticBaseUnit) {
     if (row.dateBegin) {
 
       if (!row.dateEnd) {

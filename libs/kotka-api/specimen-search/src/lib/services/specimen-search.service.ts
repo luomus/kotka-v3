@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { SpecimenExtractorService } from '../extractor/specimen-extractor.service';
 import { EsClientService, AutocompleteExtractorService } from '@kotka/api/elasticsearch';
-import { Document, ElasticDocument, IndexType } from '@kotka/shared/models';
+import { Document, ElasticDocument, IndexType, ElasticIndex } from '@kotka/shared/models';
 
 @Injectable()
 export class SpecimenSearchService {
@@ -39,7 +39,21 @@ export class SpecimenSearchService {
     });
   }
 
-  getSearchIndex(type?: IndexType) {
-    return type ? `specimen_${type.toLowerCase()}` : 'specimen_unit';
+  async deleteById(ids: string[]) {
+    return await this.esClientService.deleteByQueryString(`_id:(${ids.join(' OR ')})`, this.getSearchIndex());
+  }
+
+  async deleteByDocumentQName(qName: string[]) {
+    return await this.esClientService.deleteByQueryString(`documentQName:(${qName.join(' OR ')})`, this.getSearchIndex());
+  }
+
+  getSearchIndex(): ElasticIndex[];
+  getSearchIndex(type: IndexType): ElasticIndex;
+  getSearchIndex(type?: IndexType): ElasticIndex | ElasticIndex[] {
+    if (type && type !== undefined) {
+      return `specimen_${type.toLowerCase()}` as any;
+    } else {
+      return ['specimen_unit','specimen_identification','specimen_typespecimen','specimen_sample'] as any;
+    }
   }
 }

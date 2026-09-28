@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ExtractorInterface, REPLICAS, SHARDS } from './extractor.interface';
 import { EsClientService } from './es-client.service';
 import { BulkRequest, IndicesIndexSettingsKeys, MappingTypeMapping } from '@elastic/elasticsearch/lib/api/types';
+import { ElasticIndex } from '@kotka/shared/models';
 
 @Injectable()
 export class AutocompleteExtractorService implements ExtractorInterface {
@@ -54,7 +55,7 @@ export class AutocompleteExtractorService implements ExtractorInterface {
 
   async addToBulk(esRow: { [key: string]: any }, bulk: BulkRequest, fields: string[] = []) {
     if (!esRow) {
-      return;
+      return undefined;
     }
 
     const suggestions: ({ [key: string]: { [key: string]: { field: string, output: string, auto: string[] }}}) = {};
@@ -136,7 +137,7 @@ export class AutocompleteExtractorService implements ExtractorInterface {
     }
   }
 
-  getIndex() {
+  getIndex(): ElasticIndex {
     return this.INDEX;
   }
 

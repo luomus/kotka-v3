@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { getPrefixAndId, getUri } from '@kotka/shared/utils';
-import { ElasticDocumentRow, ElasticUnitRow, EsMeasurement, MeasurementsStrings, NonPrefixedElasticSample } from '@kotka/shared/models';
+import { ElasticBaseUnit, ElasticRowBases, EsMeasurement, MeasurementsStrings, NonPrefixedElasticSample, ElasticIndex, ArrayedObjects } from '@kotka/shared/models';
 import { BulkRequest, IndicesIndexSettingsKeys, MappingTypeMapping } from '@elastic/elasticsearch/lib/api/types';
 import { ExtractorInterface, REPLICAS, SHARDS } from '@kotka/api/elasticsearch';
 import { ExtractorValueMappingService } from '../mapper/extractor-value-mapping.service';
@@ -45,10 +45,12 @@ export class BaseExtractorService implements ExtractorInterface {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/no-empty-function
-  async addToBulk(document: any, bulk: BulkRequest, parent?: any): Promise<void> {}
+  async addToBulk(document: any, bulk: BulkRequest, parent?: any): Promise<undefined | any[]> {
+    return;
+  }
 
-  getIndex(): string {
-    return `${this.INDEX_PREFIX}_${this.type || this.DEFAULT_INDEX}`;
+  getIndex(): ElasticIndex {
+    return `${this.INDEX_PREFIX}_${this.type || this.DEFAULT_INDEX}` as ElasticIndex;
   }
 
   getMapping() {
@@ -70,9 +72,6 @@ export class BaseExtractorService implements ExtractorInterface {
       'properties': {
         'id': {
           'type': 'keyword'
-        },
-        'accepted': {
-          'type': 'boolean'
         },
         'firstInDocument': {
           'type': 'boolean'
@@ -220,17 +219,17 @@ export class BaseExtractorService implements ExtractorInterface {
     return [];
   }
 
-  async extract<T extends ElasticDocumentRow | NonPrefixedElasticSample>(row: T) {
+  async extract<T extends ElasticRowBases | NonPrefixedElasticSample>(row: T) {
     await this.openValues<T>(row);
     this.removeUnwantedFields<T>(row);
     this.extractKeyValueFields<T>(row);
-    if (row['measurement']) {
-      this.extractMeasurementsAsString(row);
+    if ('measurement' in row) {
+      this.extractMeasurementsAsString(row as ElasticBaseUnit | NonPrefixedElasticSample);
     }
     this.removeNewLineFromFields<T>(row);
   }
 
-  extractMeasurementsAsString(row: ElasticUnitRow | NonPrefixedElasticSample) {
+  extractMeasurementsAsString(row: ElasticBaseUnit | NonPrefixedElasticSample) {
     if (!row['measurement']) {
       return;
     }
@@ -376,5 +375,66 @@ export class BaseExtractorService implements ExtractorInterface {
     date = date.replace('T', ' ');
 
     return date;
+  }
+
+  flattenObjectArray<T extends Record<string, any>>(sourceArr: T[]): ArrayedObjects<T> {
+    const flattened: Record<string, any> = {};
+
+    sourceArr.forEach(source => {
+      Object.keys(source).forEach((key) => {
+        if (!flattened[key]) {
+          if (typeof source[key as keyof T] === 'object' && !Array.isArray(source[key as keyof T])) {
+            flattened[key] = {};
+          } else {
+            flattened[key] = [];
+          }
+        }
+
+        const value = source[key as keyof T];
+
+        if (value === undefined || value === null) {
+          return;
+        }
+
+        if (typeof value === 'object' && !Array.isArray(value)) {
+          Object.keys(value).forEach((subKey) => {
+            if (!flattened[key][subKey]) {
+              flattened[key][subKey] = [];
+            }
+
+            const subValue = value[subKey];
+
+            if (subValue === undefined || subValue === null) {
+              return;
+            }
+
+            if (Array.isArray(subValue)) {
+              subValue.forEach((v: any) => {
+                if (!flattened[key][subKey].includes(v)) {
+                  flattened[key][subKey].push(v);
+                }
+              });
+            } else {
+              if (!flattened[key][subKey].includes(subValue)) {
+                flattened[key][subKey].push(subValue);
+              }
+            }
+          });
+
+        } else if (Array.isArray(value)) {
+          value.forEach((v: any) => {
+            if (!flattened[key].includes(v)) {
+              flattened[key].push(v);
+            }
+          });
+        } else {
+          if (!flattened[key].includes(value)) {
+            flattened[key].push(value);
+          }
+        }
+      });
+    });
+
+    return flattened as ArrayedObjects<T>;
   }
 }

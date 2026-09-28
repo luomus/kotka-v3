@@ -124,8 +124,8 @@ export class OldKotkaDataService {
             const data = await fun(current);
             current++;
 
-            if (this.current === last || !data.length) {
-              return { done: true };
+            if (current === last || !data.length) {
+              return { done: true, value: data };
             } else {
               return { done: false, value: data };
             }

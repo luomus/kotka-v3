@@ -10,6 +10,9 @@ import { SequenceCommand } from './commands/sequence.command';
 import { TaxonUpdateCommand } from './commands/taxon-update.command';
 import { CacheModule } from '@kotka/api/cache';
 import { TaxonLinkingModule } from '@kotka/api/taxon-linking';
+import { IndexCommand } from './commands/index.command';
+import { SpecimenSearchModule } from '@kotka/api/specimen-search';
+import { ElasticModule } from '@kotka/api/elasticsearch';
 
 @Module({
 
@@ -18,7 +21,9 @@ import { TaxonLinkingModule } from '@kotka/api/taxon-linking';
     ConsoleModule,
     ApiServicesModule,
     TaxonLinkingModule,
+    SpecimenSearchModule,
+    ElasticModule
   ],
-  providers: [MigrateCommand, SequenceCommand, TaxonUpdateCommand ]
+  providers: [MigrateCommand, SequenceCommand, TaxonUpdateCommand, IndexCommand ]
 })
 export class KotkaCliModule {}

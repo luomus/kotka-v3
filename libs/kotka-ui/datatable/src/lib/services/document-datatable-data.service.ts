@@ -24,7 +24,12 @@ import { Observable } from 'rxjs';
 export type DatatableRow<
   T extends KotkaDocumentType = KotkaDocumentType,
   S extends IndexType | undefined = IndexType | undefined
-> = S extends IndexType ? SearchResponse<SearchResult<S>> : ListResponse<KotkaDocument<T>>;
+> = [S] extends [undefined]
+    ? ListResponse<KotkaDocument<T>>
+    : [S] extends [IndexType]
+      ? SearchResponse<SearchResult<S>>
+      : ListResponse<KotkaDocument<T>>
+        | SearchResponse<SearchResult<Exclude<S, undefined>>>;
 
 @Injectable({
   providedIn: 'root',
