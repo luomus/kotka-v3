@@ -15,8 +15,7 @@ import {
   IndexType,
   KotkaDocument,
   KotkaDocumentType,
-  SearchResponse,
-  SearchResult,
+  SearchResponse
 } from '@kotka/shared/models';
 import { ListResponse } from '@luomus/laji-schema';
 import { Observable } from 'rxjs';
@@ -24,12 +23,7 @@ import { Observable } from 'rxjs';
 export type DatatableRow<
   T extends KotkaDocumentType = KotkaDocumentType,
   S extends IndexType | undefined = IndexType | undefined
-> = [S] extends [undefined]
-    ? ListResponse<KotkaDocument<T>>
-    : [S] extends [IndexType]
-      ? SearchResponse<SearchResult<S>>
-      : ListResponse<KotkaDocument<T>>
-        | SearchResponse<SearchResult<Exclude<S, undefined>>>;
+> = S extends IndexType ? SearchResponse : ListResponse<KotkaDocument<T>>
 
 @Injectable({
   providedIn: 'root',
