@@ -9,13 +9,16 @@ import {
   URICellRendererComponent,
   DatatableColumn,
   DatatableLoadedData,
-  DocumentDatatableComponent,
+  DocumentDatatableComponent, getUriColumnOptions,
 } from '@kotka/ui/datatable';
-import { KotkaDocumentType, Document, IndexType, SearchResponse, FieldAggregate, SearchField } from '@kotka/shared/models';
+import {
+  KotkaDocumentType, Document, IndexType, SearchResponse, FieldAggregate, SearchField,
+  SearchResultKey
+} from '@kotka/shared/models';
 import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
 import { FormsModule } from '@angular/forms';
 import {
-  ApiClient,
+  ApiClient, DataTypeNamePipePipe,
   IteratorSearchParams,
   SearchResultIteratorService,
 } from '@kotka/ui/core';
@@ -36,6 +39,25 @@ interface ViewModel {
   columnsLoading: boolean;
 }
 
+const DEFAULT_SELECTED_FIELDS: Record<IndexType, SearchResultKey[]> = {
+  unit: ['documentID', 'locality', 'taxon'],
+  identification: ['documentID', 'locality', 'taxon'],
+  typeSpecimen: ['documentID', 'locality', 'taxon'],
+  sample: ['documentID', 'id', 'recordParts', 'taxon'],
+};
+const SPECIAL_COLUMNS: Partial<Record<SearchResultKey, DatatableColumn>> = {
+  documentID: {
+    ...getUriColumnOptions({
+      editRouterLink: ['..', 'edit'],
+      showViewLink: true,
+    }),
+    lockPosition: 'left'
+  },
+  id: getUriColumnOptions({
+    showEditLink: false,
+  })
+};
+
 @Component({
   selector: 'kotka-specimen-table',
   templateUrl: './specimen-table.component.html',
@@ -51,6 +73,7 @@ interface ViewModel {
     AggregationsComponent,
     SearchComponent,
     NgbAlert,
+    DataTypeNamePipePipe,
   ],
 })
 export class SpecimenTableComponent {
@@ -63,7 +86,7 @@ export class SpecimenTableComponent {
 
   searchError?: string;
 
-  indexOptions: (IndexType | undefined)[] = [undefined, 'unit', 'identification', 'typeSpecimen', 'sample'];
+  indexOptions: IndexType[] = ['unit', 'identification', 'typeSpecimen', 'sample'];
   aggregateFields: string[] = ['editor', 'leg', 'taxon', 'taxonRank', 'typeStatus'];
 
   aggregates?: FieldAggregate[];
@@ -125,12 +148,16 @@ export class SpecimenTableComponent {
           return of({ index, fields: [{ type: 'keyword', field: 'id' }], columns, columnsLoading: false });
         }
 
+        const defaultSelectedFields: string[] = DEFAULT_SELECTED_FIELDS[index];
+        const specialColumns: Record<string, DatatableColumn> = SPECIAL_COLUMNS;
+
         return this.apiClient.getSearchFields(this.dataType, index).pipe(
           map((fields) => {
             const columns: DatatableColumn[] = fields.map((field) => ({
               headerName: field.field[0].toUpperCase() + field.field.slice(1),
               field: field.field,
-              defaultSelected: true,
+              ...(specialColumns[field.field] || {}),
+              defaultSelected: defaultSelectedFields.includes(field.field),
             }));
             return {
               index,

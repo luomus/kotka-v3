@@ -7,8 +7,8 @@
   [enableColumnSelection]="enableColumnSelection()"
   [disableFilter]="disableFilter()"
   [settingsKey]="settingsKey()"
-  [dataTypeName]="dataType() | dataTypeName"
-  [dataTypeNamePlural]="dataType() | dataTypeName: false: true"
+  [dataTypeName]="dataType() | dataTypeName: false: false: index()"
+  [dataTypeNamePlural]="dataType() | dataTypeName: false: true: index()"
   [defaultFilterModel]="defaultFilterModel()"
 >
 </kui-datatable>

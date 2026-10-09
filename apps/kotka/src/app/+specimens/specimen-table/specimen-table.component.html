@@ -10,7 +10,7 @@
             <label class="form-label sidebar-label" for="specimen-result-type">Result type</label>
             <select id="specimen-result-type" class="form-select form-select-sm" [(ngModel)]="index">
               @for (indexOption of indexOptions; track $index) {
-                <option [ngValue]="indexOption">{{ indexOption }}</option>
+                <option [ngValue]="indexOption">{{ dataType | dataTypeName: true: false: indexOption }}</option>
               }
             </select>
           </div>

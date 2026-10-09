@@ -20,7 +20,6 @@ export function getUriColumnOptions(params?: URICellRendererParams): DatatableCo
     cellRendererParams: params,
     width: 145,
     flex: 0,
-    lockPosition: 'left',
     defaultSelected: true,
     cellStyle: params?.showEditLink === false ? { lineHeight: 'normal' } : undefined,
   };

@@ -1,4 +1,5 @@
 import { Document, Gathering, Identification, Sample, TypeSpecimen, Unit, Measurement, Preparation, ListResponse } from '@luomus/laji-schema/models';
+import { KeysOfUnion } from './util-models';
 
 type StoreKeys = 'isPartOf' | '@type' | '@context';
 type EsIdFields = {
@@ -122,6 +123,7 @@ interface SearchResultMap {
 }
 
 export type SearchResult<T extends IndexType = IndexType> = SearchResultMap[T];
+export type SearchResultKey = KeysOfUnion<SearchResult>;
 
 export type AggregationBucketKey = string | number | boolean;
 
