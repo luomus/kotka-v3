@@ -238,7 +238,7 @@ export class ApiClient {
 
     return this.httpClient.post<RawSearchResponse<Y>>(
       `${path}${type}/${index}/_search`,
-      { ...searchQuery, _source: true },
+      searchQuery,
       { params },
     ).pipe(
       map(response => {

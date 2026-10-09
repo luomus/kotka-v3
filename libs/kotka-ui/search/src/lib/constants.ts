@@ -11,6 +11,11 @@ export const SEARCH_OPERATORS: SearchOperatorInfo[] = [
   { id: 'endsWith', label: 'Ends with' },
   { id: 'blank', label: 'Blank', noValue: true },
   { id: 'notBlank', label: 'Not blank', noValue: true },
+  { id: 'greaterThan', label: 'Greater than' },
+  { id: 'greaterThanOrEqual', label: 'Greater than or equal' },
+  { id: 'lessThan', label: 'Less than' },
+  { id: 'lessThanOrEqual', label: 'Less than or equal' },
+  { id: 'inRange', label: 'In range' },
 ];
 
 export const SEARCH_OPERATOR_MAP = <Record<SearchOperator, SearchOperatorInfo>>(

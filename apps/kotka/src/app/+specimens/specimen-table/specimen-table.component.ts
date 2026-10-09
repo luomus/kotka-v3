@@ -25,7 +25,8 @@ import { Observable, of } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { map, startWith, switchMap } from 'rxjs/operators';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { groupToQueryString, joinQueryStrings, SearchComponent, SearchGroup } from '@kotka/ui/search';
+import { BuilderQuery,
+  builderQueryToQueryString, groupToQueryString, joinQueryStrings, SearchComponent, SearchGroup, SearchQuery } from '@kotka/ui/search';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 
 interface ViewModel {
@@ -73,12 +74,18 @@ export class SpecimenTableComponent {
   labelDesignerData$?: Observable<Document[]>;
 
   private filtersSearchQuery = signal('');
+  private idSearchQuery = signal<BuilderQuery>({ groups: [], joinOperator: 'AND' });
   private inputSearchQuery = signal('');
   private activeSearchParams?: IteratorSearchParams;
 
   constructor() {
     this.searchQuery = computed(() => (
-      joinQueryStrings(this.filtersSearchQuery(), this.inputSearchQuery())
+      joinQueryStrings(
+        'AND',
+        this.filtersSearchQuery(),
+        builderQueryToQueryString(this.idSearchQuery()),
+        this.inputSearchQuery()
+      )
     ));
 
     effect(() => {
@@ -156,8 +163,9 @@ export class SpecimenTableComponent {
     this.filtersSearchQuery.set(groupToQueryString(searchGroup).result);
   }
 
-  onSearch(searchQuery: string) {
-    this.inputSearchQuery.set(searchQuery);
+  onSearch(searchQuery: SearchQuery) {
+    this.idSearchQuery.set(searchQuery.idSearchQuery);
+    this.inputSearchQuery.set(searchQuery.textSearchQuery);
   }
 
   onDataLoad(data: DatatableLoadedData) {

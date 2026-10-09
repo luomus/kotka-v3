@@ -17,7 +17,7 @@ import { globals } from '../../../environments/globals';
 import { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { map } from 'rxjs/operators';
-import { SearchComponent } from '@kotka/ui/search';
+import { SearchComponent, SearchQuery } from '@kotka/ui/search';
 
 @Component({
   selector: 'kotka-branch-search',
@@ -76,8 +76,8 @@ export class BranchSearchComponent {
       .pipe(map((columns) => [...this.customColumns, ...columns]));
   }
 
-  onSearch(searchQuery: string) {
-    this.searchQuery = searchQuery;
+  onSearch(searchQuery: SearchQuery) {
+    this.searchQuery = searchQuery.textSearchQuery;
   }
 
   columnsToFields(columns: DatatableColumn[]): SearchField[] {

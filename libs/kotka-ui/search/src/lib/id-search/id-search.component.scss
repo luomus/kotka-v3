@@ -1,0 +1,6 @@
+@supports (field-sizing: content) {
+  textarea {
+    field-sizing: content;
+    resize: none;
+  }
+}

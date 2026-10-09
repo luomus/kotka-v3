@@ -67,6 +67,7 @@ export function criteriaToQueryString(criteria: SearchCriteria): string {
 
   const operatorInfo = SEARCH_OPERATOR_MAP[criteria.operator];
   const value = escapeFilterString(criteria.operator, criteria.value);
+  const value2 = escapeFilterString(criteria.operator, criteria.value2);
 
   if (!operatorInfo.noValue && !value) {
     return '';
@@ -104,6 +105,21 @@ export function criteriaToQueryString(criteria: SearchCriteria): string {
     case 'endsWith': {
       return `${prefix}*${value}`;
     }
+    case 'greaterThan': {
+      return `${prefix}{${value} TO *}`;
+    }
+    case 'greaterThanOrEqual': {
+      return `${prefix}[${value} TO *]`;
+    }
+    case 'lessThan': {
+      return `${prefix}{* TO ${value}}`;
+    }
+    case 'lessThanOrEqual': {
+      return `${prefix}[* TO ${value}]`;
+    }
+    case 'inRange': {
+      return `${prefix}[${value} TO ${value2}]`;
+    }
     default: {
       throw new Error(
         'Filter type ' + criteria.operator + ' is not supported!',
@@ -132,6 +148,10 @@ export function escapeFilterString(
   return value;
 }
 
-export function joinQueryStrings(query1: string, query2: string, joinOperator: JoinOperator = 'AND'): string {
-  return [query1, query2].filter(Boolean).map(query => `(${query})`).join(` ${joinOperator} `);
+export function joinQueryStrings(joinOperator: JoinOperator, ...queries: string[]): string {
+  queries = queries.filter(Boolean);
+  if (queries.length > 1) {
+    queries = queries.map(query => `(${query})`);
+  }
+  return queries.join(` ${joinOperator} `);
 }

@@ -1,4 +1,11 @@
-<div class="card mb-2">
+@if (showIdSearch()) {
+  <kui-id-search
+    [(idSearchText)]="idSearchText"
+    [idSearchTextParseError]="idSearchTextParseError()"
+  ></kui-id-search>
+}
+
+<div class="card mt-2 mb-2">
   <div class="card-header">
     <div class="btn-group" role="group" aria-label="Search mode">
       <button
@@ -33,18 +40,19 @@
       ></kui-text-search>
     }
   </div>
-  <div class="card-footer">
-    <button
-      class="btn btn-primary me-1"
-      (click)="onSearchClick()"
-    >
-      Search
-    </button>
-    <button
-      class="btn btn-outline-secondary"
-      (click)="onClearClick()"
-    >
-      Clear all
-    </button>
-  </div>
+</div>
+
+<div>
+  <button
+    class="btn btn-primary me-1"
+    (click)="onSearchClick()"
+  >
+    Search
+  </button>
+  <button
+    class="btn btn-outline-secondary"
+    (click)="onClearClick()"
+  >
+    Clear all
+  </button>
 </div>

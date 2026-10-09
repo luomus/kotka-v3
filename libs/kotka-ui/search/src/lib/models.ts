@@ -17,6 +17,7 @@ export interface SearchCriteria {
   field: string;
   operator: SearchOperator;
   value: string;
+  value2?: string;
 }
 
 export interface SearchGroup {

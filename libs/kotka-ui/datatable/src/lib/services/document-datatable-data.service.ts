@@ -11,6 +11,7 @@ import {
 } from '../models/models';
 import { inject, Injectable } from '@angular/core';
 import { ApiClient, SearchParams } from '@kotka/ui/core';
+import { joinQueryStrings } from '@kotka/ui/search';
 import {
   IndexType,
   KotkaDocument,
@@ -70,7 +71,7 @@ export class DocumentDatatableDataService {
     endRow: number,
     sortModel: DatatableSort,
     filterModel: DatatableFilter,
-    extraSearchQuery?: string,
+    extraSearchQuery = ''
   ): SearchParams {
     const pageSize = endRow - startRow;
     const page = startRow / pageSize + 1;
@@ -81,10 +82,7 @@ export class DocumentDatatableDataService {
       filterModel,
       colIdFieldMap,
     );
-    const searchQuery = [extraSearchQuery, filterSearchQuery]
-      .filter((query) => !!query)
-      .map((query) => `(${query})`)
-      .join(' AND ');
+    const searchQuery = joinQueryStrings('AND', extraSearchQuery, filterSearchQuery);
 
     return {
       searchQuery,

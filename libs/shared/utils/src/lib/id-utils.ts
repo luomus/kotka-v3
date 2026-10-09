@@ -1,3 +1,10 @@
+export interface ParsedIdentifierParts {
+  domain?: string,
+  id?: string,
+  namespace?: string,
+  objectID?: string
+}
+
 export const defaultDomain = 'http://tun.fi/';
 export const domainMap: Record<string, string> = {
   'tun:': defaultDomain,
@@ -79,4 +86,75 @@ export function getIdWithoutPrefix(value: string): string {
   }
 
   return value;
+}
+
+export function parseAndValidateIdentifierParts(value: string, defaultToObjectID = false): ParsedIdentifierParts {
+  if (!value) {
+    return {};
+  }
+
+  let result: ParsedIdentifierParts;
+
+  if (value.includes('/')) {
+    const lastSlashIndex = value.lastIndexOf('/');
+    const fullDomain = value.substring(0, lastSlashIndex + 1);
+    const id = value.substring(lastSlashIndex + 1);
+
+    if (!idPrefixMap[fullDomain]) {
+      throw new Error(`Invalid domain: ${fullDomain}`);
+    }
+    const domain = idPrefixMap[fullDomain];
+
+    result = { domain, ...parseIdPart(id, defaultToObjectID) };
+  } else if (value.includes(':')) {
+    const firstColonIndex = value.indexOf(':');
+    const domain = value.substring(0, firstColonIndex);
+    const id = value.substring(firstColonIndex + 1);
+
+    result = { domain, ...parseIdPart(id, defaultToObjectID) };
+  } else {
+    result = parseIdPart(value, defaultToObjectID);
+  }
+
+  validateIdParts(result);
+
+  return result;
+}
+
+function parseIdPart(id: string, defaultToObjectID: boolean): Pick<ParsedIdentifierParts, 'id'|'namespace'|'objectID'> {
+  const firstDotIndex = id.indexOf('.');
+  if (firstDotIndex !== -1) {
+    const namespace = id.substring(0, firstDotIndex);
+    const objectID = id.substring(firstDotIndex + 1);
+
+    const result: Pick<ParsedIdentifierParts, 'id'|'namespace'|'objectID'> = { };
+    if (namespace) {
+      result.namespace = namespace;
+    }
+    if (objectID) {
+      result.objectID = objectID;
+    }
+    if (namespace && objectID) {
+      result.id = id;
+    }
+    return result;
+  }
+
+  if (defaultToObjectID) {
+    return { objectID: id };
+  }
+
+  return { namespace: id };
+}
+
+function validateIdParts(idParts: ParsedIdentifierParts) {
+  if (idParts.domain && !acceptedPrefixes.includes(idParts.domain)) {
+    throw new Error(`Invalid domain: ${idParts.domain}`);
+  }
+  if (idParts.namespace && !/^[a-zA-Z0-9-]+$/.test(idParts.namespace)) {
+    throw new Error(`Invalid namespace: ${idParts.namespace}`);
+  }
+  if (idParts.objectID && !/^[a-zA-Z0-9-]+$/.test(idParts.objectID)) {
+    throw new Error(`Invalid objectID: ${idParts.objectID}`);
+  }
 }

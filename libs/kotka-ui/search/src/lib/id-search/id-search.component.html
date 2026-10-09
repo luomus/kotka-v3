@@ -1,0 +1,14 @@
+<textarea
+  class="form-control"
+  [rows]="1"
+  spellcheck="false"
+  autocomplete="off"
+  [(ngModel)]="idSearchText"
+  placeholder="Identifier: eg. HT.30..33 or HT.31,HT.42,HT.50"
+  [class.is-invalid]="!!idSearchTextParseError()"
+></textarea>
+@if (idSearchTextParseError(); as searchError) {
+  <div class="invalid-feedback">
+    <strong>{{ searchError }}</strong>
+  </div>
+}
