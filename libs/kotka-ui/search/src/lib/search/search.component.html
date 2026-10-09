@@ -1,12 +1,5 @@
-@if (showIdSearch()) {
-  <kui-id-search
-    [(idSearchText)]="idSearchText"
-    [idSearchTextParseError]="idSearchTextParseError()"
-  ></kui-id-search>
-}
-
 <div class="card mt-2 mb-2">
-  <div class="card-header">
+  <div class="card-header d-flex justify-content-between align-items-center">
     <div class="btn-group" role="group" aria-label="Search mode">
       <button
         class="btn btn-outline-secondary"
@@ -25,6 +18,7 @@
         Advanced search
       </button>
     </div>
+    <ng-content select="[kuiSearchHeaderActions]"></ng-content>
   </div>
 
   <div class="card-body">

@@ -1,0 +1,19 @@
+<kui-id-search
+  [(idSearchText)]="idSearchText"
+  [idSearchTextParseError]="idSearchTextParseError()"
+></kui-id-search>
+<kui-search
+  [(text)]="text"
+  [fields]="fields()"
+  (search)="onSearch($event)"
+  (clear)="onClear()"
+>
+  <button
+    kuiSearchHeaderActions
+    class="btn btn-link text-decoration-none"
+    (click)="onMyNewSpecimensClick()"
+  >
+    <i class="fa fa-arrow-down"></i>
+    Specimens I've edited or created today
+  </button>
+</kui-search>

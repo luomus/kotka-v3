@@ -32,13 +32,12 @@
           Print labels
         </button-->
         @if (vm$ | async; as vm) {
-          <kui-search
+          <kui-specimen-search
             class="specimen-search"
             [fields]="vm.fields"
-            [showIdSearch]="true"
             (search)="onSearch($event)"
           >
-          </kui-search>
+          </kui-specimen-search>
           @if (searchError) {
             <ngb-alert type="danger" [dismissible]="false">
               <strong>Error:</strong> {{ searchError }}

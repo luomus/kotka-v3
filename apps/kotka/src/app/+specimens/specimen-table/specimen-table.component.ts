@@ -6,7 +6,6 @@ import {
   signal,
 } from '@angular/core';
 import {
-  URICellRendererComponent,
   DatatableColumn,
   DatatableLoadedData,
   DocumentDatatableComponent, getUriColumnOptions,
@@ -24,12 +23,13 @@ import {
 } from '@kotka/ui/core';
 import { SpecimenLabelDesignerComponent } from '../specimen-label-designer/specimen-label-designer.component';
 import { AggregationsComponent, FieldValue } from './aggregations.component';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { map, startWith, switchMap } from 'rxjs/operators';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { BuilderQuery,
-  builderQueryToQueryString, groupToQueryString, joinQueryStrings, SearchComponent, SearchGroup, SearchQuery } from '@kotka/ui/search';
+import { BuilderQuery, builderQueryToQueryString, groupToQueryString, joinQueryStrings,
+  SearchGroup, SearchQuery, SpecimenSearchComponent
+} from '@kotka/ui/search';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 
 interface ViewModel {
@@ -71,7 +71,7 @@ const SPECIAL_COLUMNS: Partial<Record<SearchResultKey, DatatableColumn>> = {
     AsyncPipe,
     SpinnerComponent,
     AggregationsComponent,
-    SearchComponent,
+    SpecimenSearchComponent,
     NgbAlert,
     DataTypeNamePipePipe,
   ],
@@ -81,7 +81,7 @@ export class SpecimenTableComponent {
   private searchResultIteratorService = inject(SearchResultIteratorService);
 
   dataType: KotkaDocumentType.specimen = KotkaDocumentType.specimen;
-  index = signal<IndexType | undefined>('unit');
+  index = signal<IndexType>('unit');
   searchQuery: Signal<string>;
 
   searchError?: string;
@@ -129,25 +129,6 @@ export class SpecimenTableComponent {
 
     this.vm$ = toObservable(this.index).pipe(
       switchMap((index) => {
-        if (!index) {
-          const columns: DatatableColumn[] = [
-            {
-              headerName: 'URI',
-              field: 'id',
-              cellRenderer: URICellRendererComponent,
-              cellRendererParams: {
-                editRouterLink: ['..', 'edit'],
-                showViewLink: true,
-              },
-              width: 145,
-              flex: 0,
-              lockPosition: 'left',
-              defaultSelected: true,
-            },
-          ];
-          return of({ index, fields: [{ type: 'keyword', field: 'id' }], columns, columnsLoading: false });
-        }
-
         const defaultSelectedFields: string[] = DEFAULT_SELECTED_FIELDS[index];
         const specialColumns: Record<string, DatatableColumn> = SPECIAL_COLUMNS;
 

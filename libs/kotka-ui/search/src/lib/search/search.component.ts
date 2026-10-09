@@ -1,7 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component, inject,
-  input, output,
+  input, model, output,
   signal, viewChild,
 } from '@angular/core';
 import { SearchBuilderComponent } from '../search-builder/search-builder.component';
@@ -9,20 +9,12 @@ import { TextSearchComponent } from '../text-search/text-search.component';
 import { queryStringToBuilderQuery } from '../services/query-parse';
 import { DialogService } from '@kotka/ui/core';
 import { SearchField } from '@kotka/shared/models';
-import { IdSearchComponent } from '../id-search/id-search.component';
-import { parseIdQuery } from '../services/id-query';
-import { BuilderQuery } from '../models';
 
 type SearchMode = 'builder' | 'text';
 
-export interface SearchQuery {
-  idSearchQuery: BuilderQuery;
-  textSearchQuery: string;
-}
-
 @Component({
   selector: 'kui-search',
-  imports: [SearchBuilderComponent, TextSearchComponent, IdSearchComponent],
+  imports: [SearchBuilderComponent, TextSearchComponent],
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,15 +22,13 @@ export interface SearchQuery {
 export class SearchComponent {
   private dialogService = inject(DialogService);
 
+  text = model<string>('');
   fields = input<SearchField[]>([]);
-  showIdSearch = input<boolean>(false);
 
   mode = signal<SearchMode>('builder');
-  idSearchText = signal<string>('');
-  idSearchTextParseError = signal<string>('');
-  text = signal<string>('');
 
-  search = output<SearchQuery>();
+  search = output<string>();
+  clear = output<void>();
 
   private builder = viewChild(SearchBuilderComponent);
 
@@ -58,27 +48,13 @@ export class SearchComponent {
   }
 
   onSearchClick() {
-    this.idSearchTextParseError.set('');
-
-    let idSearchQuery: BuilderQuery;
-    try {
-      idSearchQuery = parseIdQuery(this.idSearchText());
-    } catch (e: any) {
-      this.idSearchTextParseError.set(e?.message || 'Failed to parse ID query');
-      return;
-    }
-
-    this.search.emit({
-      idSearchQuery,
-      textSearchQuery: this.text(),
-    });
+    this.search.emit(this.text());
   }
 
   onClearClick() {
     this.builder()?.clear();
-    this.idSearchText.set('');
-    this.idSearchTextParseError.set('');
     this.text.set('');
+    this.clear.emit();
     this.onSearchClick();
   }
 }
