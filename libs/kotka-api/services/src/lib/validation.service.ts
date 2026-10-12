@@ -241,6 +241,10 @@ export class ValidationService {
     const wgs84Latitude = data.gatherings[0].wgs84Latitude;
     const wgs84Longitude = data.gatherings[0].wgs84Longitude;
 
+    if (!wgs84Latitude && !wgs84Longitude) {
+      return;
+    }
+
     if ((!wgs84Latitude && wgs84Longitude) || (wgs84Latitude && !wgs84Longitude)) {
       return getError(field, 'Only one of the coordinates found.');
     }

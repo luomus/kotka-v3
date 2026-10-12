@@ -1,5 +1,5 @@
 import { SpecimenSearchService } from './services/specimen-search.service';
-import { ExtractorValueMappingService } from './mapper/extractor-value-mapping.service';
+import { ExtractorFieldMappingService } from './mapper/extractor-field-mapping.service';
 import { TypeExtractorService } from './extractor/type-extractor.service';
 import { ElasticModule } from '@kotka/api/elasticsearch';
 import { Module } from '@nestjs/common';
@@ -20,21 +20,19 @@ import { TaxonLinkingModule } from '@kotka/api/taxon-linking';
   ],
   providers: [
     SpecimenSearchService,
-    ExtractorValueMappingService,
+    ExtractorFieldMappingService,
     TypeExtractorService,
     SampleExtractorService,
     IdentificationExtractorService,
     SpecimenExtractorService,
-    BaseExtractorService
   ],
   exports: [
     SpecimenSearchService,
-    ExtractorValueMappingService,
+    ExtractorFieldMappingService,
     TypeExtractorService,
     SampleExtractorService,
     IdentificationExtractorService,
     SpecimenExtractorService,
-    BaseExtractorService,
   ]
 })
 export class SpecimenSearchModule {}

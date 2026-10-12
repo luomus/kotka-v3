@@ -152,5 +152,8 @@ export interface SearchResponse<T extends SearchResult | Partial<SearchResult> =
 
 export interface SearchField {
   field: string,
-  type: string
+  label?: string,
+  type: string,
+  hasRaw?: boolean;
+  hasAutocomplete?: boolean;
 }

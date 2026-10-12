@@ -2,17 +2,43 @@ import { JSONSchema4 } from 'json-schema';
 import { Injectable } from '@nestjs/common';
 import { LajiApiService, LajiStoreService, OldKotkaDataService } from '@kotka/api/services';
 import { CacheService, MultiSetEntry } from '@kotka/api/cache';
-import { Collection, Dataset, Organization, Person } from '@kotka/shared/models';
+import { Collection, Dataset, Organization, Person, specimenIndices } from '@kotka/shared/models';
 import { lastValueFrom, map } from 'rxjs';
 import { PerStoreTtl } from 'cacheable';
+import { specimenConfig } from '../extractor/config/specimen.config';
+import { identificationConfig } from '../extractor/config/identification.config';
+import { typeSpecimenConfig } from '../extractor/config/type-specimen.config';
+import { sampleConfig } from '../extractor/config/sample.config';
 
 const EXTRACTOR_TTL: PerStoreTtl = { primary:  '10m', secondary: '24h' };
-const EXTRACTOR_ENUM_ROOT = 'extractor_enum';
-const EXTRACTOR_DATASET_ROOT = 'extractor_dataset';
-const EXTRACTOR_ORGANIZATION_ROOT = 'extractor_organization';
-const EXTRACTOR_COLLECTION_ROOT = 'extractor_collection';
+const KEY_FORM_ROOT = 'extractor_schema';
+const KEY_FORM_ENUM_ROOT = `${KEY_FORM_ROOT}_enum`;
+const KEY_FORM_FIELD_ROOT = `${KEY_FORM_ROOT}_fields`;
+const KEY_ALT_ROOT = 'extractor_alt';
+const KEY_DATASET_ROOT = 'extractor_dataset';
+const KEY_ORGANIZATION_ROOT = 'extractor_organization';
+const KEY_COLLECTION_ROOT = 'extractor_collection';
 
-const extratedLevels = ['MY.document', 'MY.gathering', 'MY.unit', 'MF.sample', 'MY.identification', 'MY.typeSpecimen', 'MF.preparationClass'] as const;
+const extratedLevels = {
+  'document': 'document',
+  'gatherings': 'gathering',
+  'units': 'unit',
+  'samples': 'sample',
+  'identifications': 'identification',
+  'typeSpecimens': 'typespecimen',
+  'preparations': 'preparation',
+  'measurement': 'measurement',
+};
+
+const levelConfigs = {
+  document: specimenConfig,
+  gathering: specimenConfig,
+  unit: specimenConfig,
+  measurement: specimenConfig,
+  sample: sampleConfig,
+  identification: identificationConfig,
+  typespecimen: typeSpecimenConfig,
+}
 
 interface CollectionTreeNode {
   id: string;
@@ -22,12 +48,12 @@ interface CollectionTreeNode {
 }
 
 @Injectable()
-export class ExtractorValueMappingService {
+export class ExtractorFieldMappingService {
   constructor(
     private readonly cacheService: CacheService,
     private readonly storeService: LajiStoreService,
     private readonly lajiApiService: LajiApiService,
-    private readonly oldKotkaDataService: OldKotkaDataService
+    private readonly oldKotkaDataService: OldKotkaDataService,
   ) {}
 
   normalizeClassName(className: string) {
@@ -41,20 +67,20 @@ export class ExtractorValueMappingService {
   }
 
   async intLabelCaches() {
-    await this.cacheService.setValueWithFunc(EXTRACTOR_DATASET_ROOT, async () => {
+    await this.cacheService.setValueWithFunc(KEY_DATASET_ROOT, async () => {
       return await this.initDatasets();
     }, EXTRACTOR_TTL, true);
 
-    await this.cacheService.setValueWithFunc(EXTRACTOR_ORGANIZATION_ROOT, async () => {
+    await this.cacheService.setValueWithFunc(KEY_ORGANIZATION_ROOT, async () => {
       return await this.initOrganizations();
     }, EXTRACTOR_TTL, true);
 
-    await this.cacheService.setValueWithFunc(EXTRACTOR_COLLECTION_ROOT, async () => {
+    await this.cacheService.setValueWithFunc(KEY_COLLECTION_ROOT, async () => {
       return await this.initCollectionTree();
     }, EXTRACTOR_TTL, true);
 
-    await this.cacheService.setValueWithFunc(EXTRACTOR_ENUM_ROOT, async () => {
-      return await this.initSchemaEnums();
+    await this.cacheService.setValueWithFunc(KEY_FORM_ROOT, async () => {
+      return await this.initFormMappings();
     }, EXTRACTOR_TTL, true);
   }
 
@@ -68,7 +94,7 @@ export class ExtractorValueMappingService {
     );
 
     data.forEach(organization => {
-      organizationNameLookup[organization.id!] = organization.fullName!.en!;
+      organizationNameLookup[`${KEY_ORGANIZATION_ROOT}_${organization.id!}`] = organization.fullName!.en!;
     });
 
     return organizationNameLookup;
@@ -76,8 +102,8 @@ export class ExtractorValueMappingService {
 
   async getOrganizationLabel(key: string) {
     const name = await this.cacheService.getValueWithMultiSet<string>(
-      EXTRACTOR_ORGANIZATION_ROOT,
-      key,
+      `${KEY_ORGANIZATION_ROOT}_${key}`,
+      KEY_ORGANIZATION_ROOT,
       EXTRACTOR_TTL,
       async () => {
         return await this.initOrganizations();
@@ -101,7 +127,7 @@ export class ExtractorValueMappingService {
     );
 
     data.forEach(dataset => {
-      datasetNameLookup[dataset.id!] = dataset.datasetName.en!;
+      datasetNameLookup[`${KEY_DATASET_ROOT}_${dataset.id!}`] = dataset.datasetName.en!;
     });
 
     return datasetNameLookup;
@@ -109,8 +135,8 @@ export class ExtractorValueMappingService {
 
   async getDatasetLabel(key: string) {
     const name = await this.cacheService.getValueWithMultiSet<string>(
-      EXTRACTOR_DATASET_ROOT,
-      key,
+      `${KEY_DATASET_ROOT}_${key}`,
+      KEY_DATASET_ROOT,
       EXTRACTOR_TTL,
       async () => {
         return await this.initDatasets();
@@ -146,6 +172,11 @@ export class ExtractorValueMappingService {
       this.parseCollectionTree(root, childLookup, treeLookup);
     });
 
+    Object.keys(treeLookup).forEach(key => {
+      treeLookup[`${KEY_COLLECTION_ROOT}_${key}`] = treeLookup[key];
+      delete treeLookup[key];
+    });
+
     return treeLookup;
   }
 
@@ -173,8 +204,8 @@ export class ExtractorValueMappingService {
 
   async getCollection(key: string): Promise<CollectionTreeNode | undefined> {
     const collection = await this.cacheService.getValueWithMultiSet<CollectionTreeNode>(
-      EXTRACTOR_COLLECTION_ROOT,
-      key,
+      `${KEY_COLLECTION_ROOT}_${key}`,
+      KEY_COLLECTION_ROOT,
       EXTRACTOR_TTL,
       async () => {
         return await this.initCollectionTree();
@@ -208,55 +239,110 @@ export class ExtractorValueMappingService {
     return collection.collectionName;
   }
 
-  async initSchemaEnums() {
-    const schema = await lastValueFrom(this.storeService.getJsonSchema('MY.document').pipe(map(res => res.data)));
+  async initFormMappings() {
+    const schema = await lastValueFrom(this.lajiApiService.get<{schema: JSONSchema4}>('forms/MHL.1158').pipe(map(res => res.data?.schema)));
 
-    const schemaEnums = {} as { [field: string]: { [value: string]: string }};
+    const schemaMappings = {} as { [key: string]: { [value: string]: string }};
 
-    this.parseSchemaEnums(schema, schemaEnums);
+    this.parseFormMappings('document', schema, schemaMappings);
 
-    return schemaEnums;
+    return schemaMappings;
   }
 
-  async parseSchemaEnums(schema: JSONSchema4, schemaEnums: { [key: string]: {[value: string]: string }}) {
-    if (extratedLevels.includes(schema.subject) && schema.properties) {
-
-      if (!schema.properties) {
-        return;
-      }
-
-      Object.keys(schema.properties!).forEach((property) => {
-        const val: JSONSchema4 = schema.properties![property];
-        const items = val.items as JSONSchema4 | undefined;
-        if (val.enum && val.enumNames) {
-          this.mapEnums(property, val.enum as string[], val.enumNames as string[], schemaEnums);
-        } else if (
-          val.type === 'array' &&
-          items?.subject &&
-          extratedLevels.includes(items?.subject)
-        ) {
-          this.parseSchemaEnums(val.items as JSONSchema4, schemaEnums);
-        } else if (
-          val.type === 'array' &&
-          items?.enum &&
-          items?.enumNames) {
-            this.mapEnums(property, items.enum as string[], items.enumNames as string[], schemaEnums);
-          }
-      });
+  async parseFormMappings(parent: string, schema: JSONSchema4, schemaEnums: { [key: string]: { [value: string]: string | {[key: string]: string}}}) {
+    if (parent === 'document') {
+      this.mapHardCodedFields(schemaEnums);
     }
+
+    Object.keys(schema.properties!).forEach((property) => {
+      const val: JSONSchema4 = schema.properties[property];
+
+      this.mapLabels(parent, property, val, schemaEnums);
+
+      const items = val.items as JSONSchema4 | undefined;
+      if (val.type === 'string' && val.oneOf) {
+        this.mapEnums(property, val.oneOf, schemaEnums);
+      } else if (
+        val.type === 'array' &&
+        items?.type === 'string' &&
+        items?.oneOf) {
+          this.mapEnums(property, items.oneOf, schemaEnums);
+      } else if (
+        val.type === 'array' &&
+        items?.properties &&
+        extratedLevels[property]
+      ) {
+        this.parseFormMappings(`${parent}.${extratedLevels[property] || property}`, val.items as JSONSchema4, schemaEnums);
+      } else if (
+        val.type === 'object' &&
+        val.properties &&
+        extratedLevels[property])
+      {
+        this.parseFormMappings(`${parent}.${extratedLevels[property] || property}`, val, schemaEnums);
+      }
+    });
   }
 
-  mapEnums(property: string, enumValues: string[], enumNames: string[], schemaEnums: { [key: string]: {[value: string]: string }}) {
-    schemaEnums[`${property}`] = Object.fromEntries(enumValues.map((value, index) => [value, enumNames[index]]));
+  mapHardCodedFields(schemaEnums: { [key: string]: { [value: string]: string | {[key: string]: string}}}) {
+    if (!schemaEnums[KEY_FORM_FIELD_ROOT]) {
+      schemaEnums[KEY_FORM_FIELD_ROOT] = {};
+    }
+
+    specimenIndices.forEach((index) => {
+      const { hardCodedFields, autocompleteFields } = levelConfigs[index.replace('specimen_', '')];
+
+      Object.keys(hardCodedFields).forEach((key) => {
+        schemaEnums[KEY_FORM_FIELD_ROOT][key] = {
+          ...hardCodedFields[key],
+          hasAutocomplete: autocompleteFields[key] ?? false,
+      };
+      });
+    });
   }
 
-  async getSchemaEnum(key: string, field: string) {
+  mapLabels(path: string, key: string, property: JSONSchema4, enums: { [key: string]: {[value: string]: string | {[key: string]: string} }}) {
+    if (!property.title) {
+      return;
+    }
+
+    let level = path.split('.').slice(-1)[0];
+
+    const { autocompleteFields, remove } = levelConfigs[level] || {};
+
+    if (remove?.includes(key)) {
+      return;
+    }
+
+    if (path.includes('sample')) {
+        if (path.includes('measurement')) return;
+
+      key = key.startsWith('sample') ? key : `sample${key.charAt(0).toUpperCase() + key.slice(1)}`;
+    }
+
+    if (!enums[KEY_FORM_FIELD_ROOT]) {
+      enums[KEY_FORM_FIELD_ROOT] = {}
+    }
+
+    const hardCodedField = levelConfigs[level]?.hardCodedFields?.[key];
+
+    enums[KEY_FORM_FIELD_ROOT][key] = {
+      label: hardCodedField?.label ?? property.title,
+      level: level,
+      hasAutocomplete: autocompleteFields?.includes(key) ?? false,
+    };
+  }
+
+  mapEnums(property: string, oneOf: JSONSchema4[], enums) {
+    enums[`${KEY_FORM_ENUM_ROOT}_${property}`] = Object.fromEntries(oneOf.map((e) => [e.const, e.title]));
+  }
+
+  async getFormEnum(key: string, field: string) {
     const values = await this.cacheService.getValueWithMultiSet<{ [value: string]: string }>(
-      `${EXTRACTOR_ENUM_ROOT}`,
-      field,
+      `${KEY_FORM_ENUM_ROOT}_${field}`,
+      KEY_FORM_ROOT,
       EXTRACTOR_TTL,
       async () => {
-        return await this.initSchemaEnums();
+        return await this.initFormMappings();
       }
     );
 
@@ -276,9 +362,22 @@ export class ExtractorValueMappingService {
     return key;
   }
 
+  async getFormFields() {
+    const fields = await this.cacheService.getValueWithMultiSet<{ [key: string]: any }>(
+      KEY_FORM_FIELD_ROOT,
+      KEY_FORM_ROOT,
+      EXTRACTOR_TTL,
+      async () => {
+        return await this.initFormMappings();
+      }
+    );
+
+    return fields;
+  }
+
   async getAltEnum(key: string, field: string) {
     const values = await this.cacheService.getValue<{ [value: string]: string }>(
-      `${EXTRACTOR_ENUM_ROOT}_${field}`,
+      `${KEY_ALT_ROOT}_${field}`,
       EXTRACTOR_TTL,
       async () => {
         return await this.getMetadataAlt(field);
@@ -340,7 +439,7 @@ export class ExtractorValueMappingService {
     return label;
   }
 
-  async getValueMapping(value: string, field: string) {
+  async getFieldValueMapping(value: string, field: string) {
     switch (field) {
       case 'creator':
       case 'editor':
@@ -355,7 +454,7 @@ export class ExtractorValueMappingService {
       case 'endangeredStatus':
         return await this.getAltEnum(value, 'MX.iucnStatuses');
       default:
-        return await this.getSchemaEnum(value, field);
+        return await this.getFormEnum(value, field);
     }
   }
 }

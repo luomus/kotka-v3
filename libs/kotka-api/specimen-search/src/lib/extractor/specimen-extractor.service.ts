@@ -11,7 +11,7 @@ import {
   ElasticUnitRow,
 } from '@kotka/shared/models';
 import { IdentificationExtractorService } from './identification-extractor.service';
-import { ExtractorValueMappingService } from '../mapper/extractor-value-mapping.service';
+import { ExtractorFieldMappingService } from '../mapper/extractor-field-mapping.service';
 import { ExtractorInterface } from '@kotka/api/elasticsearch';
 import { TypeExtractorService } from './type-extractor.service';
 import { SampleExtractorService } from './sample-extractor.service';
@@ -20,117 +20,7 @@ import { MediaApiService } from '@kotka/api/services';
 import { lastValueFrom } from 'rxjs';
 import { AutocompleteExtractorService } from '@kotka/api/elasticsearch';
 import { assignWith } from 'lodash'
-
-const open = [
-  'acquiredFromOrganization',
-  'collectionID',
-  'coordinateSource',
-  'coordinateSystem',
-  'creator',
-  'datasetID',
-  'earliestEpochOrLowestSeries',
-  'editor',
-  'fruitType',
-  'georeferenceSource',
-  'latestEpochOrHighestSeries',
-  'lifeStage',
-  'microbiologicalRiskGroup',
-  'owner',
-  'plantStatusCode',
-  'preservation',
-  'projectId',
-  'provenance',
-  'publicityRestrictions',
-  'recordBasis',
-  'recordParts',
-  'samplingMethod',
-  'seedMaturity',
-  'seedMorphology',
-  'sex',
-  'status',
-];
-
-const mapOpenedIdsTo = {
-  'owner': 'ownerID',
-  'acquiredFromOrganization': 'acquiredFromOrganizationID'
-};
-
-const mapOpenedValuesTo = {
-  'datasetID': 'dataset',
-  'collectionID': 'collection',
-};
-
-const remove = [
-  'gatherings',
-  'gatheringEvent',
-  'units',
-  'identifications',
-  'typeSpecimens',
-  'samples',
-  'notes',
-];
-
-const removeNewLine = [
-  'localityVerbatim',
-  'localityDescription',
-  'labelsVerbatim',
-  'editNotes',
-  'documentNotes',
-  'gatheringNotes',
-  'unitNotes',
-  'identificationNotes',
-  'sampleHistory',
-];
-
-const autocomplete = [
-  'acquiredFrom',
-  'administrativeProvince',
-  'age',
-  'biologicalProvince',
-  'boldDescription',
-  'chemistry',
-  'cladVerbatim',
-  'collection',
-  'coordinateNotes',
-  'coordinatesVerbatim',
-  'country',
-  'county',
-  'creator',
-  'dataset',
-  'dataSource',
-  'datatype',
-  'documentLocation',
-  'documentNotes',
-  'editNotes',
-  'editor',
-  'entered',
-  'exsiccatum',
-  'gatheringNotes',
-  'genbankDescription',
-  'habitatClassification',
-  'habitatDescription',
-  'higherGeography',
-  'labelsVerbatim',
-  'language',
-  'leg',
-  'legID',
-  'legVerbatim',
-  'locality',
-  'localityDescription',
-  'localityVerbatim',
-  'municipality',
-  'populationAbundance',
-  'preparations',
-  'primaryDataLocation',
-  'publication',
-  'sampleHistory',
-  'digitisers',//mapped from old transcribers
-  'unitNotes',
-];
-
-const keyValueFields: { [key: string]: string } = {
-  'relationship': ':',
-};
+import { specimenConfig } from './config/specimen.config';
 
 @Injectable()
 export class SpecimenExtractorService extends BaseExtractorService {
@@ -140,27 +30,10 @@ export class SpecimenExtractorService extends BaseExtractorService {
     private readonly typeSpecimenExtractor: TypeExtractorService,
     private readonly sampleExtractor: SampleExtractorService,
     private readonly autocompleteExtractorService: AutocompleteExtractorService,
-    protected readonly valueMappingService: ExtractorValueMappingService,
+    protected readonly valueMappingService: ExtractorFieldMappingService,
 
   ) {
-    super();
-
-    this.open = open;
-    this.mapOpenedIdsTo = mapOpenedIdsTo;
-    this.mapOpenedValuesTo = mapOpenedValuesTo;
-    this.remove = [...this.remove, ...remove];
-    this.removeNewLine = removeNewLine;
-    this.keyValueFields = keyValueFields;
-    this.autocompleteFields = autocomplete;
-  }
-
-  getMapping() {
-    const baseMapping = super.getMapping();
-    const sampleProperties = this.sampleExtractor.getProperties();
-
-    baseMapping.properties = { ...baseMapping.properties, ...sampleProperties };
-
-    return baseMapping;
+    super(specimenConfig);
   }
 
   async addToBulk(document: ElasticDocument, bulk: BulkRequest): Promise<undefined | ElasticBaseUnit[]> {
@@ -217,7 +90,7 @@ export class SpecimenExtractorService extends BaseExtractorService {
 
             let unitRow: ElasticBaseUnit = await this.createSpecimenRow(bulk, id, document, gathering, unit);
 
-            await this.autocompleteExtractorService.addToBulk(unitRow, bulk, this.autocompleteFields);
+            await this.autocompleteExtractorService.addToBulk(unitRow, bulk, this.config.autocompleteFields);
 
             if (identifications?.length) {
               const identificationsRows = await this.identificationExtractor.addToBulk({ ...unitRow, identifications }, bulk);

@@ -43,7 +43,7 @@ export class CacheService {
         const lookupCacheArray = [];
 
         for (const key of Object.keys(data as MultiSetEntry<T>)) {
-          lookupCacheArray.push({key: `${cacheKey}_${key}`, value: data[key], ttl: ttl as PerStoreTtl });
+          lookupCacheArray.push({key: key, value: data[key], ttl: ttl as PerStoreTtl });
         }
 
         await this.cacheService.setMany(lookupCacheArray);
@@ -57,16 +57,16 @@ export class CacheService {
     }
   }
 
-  async getValueWithMultiSet<T>(cacheKeyRoot: string, cacheKey: string, ttl: string | number | PerStoreTtl, getDataFunc: () => Promise<{ [key: string]: T }>, forceUpdate = false): Promise<T | undefined> {
+  async getValueWithMultiSet<T>(cacheKey: string, cacheLockKey: string, ttl: string | number | PerStoreTtl, getDataFunc: () => Promise<{ [key: string]: T }>, forceUpdate = false): Promise<T | undefined> {
     if (!forceUpdate) {
-      const cachedData = await this.cacheService.get<T>(`${cacheKeyRoot}_${cacheKey}`);
+      const cachedData = await this.cacheService.get<T>(cacheKey);
 
       if (cachedData) {
         return cachedData;
       }
     }
 
-    const data = await this.setValueWithFunc<T>(cacheKeyRoot, getDataFunc, ttl, true);
+    const data = await this.setValueWithFunc<T>(cacheLockKey, getDataFunc, ttl, true);
 
     return data[cacheKey];
   }

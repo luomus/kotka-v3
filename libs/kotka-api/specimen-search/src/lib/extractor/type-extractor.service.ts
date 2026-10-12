@@ -3,41 +3,17 @@ import { BaseExtractorService } from './base-extractor.service';
 import { ElasticBaseUnit, ElasticType, ElasticTypeRow } from '@kotka/shared/models';
 import { BulkRequest } from '@elastic/elasticsearch/lib/api/types';
 import { TypeSpecimen } from '@luomus/laji-schema/models';
-import { ExtractorValueMappingService } from '../mapper/extractor-value-mapping.service';
+import { ExtractorFieldMappingService } from '../mapper/extractor-field-mapping.service';
 import { AutocompleteExtractorService, ExtractorInterface } from '@kotka/api/elasticsearch';
-
-const open = [
-  'publicityRestrictions',
-  'typeStatus',
-  'typeVerification',
-];
-
-const autocomplete = [
-  'typeAuthor',
-  'typeBasionymePubl',
-  'typeNotes',
-  'typePubl',
-  'typeSpecies',
-  'typeSubspecies',
-  'typeSubspeciesAuthor',
-  'typif',
-];
-
-const remove = [
-  'publicityRestrictions'
-];
+import { typeSpecimenConfig } from './config/type-specimen.config';
 
 @Injectable()
 export class TypeExtractorService extends BaseExtractorService {
   constructor(
     private readonly autocompleteExtractorService: AutocompleteExtractorService,
-    protected readonly valueMappingService: ExtractorValueMappingService,
+    protected readonly valueMappingService: ExtractorFieldMappingService,
   ) {
-    super();
-    this.open = open;
-    this.type = 'typespecimen';
-    this.autocompleteFields = autocomplete;
-    this.remove = [...this.remove, ...remove];
+    super(typeSpecimenConfig);
   }
 
   async addToBulk(document: ElasticBaseUnit & { typeSpecimens?: TypeSpecimen[] }, bulk: BulkRequest): Promise<undefined | ElasticType[]> {
@@ -54,7 +30,7 @@ export class TypeExtractorService extends BaseExtractorService {
 
       const typeRow: ElasticTypeRow = { ...row, ...type }
 
-      this.autocompleteExtractorService.addToBulk(typeRow, bulk, this.autocompleteFields);
+      this.autocompleteExtractorService.addToBulk(typeRow, bulk, this.config.autocompleteFields);
 
       typeRows.push(type);
     }

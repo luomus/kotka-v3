@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { BaseExtractorService } from './base-extractor.service';
 import { BulkRequest, MappingTypeMapping } from '@elastic/elasticsearch/lib/api/types';
-import { ExtractorValueMappingService } from '../mapper/extractor-value-mapping.service';
+import { ExtractorFieldMappingService } from '../mapper/extractor-field-mapping.service';
 import { ElasticBaseUnit, ElasticIdentification } from '@kotka/shared/models';
 import { Identification } from '@kotka/shared/models';
 import { identificationSort } from '@kotka/shared/utils';
 import { TaxonLinkingService } from '@kotka/api/taxon-linking';
 import { AutocompleteExtractorService, ExtractorInterface } from '@kotka/api/elasticsearch';
+import { identificationConfig } from './config/identification.config';
 
 const open = [
   'infraRank',
@@ -45,22 +46,11 @@ export class IdentificationExtractorService extends BaseExtractorService {
   constructor (
     private readonly autocompleteExtractorService: AutocompleteExtractorService,
     private readonly taxonLinkingService: TaxonLinkingService,
-    protected readonly valueMappingService: ExtractorValueMappingService,
+    protected readonly valueMappingService: ExtractorFieldMappingService,
   ) {
-    super();
-    this.open = open;
-    this.removeNewLine = removeNewLine;
-    this.type = 'identification';
-    this.autocompleteFields = autocomplete;
-    this.remove = [...this.remove, ...remove];
-  }
-
-  getMapping(): MappingTypeMapping {
-    const baseMapping = super.getMapping();
-
-    baseMapping.properties = { ...baseMapping.properties, accepted: { 'type': 'boolean' }};
-
-    return baseMapping;
+    super(
+      identificationConfig
+    );
   }
 
   async addToBulk(document: ElasticBaseUnit & { identifications?: Identification[] }, bulk: BulkRequest): Promise<undefined | ElasticIdentification[]> {
@@ -79,7 +69,7 @@ export class IdentificationExtractorService extends BaseExtractorService {
     for (const identification of identifications) {
       const identificationRow = await this.createIdentificationRow(row, identification, bulk, !hasPreferred);
 
-      this.autocompleteExtractorService.addToBulk(identificationRow, bulk, this.autocompleteFields);
+      this.autocompleteExtractorService.addToBulk(identificationRow, bulk, this.config.autocompleteFields);
 
       if (!hasPreferred) {
         hasPreferred = !hasPreferred;
@@ -144,7 +134,7 @@ export class IdentificationExtractorService extends BaseExtractorService {
     const taxon = [identification.taxon || identification.taxonVerbatim];
 
     if (identification.infraRank) {
-      const rank = await this.valueMappingService.getValueMapping(identification.infraRank, 'infraRank');
+      const rank = await this.valueMappingService.getFieldValueMapping(identification.infraRank, 'infraRank');
 
       if (rank) {
         taxon.push(rank);

@@ -38,11 +38,12 @@ export class IndexCommand {
     let countMismatch = false;
 
     const spin = ora();
+    spin.start(`Indexing...`);
 
     try {
       let stop = false;
       if (ids?.length === 1) {
-        spin.start(`Indexing (0/${ids.length})...`);
+        spin.text = `Indexing (0/${ids.length})...`;
 
         try {
           const result = await lastValueFrom(this.lajiStoreService.get<Document>(KotkaObjectFullType.document, id).pipe(map(res => res.data)));

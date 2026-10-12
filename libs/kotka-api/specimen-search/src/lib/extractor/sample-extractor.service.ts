@@ -3,8 +3,9 @@ import { BaseExtractorService } from './base-extractor.service';
 import { ElasticSample, NonPrefixedElasticSample, ElasticBaseUnit } from '@kotka/shared/models';
 import { BulkRequest } from '@elastic/elasticsearch/lib/api/types';
 import { Preparation, Sample } from '@kotka/shared/models';
-import { ExtractorValueMappingService } from '../mapper/extractor-value-mapping.service';
+import { ExtractorFieldMappingService } from '../mapper/extractor-field-mapping.service';
 import { AutocompleteExtractorService, ExtractorInterface } from '@kotka/api/elasticsearch';
+import { sampleConfig } from './config/sample.config';
 
 const open = [
   'collectionID',
@@ -44,56 +45,20 @@ const autocomplete: string[] = [
 ];
 
 const sampleProperties: Record<string, any> = {
-  'sampleMeasurement': {
-    'type': 'object',
-  },
-  'sampleDocumentURI': {
-    'type': 'keyword'
-  },
-  'sampleDocumentID': {
-    'type': 'keyword'
-  },
-  'sampleDocumentQName': {
-    'type': 'keyword'
-  },
-  'sampleObjectID': {
-    'type': 'long',
-  },
-  'sampleDateCreated': {
-    'type': 'date',
-    'format': 'yyyy-MM-dd\'T\'HH:mm:ss||date||yyyy-MM-dd\'T\'HH:mm:ss||yyyy'
-  },
+
 };
 
 @Injectable()
 export class SampleExtractorService extends BaseExtractorService {
   constructor(
     private readonly autocompleteExtractorService: AutocompleteExtractorService,
-    protected readonly valueMappingService: ExtractorValueMappingService,
+    protected readonly valueMappingService: ExtractorFieldMappingService,
   ) {
-    super();
-    this.open = open;
-    this.removeNewLine = removeNewLine;
-    this.mapOpenedValuesTo = mapOpenedValuesTo;
-    this.type = 'sample';
-    this.remove = [...this.remove, ...remove];
-    this.autocompleteFields = autocomplete;
+    super(sampleConfig);
   }
 
   getIndex() {
     return super.getIndex();
-  }
-
-  getMapping() {
-    const baseMapping = super.getMapping();
-
-    baseMapping.properties = { ...baseMapping.properties, ...sampleProperties };
-
-    return baseMapping;
-  }
-
-  getProperties() {
-    return sampleProperties;
   }
 
   async addToBulk(document: ElasticBaseUnit & { samples?: Sample[] }, bulk: BulkRequest): Promise<undefined | ElasticSample[]> {
@@ -108,7 +73,7 @@ export class SampleExtractorService extends BaseExtractorService {
     for (const sample of samples) {
       const sampleRow = await this.createSampleRow(row, sample, bulk);
 
-      await this.autocompleteExtractorService.addToBulk(sampleRow, bulk, this.autocompleteFields);
+      await this.autocompleteExtractorService.addToBulk(sampleRow, bulk, this.config.autocompleteFields);
 
       sampleRows.push(sampleRow);
     }

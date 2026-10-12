@@ -1,30 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { getPrefixAndId, getUri } from '@kotka/shared/utils';
 import { ElasticBaseUnit, ElasticRowBases, EsMeasurement, MeasurementsStrings, NonPrefixedElasticSample, ElasticIndex, ArrayedObjects } from '@kotka/shared/models';
 import { BulkRequest, IndicesIndexSettingsKeys, MappingTypeMapping } from '@elastic/elasticsearch/lib/api/types';
 import { ExtractorInterface, REPLICAS, SHARDS } from '@kotka/api/elasticsearch';
-import { ExtractorValueMappingService } from '../mapper/extractor-value-mapping.service';
+import { ExtractorFieldMappingService } from '../mapper/extractor-field-mapping.service';
+import { ExtractorConfig, INDEX_PREFIX, baseConfig, mergeConfig } from './config/base.config';
 
-@Injectable()
 export class BaseExtractorService implements ExtractorInterface {
-  protected readonly valueMappingService!: ExtractorValueMappingService;
-  open: string[] = [];
-  type?: string;
-  mapOpenedIdsTo: { [key: string]: string } = {};
-  mapOpenedValuesTo: { [key: string]: string } = {};
-  remove = [
-    'notes',
-    '@type',
-    '@context',
-    'isPartOf'
-  ];
-  removeNewLine: string[] = [];
-  keyValueFields: { [k: string]: string } = {};
-  autocompleteFields: string[] = [];
+  protected readonly valueMappingService: ExtractorFieldMappingService;
+  constructor(
+    parentConfig: ExtractorConfig,
+  ) {
+    this.config = mergeConfig(parentConfig);
+  }
 
-  protected readonly FORMAT_DATETIME = 'yyyy-MM-dd HH:mm:ss';
-  protected readonly INDEX_PREFIX = 'specimen';
-  protected readonly DEFAULT_INDEX = 'unit';
+  protected readonly config: ExtractorConfig;
 
   extractIDs(row: any) {
     const id = row.id!;
@@ -50,169 +40,15 @@ export class BaseExtractorService implements ExtractorInterface {
   }
 
   getIndex(): ElasticIndex {
-    return `${this.INDEX_PREFIX}_${this.type || this.DEFAULT_INDEX}` as ElasticIndex;
+    return `${INDEX_PREFIX}_${this.config.type}` as ElasticIndex;
   }
 
   getMapping() {
-    const baseMapping: MappingTypeMapping = {
-      'dynamic_templates': [
-        {
-          'generic': {
-            'match': '*',
-            'mapping': {
-              'type': 'text',
-              'fields': {
-                'raw': {'type': 'keyword'}
-              }
-            }
-          },
-        },
-      ],
-      'date_detection': false,
-      'properties': {
-        'id': {
-          'type': 'keyword'
-        },
-        'firstInDocument': {
-          'type': 'boolean'
-        },
-        'acquisitionDate': {
-          'type': 'date',
-          'format': 'date',
-          'fields': {'raw': {'type': 'keyword'}}
-        },
-        'branchLocationTree': {
-          'type': 'text',
-        },
-        'branchLocationID': {
-          'type': 'keyword'
-        },
-        'accessionLocationID': {
-          'type': 'keyword'
-        },
-        'branchID': {
-          'type': 'keyword'
-        },
-        'sampleExists': {
-          'type': 'boolean'
-        },
-        'collectionID': {
-          'type': 'keyword'
-        },
-        'collectionTree': {
-          'type': 'text',
-        },
-        'datasetID': {
-          'type': 'keyword'
-        },
-        'dateBegin': {
-          'type': 'date',
-          'format': 'date',
-          'fields': {'raw': {'type': 'keyword'}}
-        },
-        'dateCreated': {
-          'type': 'date',
-          'format': this.FORMAT_DATETIME + '||date||yyyy-MM-dd\'T\'HH:mm:ss'
-        },
-        'dateEdited': {
-          'type': 'date',
-          'format': this.FORMAT_DATETIME + '||date||yyyy-MM-dd\'T\'HH:mm:ss'
-        },
-        'dateEnd': {
-          'type': 'date',
-          'format': 'date',
-          'fields': {'raw': {'type': 'keyword'}}
-        },
-        'documentURI': {
-          'type': 'keyword'
-        },
-        'documentID': {
-          'type': 'keyword'
-        },
-        'documentQName': {
-          'type': 'keyword'
-        },
-        'eventDate': {
-          'type': 'date',
-          'format': this.FORMAT_DATETIME + '||date||yyyy-MM-dd\'T\'HH:mm:ss||yyyy-MM-dd||yyyy'
-        },
-        'gatheringCount': {
-          'type': 'integer'
-        },
-        'hasPicture': {
-          'type': 'boolean'
-        },
-        'pictureCount': {
-          'type': 'integer'
-        },
-        'identificationCount': {
-          'type': 'integer'
-        },
-        'isType': {
-          'type': 'boolean'
-        },
-        'measurement': {
-          'type': 'object'
-        },
-        'relationship': {
-          'type': 'object'
-        },
-        'namespace': {
-          'type': 'keyword'
-        },
-        'objectID': {
-          'type': 'long'
-        },
-        'specimenCount': {
-          'type': 'integer'
-        },
-        'typeCount': {
-          'type': 'integer'
-        },
-        'unitCount': {
-          'type': 'integer'
-        },
-        'sampleCount': {
-          'type': 'integer'
-        },
-        'wgs84Latitude': {
-          'type': 'float',
-          'fields': {'raw': {'type': 'keyword'}}
-        },
-        'wgs84Location': {
-          'type': 'geo_point'
-        },
-        'wgs84Longitude': {
-          'type': 'float',
-          'fields': {'raw': {'type': 'keyword'}}
-        },
-      }
-    };
-
-    return baseMapping;
+    return this.config.elasticMapping;
   }
 
   getSettings(): IndicesIndexSettingsKeys {
-    return {
-      number_of_shards: SHARDS,
-      number_of_replicas: REPLICAS,
-      max_result_window: 5000000,
-      analysis: {
-        filter: {
-          kotka_folding: {
-            type: 'icu_folding',
-            unicode_set_filter: '[^åäöÅÄÖ]'
-          },
-        },
-        analyzer: {
-          default: {
-            type: 'custom',
-            tokenizer: 'standard',
-            filter: ['lowercase', 'kotka_folding']
-          }
-        }
-      }
-    };
+    return this.config.elasticSettings;
   }
 
   getRelatedExtracts(): ExtractorInterface[] {
@@ -246,7 +82,7 @@ export class BaseExtractorService implements ExtractorInterface {
   }
 
   removeNewLineFromFields<T>(row: T) {
-    this.removeNewLine.forEach((key) => {
+    this.config.removeNewLine.forEach((key) => {
       if (row[key as keyof T] !== undefined) {
         const value = row[key as keyof T] as string | string[];
 
@@ -260,8 +96,8 @@ export class BaseExtractorService implements ExtractorInterface {
   }
 
   extractKeyValueFields<T>(row: T) {
-  Object.keys(this.keyValueFields).forEach((key) => {
-    const delimiter = this.keyValueFields[key];
+  Object.keys(this.config.keyValueFields).forEach((key) => {
+    const delimiter = this.config.keyValueFields[key];
     const value = row[key as keyof T];
 
     if (value) {
@@ -286,7 +122,7 @@ export class BaseExtractorService implements ExtractorInterface {
 
 
   removeUnwantedFields<T>(row: T) {
-    this.remove.forEach((key) => {
+    this.config.remove.forEach((key) => {
       if (row[key as keyof T]) {
         delete row[key as keyof T];
       }
@@ -294,7 +130,7 @@ export class BaseExtractorService implements ExtractorInterface {
   }
 
   async openValues<T>(row: T) {
-    for (const key of this.open) {
+    for (const key of this.config.open) {
       if (row[key as keyof T]) {
         const value = row[key as keyof T];
 
@@ -302,21 +138,21 @@ export class BaseExtractorService implements ExtractorInterface {
 
         if (Array.isArray(value)) {
           newValue = await Promise.all(value.map(async val => {
-            const newVal = await this.valueMappingService.getValueMapping(val as string, key);
+            const newVal = await this.valueMappingService.getFieldValueMapping(val as string, key);
 
             return newVal ?? val as string;
           }));
         } else {
-          newValue = await this.valueMappingService.getValueMapping(value as string, key);
+          newValue = await this.valueMappingService.getFieldValueMapping(value as string, key);
         }
 
-        if (Object.keys(this.mapOpenedIdsTo).includes(key)) {
-          const newKey = this.mapOpenedIdsTo[key as keyof typeof this.mapOpenedIdsTo];
+        if (Object.keys(this.config.mapOpenedIdsTo).includes(key)) {
+          const newKey = this.config.mapOpenedIdsTo[key as keyof typeof this.config.mapOpenedIdsTo];
 
           (row[newKey as keyof T] as any) = row[key as keyof T];
           (row[key as keyof T] as any) = newValue as any;
-        } else if (Object.keys(this.mapOpenedValuesTo).includes(key)) {
-          const newKey = this.mapOpenedValuesTo[key as keyof typeof this.mapOpenedValuesTo];
+        } else if (Object.keys(this.config.mapOpenedValuesTo).includes(key)) {
+          const newKey = this.config.mapOpenedValuesTo[key as keyof typeof this.config.mapOpenedValuesTo];
 
           (row[newKey as keyof T] as any) = newValue as any;
         } else {

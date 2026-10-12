@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { SpecimenExtractorService } from '../extractor/specimen-extractor.service';
 import { EsClientService, AutocompleteExtractorService } from '@kotka/api/elasticsearch';
 import { Document, ElasticDocument, IndexType, ElasticIndex } from '@kotka/shared/models';
+import { ExtractorFieldMappingService } from '../mapper/extractor-field-mapping.service';
 
 @Injectable()
 export class SpecimenSearchService {
@@ -9,6 +10,7 @@ export class SpecimenSearchService {
     private readonly esClientService: EsClientService,
     private readonly specimenExtractorService: SpecimenExtractorService,
     private readonly autocompleteExtractorService: AutocompleteExtractorService,
+    private readonly extractorFieldMappingService: ExtractorFieldMappingService
   ) {}
 
   async indexSingle(specimen: Document) {
@@ -20,7 +22,52 @@ export class SpecimenSearchService {
   }
 
   async getIndexedFields(type: IndexType) {
-    return await this.esClientService.getMappedFields(this.getSearchIndex(type));
+    const fields = await this.extractorFieldMappingService.getFormFields();
+
+    return await this.esClientService.getMappedFields(this.getSearchIndex(type)).then(res => {
+      return res.map(field => {
+        let label = fields[field.field]?.label;
+
+        if (field.field.toLowerCase().includes('measurement')) {
+          const [parent, child ] = field.field.split('.').slice(-2);
+
+          const parentLabel = fields[parent]?.label;
+          const childLabel = fields[child]?.label;
+
+          label = `${parentLabel}: ${childLabel}`;
+
+          return {
+            ...field,
+            ...fields[parent],
+            label,
+          };
+        }
+
+        if (field.field.includes('relationship')) {
+          const [parent, child ] = field.field.split('.').slice(-2);
+
+          const parentLabel = fields[parent]?.label;
+
+          label = `${parentLabel}: ${child.charAt(0).toUpperCase() + child.slice(1)}`;
+
+            return {
+            ...field,
+            ...fields[parent],
+            label,
+          };
+        }
+
+        const schemaField = fields[field.field];
+        if(schemaField) {
+          return {
+            ...field,
+            ...schemaField,
+          }
+        }
+
+        return field;
+      });
+    });
   }
 
   async getAutocompleteSuggestions(field: string, query: string, limit: number) {

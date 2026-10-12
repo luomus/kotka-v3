@@ -116,7 +116,9 @@ export class EsClientService {
 
   async deleteIndex(index: ElasticIndex | ElasticIndex[]) {
     await this.elasticsearchService.indices.delete({
-      index
+      index,
+      allow_no_indices: true,
+      ignore_unavailable: true
     });
   }
 
@@ -234,7 +236,7 @@ export class EsClientService {
         const field = mapping.properties![key];
 
         if (field.type && field.type !== 'object') {
-          return path.push({ field: parent ? `${parent}.${key}` : key, type: field.type });
+          path.push({ field: parent ? `${parent}.${key}` : key, type: field.type, hasRaw: !!field.fields?.raw });
         } else {
           this.traverseMapping(field as MappingTypeMapping, path, parent ? `${parent}.${key}` : key);
         }
