@@ -1,10 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
 import { getPrefixAndId, getUri } from '@kotka/shared/utils';
 import { ElasticBaseUnit, ElasticRowBases, EsMeasurement, MeasurementsStrings, NonPrefixedElasticSample, ElasticIndex, ArrayedObjects } from '@kotka/shared/models';
-import { BulkRequest, IndicesIndexSettingsKeys, MappingTypeMapping } from '@elastic/elasticsearch/lib/api/types';
-import { ExtractorInterface, REPLICAS, SHARDS } from '@kotka/api/elasticsearch';
+import { BulkRequest, IndicesIndexSettingsKeys } from '@elastic/elasticsearch/lib/api/types';
+import { ExtractorInterface } from '@kotka/api/elasticsearch';
 import { ExtractorFieldMappingService } from '../mapper/extractor-field-mapping.service';
-import { ExtractorConfig, INDEX_PREFIX, baseConfig, mergeConfig } from './config/base.config';
+import { ExtractorConfig, INDEX_PREFIX, mergeConfig } from './config/base.config';
 
 export class BaseExtractorService implements ExtractorInterface {
   protected readonly valueMappingService: ExtractorFieldMappingService;

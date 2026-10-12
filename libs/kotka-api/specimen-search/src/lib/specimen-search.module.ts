@@ -3,7 +3,6 @@ import { ExtractorFieldMappingService } from './mapper/extractor-field-mapping.s
 import { TypeExtractorService } from './extractor/type-extractor.service';
 import { ElasticModule } from '@kotka/api/elasticsearch';
 import { Module } from '@nestjs/common';
-import { BaseExtractorService } from './extractor/base-extractor.service';
 import { IdentificationExtractorService } from './extractor/identification-extractor.service';
 import { SampleExtractorService } from './extractor/sample-extractor.service';
 import { SpecimenExtractorService } from './extractor/specimen-extractor.service';

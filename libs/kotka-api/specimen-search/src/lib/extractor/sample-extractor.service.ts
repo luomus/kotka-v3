@@ -3,56 +3,13 @@ import { BaseExtractorService } from './base-extractor.service';
 import { ElasticSample, NonPrefixedElasticSample, ElasticBaseUnit } from '@kotka/shared/models';
 import { BulkRequest } from '@elastic/elasticsearch/lib/api/types';
 import { Preparation, Sample } from '@kotka/shared/models';
-import { ExtractorFieldMappingService } from '../mapper/extractor-field-mapping.service';
 import { AutocompleteExtractorService, ExtractorInterface } from '@kotka/api/elasticsearch';
 import { sampleConfig } from './config/sample.config';
-
-const open = [
-  'collectionID',
-  'creator',
-  'datasetID',
-  'editor',
-  'elutionMedium',
-  'material',
-  'microbiologicalRiskGroup',
-  'owner',
-  'preservation',
-  'quality',
-  'qualityCheckMethod',
-  'status',
-  'preparationProcess',
-  'preparationMaterials',
-  'preparationType',
-];
-
-const remove = [
-  'preparations',
-  'publicityRestrictions'
-];
-
-const removeNewLine = [
-  'sampleHistory',
-];
-
-const mapOpenedValuesTo = {
-  'datasetID': 'dataset',
-  'collectionID': 'collection',
-};
-
-const autocomplete: string[] = [
-  'sampleDataset',
-  'sampleCollection',
-];
-
-const sampleProperties: Record<string, any> = {
-
-};
 
 @Injectable()
 export class SampleExtractorService extends BaseExtractorService {
   constructor(
-    private readonly autocompleteExtractorService: AutocompleteExtractorService,
-    protected readonly valueMappingService: ExtractorFieldMappingService,
+    private readonly autocompleteExtractorService: AutocompleteExtractorService
   ) {
     super(sampleConfig);
   }

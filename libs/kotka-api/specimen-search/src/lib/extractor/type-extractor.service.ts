@@ -3,15 +3,13 @@ import { BaseExtractorService } from './base-extractor.service';
 import { ElasticBaseUnit, ElasticType, ElasticTypeRow } from '@kotka/shared/models';
 import { BulkRequest } from '@elastic/elasticsearch/lib/api/types';
 import { TypeSpecimen } from '@luomus/laji-schema/models';
-import { ExtractorFieldMappingService } from '../mapper/extractor-field-mapping.service';
 import { AutocompleteExtractorService, ExtractorInterface } from '@kotka/api/elasticsearch';
 import { typeSpecimenConfig } from './config/type-specimen.config';
 
 @Injectable()
 export class TypeExtractorService extends BaseExtractorService {
   constructor(
-    private readonly autocompleteExtractorService: AutocompleteExtractorService,
-    protected readonly valueMappingService: ExtractorFieldMappingService,
+    private readonly autocompleteExtractorService: AutocompleteExtractorService
   ) {
     super(typeSpecimenConfig);
   }
@@ -28,7 +26,7 @@ export class TypeExtractorService extends BaseExtractorService {
     for (const typeSpecimen of typeSpecimens) {
       const type = await this.createTypeSpecimenRow(row, typeSpecimen, bulk);
 
-      const typeRow: ElasticTypeRow = { ...row, ...type }
+      const typeRow: ElasticTypeRow = { ...row, ...type };
 
       this.autocompleteExtractorService.addToBulk(typeRow, bulk, this.config.autocompleteFields);
 

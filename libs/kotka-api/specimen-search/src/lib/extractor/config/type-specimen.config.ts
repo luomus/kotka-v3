@@ -1,4 +1,4 @@
-import { ExtractorConfig } from "./base.config";
+import { ExtractorConfig } from './base.config';
 
 export const typeSpecimenConfig: ExtractorConfig = {
   type: 'typespecimen',

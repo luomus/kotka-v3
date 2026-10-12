@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BaseExtractorService } from './base-extractor.service';
-import { BulkRequest, MappingTypeMapping } from '@elastic/elasticsearch/lib/api/types';
+import { BulkRequest } from '@elastic/elasticsearch/lib/api/types';
 import { ExtractorFieldMappingService } from '../mapper/extractor-field-mapping.service';
 import { ElasticBaseUnit, ElasticIdentification } from '@kotka/shared/models';
 import { Identification } from '@kotka/shared/models';
@@ -8,38 +8,6 @@ import { identificationSort } from '@kotka/shared/utils';
 import { TaxonLinkingService } from '@kotka/api/taxon-linking';
 import { AutocompleteExtractorService, ExtractorInterface } from '@kotka/api/elasticsearch';
 import { identificationConfig } from './config/identification.config';
-
-const open = [
-  'infraRank',
-  'publicityRestrictions',
-  'taxonRank',
-  'endangeredStatus',
-];
-
-const removeNewLine = [
-  'identificationNotes',
-];
-
-const autocomplete = [
-  'author',
-  'branchLocation',
-  'det',
-  'detVerbatim',
-  'endangeredStatus',
-  'genusQualifier',
-  'host',
-  'identificationNotes',
-  'infraAuthor',
-  'infraEpithet',
-  'sec',
-  'speciesQualifier',
-  'taxon',
-  'taxonVerbatim',
-];
-
-const remove = [
-  'publicityRestrictions'
-];
 
 @Injectable()
 export class IdentificationExtractorService extends BaseExtractorService {

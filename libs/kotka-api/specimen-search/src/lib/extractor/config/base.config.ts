@@ -1,5 +1,5 @@
-import { MappingTypeMapping, IndicesIndexSettingsKeys } from "@elastic/elasticsearch/lib/api/types";
-import { REPLICAS, SHARDS } from "@kotka/api/elasticsearch";
+import { MappingTypeMapping, IndicesIndexSettingsKeys } from '@elastic/elasticsearch/lib/api/types';
+import { REPLICAS, SHARDS } from '@kotka/api/elasticsearch';
 import { merge } from 'lodash';
 
 export const FORMAT_DATETIME = 'yyyy-MM-dd HH:mm:ss';

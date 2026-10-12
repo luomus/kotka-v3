@@ -38,7 +38,7 @@ export class IndexCommand {
     let countMismatch = false;
 
     const spin = ora();
-    spin.start(`Indexing...`);
+    spin.start('Indexing...');
 
     try {
       let stop = false;

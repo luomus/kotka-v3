@@ -19,7 +19,7 @@ import { Identification, Sample, TypeSpecimen, MediaType } from '@kotka/shared/m
 import { MediaApiService } from '@kotka/api/services';
 import { lastValueFrom } from 'rxjs';
 import { AutocompleteExtractorService } from '@kotka/api/elasticsearch';
-import { assignWith } from 'lodash'
+import { assignWith } from 'lodash';
 import { specimenConfig } from './config/specimen.config';
 
 @Injectable()
@@ -88,7 +88,7 @@ export class SpecimenExtractorService extends BaseExtractorService {
 
             unit.sampleExists = !!unit.samples?.length;
 
-            let unitRow: ElasticBaseUnit = await this.createSpecimenRow(bulk, id, document, gathering, unit);
+            const unitRow: ElasticBaseUnit = await this.createSpecimenRow(bulk, id, document, gathering, unit);
 
             await this.autocompleteExtractorService.addToBulk(unitRow, bulk, this.config.autocompleteFields);
 

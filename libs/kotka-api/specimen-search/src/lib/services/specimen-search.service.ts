@@ -62,7 +62,7 @@ export class SpecimenSearchService {
           return {
             ...field,
             ...schemaField,
-          }
+          };
         }
 
         return field;

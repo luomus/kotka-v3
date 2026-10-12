@@ -38,7 +38,7 @@ const levelConfigs = {
   sample: sampleConfig,
   identification: identificationConfig,
   typespecimen: typeSpecimenConfig,
-}
+};
 
 interface CollectionTreeNode {
   id: string;
@@ -305,7 +305,7 @@ export class ExtractorFieldMappingService {
       return;
     }
 
-    let level = path.split('.').slice(-1)[0];
+    const level = path.split('.').slice(-1)[0];
 
     const { autocompleteFields, remove } = levelConfigs[level] || {};
 
@@ -320,7 +320,7 @@ export class ExtractorFieldMappingService {
     }
 
     if (!enums[KEY_FORM_FIELD_ROOT]) {
-      enums[KEY_FORM_FIELD_ROOT] = {}
+      enums[KEY_FORM_FIELD_ROOT] = {};
     }
 
     const hardCodedField = levelConfigs[level]?.hardCodedFields?.[key];

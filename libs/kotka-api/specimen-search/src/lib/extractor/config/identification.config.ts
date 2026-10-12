@@ -1,4 +1,4 @@
-import { ExtractorConfig } from "./base.config";
+import { ExtractorConfig } from './base.config';
 
 export const identificationConfig: ExtractorConfig = {
   type: 'identification',
@@ -73,4 +73,4 @@ export const identificationConfig: ExtractorConfig = {
       level: 'identification',
     },
   }
-}
+};
