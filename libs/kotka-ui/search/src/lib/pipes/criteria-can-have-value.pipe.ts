@@ -7,8 +7,8 @@ import { SEARCH_OPERATOR_MAP } from '../constants';
   pure: true,
 })
 export class CriteriaCanHaveValuePipe implements PipeTransform {
-  transform(value: SearchCriteria): boolean {
+  transform(value: SearchCriteria, isSecondValue = false): boolean {
     const operatorInfo = SEARCH_OPERATOR_MAP[value.operator];
-    return !operatorInfo.noValue;
+    return isSecondValue ? operatorInfo.twoValues || false : !operatorInfo.noValue;
   }
 }

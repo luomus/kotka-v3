@@ -11,6 +11,7 @@ export interface SearchOperatorInfo {
   id: SearchOperator;
   label: string;
   noValue?: boolean;
+  twoValues?: boolean;
 }
 
 export interface SearchCriteria {

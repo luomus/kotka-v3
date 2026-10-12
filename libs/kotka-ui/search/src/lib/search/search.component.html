@@ -24,12 +24,12 @@
   <div class="card-body">
     @if (mode() === 'builder') {
       <kui-search-builder
-        [fields]="fields()"
+        [fields]="filteredFields()"
         [(text)]="text"
       ></kui-search-builder>
     } @else {
       <kui-text-search
-        [fields]="fields()"
+        [fields]="filteredFields()"
         [(text)]="text"
       ></kui-text-search>
     }

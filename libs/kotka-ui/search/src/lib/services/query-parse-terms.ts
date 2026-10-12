@@ -1,5 +1,5 @@
 import { JoinOperator } from '../models';
-import { ESCAPE_CHARACTERS } from './query-stringify';
+import { ESCAPED_CHARACTERS } from './query-stringify';
 
 export type ValueType = 'exact' | 'contains' | 'startsWith' | 'endsWith' | undefined;
 
@@ -185,7 +185,7 @@ function unescapeValue(value: string): string {
       }
       escapeNext = true;
     } else {
-      if (ESCAPE_CHARACTERS.includes(char) && !escapeNext) {
+      if (ESCAPED_CHARACTERS.includes(char) && !escapeNext) {
         throw new Error('Contains unescaped special character');
       }
       escapeNext = false;

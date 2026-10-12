@@ -40,21 +40,38 @@
                 [ngModel]="criteria.operator"
                 (ngModelChange)="setOperator(groupIdx, critIdx, $event)"
               >
-                @for (operator of operators; track operator.id) {
+                @for (operator of (criteria.field | operatorsForField: fieldTypes()); track operator.id) {
                   <option [value]="operator.id">{{ operator.label }}</option>
                 }
               </select>
             </div>
 
             <div class="col">
-              @if (criteria | criteriaCanHaveValue) {
-                <input
-                  class="form-control"
-                  placeholder="Value"
-                  [ngModel]="criteria.value"
-                  (ngModelChange)="setValue(groupIdx, critIdx, $event)"
-                />
-              }
+              <div class="row g-2">
+                <div class="col">
+                  @if (criteria | criteriaCanHaveValue) {
+                    <input
+                      class="form-control"
+                      placeholder="Value"
+                      [ngModel]="criteria.value"
+                      (ngModelChange)="setValue(groupIdx, critIdx, $event)"
+                    />
+                  }
+                </div>
+                @if (criteria | criteriaCanHaveValue:true) {
+                  <div class="col col-auto align-self-center">
+                    TO
+                  </div>
+                  <div class="col">
+                    <input
+                      class="form-control"
+                      placeholder="Value"
+                      [ngModel]="criteria.value2"
+                      (ngModelChange)="setValue(groupIdx, critIdx, $event, true)"
+                    />
+                  </div>
+                }
+              </div>
             </div>
 
             <div class="col col-auto align-self-center me-3">

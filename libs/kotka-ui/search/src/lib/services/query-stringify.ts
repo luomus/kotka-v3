@@ -6,7 +6,7 @@ import {
 } from '../models';
 import { SEARCH_OPERATOR_MAP } from '../constants';
 
-export const ESCAPE_CHARACTERS: string[] = [
+export const ESCAPED_CHARACTERS: string[] = [
   '\\',
   '*',
   '?',
@@ -22,8 +22,6 @@ export const ESCAPE_CHARACTERS: string[] = [
   '[',
   ']',
   '^',
-  '>',
-  '<',
   '~',
   ':',
   '"',
@@ -31,6 +29,7 @@ export const ESCAPE_CHARACTERS: string[] = [
   '/',
   ' ',
 ];
+export const REMOVED_CHARACTERS: string[] = ['>', '<'];
 
 export function builderQueryToQueryString(query: BuilderQuery): string {
   const results = query.groups
@@ -136,13 +135,23 @@ export function escapeFilterString(
     return '';
   }
 
-  let escapedChars = ESCAPE_CHARACTERS;
+  let escapedChars = ESCAPED_CHARACTERS;
+  let removedChars = REMOVED_CHARACTERS;
+
   if (operator === 'equals' || operator === 'notEqual') {
-    escapedChars = ['"'];
+    escapedChars = ['\\', '"'];
+    removedChars = [];
+  } else if (operator === 'inRange') {
+    escapedChars = ['\\'];
+    removedChars = [']', '}'];
   }
 
   escapedChars.forEach((char) => {
     value = value!.split(char).join('\\' + char);
+  });
+
+  removedChars.forEach((char) => {
+    value = value!.split(char).join('');
   });
 
   return value;

@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
   input,
   model,
@@ -21,10 +22,11 @@ import {
 import { SEARCH_OPERATORS } from '../constants';
 import { CriteriaCanHaveValuePipe } from '../pipes/criteria-can-have-value.pipe';
 import { SearchField } from '@kotka/shared/models';
+import { OperatorsForFieldPipe, getOperatorsForType } from '../pipes/operators-for-field.pipe';
 
 
 function createCriteria(): SearchCriteria {
-  return { field: '', operator: 'contains', value: '' };
+  return { field: '', operator: 'equals', value: '' };
 }
 
 function createGroup(): SearchGroup {
@@ -41,15 +43,23 @@ function createBuilderQuery(): BuilderQuery {
   imports: [
     FormsModule,
     FieldTypeaheadComponent,
-    CriteriaCanHaveValuePipe
+    CriteriaCanHaveValuePipe,
+    OperatorsForFieldPipe
   ],
   templateUrl: './search-builder.component.html',
-  styleUrl: './search-builder.component.scss',
+  styleUrls: ['./search-builder.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchBuilderComponent {
   fields = input<SearchField[]>([]);
   text = model<string>('');
+
+  fieldTypes = computed(() => this.fields().reduce(
+    (types, field) => {
+      types[field.field] = field.type;
+      return types;
+    }, <Record<string, string>>{})
+  );
 
   query = signal<BuilderQuery | null>(null);
 
@@ -80,7 +90,13 @@ export class SearchBuilderComponent {
 
   setField(groupIdx: number, criteriaIdx: number, field: string) {
     this.modifyQuery((query) => {
-      query.groups[groupIdx].criteria[criteriaIdx].field = field;
+      const criteria = query.groups[groupIdx].criteria[criteriaIdx];
+      criteria.field = field;
+
+      const operators = getOperatorsForType(this.fieldTypes()[field]);
+      if (!operators.some(operator => operator.id === criteria.operator)) {
+        criteria.operator = 'equals';
+      }
     });
   }
 
@@ -90,9 +106,13 @@ export class SearchBuilderComponent {
     });
   }
 
-  setValue(groupIdx: number, criteriaIdx: number, value: string) {
+  setValue(groupIdx: number, criteriaIdx: number, value: string, isSecondValue = false) {
     this.modifyQuery((query) => {
-      query.groups[groupIdx].criteria[criteriaIdx].value = value;
+      if (isSecondValue) {
+        query.groups[groupIdx].criteria[criteriaIdx].value2 = value;
+      } else {
+        query.groups[groupIdx].criteria[criteriaIdx].value = value;
+      }
     });
   }
 

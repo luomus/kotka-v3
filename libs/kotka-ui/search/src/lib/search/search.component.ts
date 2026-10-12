@@ -1,7 +1,7 @@
 import {
   ChangeDetectionStrategy,
-  Component, inject,
-  input, model, output,
+  Component, computed, inject,
+  input, model, output, Signal,
   signal, viewChild,
 } from '@angular/core';
 import { SearchBuilderComponent } from '../search-builder/search-builder.component';
@@ -9,6 +9,7 @@ import { TextSearchComponent } from '../text-search/text-search.component';
 import { queryStringToBuilderQuery } from '../services/query-parse';
 import { DialogService } from '@kotka/ui/core';
 import { SearchField } from '@kotka/shared/models';
+import { QUERY_STRING_SUPPORTED_TYPES } from '../constants';
 
 type SearchMode = 'builder' | 'text';
 
@@ -25,12 +26,17 @@ export class SearchComponent {
   text = model<string>('');
   fields = input<SearchField[]>([]);
 
+  filteredFields: Signal<SearchField[]>;
   mode = signal<SearchMode>('builder');
 
   search = output<string>();
   clear = output<void>();
 
   private builder = viewChild(SearchBuilderComponent);
+
+  constructor() {
+    this.filteredFields = computed(() => this.fields().filter(field => QUERY_STRING_SUPPORTED_TYPES.includes(field.type)));
+  }
 
   setMode(mode: SearchMode) {
     if (mode === 'builder') {
