@@ -51,12 +51,12 @@ export class FieldTypeaheadComponent {
     const results: AutocompleteResult[] = this.fields()
       .filter(
         (field) =>
-          field.field?.toLowerCase().includes(term)
-          // || field.label?.toLowerCase().includes(term), TODO when label exists
+          field.label?.toLowerCase().includes(term)
+          || field.field?.toLowerCase().includes(term)
       )
       .map((field) => ({
         key: field.field,
-        value: field.field,
+        value: field.label || field.field,
       }))
       .sort((a, b) => this.scoreMatch(a, term) - this.scoreMatch(b, term));
 
