@@ -1,4 +1,4 @@
-import { parseIdQuery } from './id-query';
+import { parseIdQuery } from './specimen-id-query';
 
 describe('parseIdQuery', () => {
   it('parses a single id', () => {
@@ -17,7 +17,7 @@ describe('parseIdQuery', () => {
         { criteria: [{ field: 'documentID', operator: 'equals', value: 'HT.2' }], joinOperator: 'AND' },
         {
           criteria: [
-            { field: 'namespaceID', operator: 'equals', value: 'HT' },
+            { field: 'namespace', operator: 'equals', value: 'HT' },
             { field: 'objectID', operator: 'inRange', value: '3', value2: '4' },
           ],
           joinOperator: 'AND',
@@ -34,7 +34,7 @@ describe('parseIdQuery', () => {
         { criteria: [{ field: 'documentID', operator: 'equals', value: 'HT.2' }], joinOperator: 'AND' },
         {
           criteria: [
-            { field: 'namespaceID', operator: 'equals', value: 'HT' },
+            { field: 'namespace', operator: 'equals', value: 'HT' },
             { field: 'objectID', operator: 'inRange', value: '3', value2: '4' },
           ],
           joinOperator: 'AND',
@@ -60,7 +60,7 @@ describe('parseIdQuery', () => {
         {
           criteria: [
             { field: 'domain', operator: 'equals', value: 'tun' },
-            { field: 'namespaceID', operator: 'equals', value: 'JA' },
+            { field: 'namespace', operator: 'equals', value: 'JA' },
             { field: 'objectID', operator: 'inRange', value: '12', value2: '23' },
           ],
           joinOperator: 'AND',
@@ -91,7 +91,7 @@ describe('parseIdQuery', () => {
         {
           criteria: [
             { field: 'domain', operator: 'equals', value: 'tun' },
-            { field: 'namespaceID', operator: 'equals', value: 'JA' },
+            { field: 'namespace', operator: 'equals', value: 'JA' },
             { field: 'objectID', operator: 'greaterThanOrEqual', value: '12' },
           ],
           joinOperator: 'AND',
@@ -104,7 +104,7 @@ describe('parseIdQuery', () => {
         {
           criteria: [
             { field: 'domain', operator: 'equals', value: 'tun' },
-            { field: 'namespaceID', operator: 'equals', value: 'JA' },
+            { field: 'namespace', operator: 'equals', value: 'JA' },
             { field: 'objectID', operator: 'lessThanOrEqual', value: '23' },
           ],
           joinOperator: 'AND',

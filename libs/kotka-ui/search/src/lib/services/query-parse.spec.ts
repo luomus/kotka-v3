@@ -70,6 +70,22 @@ describe('Valid queries', () => {
     });
   });
 
+  it('parses range value types into operators', () => {
+    expect(queryStringToBuilderQuery('a:[0 TO 1] AND b:{0 TO *} AND c:{* TO 10]')).toEqual({
+      groups: [
+        {
+          criteria: [
+            { field: 'a', value: '0', value2: '1', operator: 'inRange' },
+            { field: 'b', value: '0', operator: 'greaterThan' },
+            { field: 'c', value: '10', operator: 'lessThanOrEqual' },
+          ],
+          joinOperator: 'AND',
+        },
+      ],
+      joinOperator: 'AND',
+    });
+  });
+
   it('parses negation into the negated operators', () => {
     expect(queryStringToBuilderQuery('NOT a:1 AND NOT b:*2*')).toEqual({
       groups: [

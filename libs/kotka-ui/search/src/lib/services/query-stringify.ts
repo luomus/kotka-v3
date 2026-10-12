@@ -6,6 +6,9 @@ import {
 } from '../models';
 import { SEARCH_OPERATOR_MAP } from '../constants';
 
+const EQUALS_OPERATORS: SearchOperator[] = ['equals', 'notEqual'];
+const RANGE_OPERATORS: SearchOperator[] = ['greaterThan', 'greaterThanOrEqual', 'lessThan', 'lessThanOrEqual', 'inRange'];
+
 export const ESCAPED_CHARACTERS: string[] = [
   '\\',
   '*',
@@ -135,16 +138,8 @@ export function escapeFilterString(
     return '';
   }
 
-  let escapedChars = ESCAPED_CHARACTERS;
-  let removedChars = REMOVED_CHARACTERS;
-
-  if (operator === 'equals' || operator === 'notEqual') {
-    escapedChars = ['\\', '"'];
-    removedChars = [];
-  } else if (operator === 'inRange') {
-    escapedChars = ['\\'];
-    removedChars = [']', '}'];
-  }
+  const escapedChars = getEscapedCharacters(operator);
+  const removedChars = getRemovedCharacters(operator);
 
   escapedChars.forEach((char) => {
     value = value!.split(char).join('\\' + char);
@@ -155,6 +150,30 @@ export function escapeFilterString(
   });
 
   return value;
+}
+
+export function getEscapedCharacters(operator?: SearchOperator): string[] {
+  if (!operator) {
+    return ESCAPED_CHARACTERS;
+  } else if (EQUALS_OPERATORS.includes(operator)) {
+    return ['\\', '"'];
+  } else if (RANGE_OPERATORS.includes(operator)) {
+    return ['\\'];
+  } else {
+    return ESCAPED_CHARACTERS;
+  }
+}
+
+export function getRemovedCharacters(operator?: SearchOperator): string[] {
+  if (!operator) {
+    return REMOVED_CHARACTERS;
+  } else if (EQUALS_OPERATORS.includes(operator)) {
+    return [];
+  } else if (RANGE_OPERATORS.includes(operator)) {
+    return [']', '}'];
+  } else {
+    return REMOVED_CHARACTERS;
+  }
 }
 
 export function joinQueryStrings(joinOperator: JoinOperator, ...queries: string[]): string {

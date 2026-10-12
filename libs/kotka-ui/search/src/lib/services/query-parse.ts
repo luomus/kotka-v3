@@ -107,7 +107,7 @@ function termsToSearchGroup(terms: Term[]): SearchGroup {
     if (type === 'field') {
       currentField = value;
     } else if (type === 'value') {
-      criteria.push(getCriteria(currentField, value, term.valueType, currentIsNegated));
+      criteria.push(getCriteria(currentField, value, term.value2, term.valueType, currentIsNegated));
       currentField = '';
       currentIsNegated = false;
     } else if (type === 'joinOperator') {
@@ -125,7 +125,7 @@ function termsToSearchGroup(terms: Term[]): SearchGroup {
   return { criteria: criteria, joinOperator: joinOperator || 'AND' };
 }
 
-function getCriteria(field: string, value: string, valueType: ValueType, isNegated = false): SearchCriteria {
+function getCriteria(field: string, value: string, value2: string | undefined, valueType: ValueType, isNegated = false): SearchCriteria {
   if (!value) {
     throw new Error('Empty values are not supported');
   }
@@ -135,6 +135,12 @@ function getCriteria(field: string, value: string, valueType: ValueType, isNegat
       field: value,
       value: '',
       operator: isNegated ? 'blank' : 'notBlank'
+    };
+  } else if (valueType === 'equals') {
+    return {
+      field,
+      value,
+      operator: isNegated ? 'notEqual' : 'equals'
     };
   } else if (valueType === 'contains') {
     return {
@@ -156,7 +162,30 @@ function getCriteria(field: string, value: string, valueType: ValueType, isNegat
       );
     }
     return { field, value, operator: 'startsWith' };
-  } else {
-    return { field, value, operator: isNegated ? 'notEqual' : 'equals' };
   }
+
+  if (isNegated) {
+    throw new Error(`Negation is not supported with "${valueType}" operator`);
+  }
+
+  const partlyRangeOperators: ValueType[] = ['greaterThan', 'greaterThanOrEqual', 'lessThan', 'lessThanOrEqual'];
+  if (partlyRangeOperators.includes(valueType)) {
+    return {
+      field,
+      value,
+      operator: valueType
+    };
+  } else if (valueType === 'inRange') {
+    if (!value2) {
+      throw new Error('Empty values are not supported');
+    }
+    return {
+      field,
+      value,
+      value2,
+      operator: 'inRange'
+    };
+  }
+
+  throw new Error('Unknown value type: ' + valueType);
 }

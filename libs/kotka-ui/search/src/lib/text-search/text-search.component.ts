@@ -252,11 +252,11 @@ export class TextSearchComponent {
       '/': 'regex'
     };
 
-    const endCharacter: Record<Exclude<TokenDataItem['isBetween'], undefined>, string> = {
-      quotes: '"',
-      brackets: ']',
-      curlyBrackets: '}',
-      regex: '/',
+    const endCharacters: Record<Exclude<TokenDataItem['isBetween'], undefined>, string[]> = {
+      quotes: ['"'],
+      brackets: [']', '}'],
+      curlyBrackets: [']', '}'],
+      regex: ['/'],
     };
 
     const reset = () => {
@@ -279,7 +279,7 @@ export class TextSearchComponent {
       if (!nextIsEscaped && !isBetween && startCharacter[char]) {
         reset();
         isBetween = startCharacter[char];
-      } else if (!nextIsEscaped && isBetween && endCharacter[isBetween] === char) {
+      } else if (!nextIsEscaped && isBetween && endCharacters[isBetween].includes(char)) {
         reset();
       } else if (!nextIsEscaped && !isBetween && /[\s()]/.test(char)) {
         reset();
