@@ -13,11 +13,13 @@ import { HighlightMatchPipe } from '@kotka/ui/core';
   selector: 'kui-field-typeahead',
   template: `
     <kui-autocomplete
-      [(value)]="value"
+      [value]="value()"
       [placeholder]="placeholder()"
       [minCharacters]="0"
       [resultTemplate]="resultTemplate"
       [fetchResultsFunc]="fetchResultsFunc"
+      [showSuggestionsLoadingSpinner]="false"
+      (valueChange)="value.set($event || '')"
     ></kui-autocomplete>
     <ng-template #resultTemplate let-option="result" let-term="term">
       <span>

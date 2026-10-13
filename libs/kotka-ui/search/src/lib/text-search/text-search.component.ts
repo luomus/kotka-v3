@@ -70,6 +70,11 @@ const SPECIAL_OPERATOR_SUGGESTIONS: AutocompleteSuggestion[] = [
   { value: '_exists_', suffix: ': "' },
 ];
 
+const BOOLEAN_SUGGESTIONS: AutocompleteSuggestion[] = [
+  { value: 'true', suffix: '" ' },
+  { value: 'false', suffix: '" ' },
+];
+
 const SUGGESTION_LIMIT = 10;
 
 const isRangeTokenDataItem = (item: TokenDataItem): item is RangeTokenDataItem => (item.isBetween === 'brackets' || item.isBetween === 'curlyBrackets');
@@ -187,14 +192,14 @@ export class TextSearchComponent {
       if (field && field.type !== 'unknown') {
         if (field.type === 'exists') {
           return this.fieldValueSuggestions();
-        }
-
-        if (field.type === 'date') {
+        } else if (field.type === 'date') {
           return { type: 'datepicker', suffix: '" ' };
+        } else if (field.type === 'boolean') {
+          return BOOLEAN_SUGGESTIONS;
+        } else if (field.hasAutocomplete && token.length > 0) {
+          this.fieldValueContext$.next({ field: field.field, query: token });
+          return null;
         }
-
-        this.fieldValueContext$.next({ field: field.field, query: token });
-        return null;
       }
 
       return [];

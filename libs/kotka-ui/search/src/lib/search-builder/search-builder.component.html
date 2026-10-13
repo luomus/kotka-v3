@@ -40,7 +40,7 @@
                 [ngModel]="criteria.operator"
                 (ngModelChange)="setOperator(groupIdx, critIdx, $event)"
               >
-                @for (operator of (criteria.field | operatorsForField: fieldTypes()); track operator.id) {
+                @for (operator of (criteria.field | operatorsForField: fieldMap()); track operator.id) {
                   <option [value]="operator.id">{{ operator.label }}</option>
                 }
               </select>
@@ -50,12 +50,11 @@
               <div class="row g-2">
                 <div class="col">
                   @if (criteria | criteriaCanHaveValue) {
-                    <input
-                      class="form-control"
-                      placeholder="Value"
-                      [ngModel]="criteria.value"
-                      (ngModelChange)="setValue(groupIdx, critIdx, $event)"
-                    />
+                    <kui-search-value-input
+                      [field]="fieldMap()[criteria.field]"
+                      [value]="criteria.value"
+                      (valueChange)="setValue(groupIdx, critIdx, $event)"
+                    ></kui-search-value-input>
                   }
                 </div>
                 @if (criteria | criteriaCanHaveValue:true) {
@@ -63,12 +62,11 @@
                     TO
                   </div>
                   <div class="col">
-                    <input
-                      class="form-control"
-                      placeholder="Value"
-                      [ngModel]="criteria.value2"
-                      (ngModelChange)="setValue(groupIdx, critIdx, $event, true)"
-                    />
+                    <kui-search-value-input
+                      [field]="fieldMap()[criteria.field]"
+                      [value]="criteria.value2 || ''"
+                      (valueChange)="setValue(groupIdx, critIdx, $event, true)"
+                    ></kui-search-value-input>
                   </div>
                 }
               </div>

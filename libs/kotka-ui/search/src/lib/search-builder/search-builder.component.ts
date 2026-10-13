@@ -23,6 +23,7 @@ import { SEARCH_OPERATORS } from '../constants';
 import { CriteriaCanHaveValuePipe } from '../pipes/criteria-can-have-value.pipe';
 import { SearchField } from '@kotka/shared/models';
 import { OperatorsForFieldPipe, getOperatorsForType } from '../pipes/operators-for-field.pipe';
+import { SearchValueInputComponent } from '../search-value-input/search-value-input.component';
 
 
 function createCriteria(): SearchCriteria {
@@ -43,6 +44,7 @@ function createBuilderQuery(): BuilderQuery {
   imports: [
     FormsModule,
     FieldTypeaheadComponent,
+    SearchValueInputComponent,
     CriteriaCanHaveValuePipe,
     OperatorsForFieldPipe
   ],
@@ -54,11 +56,11 @@ export class SearchBuilderComponent {
   fields = input<SearchField[]>([]);
   text = model<string>('');
 
-  fieldTypes = computed(() => this.fields().reduce(
-    (types, field) => {
-      types[field.field] = field.type;
-      return types;
-    }, <Record<string, string>>{})
+  fieldMap = computed(() => this.fields().reduce(
+    (result, field) => {
+      result[field.field] = field;
+      return result;
+    }, <Record<string, SearchField>>{})
   );
 
   query = signal<BuilderQuery | null>(null);
@@ -93,7 +95,7 @@ export class SearchBuilderComponent {
       const criteria = query.groups[groupIdx].criteria[criteriaIdx];
       criteria.field = field;
 
-      const operators = getOperatorsForType(this.fieldTypes()[field]);
+      const operators = getOperatorsForType(field ? this.fieldMap()[field]?.type : undefined);
       if (!operators.some(operator => operator.id === criteria.operator)) {
         criteria.operator = 'equals';
       }

@@ -1,67 +1,21 @@
-import { Component, ElementRef, Injectable, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { IDateAngularComp } from '@ag-grid-community/angular';
 import { IDateParams } from '@ag-grid-community/core';
 import {
   NgbDateAdapter,
   NgbDateParserFormatter,
-  NgbDateStruct,
   NgbInputDatepicker,
 } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
-import { padDayOrMonth } from '@kotka/ui/core';
+import {
+  KotkaDateAdapter,
+  KotkaDateParserFormatter,
+} from '@kotka/ui/components';
 
-/**
- * This Service handles how the date is represented in scripts i.e. ngModel.
- */
-@Injectable()
-export class CustomAdapter extends NgbDateAdapter<Date> {
-  fromModel(value: Date | string | null): NgbDateStruct | null {
-    if (value && typeof value !== 'string') {
-      return {
-        day: value.getDate(),
-        month: value.getMonth() + 1,
-        year: value.getFullYear(),
-      };
-    }
-    return null;
-  }
-
-  toModel(date: NgbDateStruct | null): Date | null {
-    return date ? new Date(date.year, date.month - 1, date.day) : null;
-  }
-}
-
-/**
- * This Service handles how the date is rendered and parsed from keyboard i.e. in the bound input field.
- */
-@Injectable()
-export class CustomDateParserFormatter extends NgbDateParserFormatter {
-  readonly DELIMITER = '.';
-
-  parse(value: string): NgbDateStruct | null {
-    if (value) {
-      const date = value.split(this.DELIMITER);
-      return {
-        day: parseInt(date[0], 10),
-        month: parseInt(date[1], 10),
-        year: parseInt(date[2], 10),
-      };
-    }
-    return null;
-  }
-
-  format(date: NgbDateStruct | null): string {
-    if (date) {
-      return (
-        padDayOrMonth(date.day) +
-        this.DELIMITER +
-        padDayOrMonth(date.month) +
-        this.DELIMITER +
-        date.year
-      );
-    }
-    return '';
-  }
+function finnishDateParserFormatter(): KotkaDateParserFormatter {
+  const parserFormatter = new KotkaDateParserFormatter();
+  parserFormatter.setDateFormat('finnish');
+  return parserFormatter;
 }
 
 @Component({
@@ -107,8 +61,8 @@ export class CustomDateParserFormatter extends NgbDateParserFormatter {
     `,
   ],
   providers: [
-    { provide: NgbDateAdapter, useClass: CustomAdapter },
-    { provide: NgbDateParserFormatter, useClass: CustomDateParserFormatter },
+    { provide: NgbDateAdapter, useClass: KotkaDateAdapter },
+    { provide: NgbDateParserFormatter, useFactory: finnishDateParserFormatter },
   ],
 })
 export class CustomDatepickerComponent implements IDateAngularComp {
