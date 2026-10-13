@@ -24,6 +24,7 @@ import { CriteriaCanHaveValuePipe } from '../pipes/criteria-can-have-value.pipe'
 import { SearchField } from '@kotka/shared/models';
 import { OperatorsForFieldPipe, getOperatorsForType } from '../pipes/operators-for-field.pipe';
 import { SearchValueInputComponent } from '../search-value-input/search-value-input.component';
+import { validateBuilderQueryValues } from '../services/query-validate';
 
 
 function createCriteria(): SearchCriteria {
@@ -53,15 +54,10 @@ function createBuilderQuery(): BuilderQuery {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchBuilderComponent {
-  fields = input<SearchField[]>([]);
   text = model<string>('');
 
-  fieldMap = computed(() => this.fields().reduce(
-    (result, field) => {
-      result[field.field] = field;
-      return result;
-    }, <Record<string, SearchField>>{})
-  );
+  fields = input<SearchField[]>([]);
+  fieldMap = input<Record<string, SearchField>>({});
 
   query = signal<BuilderQuery | null>(null);
 
@@ -170,6 +166,7 @@ export class SearchBuilderComponent {
 
     try {
       query = queryStringToBuilderQuery(queryString);
+      validateBuilderQueryValues(query, this.fieldMap());
     } catch (e) {
       console.warn('Failed to parse query string', e);
       this.query.set(null);

@@ -89,6 +89,7 @@ export class TextSearchComponent {
   private apiClient = inject(ApiClient);
 
   fields = input<SearchField[]>([]);
+  fieldMap = input<Record<string, SearchField>>({});
 
   text = model<string>('');
 
@@ -96,18 +97,12 @@ export class TextSearchComponent {
   suggestions = signal<AutocompleteSuggestions>([]);
   suggestionsLoading = signal(false);
 
-  private fieldMap: Signal<Record<string, SearchField>>;
   private fieldFilterSuggestions: Signal<AutocompleteSuggestion[]>;
   private fieldValueSuggestions: Signal<AutocompleteSuggestion[]>;
 
   private fieldValueContext$ = new Subject<FieldValueContext | null>();
 
   constructor() {
-    this.fieldMap = computed(() => this.fields().reduce((map, field) => {
-      map[field.field] = field;
-      return map;
-    }, <Record<string, SearchField>>{}));
-
     this.fieldFilterSuggestions = computed<AutocompleteSuggestion[]>(() =>
       this.fields().map((field) => ({
         value: field.field,
