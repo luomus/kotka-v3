@@ -71,9 +71,8 @@ export class AutocompleteTextareaComponent {
   private dropdownTargetPosition: Signal<number>;
   private dropdownPosition: Signal<{ top: number; left: number }>;
 
-  private textBeforeCursor = signal('');
-
-  private keepSuggestionsOnBlur = false;
+  private textBeforeCursor = computed(() => this.text().slice(0, this.cursorPosition()));
+  private textAfterCursor = computed(() => this.text().slice(this.cursorPosition()));
 
   constructor() {
     this.dropdownTargetPosition = computed(
@@ -181,9 +180,8 @@ export class AutocompleteTextareaComponent {
       return;
     }
 
-    this.showSuggestions.set(true);
     this.cursorPosition.set(textarea.selectionStart);
-    this.textBeforeCursor.set(textarea.value.slice(0, this.cursorPosition()));
+    this.showSuggestions.set(true);
   }
 
   hideSuggestions() {
@@ -201,21 +199,18 @@ export class AutocompleteTextareaComponent {
       return;
     }
 
-    const cursor = textarea.selectionStart;
-    const value = textarea.value;
-    const tokenStart = cursor - this.token().length;
+    const tokenStart = this.cursorPosition() - this.token().length;
     const insert = suggestion.value + (suggestion.suffix || '');
-    const newText = value.slice(0, tokenStart) + insert + value.slice(cursor);
-    const newCursor = tokenStart + insert.length;
+    const newText = this.textBeforeCursor().slice(0, tokenStart) + insert + this.textAfterCursor();
+    const newCursor = this.cursorPosition() + insert.length;
+
+    textarea.value = newText;
+    textarea.focus();
+    textarea.setSelectionRange(newCursor, newCursor);
 
     this.text.set(newText);
-    this.hideSuggestions();
-
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(newCursor, newCursor);
-      this.updateSuggestions();
-    });
+    this.cursorPosition.set(newCursor);
+    this.showSuggestions.set(true);
   }
 
   onDatepickerMousedown(event: MouseEvent) {
