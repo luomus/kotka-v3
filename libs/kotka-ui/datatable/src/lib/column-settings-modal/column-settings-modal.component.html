@@ -1,16 +1,25 @@
 <div class="modal-body">
   <h1>Select columns</h1>
+  <p>Select columns that are displayed in the result table.</p>
+  <label class="form-label mb-1 fw-semibold" for="columnSearch">
+    Search columns
+  </label>
+  <input
+    id="columnSearch"
+    type="text"
+    class="form-control mb-3"
+    placeholder="Search..."
+    [(ngModel)]="searchText"
+  />
   <ag-grid-angular
     id="columnSettingsGrid"
     class="ag-theme-alpine grid"
     [gridOptions]="gridOptions"
-    [columnDefs]="colDefs"
-    [rowSelection]="'multiple'"
-    [rowMultiSelectWithClick]="true"
+    [columnDefs]="gridColDefs"
     [headerHeight]="0"
     [domLayout]="'autoHeight'"
     (gridReady)="onGridReady($event)"
-    (rowDragMove)="onRowDragMove()"
+    (rowDragMove)="onRowDragMove($event)"
     (rowDragEnd)="onRowDragEnd()"
     (dragStopped)="onDragStopped()"
     (rowSelected)="onRowSelect($event)"
@@ -19,7 +28,7 @@
 <div class="modal-footer">
   <button
     type="button"
-    class="btn btn-default me-auto"
+    class="btn btn-outline-secondary me-auto"
     (click)="resetSettings()"
   >
     Reset settings
@@ -33,7 +42,7 @@
   >
     OK
   </button>
-  <button type="button" class="btn btn-default" (click)="modal.dismiss()">
+  <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">
     Cancel
   </button>
 </div>

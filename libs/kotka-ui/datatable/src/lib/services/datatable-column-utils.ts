@@ -3,6 +3,19 @@ import { ColDef, ColDefWithExtra, ColumnSettings, DatatableColumn, ExtraColDef, 
 type CustomColumnKeyList = TupleUnion<keyof ExtraColDef>;
 
 export function getProcessedColumns(columns: DatatableColumn[]): ColDefWithExtra[] {
+  columns = [...columns].sort((a, b) => {
+    const lockPositionA = a.lockPosition === true ? 'left' : a.lockPosition || undefined;
+    const lockPositionB = b.lockPosition === true ? 'left' : b.lockPosition || undefined;
+
+    if (lockPositionA === lockPositionB) {
+      return 0;
+    } else if (lockPositionA) {
+      return lockPositionA === 'right' ? 1 : -1;
+    } else {
+      return lockPositionB === 'right' ? -1 : 1;
+    }
+  });
+
   return columns.map((col) => {
     const colId = col.colId || col.field;
     if (!colId) {
@@ -36,9 +49,30 @@ export function getDefaultColumnSettings(columns: ColDefWithExtra[], columnSelec
   return { selected, order };
 }
 
-export function getColumnSettingsAfterColumnMove(oldSettings: ColumnSettings, newSelected: string[], changedColId: string): ColumnSettings {
-  const order = getOrderAfterColumnMove(oldSettings, newSelected, changedColId);
-  return { selected: newSelected, order };
+export function getOrderAfterColumnMove(oldOrder: string[], oldVisibleOrder: string[], newVisibleOrder: string[], movedColId: string,): string[] {
+  const order = [...oldOrder];
+
+  if (!oldVisibleOrder.includes(movedColId) || !newVisibleOrder.includes(movedColId)) {
+    return order;
+  }
+
+  const oldSelectedIdx = oldVisibleOrder.indexOf(movedColId);
+  const newSelectedIdx = newVisibleOrder.indexOf(movedColId);
+
+  const oldOrderIdx = order.indexOf(movedColId);
+  let newOrderIndex = oldOrderIdx;
+
+  if (newSelectedIdx < oldSelectedIdx) {
+    newOrderIndex = order.indexOf(newVisibleOrder[newSelectedIdx + 1]);
+  } else if (newSelectedIdx > oldSelectedIdx) {
+    newOrderIndex = order.indexOf(newVisibleOrder[newSelectedIdx - 1]);
+  }
+
+  if (newOrderIndex !== oldOrderIdx) {
+    order.splice(newOrderIndex, 0, order.splice(oldOrderIdx, 1)[0]);
+  }
+
+  return order;
 }
 
 function getColDefsFromColumns(columns: ColDefWithExtra[], settings: ColumnSettings): ColDef[] {
@@ -72,30 +106,4 @@ function removeCustomColumnKeys(columns: ColDefWithExtra[]): ColDef[] {
 
     return col;
   });
-}
-
-function getOrderAfterColumnMove(oldSettings: ColumnSettings, newSelected: string[], colId: string): string[] {
-  const order = [...oldSettings.order];
-
-  if (!oldSettings.selected.includes(colId) || !newSelected.includes(colId)) {
-    return order;
-  }
-
-  const oldSelectedIdx = oldSettings.selected.indexOf(colId);
-  const newSelectedIdx = newSelected.indexOf(colId);
-
-  const oldOrderIdx = order.indexOf(colId);
-  let newOrderIndex = oldOrderIdx;
-
-  if (newSelectedIdx < oldSelectedIdx) {
-    newOrderIndex = order.indexOf(newSelected[newSelectedIdx + 1]);
-  } else if (newSelectedIdx > oldSelectedIdx) {
-    newOrderIndex = order.indexOf(newSelected[newSelectedIdx - 1]);
-  }
-
-  if (newOrderIndex !== oldOrderIdx) {
-    order.splice(newOrderIndex, 0, order.splice(oldOrderIdx, 1)[0]);
-  }
-
-  return order;
 }
