@@ -52,13 +52,19 @@ export class AutocompleteTextareaComponent {
 
   showSuggestions = signal(false);
   activeSuggestionIndex = signal(0);
-  fixedDropdownPosition = signal<{ top: number; left: number }>({ top: 0, left: 0});
+  fixedDropdownPosition = signal<{ top: number; left: number }>({
+    top: 0,
+    left: 0,
+  });
 
   isSpecialAutocomplete = isSpecialAutocomplete;
 
   private textareaRef = viewChild<ElementRef<HTMLTextAreaElement>>('textarea');
   private mirrorRef = viewChild<ElementRef<HTMLDivElement>>('mirror');
-  private datepickerRef = viewChild<NgbDatepicker, ElementRef<HTMLElement>>('datepicker', { read: ElementRef });
+  private datepickerRef = viewChild<NgbDatepicker, ElementRef<HTMLElement>>(
+    'datepicker',
+    { read: ElementRef },
+  );
   private dropdownRef = viewChild<ElementRef<HTMLDivElement>>('dropdown');
 
   private cursorPosition = signal(0);
@@ -67,14 +73,18 @@ export class AutocompleteTextareaComponent {
 
   private textBeforeCursor = signal('');
 
+  private keepSuggestionsOnBlur = false;
+
   constructor() {
-    this.dropdownTargetPosition = computed(() => this.cursorPosition() - this.token().length);
+    this.dropdownTargetPosition = computed(
+      () => this.cursorPosition() - this.token().length,
+    );
 
     this.dropdownPosition = computed(() =>
       this.getDropdownPosition(
         this.mirrorRef()?.nativeElement,
         this.textareaRef()?.nativeElement,
-        this.dropdownTargetPosition()
+        this.dropdownTargetPosition(),
       ),
     );
 
@@ -82,14 +92,21 @@ export class AutocompleteTextareaComponent {
       let fixedPosition = this.dropdownPosition();
 
       setTimeout(() => {
-        const elem = this.datepickerRef()?.nativeElement || this.dropdownRef()?.nativeElement;
-        const textareaLeft = this.textareaRef()?.nativeElement.getBoundingClientRect().left;
+        const elem =
+          this.datepickerRef()?.nativeElement ||
+          this.dropdownRef()?.nativeElement;
+        const textareaLeft =
+          this.textareaRef()?.nativeElement.getBoundingClientRect().left;
 
         if (elem && textareaLeft !== undefined) {
           const width = elem.getBoundingClientRect().width;
 
-          const maxLeft = this.document.documentElement.clientWidth - textareaLeft - width;
-          fixedPosition = { ...fixedPosition, left: Math.min(fixedPosition.left, maxLeft) };
+          const maxLeft =
+            this.document.documentElement.clientWidth - textareaLeft - width;
+          fixedPosition = {
+            ...fixedPosition,
+            left: Math.min(fixedPosition.left, maxLeft),
+          };
         }
 
         this.fixedDropdownPosition.set(fixedPosition);
@@ -150,6 +167,14 @@ export class AutocompleteTextareaComponent {
     }
   }
 
+  onBlur(event: FocusEvent) {
+    if (this.isInsideDatepicker(event.relatedTarget)) {
+      return;
+    }
+
+    this.hideSuggestions();
+  }
+
   updateSuggestions() {
     const textarea = this.textareaRef()?.nativeElement;
     if (!textarea) {
@@ -193,9 +218,39 @@ export class AutocompleteTextareaComponent {
     });
   }
 
+  onDatepickerMousedown(event: MouseEvent) {
+    const target = event.target;
+    const isInteractiveElem =
+      target instanceof Element && !!target.closest('select, button');
+
+    if (!isInteractiveElem) {
+      event.preventDefault();
+    }
+  }
+
+  onDatepickerFocusout(event: FocusEvent) {
+    const related = event.relatedTarget;
+    if (related === this.textareaRef()?.nativeElement || this.isInsideDatepicker(related)) {
+      return;
+    }
+
+    this.hideSuggestions();
+  }
+
+  onDatepickerKeydown(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.hideSuggestions();
+      this.textareaRef()?.nativeElement.focus();
+    }
+  }
+
   private moveActive(suggestions: AutocompleteSuggestion[], delta: number) {
     const count = suggestions.length;
-    const newIndex = Math.min(Math.max(this.activeSuggestionIndex() + delta, 0), count - 1);
+    const newIndex = Math.min(
+      Math.max(this.activeSuggestionIndex() + delta, 0),
+      count - 1,
+    );
     this.activeSuggestionIndex.set(newIndex);
   }
 
@@ -224,7 +279,10 @@ export class AutocompleteTextareaComponent {
     const textChild = mirror.children.item(0);
     const markerChild = mirror.children.item(1);
 
-    if (!(textChild instanceof HTMLElement) || !(markerChild instanceof HTMLElement)) {
+    if (
+      !(textChild instanceof HTMLElement) ||
+      !(markerChild instanceof HTMLElement)
+    ) {
       throw new Error('Textarea mirror element children are missing.');
     }
 
@@ -232,9 +290,18 @@ export class AutocompleteTextareaComponent {
 
     const top = markerChild.offsetTop;
     const left = markerChild.offsetLeft;
-    const lineHeight = parseFloat(this.window.getComputedStyle(mirror).getPropertyValue('line-height'));
+    const lineHeight = parseFloat(
+      this.window.getComputedStyle(mirror).getPropertyValue('line-height'),
+    );
 
     return { top, left, lineHeight };
+  }
+
+  private isInsideDatepicker(target: EventTarget | null): boolean {
+    const datepicker = this.datepickerRef()?.nativeElement;
+    return (
+      !!datepicker && target instanceof Node && datepicker.contains(target)
+    );
   }
 }
 

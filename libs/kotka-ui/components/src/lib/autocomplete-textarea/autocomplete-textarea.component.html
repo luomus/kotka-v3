@@ -11,7 +11,7 @@
     (focus)="updateSuggestions()"
     (keyup)="onKeyup($event)"
     (keydown)="onKeydown($event)"
-    (blur)="hideSuggestions()"
+    (blur)="onBlur($event)"
   ></textarea>
 
   <div #mirror class="form-control textarea-mirror">
@@ -37,7 +37,9 @@
           class="datepicker-dropdown"
           [style.top.px]="fixedDropdownPosition().top"
           [style.left.px]="fixedDropdownPosition().left"
-          (mousedown)="$event.preventDefault()"
+          (mousedown)="onDatepickerMousedown($event)"
+          (focusout)="onDatepickerFocusout($event)"
+          (keydown)="onDatepickerKeydown($event)"
           (dateSelect)="applyDateSuggestion($event, currentSuggestions.suffix)"
         ></ngb-datepicker>
       }
