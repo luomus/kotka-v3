@@ -10,7 +10,6 @@ import {
 } from '@angular/core';
 import {
   ColDefWithExtra,
-  ColumnSettingsModalComponent,
   DatatableColumn,
   DatatableLoadedData,
   DocumentDatatableComponent,
@@ -30,6 +29,10 @@ import {
 } from '@kotka/ui/core';
 import { SpecimenLabelDesignerComponent } from '../specimen-label-designer/specimen-label-designer.component';
 import { AggregationsComponent, FieldValue } from './aggregations.component';
+import {
+  AggregationsSettings,
+  AggregationsSettingsModalComponent,
+} from './aggregations-settings-modal.component';
 import { from, Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { map, startWith, switchMap } from 'rxjs/operators';
@@ -38,6 +41,7 @@ import { BuilderQuery, builderQueryToQueryString, groupToQueryString, joinQueryS
   SearchGroup, SearchQuery, SpecimenSearchComponent
 } from '@kotka/ui/search';
 import { NgbAlert, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { isEqual } from 'lodash';
 
 interface FieldData {
   fields: SearchField[];
@@ -62,6 +66,7 @@ const DEFAULT_AGGREGATE_FIELDS: string[] = [
   'taxonRank',
   'typeStatus',
 ];
+const DEFAULT_AGGREGATE_SIZE = 10;
 
 const SPECIAL_COLUMNS: Partial<Record<SearchResultKey, DatatableColumn>> = {
   documentID: {
@@ -129,11 +134,13 @@ export class SpecimenTableComponent implements OnDestroy {
   aggregateBy: Signal<AggregateBy[]> = computed(() =>
     this.aggregateValidFields().map((field) => ({
       field,
-      aggregateField: this.fieldData().fieldMap[field]?.hasRaw ? `${field}.raw` : field,
-      size: this.aggregateSize(),
+      aggregateField: this.fieldData().fieldMap[field]?.hasRaw
+        ? `${field}.raw`
+        : field,
+      aggregateSize: this.aggregateSize(),
     })),
   );
-  aggregateSize = signal<number>(10);
+  aggregateSize = signal<number>(DEFAULT_AGGREGATE_SIZE);
   aggregateFieldOrder = signal<string[] | undefined>(undefined);
 
   aggregateResults?: FieldAggregate[];
@@ -143,7 +150,9 @@ export class SpecimenTableComponent implements OnDestroy {
   showLabelDesigner = signal(false);
   labelDesignerData$?: Observable<Document[]>;
 
-  private aggregateFields = signal<string[]>(DEFAULT_AGGREGATE_FIELDS);
+  private aggregateFields = signal<string[]>(DEFAULT_AGGREGATE_FIELDS, {
+    equal: isEqual,
+  });
 
   private filtersSearchQuery = signal('');
   private idSearchQuery = signal<BuilderQuery>({
@@ -211,7 +220,7 @@ export class SpecimenTableComponent implements OnDestroy {
   }
 
   openAggregateSettingsModal() {
-    this.modalRef = this.modalService.open(ColumnSettingsModalComponent, {
+    this.modalRef = this.modalService.open(AggregationsSettingsModalComponent, {
       backdrop: 'static',
       size: 'md',
       modalDialogClass: 'scrollable-modal column-settings-modal',
@@ -220,24 +229,24 @@ export class SpecimenTableComponent implements OnDestroy {
     this.modalRef.componentInstance.columns.set(
       this.fieldData().allAggregateColumns,
     );
-    this.modalRef.componentInstance.settings.set({
+    this.modalRef.componentInstance.columnSettings.set({
       selected: this.aggregateValidFields(),
       order: this.aggregateFieldOrder() || this.fieldData().allAggregateFields,
     });
-    this.modalRef.componentInstance.defaultSettings.set({
+    this.modalRef.componentInstance.defaultColumnSettings.set({
       selected: DEFAULT_AGGREGATE_FIELDS,
       order: this.fieldData().allAggregateFields,
     });
-    this.modalRef.componentInstance.title.set('Select fields');
-    this.modalRef.componentInstance.description.set(
-      'Select fields that are displayed on the sidebar.',
+    this.modalRef.componentInstance.filterSize.set(this.aggregateSize());
+    this.modalRef.componentInstance.defaultFilterSize.set(
+      DEFAULT_AGGREGATE_SIZE,
     );
-    this.modalRef.componentInstance.searchLabel.set('Search fields');
 
     from(this.modalRef.result).subscribe({
-      next: (settings) => {
+      next: (settings: AggregationsSettings) => {
         this.aggregateFields.set(settings.selected);
         this.aggregateFieldOrder.set(settings.order);
+        this.aggregateSize.set(settings.filterSize);
       },
       error: () => undefined,
     });

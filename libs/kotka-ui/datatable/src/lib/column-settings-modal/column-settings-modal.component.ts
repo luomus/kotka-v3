@@ -4,6 +4,9 @@ import {
   computed,
   effect,
   inject,
+  input,
+  model,
+  output,
   signal,
   untracked,
 } from '@angular/core';
@@ -44,16 +47,20 @@ function moveInArray(arr: any[], fromIndex: number, toIndex: number) {
 export class ColumnSettingsModalComponent {
   modal = inject(NgbActiveModal);
 
-  columns = signal(<ColDefWithExtra[]>[]);
-  settings = signal(<ColumnSettings>{ selected: [], order: [] });
-  defaultSettings = signal(<ColumnSettings>{ selected: [], order: [] });
-  searchText = signal('');
+  columns = model<ColDefWithExtra[]>([]);
+  settings = model<ColumnSettings>({ selected: [], order: [] });
+  defaultSettings = model<ColumnSettings>({ selected: [], order: [] });
 
-  title = signal('Select columns');
-  description = signal(
-    'Select columns that are displayed in the result table.',
-  );
-  searchLabel = signal('Search columns');
+  title = model('Select columns');
+  description = model('Select columns that are displayed in the result table.');
+  searchLabel = model('Search columns:');
+
+  closeModalOnConfirm = input(true);
+
+  resetClick = output<void>();
+  confirmClick = output<ColumnSettings>();
+
+  searchText = signal('');
 
   gridColDefs: ColDef[];
   gridOptions: GridOptions;
@@ -129,7 +136,12 @@ export class ColumnSettingsModalComponent {
     selected.sort(
       (colId1, colId2) => order.indexOf(colId1) - order.indexOf(colId2),
     );
-    this.modal.close({ selected, order });
+
+    this.confirmClick.emit({ selected, order });
+
+    if (this.closeModalOnConfirm()) {
+      this.modal.close({ selected, order });
+    }
   }
 
   onGridReady(params: GridReadyEvent) {
@@ -138,6 +150,7 @@ export class ColumnSettingsModalComponent {
 
   resetSettings() {
     this.settings.set(this.defaultSettings());
+    this.resetClick.emit();
   }
 
   onRowSelect(e: RowSelectedEvent) {

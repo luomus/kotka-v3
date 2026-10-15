@@ -7,13 +7,13 @@
   <input
     id="columnSearch"
     type="text"
-    class="form-control mb-3"
+    class="form-control mb-2"
     placeholder="Search..."
     [(ngModel)]="searchText"
   />
   <ag-grid-angular
     id="columnSettingsGrid"
-    class="ag-theme-alpine grid overflow-y-auto"
+    class="ag-theme-alpine grid overflow-y-auto headerless-table borderless-table"
     [gridOptions]="gridOptions"
     [columnDefs]="gridColDefs"
     [headerHeight]="0"
@@ -24,6 +24,7 @@
     (dragStopped)="onDragStopped()"
     (rowSelected)="onRowSelect($event)"
   ></ag-grid-angular>
+  <ng-content select="[kuiColumnSettingsModalExtra]"></ng-content>
 </div>
 <div class="modal-footer">
   <button

@@ -7,3 +7,15 @@
   display: flex;
   align-items: center;
 }
+
+.headerless-table .ag-header {
+  height: 0 !important;
+  min-height: 0 !important;
+  border: 0 !important;
+}
+
+.borderless-table {
+  .ag-root-wrapper {
+    border: 0 !important;
+  }
+}
