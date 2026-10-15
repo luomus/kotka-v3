@@ -1,4 +1,4 @@
-<div class="modal-body">
+<div class="modal-body d-flex flex-column">
   <h1> {{ title() }}</h1>
   <p>{{ description() }}</p>
   <label class="form-label mb-1 fw-semibold" for="columnSearch">
@@ -13,7 +13,7 @@
   />
   <ag-grid-angular
     id="columnSettingsGrid"
-    class="ag-theme-alpine grid"
+    class="ag-theme-alpine grid overflow-y-auto"
     [gridOptions]="gridOptions"
     [columnDefs]="gridColDefs"
     [headerHeight]="0"
