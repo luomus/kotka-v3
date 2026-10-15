@@ -36,6 +36,12 @@ export interface SearchParams {
   fields?: string[];
 }
 
+export interface AggregateBy {
+  field: string;
+  aggregateField?: string;
+  aggregateSize?: number;
+}
+
 export const COUNT_PRECISION_THRESHOLD = 10000;
 
 const path = apiBase + '/';
@@ -217,8 +223,7 @@ export class ApiClient {
     pageSize = 100,
     sort?: string,
     fields?: X,
-    aggregateBy?: string[],
-    aggregateSize = 10
+    aggregateBy?: AggregateBy[]
   ): Observable<SearchResponse<Y>> {
     let params = new HttpParams().set('page', page).set('page_size', pageSize);
     if (sort) {
@@ -234,7 +239,7 @@ export class ApiClient {
       searchQuery = searchQuery || {};
     }
 
-    searchQuery = this.addAggregationsToSearchQuery(searchQuery, aggregateBy, aggregateSize);
+    searchQuery = this.addAggregationsToSearchQuery(searchQuery, aggregateBy);
 
     return this.httpClient.post<RawSearchResponse<Y>>(
       `${path}${type}/${index}/_search`,
@@ -401,20 +406,21 @@ export class ApiClient {
     );
   }
 
-  private addAggregationsToSearchQuery(searchQuery: ElasticsearchQuery, aggregateBy?: string[], aggregateSize = 10): ElasticsearchQuery {
+  private addAggregationsToSearchQuery(searchQuery: ElasticsearchQuery, aggregateBy?: AggregateBy[]): ElasticsearchQuery {
     if (aggregateBy && aggregateBy.length > 0) {
       const aggs: Aggs = {};
-      aggregateBy.forEach(field => {
-        const fieldName = field.replace(/\.raw$/, '');
-        aggs[fieldName] = {
+      aggregateBy.forEach(item => {
+        const { field, aggregateField = field, aggregateSize = 10 } = item;
+
+        aggs[field] = {
           terms: {
-            field,
+            field: aggregateField,
             size: aggregateSize,
           },
         };
-        aggs[`${fieldName}_count`] = {
+        aggs[`${field}_count`] = {
           cardinality: {
-            field,
+            field: aggregateField,
             precision_threshold: COUNT_PRECISION_THRESHOLD
           }
         };
@@ -428,21 +434,21 @@ export class ApiClient {
 
   private convertAggregations(
     aggregations?: Aggregations,
-    aggregateBy?: string[],
+    aggregateBy?: AggregateBy[],
   ): FieldAggregate[] {
     if (!aggregations || !aggregateBy?.length) {
       return [];
     }
 
-    return aggregateBy.map(field => {
-      const fieldName = field.replace(/\.raw$/, '');
-      const count = aggregations[`${fieldName}_count`]?.value || 0;
+    return aggregateBy.map(item => {
+      const field = item.field;
+      const count = aggregations[`${field}_count`]?.value || 0;
 
       return {
-        field: fieldName,
+        field,
         count,
         countUnprecise: count > COUNT_PRECISION_THRESHOLD,
-        values: (aggregations[fieldName]?.buckets || []).map(bucket => ({
+        values: (aggregations[field]?.buckets || []).map(bucket => ({
           value: bucket.key,
           docCount: bucket.doc_count,
         })),

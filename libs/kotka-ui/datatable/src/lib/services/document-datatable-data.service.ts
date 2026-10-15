@@ -8,7 +8,7 @@ import {
   isDateFilterModel
 } from '../models/models';
 import { inject, Injectable } from '@angular/core';
-import { ApiClient, SearchParams } from '@kotka/ui/core';
+import { AggregateBy, ApiClient, SearchParams } from '@kotka/ui/core';
 import {
   builderQueryToQueryString,
   joinQueryStrings,
@@ -41,8 +41,8 @@ export class DocumentDatatableDataService {
   getRows<
     T extends KotkaDocumentType,
     S extends IndexType | undefined
-  >(type: T, index: S | undefined, searchParams: SearchParams, aggregateBy?: string[]): Observable<DatatableRow<T, S>>;
-  getRows(type: KotkaDocumentType, index: IndexType | undefined, searchParams: SearchParams, aggregateBy?: string[]): Observable<DatatableRow> {
+  >(type: T, index: S | undefined, searchParams: SearchParams, aggregateBy?: AggregateBy[]): Observable<DatatableRow<T, S>>;
+  getRows(type: KotkaDocumentType, index: IndexType | undefined, searchParams: SearchParams, aggregateBy?: AggregateBy[]): Observable<DatatableRow> {
     if (index) {
       if (type !== KotkaDocumentType.specimen) {
         throw new Error(

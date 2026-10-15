@@ -23,9 +23,10 @@ import {
 import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
 import { FormsModule } from '@angular/forms';
 import {
+  AggregateBy,
   ApiClient, DataTypeNamePipePipe,
   IteratorSearchParams,
-  SearchResultIteratorService,
+  SearchResultIteratorService
 } from '@kotka/ui/core';
 import { SpecimenLabelDesignerComponent } from '../specimen-label-designer/specimen-label-designer.component';
 import { AggregationsComponent, FieldValue } from './aggregations.component';
@@ -125,11 +126,14 @@ export class SpecimenTableComponent implements OnDestroy {
       (field) => this.fieldData().fieldMap[field] !== undefined,
     ),
   );
-  aggregateSearchFields = computed(() =>
-    this.aggregateValidFields().map((field) =>
-      this.fieldData().fieldMap[field]?.hasRaw ? `${field}.raw` : field,
-    ),
+  aggregateBy: Signal<AggregateBy[]> = computed(() =>
+    this.aggregateValidFields().map((field) => ({
+      field,
+      aggregateField: this.fieldData().fieldMap[field]?.hasRaw ? `${field}.raw` : field,
+      size: this.aggregateSize(),
+    })),
   );
+  aggregateSize = signal<number>(10);
   aggregateFieldOrder = signal<string[] | undefined>(undefined);
 
   aggregateResults?: FieldAggregate[];

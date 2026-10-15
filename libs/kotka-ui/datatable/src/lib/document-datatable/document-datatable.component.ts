@@ -12,7 +12,12 @@ import {
   IndexType,
   KotkaDocumentType,
 } from '@kotka/shared/models';
-import { DataTypeNamePipePipe, SearchParams, UserService } from '@kotka/ui/core';
+import {
+  AggregateBy,
+  DataTypeNamePipePipe,
+  SearchParams,
+  UserService,
+} from '@kotka/ui/core';
 import { catchError, map, of } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 
@@ -52,7 +57,7 @@ export class DocumentDatatableComponent<
 
   extraSortModel = input<DatatableSort>([]);
   extraSearchQuery = input<string>();
-  aggregateBy = input<S extends IndexType ? string[] : never>();
+  aggregateBy = input<S extends IndexType ? AggregateBy[] : never>();
 
   datasource = signal<DatatableSource | undefined>(undefined);
   settingsKey: Signal<string | undefined>;
@@ -86,7 +91,7 @@ export class DocumentDatatableComponent<
     });
   }
 
-  private getDataSource(dataType: T, index: S | undefined, columns: DatatableColumn[], extraSortModel: DatatableSort, extraSearchQuery?: string, aggregateBy?: S extends IndexType ? string[] : never): DatatableSource {
+  private getDataSource(dataType: T, index: S | undefined, columns: DatatableColumn[], extraSortModel: DatatableSort, extraSearchQuery?: string, aggregateBy?: AggregateBy[]): DatatableSource {
     return {
       getRows: (params: GetRowsParams) => {
         const searchParams = this.dataService.getSearchParams(

@@ -68,7 +68,7 @@
                 colId: 'id',
                 sort:  'desc'
               }]"
-            [aggregateBy]="aggregateSearchFields()"
+            [aggregateBy]="aggregateBy()"
             (loadData)="onDataLoad($event)"
             (invalidQueryError)="onInvalidQueryError()"
           >
