@@ -133,6 +133,9 @@ export const baseConfig = {
       'measurement': {
         'type': 'object'
       },
+      'primarySpecimen': {
+        'type': 'boolean'
+      },
       'relationship': {
         'type': 'object'
       },

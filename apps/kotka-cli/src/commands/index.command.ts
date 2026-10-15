@@ -6,6 +6,7 @@ import { lastValueFrom, map } from 'rxjs';
 import { KotkaObjectFullType, Document, specimenIndices, indices, ElasticIndex } from '@kotka/shared/models';
 import ora from 'ora';
 import { getId } from '@kotka/shared/utils';
+import { ExtractorFieldMappingService } from '@kotka/api/specimen-search';
 
 interface Options {
   batch: number
@@ -17,6 +18,7 @@ export class IndexCommand {
     private readonly esClientService: EsClientService,
     private readonly specimenSearchService: SpecimenSearchService,
     private readonly lajiStoreService: LajiStoreService,
+    private readonly extractorFieldMappingService: ExtractorFieldMappingService,
   ) {}
 
   @Command({
@@ -168,6 +170,22 @@ export class IndexCommand {
     } catch (err) {
       console.error(err);
       spin.fail(`Error dropping index ${index}!`);
+    }
+  }
+
+  @Command({
+    command: 'update-field-mappings'
+  })
+  async fieldMappings() {
+
+    const spin = ora();
+    spin.start('Initializing field mappings...');
+    try {
+      await this.extractorFieldMappingService.initLabelCaches();
+      spin.succeed('Field mappings initialized.');
+    } catch (err) {
+      console.error(err);
+      spin.fail('Error initializing field mappings!');
     }
   }
 

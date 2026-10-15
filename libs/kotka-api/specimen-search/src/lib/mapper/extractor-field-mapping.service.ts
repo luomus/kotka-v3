@@ -2,7 +2,7 @@ import { JSONSchema4 } from 'json-schema';
 import { Injectable } from '@nestjs/common';
 import { LajiApiService, LajiStoreService, OldKotkaDataService } from '@kotka/api/services';
 import { CacheService, MultiSetEntry } from '@kotka/api/cache';
-import { Collection, Dataset, Organization, Person, specimenIndices } from '@kotka/shared/models';
+import { Collection, Dataset, KotkaObjectFullType, Organization, Person, specimenIndices } from '@kotka/shared/models';
 import { lastValueFrom, map } from 'rxjs';
 import { PerStoreTtl } from 'cacheable';
 import { specimenConfig } from '../extractor/config/specimen.config';
@@ -66,7 +66,7 @@ export class ExtractorFieldMappingService {
     return className.replace(/(Class|Object)$/, '');
   }
 
-  async intLabelCaches() {
+  async initLabelCaches() {
     await this.cacheService.setValueWithFunc(KEY_DATASET_ROOT, async () => {
       return await this.initDatasets();
     }, EXTRACTOR_TTL, true);
@@ -240,45 +240,47 @@ export class ExtractorFieldMappingService {
   }
 
   async initFormMappings() {
-    const schema = await lastValueFrom(this.lajiApiService.get<{schema: JSONSchema4}>('forms/MHL.1158').pipe(map(res => res.data?.schema)));
+    const schema = await lastValueFrom(this.storeService.getJsonSchema(KotkaObjectFullType.document).pipe(map(res => res.data)));
+    const form = await lastValueFrom(this.lajiApiService.get<{schema: JSONSchema4}>('forms/MHL.1158').pipe(map(res => res.data?.schema)));
 
     const schemaMappings = {} as { [key: string]: { [value: string]: string }};
 
-    this.parseFormMappings('document', schema, schemaMappings);
+    this.mapHardCodedFields(schemaMappings);
+
+    this.parseFormMappings('document', schema, form, schemaMappings);
 
     return schemaMappings;
   }
 
-  async parseFormMappings(parent: string, schema: JSONSchema4, schemaEnums: { [key: string]: { [value: string]: string | {[key: string]: string}}}) {
-    if (parent === 'document') {
-      this.mapHardCodedFields(schemaEnums);
-    }
-
+  async parseFormMappings(parent: string, schema: JSONSchema4, form: JSONSchema4 | undefined, schemaEnums: { [key: string]: { [value: string]: string | {[key: string]: string}}}) {
     Object.keys(schema.properties!).forEach((property) => {
-      const val: JSONSchema4 = schema.properties[property];
+      const formVal: JSONSchema4 = form?.properties?.[property];
+      const schemaVal: JSONSchema4 = schema.properties[property];
 
-      this.mapLabels(parent, property, val, schemaEnums);
+      this.mapLabels(parent, property, schemaVal, formVal, schemaEnums);
 
-      const items = val.items as JSONSchema4 | undefined;
-      if (val.type === 'string' && val.oneOf) {
-        this.mapEnums(property, val.oneOf, schemaEnums);
+      const schemaItems = schemaVal.items as JSONSchema4;
+      const formItems = formVal?.items as JSONSchema4 | undefined;
+
+      if (schemaVal.type === 'string' && schemaVal.enum) {
+        this.mapEnums(parent, property, schemaVal, formVal, schemaEnums);
       } else if (
-        val.type === 'array' &&
-        items?.type === 'string' &&
-        items?.oneOf) {
-          this.mapEnums(property, items.oneOf, schemaEnums);
+        schemaVal.type === 'array' &&
+        schemaItems?.type === 'string' &&
+        schemaItems?.enum) {
+          this.mapEnums(parent, property, schemaItems, formItems, schemaEnums);
       } else if (
-        val.type === 'array' &&
-        items?.properties &&
+        schemaVal.type === 'array' &&
+        schemaItems?.properties &&
         extratedLevels[property]
       ) {
-        this.parseFormMappings(`${parent}.${extratedLevels[property] || property}`, val.items as JSONSchema4, schemaEnums);
+        this.parseFormMappings(`${parent}.${extratedLevels[property] || property}`, schemaVal.items, formVal?.items, schemaEnums);
       } else if (
-        val.type === 'object' &&
-        val.properties &&
+        schemaVal.type === 'object' &&
+        schemaVal.properties &&
         extratedLevels[property])
       {
-        this.parseFormMappings(`${parent}.${extratedLevels[property] || property}`, val, schemaEnums);
+        this.parseFormMappings(`${parent}.${extratedLevels[property] || property}`, schemaVal, formVal, schemaEnums);
       }
     });
   }
@@ -300,23 +302,26 @@ export class ExtractorFieldMappingService {
     });
   }
 
-  mapLabels(path: string, key: string, property: JSONSchema4, enums: { [key: string]: {[value: string]: string | {[key: string]: string} }}) {
-    if (!property.title) {
-      return;
-    }
-
+  mapLabels(path: string, key: string, schema: JSONSchema4, form: JSONSchema4 | undefined, enums: { [key: string]: {[value: string]: string | {[key: string]: string} }}) {
     const level = path.split('.').slice(-1)[0];
 
-    const { autocompleteFields, remove } = levelConfigs[level] || {};
+    const { autocompleteFields, remove, mapOpenedIdsTo, mapOpenedValuesTo } = levelConfigs[level] || {};
+
+    if (mapOpenedIdsTo?.[key]) {
+      this.mapLabels(path, mapOpenedIdsTo[key], schema, form, enums);
+    } else if (mapOpenedValuesTo?.[key]) {
+      this.mapLabels(path, mapOpenedValuesTo[key], schema, form, enums);
+    }
 
     if (remove?.includes(key)) {
       return;
     }
 
     if (path.includes('sample')) {
-        if (path.includes('measurement')) return;
+      if (path.includes('measurement')) return;
 
-      key = key.startsWith('sample') ? key : `sample${key.charAt(0).toUpperCase() + key.slice(1)}`;
+      if (key === 'id') key = 'sampleID';
+      else key = key.startsWith('sample') ? key : `sample${key.charAt(0).toUpperCase() + key.slice(1)}`;
     }
 
     if (!enums[KEY_FORM_FIELD_ROOT]) {
@@ -326,14 +331,28 @@ export class ExtractorFieldMappingService {
     const hardCodedField = levelConfigs[level]?.hardCodedFields?.[key];
 
     enums[KEY_FORM_FIELD_ROOT][key] = {
-      label: hardCodedField?.label ?? property.title,
+      label: hardCodedField?.label ?? form?.title ?? schema?.title ?? key,
       level: level,
       hasAutocomplete: autocompleteFields?.includes(key) ?? false,
     };
   }
 
-  mapEnums(property: string, oneOf: JSONSchema4[], enums) {
-    enums[`${KEY_FORM_ENUM_ROOT}_${property}`] = Object.fromEntries(oneOf.map((e) => [e.const, e.title]));
+  mapEnums(path: string,property: string, schema: JSONSchema4, form: JSONSchema4 | undefined, enums) {
+    const level = path.split('.').slice(-1)[0];
+
+    const { remove } = levelConfigs[level] || {};
+
+    if (remove?.includes(property)) {
+      return;
+    }
+
+    if (form?.oneOf) {
+      return enums[`${KEY_FORM_ENUM_ROOT}_${property}`] = Object.fromEntries(form.oneOf.map((e) => [e.const, e.title]));
+    }
+
+    enums[`${KEY_FORM_ENUM_ROOT}_${property}`] = Object.fromEntries(schema.enum.map((key, index) => {
+      return [key, schema.enumNames?.[index] ?? key];
+    }));
   }
 
   async getFormEnum(key: string, field: string) {

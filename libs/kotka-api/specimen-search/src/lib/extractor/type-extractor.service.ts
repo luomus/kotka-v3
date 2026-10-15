@@ -5,11 +5,13 @@ import { BulkRequest } from '@elastic/elasticsearch/lib/api/types';
 import { TypeSpecimen } from '@luomus/laji-schema/models';
 import { AutocompleteExtractorService, ExtractorInterface } from '@kotka/api/elasticsearch';
 import { typeSpecimenConfig } from './config/type-specimen.config';
+import { ExtractorFieldMappingService } from '../mapper/extractor-field-mapping.service';
 
 @Injectable()
 export class TypeExtractorService extends BaseExtractorService {
   constructor(
-    private readonly autocompleteExtractorService: AutocompleteExtractorService
+    private readonly autocompleteExtractorService: AutocompleteExtractorService,
+    protected readonly valueMappingService: ExtractorFieldMappingService,
   ) {
     super(typeSpecimenConfig);
   }

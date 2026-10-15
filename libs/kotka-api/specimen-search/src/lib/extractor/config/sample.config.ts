@@ -95,6 +95,14 @@ export const sampleConfig: ExtractorConfig = {
     sampleNotes: {
       label: 'Sample notes',
       level: 'sample',
-    }
+    },
+    sampleCollectionID: {
+      label: 'Sample collection ID',
+      level: 'sample',
+    },
+    sampleDatasetID: {
+      label: 'Sample dataset ID',
+      level: 'sample',
+    },
   }
 };

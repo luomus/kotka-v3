@@ -182,15 +182,6 @@ export const specimenConfig: ExtractorConfig = {
         label: 'Tag IDs',
         level: 'document',
       },
-      dataset: {
-        label: 'Tag',
-        level: 'document',
-
-      },
-      collection: {
-        label: 'Collection',
-        level: 'document',
-      },
       collectionID: {
         label: 'Collection ID',
         level: 'document',
