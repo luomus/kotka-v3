@@ -10,6 +10,7 @@ import { queryStringToBuilderQuery } from '../services/query-parse';
 import { DialogService } from '@kotka/ui/core';
 import { SearchField } from '@kotka/shared/models';
 import { QUERY_STRING_SUPPORTED_TYPES } from '../constants';
+import { validateBuilderQueryValues } from '../services/query-validate';
 
 type SearchMode = 'builder' | 'text';
 
@@ -29,6 +30,13 @@ export class SearchComponent {
   filteredFields: Signal<SearchField[]>;
   mode = signal<SearchMode>('builder');
 
+  filteredFieldsMap = computed(() => this.filteredFields().reduce(
+    (result, field) => {
+      result[field.field] = field;
+      return result;
+    }, <Record<string, SearchField>>{})
+  );
+
   search = output<string>();
   clear = output<void>();
 
@@ -41,7 +49,8 @@ export class SearchComponent {
   setMode(mode: SearchMode) {
     if (mode === 'builder') {
       try {
-        queryStringToBuilderQuery(this.text());
+        const query = queryStringToBuilderQuery(this.text());
+        validateBuilderQueryValues(query, this.filteredFieldsMap());
       } catch (e) {
         console.warn('Failed to parse query string', e);
         this.dialogService.alert(

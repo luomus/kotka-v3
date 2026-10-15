@@ -1,0 +1,39 @@
+@switch (inputType()) {
+  @case ('date') {
+    <kui-datepicker
+      [(value)]="value"
+    ></kui-datepicker>
+  }
+  @case ('boolean') {
+    <select
+      class="form-select"
+      [(ngModel)]="value"
+    >
+      <option value=""></option>
+      <option value="true">true</option>
+      <option value="false">false</option>
+    </select>
+  }
+  @case ('autocomplete') {
+    <kui-autocomplete
+      [value]="value()"
+      [placeholder]="placeholder()"
+      [allowFreeText]="true"
+      [minCharacters]="1"
+      [resultTemplate]="resultTemplate"
+      [fetchResultsFunc]="fetchResultsFunc"
+      (valueChange)="value.set($event ?? '')"
+    ></kui-autocomplete>
+    <ng-template #resultTemplate let-option="result" let-term="term">
+      <span [innerHTML]="option.value | highlightMatch: term"></span>
+    </ng-template>
+  }
+  @default {
+    <input
+      type="text"
+      class="form-control"
+      [placeholder]="placeholder()"
+      [(ngModel)]="value"
+    />
+  }
+}

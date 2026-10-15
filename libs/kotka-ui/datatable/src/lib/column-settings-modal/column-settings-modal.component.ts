@@ -1,223 +1,208 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+} from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import {
   ColDef,
   GridApi,
   GridOptions,
   GridReadyEvent,
+  RowDragMoveEvent,
   RowSelectedEvent,
 } from '@ag-grid-community/core';
-import { combineLatest, ReplaySubject, take } from 'rxjs';
 import { ColDefWithExtra, ColumnSettings } from '../models/models';
 import { AgGridAngular } from '@ag-grid-community/angular';
+import { FormsModule } from '@angular/forms';
+import { getOrderAfterColumnMove } from '../services/datatable-column-utils';
+
+const comparator = (order: string[]) => (
+  columnA: ColDefWithExtra,
+  columnB: ColDefWithExtra,
+): number => {
+  return order.indexOf(columnA.colId) - order.indexOf(columnB.colId);
+};
+
+function moveInArray(arr: any[], fromIndex: number, toIndex: number) {
+  const element = arr[fromIndex];
+  arr.splice(fromIndex, 1);
+  arr.splice(toIndex, 0, element);
+}
 
 @Component({
   selector: 'kui-column-settings-modal',
   templateUrl: './column-settings-modal.component.html',
   styleUrls: ['./column-settings-modal.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AgGridAngular],
+  imports: [AgGridAngular, FormsModule],
 })
 export class ColumnSettingsModalComponent {
   modal = inject(NgbActiveModal);
-  private cdr = inject(ChangeDetectorRef);
 
-  columnsSubject: ReplaySubject<ColDefWithExtra[]> = new ReplaySubject(1);
-  @Input() set columns(columns: ColDefWithExtra[]) {
-    this.columnsSubject.next(columns);
-  }
+  columns = signal(<ColDefWithExtra[]>[]);
+  settings = signal(<ColumnSettings>{ selected: [], order: [] });
+  defaultSettings = signal(<ColumnSettings>{ selected: [], order: [] });
+  searchText = signal('');
 
-  settingsSubject: ReplaySubject<ColumnSettings> = new ReplaySubject(1);
-  @Input() set settings(settings: ColumnSettings) {
-    this.settingsSubject.next(settings);
-  }
+  gridColDefs: ColDef[];
+  gridOptions: GridOptions;
 
-  defaultSettingsSubject: ReplaySubject<ColumnSettings> = new ReplaySubject(1);
-  @Input() set defaultSettings(defaultSettings: ColumnSettings) {
-    this.defaultSettingsSubject.next(defaultSettings);
-  }
+  private selected = computed(() => (this.settings().selected));
+  private order = computed(() => (this.settings().order));
 
-  colDefs: ColDef[] = [];
-  rowData: ColDefWithExtra[] = [];
+  private filteredColumns = computed(() => {
+    const searchText = this.searchText().toLowerCase();
+    return this.columns().filter((col) =>
+      col.headerName?.toLowerCase().includes(searchText),
+    );
+  });
 
-  gridOptions: GridOptions = {
-    rowDragManaged: true,
-    animateRows: true,
-  };
+  private lockedPositions = computed(() => {
+    const originalOrder = this.columns().map((col) => col.colId);
+    return this.columns().reduce((result, col) => {
+      if (col.lockPosition) {
+        result[col.colId] = originalOrder.indexOf(col.colId);
+      }
+      return result;
+    }, <Record<string, number>>{});
+  });
 
-  private allColumns: ColDefWithExtra[] = [];
-  private initialSettings?: ColumnSettings;
-  private _defaultSettings?: ColumnSettings;
-  private rowIsDragged = false;
-  private gridApi?: GridApi;
+  private gridApi = signal<GridApi | undefined>(undefined);
+  private visibleOrder = signal<string[]>([]);
+  private draggedRow?: string;
 
   constructor() {
-    combineLatest([
-      this.columnsSubject,
-      this.settingsSubject,
-      this.defaultSettingsSubject,
-    ])
-      .pipe(take(1))
-      .subscribe(
-        ([columns, settings, defaultSettings]: [
-          ColDefWithExtra[],
-          ColumnSettings,
-          ColumnSettings,
-        ]) => {
-          this.allColumns = columns;
-          this.initialSettings = settings;
-          this._defaultSettings = defaultSettings;
-
-          if (!this.initialSettings.selected) {
-            this.initialSettings.selected = defaultSettings.selected;
-          }
-          if (!this.initialSettings.order) {
-            this.initialSettings.order = defaultSettings.order;
-          }
-
-          this.colDefs = [
-            {
-              field: 'headerName',
-              rowDrag: (params) => {
-                return !params.data.lockPosition;
-              },
-              checkboxSelection: (params) => {
-                return !params.data.lockPosition;
-              },
-              resizable: false,
-              flex: 1,
-              showDisabledCheckboxes: true,
-            },
-          ];
-          this.updateRowData();
-
-          this.cdr.markForCheck();
+    this.gridColDefs = [
+      {
+        field: 'headerName',
+        rowDrag: (params) => {
+          return !params.data.lockPosition;
         },
+        resizable: false,
+        flex: 1,
+      },
+    ];
+    this.gridOptions = {
+      rowDragManaged: true,
+      animateRows: true,
+      rowSelection: {
+        mode: 'multiRow',
+        checkboxes: (params) => !params.data.lockPosition,
+        hideDisabledCheckboxes: false,
+        enableSelectionWithoutKeys: true,
+        enableClickSelection: true,
+      },
+    };
+
+    effect(() => {
+      const sortedRowData = [...this.filteredColumns()].sort(
+        comparator(this.order()),
       );
+      this.visibleOrder.set(sortedRowData.map((col) => col.colId));
+
+      this.gridApi()?.setGridOption('rowData', sortedRowData);
+      this.updateSelectedNodes(untracked(this.selected));
+
+    });
+
+    effect(() => {
+      this.updateSelectedNodes(this.selected());
+    });
   }
 
   onConfirm() {
-    if (!this.gridApi) {
-      return;
-    }
-
-    const selected: string[] = [];
-    const order: string[] = [];
-
-    this.gridApi.forEachNodeAfterFilterAndSort((node) => {
-      if (node.isSelected()) {
-        selected.push(node.data.colId);
-      }
-      order.push(node.data.colId);
-    });
-
+    const selected = [...this.selected()];
+    const order = this.order();
+    selected.sort(
+      (colId1, colId2) => order.indexOf(colId1) - order.indexOf(colId2),
+    );
     this.modal.close({ selected, order });
   }
 
   onGridReady(params: GridReadyEvent) {
-    this.gridApi = params.api;
-    this.updateRowData();
+    this.gridApi.set(params.api);
   }
 
   resetSettings() {
-    if (!this._defaultSettings || !this.gridApi) {
-      return;
-    }
-
-    this.initialSettings = this._defaultSettings;
-    this.updateRowData();
+    this.settings.set(this.defaultSettings());
   }
 
   onRowSelect(e: RowSelectedEvent) {
+    const selected = this.selected();
+
     const node = e.node;
     if (node.data.lockPosition && !node.isSelected()) {
       node.setSelected(true);
+    } else {
+      if (node.isSelected()) {
+        if (!selected.includes(node.data.colId)) {
+          this.settings.set({
+            ...this.settings(),
+            selected: [...selected, node.data.colId],
+          });
+        }
+      } else {
+        if (selected.includes(node.data.colId)) {
+          this.settings.set({
+            ...this.settings(),
+            selected: selected.filter((colId) => colId !== node.data.colId),
+          });
+        }
+      }
     }
   }
 
-  onRowDragMove() {
-    this.rowIsDragged = true;
+  onRowDragMove(event: RowDragMoveEvent<ColDefWithExtra>) {
+    this.draggedRow = event.node.data?.colId;
   }
 
   onDragStopped() {
-    if (this.rowIsDragged) {
-      this.onRowDragEnd();
-    }
+    this.onRowDragEnd();
   }
 
   onRowDragEnd() {
-    function moveInArray(arr: any[], fromIndex: number, toIndex: number) {
-      const element = arr[fromIndex];
-      arr.splice(fromIndex, 1);
-      arr.splice(toIndex, 0, element);
+    if (!this.draggedRow) {
+      return;
     }
 
-    const originalOrder = this.allColumns.map((col) => col.colId);
-
-    const selected: string[] = [];
-    const order: string[] = [];
-    let orderHasChanges = false;
-
-    this.gridApi!.forEachNodeAfterFilterAndSort((node, idx) => {
-      if (node.isSelected()) {
-        selected.push(node.data.colId);
-      }
-      order.push(node.data.colId);
-
-      // if the column has a lockPosition property, return it to its original place
-      if (node.data.lockPosition) {
-        const originalOrderIdx = originalOrder.indexOf(node.data.colId);
-        if (idx !== originalOrderIdx) {
-          moveInArray(order, idx, originalOrderIdx);
-          orderHasChanges = true;
-        }
-      }
+    let visibleOrder: string[] = [];
+    this.gridApi()?.forEachNodeAfterFilterAndSort((node) => {
+      visibleOrder.push(node.data.colId);
     });
 
-    if (orderHasChanges) {
-      selected.sort(
-        (colId1, colId2) => order.indexOf(colId1) - order.indexOf(colId2),
-      );
-      this.initialSettings = { selected, order };
-      this.updateRowData();
-    }
+    const order = getOrderAfterColumnMove(
+      this.order(),
+      this.visibleOrder(),
+      visibleOrder,
+      this.draggedRow,
+    );
 
-    this.rowIsDragged = false;
+    // restore locked positions
+    for (const colId of Object.keys(this.lockedPositions())) {
+      const lockedIdx = this.lockedPositions()[colId];
+      const currentIdx = order.indexOf(colId);
+      if (currentIdx !== lockedIdx) {
+        moveInArray(order, currentIdx, lockedIdx);
+      }
+    }
+    visibleOrder = order.filter((colId) => visibleOrder.includes(colId));
+
+    this.settings.set({ ...this.settings(), order: order });
+    this.visibleOrder.set(visibleOrder);
+
+    this.draggedRow = undefined;
   }
 
-  private updateRowData() {
-    if (!this.gridApi) {
-      return;
-    }
-
-    this.rowData = [...this.allColumns].sort(this.comparator.bind(this));
-    this.gridApi.setGridOption('rowData', this.rowData);
-    this.setInitialSelected();
-  }
-
-  private comparator(
-    columnA: ColDefWithExtra,
-    columnB: ColDefWithExtra,
-  ): number {
-    if (!this.initialSettings?.order) {
-      return 0;
-    }
-
-    const order = this.initialSettings.order;
-
-    return order.indexOf(columnA.colId) - order.indexOf(columnB.colId);
-  }
-
-  private setInitialSelected() {
-    if (!this.initialSettings?.selected || !this.gridApi) {
-      return;
-    }
-
-    const selected = this.initialSettings.selected;
-
-    this.gridApi.forEachNode((node) => {
-      if (selected.includes(node.data.colId)) {
-        node.setSelected(true);
+  private updateSelectedNodes(selected: string[]) {
+    this.gridApi()?.forEachNode((node) => {
+      const isSelected = selected.includes(node.data.colId);
+      if (node.isSelected() !== isSelected) {
+        node.setSelected(isSelected);
       }
     });
   }

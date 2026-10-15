@@ -13,11 +13,13 @@ import { HighlightMatchPipe } from '@kotka/ui/core';
   selector: 'kui-field-typeahead',
   template: `
     <kui-autocomplete
-      [(value)]="value"
+      [value]="value()"
       [placeholder]="placeholder()"
       [minCharacters]="0"
       [resultTemplate]="resultTemplate"
       [fetchResultsFunc]="fetchResultsFunc"
+      [showSuggestionsLoadingSpinner]="false"
+      (valueChange)="value.set($event || '')"
     ></kui-autocomplete>
     <ng-template #resultTemplate let-option="result" let-term="term">
       <span>
@@ -51,12 +53,12 @@ export class FieldTypeaheadComponent {
     const results: AutocompleteResult[] = this.fields()
       .filter(
         (field) =>
-          field.field?.toLowerCase().includes(term)
-          // || field.label?.toLowerCase().includes(term), TODO when label exists
+          field.label?.toLowerCase().includes(term)
+          || field.field?.toLowerCase().includes(term)
       )
       .map((field) => ({
         key: field.field,
-        value: field.field,
+        value: field.label || field.field,
       }))
       .sort((a, b) => this.scoreMatch(a, term) - this.scoreMatch(b, term));
 

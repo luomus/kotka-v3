@@ -34,7 +34,7 @@ import {
   getVisibleColDefs,
   getDefaultColumnSettings,
   getProcessedColumns,
-  getColumnSettingsAfterColumnMove
+  getOrderAfterColumnMove,
 } from '../services/datatable-column-utils';
 import { DatatableSettingsStoreService } from '../services/datatable-settings-store.service';
 import { DialogService, Logger } from '@kotka/ui/core';
@@ -178,9 +178,10 @@ export class DatatableComponent implements OnDestroy {
 
     const currentVisible = this.getVisibleCols();
 
-    this.columnSettings.set(
-      getColumnSettingsAfterColumnMove(this.columnSettings(), currentVisible, colId)
-    );
+    this.columnSettings.set({
+      selected: currentVisible,
+      order: getOrderAfterColumnMove(this.columnSettings().order, this.columnSettings().selected, currentVisible, colId)
+    });
   }
 
   openColumnSettingsModal() {
@@ -190,9 +191,9 @@ export class DatatableComponent implements OnDestroy {
       modalDialogClass: 'scrollable-modal column-settings-modal',
     });
 
-    this.modalRef.componentInstance.columns = this.allColumns();
-    this.modalRef.componentInstance.settings = this.columnSettings();
-    this.modalRef.componentInstance.defaultSettings = this.defaultColumnSettings();
+    this.modalRef.componentInstance.columns.set(this.allColumns());
+    this.modalRef.componentInstance.settings.set(this.columnSettings());
+    this.modalRef.componentInstance.defaultSettings.set(this.defaultColumnSettings());
 
     from(this.modalRef.result).subscribe({
       next: (settings) => {

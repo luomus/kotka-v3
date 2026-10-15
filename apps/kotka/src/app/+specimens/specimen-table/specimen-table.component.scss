@@ -34,6 +34,7 @@
 
   .sidebar-label {
     font-weight: $font-weight-semibold;
+    margin-bottom: map.get($spacers, 1);
   }
 
   .sidebar-divider {

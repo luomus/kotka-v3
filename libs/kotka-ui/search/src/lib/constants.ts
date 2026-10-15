@@ -60,8 +60,10 @@ const numericOperators: SearchOperator[] = [
 export const NUMERIC_OPERATORS = SEARCH_OPERATORS.filter((op) =>
   numericOperators.includes(op.id)
 );
+export const DATE_OPERATORS = NUMERIC_OPERATORS;
 
 export const TEXT_TYPES: string[] = ['keyword', 'wildcard', 'text'];
 export const BOOLEAN_TYPES: string[] = ['boolean'];
-export const NUMERIC_TYPES: string[] = ['long', 'integer', 'short', 'byte', 'double', 'float', 'half_float', 'scaled_float', 'unsigned_long', 'date', 'date_nanos'];
-export const QUERY_STRING_SUPPORTED_TYPES: string[] = [...TEXT_TYPES, ...BOOLEAN_TYPES, ...NUMERIC_TYPES];
+export const DATE_TYPES: string[] = ['date', 'date_nanos'];
+export const NUMERIC_TYPES: string[] = ['long', 'integer', 'short', 'byte', 'double', 'float', 'half_float', 'scaled_float', 'unsigned_long'];
+export const QUERY_STRING_SUPPORTED_TYPES: string[] = [...TEXT_TYPES, ...BOOLEAN_TYPES, ...DATE_TYPES, ...NUMERIC_TYPES];

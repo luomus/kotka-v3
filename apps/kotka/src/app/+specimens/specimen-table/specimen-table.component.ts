@@ -135,7 +135,7 @@ export class SpecimenTableComponent {
         return this.apiClient.getSearchFields(this.dataType, index).pipe(
           map((fields) => {
             const columns: DatatableColumn[] = fields.map((field) => ({
-              headerName: field.field[0].toUpperCase() + field.field.slice(1),
+              headerName: field.label || field.field,
               field: field.field,
               ...(specialColumns[field.field] || {}),
               defaultSelected: defaultSelectedFields.includes(field.field),
