@@ -2,6 +2,14 @@ import { ColDef, ColDefWithExtra, ColumnSettings, DatatableColumn, ExtraColDef, 
 
 type CustomColumnKeyList = TupleUnion<keyof ExtraColDef>;
 
+export function getColId(col: DatatableColumn): string {
+  const colId = col.colId || col.field;
+  if (!colId) {
+    throw Error('Every column should either have colId or field');
+  }
+  return colId;
+}
+
 export function getProcessedColumns(columns: DatatableColumn[]): ColDefWithExtra[] {
   columns = [...columns].sort((a, b) => {
     const lockPositionA = a.lockPosition === true ? 'left' : a.lockPosition || undefined;
@@ -17,10 +25,7 @@ export function getProcessedColumns(columns: DatatableColumn[]): ColDefWithExtra
   });
 
   return columns.map((col) => {
-    const colId = col.colId || col.field;
-    if (!colId) {
-      throw Error('Every column should either have colId or field');
-    }
+    const colId = getColId(col);
     const newCol: ColDefWithExtra = { ...col, colId };
 
     if (!col.hideDefaultHeaderTooltip) {
@@ -99,6 +104,7 @@ function removeCustomColumnKeys(columns: ColDefWithExtra[]): ColDef[] {
       'hideDefaultTooltip',
       'defaultSelected',
       'rememberFilters',
+      'sortField'
     ];
     for (const key of customKeys) {
       delete col[key];

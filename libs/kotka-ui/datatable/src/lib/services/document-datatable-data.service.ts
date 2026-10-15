@@ -20,11 +20,14 @@ import {
 } from '@kotka/shared/models';
 import { ListResponse } from '@luomus/laji-schema';
 import { Observable } from 'rxjs';
+import { getColId } from './datatable-column-utils';
 
 export type DatatableRow<
   T extends KotkaDocumentType = KotkaDocumentType,
   S extends IndexType | undefined = IndexType | undefined
 > = S extends IndexType ? SearchResponse : ListResponse<KotkaDocument<T>>
+
+type ColIdFieldMap = Record<string, { sortField: string; filterField: string }>;
 
 @Injectable({
   providedIn: 'root',
@@ -103,12 +106,15 @@ export class DocumentDatatableDataService {
     return fields.map((field) => `${field}:(*${filterText}*)`).join(' OR ');
   }
 
-  private getColIdFieldMap(columns: DatatableColumn[]): Record<string, string> {
-    const result: Record<string, string> = {};
+  private getColIdFieldMap(columns: DatatableColumn[]): ColIdFieldMap {
+    const result: ColIdFieldMap = {};
 
     columns.forEach((column) => {
       if (column.field) {
-        result[column.colId || column.field] = column.field;
+        result[getColId(column)] = {
+          sortField: column.sortField || column.field,
+          filterField: column.field,
+        };
       }
     });
 
@@ -117,23 +123,23 @@ export class DocumentDatatableDataService {
 
   private sortModelToSortString(
     sortModel: DatatableSort,
-    colIdFieldMap: Record<string, string>,
+    colIdFieldMap: ColIdFieldMap,
   ): string {
     return sortModel
       .map(
-        (sort) => (colIdFieldMap[sort.colId] || sort.colId) + ' ' + sort.sort,
+        (sort) => (colIdFieldMap[sort.colId]?.sortField || sort.colId) + ' ' + sort.sort,
       )
       .join(',');
   }
 
   private filterModelToSearchQuery(
     filterModel: DatatableFilter,
-    colIdFieldMap: Record<string, string>,
+    colIdFieldMap: ColIdFieldMap,
   ): string {
     return Object.keys(filterModel)
       .map((key) =>
         this.filterModelEntryToSearchQuery(
-          colIdFieldMap[key],
+          colIdFieldMap[key]?.filterField || key,
           filterModel[key],
         ),
       )

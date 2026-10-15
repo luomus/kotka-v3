@@ -46,6 +46,7 @@ export interface ExtraColDef {
   hideDefaultTooltip?: boolean;
   defaultSelected?: boolean;
   rememberFilters?: boolean;
+  sortField?: string;
 }
 
 export type ColDefWithExtra = ColDef & ExtraColDef;

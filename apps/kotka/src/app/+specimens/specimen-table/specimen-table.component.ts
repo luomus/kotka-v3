@@ -140,7 +140,7 @@ export class SpecimenTableComponent implements OnDestroy {
   labelDesignerData$?: Observable<Document[]>;
 
   private aggregateFields = signal<string[]>(DEFAULT_AGGREGATE_FIELDS);
-  
+
   private filtersSearchQuery = signal('');
   private idSearchQuery = signal<BuilderQuery>({
     groups: [],
@@ -279,6 +279,7 @@ export class SpecimenTableComponent implements OnDestroy {
         const columns: DatatableColumn[] = fields.map((field) => ({
           headerName: field.label || field.field,
           field: field.field,
+          sortField: field.hasRaw ? `${field.field}.raw` : field.field,
           ...(specialColumns[field.field] || {}),
           defaultSelected: defaultSelectedFields.includes(field.field),
         }));
