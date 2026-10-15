@@ -49,11 +49,17 @@ export class ColumnSettingsModalComponent {
   defaultSettings = signal(<ColumnSettings>{ selected: [], order: [] });
   searchText = signal('');
 
+  title = signal('Select columns');
+  description = signal(
+    'Select columns that are displayed in the result table.',
+  );
+  searchLabel = signal('Search columns');
+
   gridColDefs: ColDef[];
   gridOptions: GridOptions;
 
-  private selected = computed(() => (this.settings().selected));
-  private order = computed(() => (this.settings().order));
+  private selected = computed(() => this.settings().selected);
+  private order = computed(() => this.settings().order);
 
   private filteredColumns = computed(() => {
     const searchText = this.searchText().toLowerCase();
@@ -64,12 +70,15 @@ export class ColumnSettingsModalComponent {
 
   private lockedPositions = computed(() => {
     const originalOrder = this.columns().map((col) => col.colId);
-    return this.columns().reduce((result, col) => {
-      if (col.lockPosition) {
-        result[col.colId] = originalOrder.indexOf(col.colId);
-      }
-      return result;
-    }, <Record<string, number>>{});
+    return this.columns().reduce(
+      (result, col) => {
+        if (col.lockPosition) {
+          result[col.colId] = originalOrder.indexOf(col.colId);
+        }
+        return result;
+      },
+      <Record<string, number>>{},
+    );
   });
 
   private gridApi = signal<GridApi | undefined>(undefined);
@@ -107,7 +116,6 @@ export class ColumnSettingsModalComponent {
 
       this.gridApi()?.setGridOption('rowData', sortedRowData);
       this.updateSelectedNodes(untracked(this.selected));
-
     });
 
     effect(() => {

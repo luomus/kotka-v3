@@ -1,4 +1,5 @@
 export * from './lib/datatable/datatable.component';
+export * from './lib/column-settings-modal/column-settings-modal.component';
 export * from './lib/renderers/uri-cell-renderer.component';
 export * from './lib/renderers/enum-cell-renderer.component';
 export * from './lib/renderers/label-cell-renderer.component';

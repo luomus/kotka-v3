@@ -1,4 +1,4 @@
-import { Component, ViewChild, inject, output, input, effect, Signal, computed } from '@angular/core';
+import { Component, inject, output, input, effect, Signal, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   DatatableSource,
@@ -38,9 +38,6 @@ export class DocumentDatatableComponent<
   private dataService = inject(DocumentDatatableDataService);
   private userService = inject(UserService);
 
-  @ViewChild(DatatableComponent, { static: true })
-  datatableComponent!: DatatableComponent;
-
   dataType = input.required<T>();
   index = input<S>();
 
@@ -57,7 +54,7 @@ export class DocumentDatatableComponent<
   extraSearchQuery = input<string>();
   aggregateBy = input<S extends IndexType ? string[] : never>();
 
-  datasource: DatatableSource;
+  datasource = signal<DatatableSource | undefined>(undefined);
   settingsKey: Signal<string | undefined>;
 
   loadData = output<DatatableLoadedData<T, S>>();
@@ -66,22 +63,43 @@ export class DocumentDatatableComponent<
   private userId: Signal<string | undefined>;
 
   constructor() {
-    this.datasource = {
+    this.userId = toSignal(
+      this.userService.getCurrentLoggedInUser().pipe(map((user) => user.id)),
+    );
+
+    this.settingsKey = computed(
+      () =>
+        `${this.dataType()}${this.index() ? '-' + this.index() : ''}-table-${this.userId()}`,
+    );
+
+    effect(() => {
+      this.datasource.set(
+        this.getDataSource(
+          this.dataType(),
+          this.index(),
+          this.columns(),
+          this.extraSortModel(),
+          this.extraSearchQuery(),
+          this.aggregateBy(),
+        )
+      );
+    });
+  }
+
+  private getDataSource(dataType: T, index: S | undefined, columns: DatatableColumn[], extraSortModel: DatatableSort, extraSearchQuery?: string, aggregateBy?: S extends IndexType ? string[] : never): DatatableSource {
+    return {
       getRows: (params: GetRowsParams) => {
         const searchParams = this.dataService.getSearchParams(
-          this.columns(),
+          columns,
           params.startRow,
           params.endRow,
-          params.sortModel.concat(this.extraSortModel()),
+          params.sortModel.concat(extraSortModel),
           params.filterModel,
-          this.extraSearchQuery(),
+          extraSearchQuery,
         );
 
-        const dataType = this.dataType();
-        const index = this.index();
-
         return this.dataService
-          .getRows<T, S>(dataType, index, searchParams, this.aggregateBy()).pipe(
+          .getRows<T, S>(dataType, index, searchParams, aggregateBy).pipe(
             catchError((err) => {
               if (err.status === 400) {
                 this.invalidQueryError.emit(err);
@@ -98,21 +116,5 @@ export class DocumentDatatableComponent<
           });
       },
     };
-
-    this.userId = toSignal(this.userService.getCurrentLoggedInUser().pipe(map(user => user.id)));
-
-    this.settingsKey = computed(() => (
-      `${this.dataType()}${this.index() ? '-' + this.index() : ''}-table-${this.userId()}`
-    ));
-
-    effect(() => {
-      this.dataType(); // trigger refresh when any of these inputs change
-      this.index();
-      this.columns();
-      this.extraSortModel();
-      this.extraSearchQuery();
-
-      this.datatableComponent.refresh();
-    });
   }
 }

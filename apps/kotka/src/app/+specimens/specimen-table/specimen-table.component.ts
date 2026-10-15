@@ -1,14 +1,20 @@
 import {
   ChangeDetectionStrategy,
-  Component, computed,
+  Component,
+  computed,
   effect,
-  inject, Signal,
+  inject,
+  OnDestroy,
+  Signal,
   signal,
 } from '@angular/core';
 import {
+  ColDefWithExtra,
+  ColumnSettingsModalComponent,
   DatatableColumn,
   DatatableLoadedData,
-  DocumentDatatableComponent, getUriColumnOptions,
+  DocumentDatatableComponent,
+  getUriColumnOptions,
 } from '@kotka/ui/datatable';
 import {
   KotkaDocumentType, Document, IndexType, SearchResponse, FieldAggregate, SearchField,
@@ -23,20 +29,22 @@ import {
 } from '@kotka/ui/core';
 import { SpecimenLabelDesignerComponent } from '../specimen-label-designer/specimen-label-designer.component';
 import { AggregationsComponent, FieldValue } from './aggregations.component';
-import { Observable } from 'rxjs';
+import { from, Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { map, startWith, switchMap } from 'rxjs/operators';
-import { toObservable } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { BuilderQuery, builderQueryToQueryString, groupToQueryString, joinQueryStrings,
   SearchGroup, SearchQuery, SpecimenSearchComponent
 } from '@kotka/ui/search';
-import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
+import { NgbAlert, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
-interface ViewModel {
-  index: IndexType | undefined;
+interface FieldData {
   fields: SearchField[];
+  fieldMap: Record<string, SearchField>;
   columns: DatatableColumn[];
-  columnsLoading: boolean;
+  allAggregateFields: string[];
+  allAggregateColumns: DatatableColumn[];
+  fieldsLoading: boolean;
 }
 
 const DEFAULT_SELECTED_FIELDS: Record<IndexType, SearchResultKey[]> = {
@@ -45,6 +53,15 @@ const DEFAULT_SELECTED_FIELDS: Record<IndexType, SearchResultKey[]> = {
   typeSpecimen: ['documentID', 'locality', 'taxon'],
   sample: ['documentID', 'id', 'recordParts', 'taxon'],
 };
+
+const DEFAULT_AGGREGATE_FIELDS: string[] = [
+  'editor',
+  'leg',
+  'taxon',
+  'taxonRank',
+  'typeStatus',
+];
+
 const SPECIAL_COLUMNS: Partial<Record<SearchResultKey, DatatableColumn>> = {
   documentID: {
     ...getUriColumnOptions({
@@ -56,6 +73,15 @@ const SPECIAL_COLUMNS: Partial<Record<SearchResultKey, DatatableColumn>> = {
   id: getUriColumnOptions({
     showEditLink: false,
   })
+};
+
+const INITIAL_FIELD_DATA: FieldData = {
+  fields: [],
+  fieldMap: {},
+  columns: [],
+  allAggregateFields: [],
+  allAggregateColumns: [],
+  fieldsLoading: true,
 };
 
 @Component({
@@ -76,9 +102,10 @@ const SPECIAL_COLUMNS: Partial<Record<SearchResultKey, DatatableColumn>> = {
     DataTypeNamePipePipe,
   ],
 })
-export class SpecimenTableComponent {
+export class SpecimenTableComponent implements OnDestroy {
   private apiClient = inject(ApiClient);
   private searchResultIteratorService = inject(SearchResultIteratorService);
+  private modalService = inject(NgbModal);
 
   dataType: KotkaDocumentType.specimen = KotkaDocumentType.specimen;
   index = signal<IndexType>('unit');
@@ -86,86 +113,89 @@ export class SpecimenTableComponent {
 
   searchError?: string;
 
-  indexOptions: IndexType[] = ['unit', 'identification', 'typeSpecimen', 'sample'];
-  aggregateFields: string[] = ['editor', 'leg', 'taxon', 'taxonRank', 'typeStatus'];
+  indexOptions: IndexType[] = [
+    'unit',
+    'identification',
+    'typeSpecimen',
+    'sample',
+  ];
 
-  aggregates?: FieldAggregate[];
+  aggregateValidFields = computed(() =>
+    this.aggregateFields().filter(
+      (field) => this.fieldData().fieldMap[field] !== undefined,
+    ),
+  );
+  aggregateSearchFields = computed(() =>
+    this.aggregateValidFields().map((field) =>
+      this.fieldData().fieldMap[field]?.hasRaw ? `${field}.raw` : field,
+    ),
+  );
+  aggregateFieldOrder = signal<string[] | undefined>(undefined);
 
-  vm$: Observable<ViewModel>;
+  aggregateResults?: FieldAggregate[];
+
+  fieldData: Signal<FieldData>;
 
   showLabelDesigner = signal(false);
   labelDesignerData$?: Observable<Document[]>;
 
+  private aggregateFields = signal<string[]>(DEFAULT_AGGREGATE_FIELDS);
+  
   private filtersSearchQuery = signal('');
-  private idSearchQuery = signal<BuilderQuery>({ groups: [], joinOperator: 'AND' });
+  private idSearchQuery = signal<BuilderQuery>({
+    groups: [],
+    joinOperator: 'AND',
+  });
   private inputSearchQuery = signal('');
+
   private activeSearchParams?: IteratorSearchParams;
+  private modalRef?: NgbModalRef;
 
   constructor() {
-    this.searchQuery = computed(() => (
+    this.searchQuery = computed(() =>
       joinQueryStrings(
         'AND',
         this.filtersSearchQuery(),
         builderQueryToQueryString(this.idSearchQuery()),
-        this.inputSearchQuery()
-      )
-    ));
+        this.inputSearchQuery(),
+      ),
+    );
 
     effect(() => {
       if (this.showLabelDesigner()) {
         const searchParams = this.activeSearchParams;
-        this.labelDesignerData$ = this.apiClient
-          .getAllDocuments(
-            this.dataType,
-            searchParams?.searchQuery,
-            1000,
-            searchParams?.sort,
-            undefined
-          );
+        this.labelDesignerData$ = this.apiClient.getAllDocuments(
+          this.dataType,
+          searchParams?.searchQuery,
+          1000,
+          searchParams?.sort,
+          undefined,
+        );
       } else {
         this.labelDesignerData$ = undefined;
       }
     });
 
-    this.vm$ = toObservable(this.index).pipe(
-      switchMap((index) => {
-        const defaultSelectedFields: string[] = DEFAULT_SELECTED_FIELDS[index];
-        const specialColumns: Record<string, DatatableColumn> = SPECIAL_COLUMNS;
-
-        return this.apiClient.getSearchFields(this.dataType, index).pipe(
-          map((fields) => {
-            const columns: DatatableColumn[] = fields.map((field) => ({
-              headerName: field.label || field.field,
-              field: field.field,
-              ...(specialColumns[field.field] || {}),
-              defaultSelected: defaultSelectedFields.includes(field.field),
-            }));
-            return {
-              index,
-              fields,
-              columns,
-              columnsLoading: false,
-            };
-          }),
-          startWith({
-            index,
-            fields: [],
-            columns: [],
-            columnsLoading: true,
-          })
-        );
-      })
+    this.fieldData = toSignal(
+      toObservable(this.index).pipe(
+        switchMap((index) => this.getFieldData(index)),
+      ),
+      { initialValue: INITIAL_FIELD_DATA },
     );
+  }
+
+  ngOnDestroy() {
+    this.modalRef?.close();
   }
 
   onAggregationFiltersChange(fieldValues: FieldValue[] = []) {
     const searchGroup: SearchGroup = {
-      criteria: fieldValues.map(fieldValue => ({
+      criteria: fieldValues.map((fieldValue) => ({
         field: fieldValue.field,
         operator: 'equals',
-        value: `${fieldValue.value}`
+        value: `${fieldValue.value}`,
       })),
-      joinOperator: 'AND'
+      joinOperator: 'AND',
     };
 
     this.filtersSearchQuery.set(groupToQueryString(searchGroup).result);
@@ -176,12 +206,45 @@ export class SpecimenTableComponent {
     this.inputSearchQuery.set(searchQuery.textSearchQuery);
   }
 
+  openAggregateSettingsModal() {
+    this.modalRef = this.modalService.open(ColumnSettingsModalComponent, {
+      backdrop: 'static',
+      size: 'md',
+      modalDialogClass: 'scrollable-modal column-settings-modal',
+    });
+
+    this.modalRef.componentInstance.columns.set(
+      this.fieldData().allAggregateColumns,
+    );
+    this.modalRef.componentInstance.settings.set({
+      selected: this.aggregateValidFields(),
+      order: this.aggregateFieldOrder() || this.fieldData().allAggregateFields,
+    });
+    this.modalRef.componentInstance.defaultSettings.set({
+      selected: DEFAULT_AGGREGATE_FIELDS,
+      order: this.fieldData().allAggregateFields,
+    });
+    this.modalRef.componentInstance.title.set('Select fields');
+    this.modalRef.componentInstance.description.set(
+      'Select fields that are displayed on the sidebar.',
+    );
+    this.modalRef.componentInstance.searchLabel.set('Search fields');
+
+    from(this.modalRef.result).subscribe({
+      next: (settings) => {
+        this.aggregateFields.set(settings.selected);
+        this.aggregateFieldOrder.set(settings.order);
+      },
+      error: () => undefined,
+    });
+  }
+
   onDataLoad(data: DatatableLoadedData) {
-    this.aggregates = (<SearchResponse>data.result).aggregates;
+    this.aggregateResults = (<SearchResponse>data.result).aggregates;
 
     const searchParams: IteratorSearchParams = {
       sort: data.searchParams.sort,
-      searchQuery: data.searchParams.searchQuery
+      searchQuery: data.searchParams.searchQuery,
     };
 
     this.activeSearchParams = searchParams;
@@ -197,5 +260,51 @@ export class SpecimenTableComponent {
 
   onInvalidQueryError() {
     this.searchError = 'Invalid query!';
+  }
+
+  private getFieldData(index: IndexType): Observable<FieldData> {
+    const defaultSelectedFields: string[] = DEFAULT_SELECTED_FIELDS[index];
+    const specialColumns: Record<string, DatatableColumn> = SPECIAL_COLUMNS;
+
+    return this.apiClient.getSearchFields(this.dataType, index).pipe(
+      map((fields) => {
+        const fieldMap: Record<string, SearchField> = fields.reduce(
+          (result, field) => {
+            result[field.field] = field;
+            return result;
+          },
+          <Record<string, SearchField>>{},
+        );
+
+        const columns: DatatableColumn[] = fields.map((field) => ({
+          headerName: field.label || field.field,
+          field: field.field,
+          ...(specialColumns[field.field] || {}),
+          defaultSelected: defaultSelectedFields.includes(field.field),
+        }));
+
+        const allAggregateColumns: ColDefWithExtra[] = fields
+          .filter((field) => field.hasRaw || field.type === 'keyword')
+          .map((field) => ({
+            colId: field.field,
+            headerName: field.label || field.field,
+            field: field.field,
+          }));
+
+        const allAggregateFields: string[] = allAggregateColumns.map(
+          (col) => col.colId,
+        );
+
+        return {
+          fields,
+          fieldMap,
+          columns,
+          allAggregateColumns,
+          allAggregateFields,
+          fieldsLoading: false,
+        };
+      }),
+      startWith(INITIAL_FIELD_DATA),
+    );
   }
 }

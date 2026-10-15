@@ -16,10 +16,18 @@
           </div>
 
           <hr class="sidebar-divider">
+          <button
+            class="btn btn-sm btn-outline-secondary"
+            [disabled]="!aggregateResults"
+            (click)="openAggregateSettingsModal()"
+            data-cy="select-aggregate-fields"
+          >
+            <i class="fa-solid fa-gear"></i> Select filters
+          </button>
 
           <kotka-aggregations
             class="sidebar-aggregations"
-            [aggregates]="aggregates || []"
+            [aggregates]="aggregateResults || []"
             (selectedChange)="onAggregationFiltersChange($event)"
           ></kotka-aggregations>
         </aside>
@@ -31,10 +39,10 @@
         >
           Print labels
         </button-->
-        @if (vm$ | async; as vm) {
+        @if (fieldData(); as fieldData) {
           <kui-specimen-search
             class="specimen-search"
-            [fields]="vm.fields"
+            [fields]="fieldData.fields"
             (search)="onSearch($event)"
           >
           </kui-specimen-search>
@@ -46,21 +54,21 @@
           <kui-document-datatable
             class="specimen-datatable"
             [dataType]="dataType"
-            [index]="vm.index"
-            [columns]="vm.columns"
-            [columnsLoading]="vm.columnsLoading"
+            [index]="index()"
+            [columns]="fieldData.columns"
+            [columnsLoading]="fieldData.fieldsLoading"
             [enableFileExport]="true"
             [enableColumnSelection]="true"
             [disableFilter]="true"
             [extraSearchQuery]="searchQuery()"
-            [extraSortModel]="vm.index ? [] : [{
+            [extraSortModel]="index() ? [] : [{
                 colId: 'dateCreated',
                 sort:  'desc'
               }, {
                 colId: 'id',
                 sort:  'desc'
               }]"
-            [aggregateBy]="aggregateFields"
+            [aggregateBy]="aggregateSearchFields()"
             (loadData)="onDataLoad($event)"
             (invalidQueryError)="onInvalidQueryError()"
           >

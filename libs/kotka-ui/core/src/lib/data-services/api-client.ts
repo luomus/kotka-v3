@@ -405,15 +405,16 @@ export class ApiClient {
     if (aggregateBy && aggregateBy.length > 0) {
       const aggs: Aggs = {};
       aggregateBy.forEach(field => {
-        aggs[field] = {
+        const fieldName = field.replace(/\.raw$/, '');
+        aggs[fieldName] = {
           terms: {
-            field: `${field}.raw`,
+            field,
             size: aggregateSize,
           },
         };
-        aggs[`${field}_count`] = {
+        aggs[`${fieldName}_count`] = {
           cardinality: {
-            field: `${field}.raw`,
+            field,
             precision_threshold: COUNT_PRECISION_THRESHOLD
           }
         };
@@ -434,13 +435,14 @@ export class ApiClient {
     }
 
     return aggregateBy.map(field => {
-      const count = aggregations[`${field}_count`]?.value || 0;
+      const fieldName = field.replace(/\.raw$/, '');
+      const count = aggregations[`${fieldName}_count`]?.value || 0;
 
       return {
-        field,
+        field: fieldName,
         count,
         countUnprecise: count > COUNT_PRECISION_THRESHOLD,
-        values: (aggregations[field]?.buckets || []).map(bucket => ({
+        values: (aggregations[fieldName]?.buckets || []).map(bucket => ({
           value: bucket.key,
           docCount: bucket.doc_count,
         })),
