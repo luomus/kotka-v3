@@ -1,17 +1,20 @@
 import {
   BasicFilterModel,
-  CombinedFilterModel,
   DatatableColumn,
   DatatableFilter,
   DatatableSort,
   FilterModel,
   isBasicFilterModel,
-  isDateFilterModel,
-  isTextFilterModel,
+  isDateFilterModel
 } from '../models/models';
 import { inject, Injectable } from '@angular/core';
 import { ApiClient, SearchParams } from '@kotka/ui/core';
-import { joinQueryStrings } from '@kotka/ui/search';
+import {
+  builderQueryToQueryString,
+  joinQueryStrings,
+  SearchCriteria,
+  SearchGroup,
+} from '@kotka/ui/search';
 import {
   IndexType,
   KotkaDocument,
@@ -102,8 +105,17 @@ export class DocumentDatatableDataService {
     if (!filterText) {
       return '';
     }
-    filterText = this.escapeFilterString(filterText);
-    return fields.map((field) => `${field}:(*${filterText}*)`).join(' OR ');
+
+    const criteria: SearchCriteria[] = fields.map((field) => ({
+      field,
+      operator: 'contains',
+      value: filterText,
+    }));
+
+    return builderQueryToQueryString({
+      groups: [{ criteria, joinOperator: 'OR' }],
+      joinOperator: 'OR',
+    });
   }
 
   private getColIdFieldMap(columns: DatatableColumn[]): ColIdFieldMap {
@@ -136,20 +148,43 @@ export class DocumentDatatableDataService {
     filterModel: DatatableFilter,
     colIdFieldMap: ColIdFieldMap,
   ): string {
-    return Object.keys(filterModel)
-      .map((key) =>
-        this.filterModelEntryToSearchQuery(
-          colIdFieldMap[key]?.filterField || key,
-          filterModel[key],
-        ),
-      )
-      .join(' AND ');
+    const groups: SearchGroup[] = Object.keys(filterModel).map((key) =>
+      this.filterModelEntryToSearchGroup(
+        colIdFieldMap[key]?.filterField || key,
+        filterModel[key],
+      ),
+    );
+
+    return builderQueryToQueryString({ groups, joinOperator: 'AND' });
   }
 
-  private filterModelEntryToSearchQuery(
+  private filterModelEntryToSearchGroup(
     field: string,
     filterModel: FilterModel,
-  ): string {
+  ): SearchGroup {
+    if (isBasicFilterModel(filterModel)) {
+      return {
+        criteria: [this.basicFilterModelToSearchCriteria(field, filterModel)],
+        joinOperator: 'AND',
+      };
+    }
+
+    if (!filterModel.conditions) {
+      throw new Error('Filter model has errors!');
+    }
+
+    return {
+      criteria: filterModel.conditions.map((condition) =>
+        this.basicFilterModelToSearchCriteria(field, condition),
+      ),
+      joinOperator: filterModel.operator,
+    };
+  }
+
+  private basicFilterModelToSearchCriteria(
+    field: string,
+    filterModel: BasicFilterModel,
+  ): SearchCriteria {
     if (
       !(
         filterModel.filterType &&
@@ -161,123 +196,26 @@ export class DocumentDatatableDataService {
       );
     }
 
-    if (isBasicFilterModel(filterModel)) {
-      return this.basicFilterModelEntryToSearchQuery(field, filterModel);
+    if (!filterModel.type) {
+      throw new Error(
+        'Filter type is required!',
+      );
+    }
+
+    let value: string;
+    let value2: string | undefined;
+
+    if (isDateFilterModel(filterModel)) {
+      value = this.getDateFilter(filterModel.dateFrom);
+      value2 = this.getDateFilter(filterModel.dateTo);
     } else {
-      return this.combinedFilterModelEntryToSearchQuery(field, filterModel);
-    }
-  }
-
-  private basicFilterModelEntryToSearchQuery(
-    field: string,
-    filterModel: BasicFilterModel,
-  ): string {
-    let filter: string | boolean, filter2: string;
-    if (isTextFilterModel(filterModel)) {
-      filter = this.escapeFilterString(filterModel.filter);
-    } else if (isDateFilterModel(filterModel)) {
-      filter = this.getDateFilter(filterModel.dateFrom);
-      filter2 = this.getDateFilter(filterModel.dateTo);
-    } else {
-      filter = filterModel.filter;
+      value = filterModel.filter != null ? String(filterModel.filter) : '';
     }
 
-    switch (filterModel.type) {
-      case 'contains': {
-        return `${field}:(*${filter}*)`;
-      }
-      case 'notContains': {
-        return `${field}:(NOT *${filter}*)`;
-      }
-      case 'equals': {
-        return `${field}:(${filter})`;
-      }
-      case 'notEqual': {
-        return `${field}:(NOT ${filter})`;
-      }
-      case 'startsWith': {
-        return `${field}:(${filter}*)`;
-      }
-      case 'endsWith': {
-        return `${field}:(*${filter})`;
-      }
-      case 'blank': {
-        return `_exists_:(NOT ${field})`;
-      }
-      case 'notBlank': {
-        return `_exists_:${field}`;
-      }
-      case 'lessThan': {
-        return `${field}:[* TO ${filter}]`;
-      }
-      case 'greaterThan': {
-        return `${field}:[${filter} TO *]`;
-      }
-      case 'inRange': {
-        return `${field}:[${filter} TO ${filter2!}]`;
-      }
-      default: {
-        throw new Error(
-          'Filter type ' + filterModel.type + ' is not supported!',
-        );
-      }
-    }
-  }
-
-  private combinedFilterModelEntryToSearchQuery(
-    field: string,
-    filterModel: CombinedFilterModel,
-  ): string {
-    if (!filterModel.conditions) {
-      throw new Error('Filter model has errors!');
-    }
-
-    return filterModel.conditions
-      .map((condition) => this.filterModelEntryToSearchQuery(field, condition))
-      .join(` ${filterModel.operator} `);
+    return { field, operator: filterModel.type, value, value2 };
   }
 
   private getDateFilter(searchQuery?: string | null): string {
     return searchQuery ? searchQuery.split(' ')[0] : '';
-  }
-
-  private escapeFilterString(searchQuery?: string | null): string {
-    if (!searchQuery) {
-      return '';
-    }
-
-    const escapedChars = [
-      '\\',
-      '*',
-      '?',
-      '+',
-      '-',
-      '&&',
-      '||',
-      '!',
-      '(',
-      ')',
-      '{',
-      '}',
-      '[',
-      ']',
-      '^',
-      '~',
-      ':',
-      '"',
-      '=',
-      '/',
-      ' ',
-    ];
-    escapedChars.forEach((char) => {
-      searchQuery = searchQuery!.split(char).join('\\' + char);
-    });
-
-    const removedChars = ['<', '>'];
-    removedChars.forEach((char) => {
-      searchQuery = searchQuery!.split(char).join('');
-    });
-
-    return searchQuery;
   }
 }
