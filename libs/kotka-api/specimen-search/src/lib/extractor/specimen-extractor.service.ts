@@ -33,7 +33,7 @@ export class SpecimenExtractorService extends BaseExtractorService {
     protected readonly valueMappingService: ExtractorFieldMappingService,
 
   ) {
-    super(specimenConfig);
+    super(valueMappingService, specimenConfig);
   }
 
   async addToBulk(document: ElasticDocument, bulk: BulkRequest): Promise<undefined | ElasticBaseUnit[]> {

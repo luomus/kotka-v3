@@ -6,8 +6,8 @@ import { ExtractorFieldMappingService } from '../mapper/extractor-field-mapping.
 import { ExtractorConfig, INDEX_PREFIX, mergeConfig } from './config/base.config';
 
 export class BaseExtractorService implements ExtractorInterface {
-  protected readonly valueMappingService: ExtractorFieldMappingService;
   constructor(
+    protected readonly valueMappingService: ExtractorFieldMappingService,
     parentConfig: ExtractorConfig,
   ) {
     this.config = mergeConfig(parentConfig);

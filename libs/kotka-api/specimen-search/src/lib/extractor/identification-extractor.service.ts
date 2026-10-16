@@ -16,9 +16,7 @@ export class IdentificationExtractorService extends BaseExtractorService {
     private readonly taxonLinkingService: TaxonLinkingService,
     protected readonly valueMappingService: ExtractorFieldMappingService,
   ) {
-    super(
-      identificationConfig
-    );
+    super(valueMappingService, identificationConfig);
   }
 
   async addToBulk(document: ElasticBaseUnit & { identifications?: Identification[] }, bulk: BulkRequest): Promise<undefined | ElasticIdentification[]> {

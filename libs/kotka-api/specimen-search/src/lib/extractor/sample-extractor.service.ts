@@ -5,13 +5,15 @@ import { BulkRequest } from '@elastic/elasticsearch/lib/api/types';
 import { Preparation, Sample } from '@kotka/shared/models';
 import { AutocompleteExtractorService, ExtractorInterface } from '@kotka/api/elasticsearch';
 import { sampleConfig } from './config/sample.config';
+import { ExtractorFieldMappingService } from '../mapper/extractor-field-mapping.service';
 
 @Injectable()
 export class SampleExtractorService extends BaseExtractorService {
   constructor(
-    private readonly autocompleteExtractorService: AutocompleteExtractorService
+    private readonly autocompleteExtractorService: AutocompleteExtractorService,
+    protected readonly valueMappingService: ExtractorFieldMappingService
   ) {
-    super(sampleConfig);
+    super(valueMappingService, sampleConfig);
   }
 
   getIndex() {

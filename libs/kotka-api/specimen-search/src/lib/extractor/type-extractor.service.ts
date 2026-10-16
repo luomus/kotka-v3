@@ -13,7 +13,7 @@ export class TypeExtractorService extends BaseExtractorService {
     private readonly autocompleteExtractorService: AutocompleteExtractorService,
     protected readonly valueMappingService: ExtractorFieldMappingService,
   ) {
-    super(typeSpecimenConfig);
+    super(valueMappingService, typeSpecimenConfig);
   }
 
   async addToBulk(document: ElasticBaseUnit & { typeSpecimens?: TypeSpecimen[] }, bulk: BulkRequest): Promise<undefined | ElasticType[]> {
