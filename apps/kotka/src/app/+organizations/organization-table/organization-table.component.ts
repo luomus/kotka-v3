@@ -109,7 +109,7 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
     },
   };
 
-  extraSearchQuery?: string;
+  searchQuery?: string;
 
   nameFilterText = '';
 
@@ -140,7 +140,7 @@ export class OrganizationTableComponent implements OnInit, OnDestroy {
     this.updateSearchQuerySub = this.nameFilterChangedSubject
       .pipe(debounceTime(500))
       .subscribe(() => {
-        this.extraSearchQuery =
+        this.searchQuery =
           this.dataService.getSearchQueryForMultiColumnTextSearch(
             this.allNameFields,
             this.nameFilterText,

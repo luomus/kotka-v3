@@ -1,4 +1,4 @@
-import { Component, Injector, OnDestroy, input, computed, signal, Signal, effect, WritableSignal, inject } from '@angular/core';
+import { Component, Injector, OnDestroy, input, computed, signal, Signal, effect, WritableSignal, inject, model } from '@angular/core';
 import {
   ColDef as AgGridColDef,
   DragStoppedEvent,
@@ -72,7 +72,10 @@ export class DatatableComponent implements OnDestroy {
   enableColumnSelection = input<boolean|undefined>(false);
   disableFilter = input<boolean|undefined>(false);
 
+  columnSettings = model<ColumnSettings | undefined>(undefined);
   settingsKey = input<string>();
+
+  sortModel = model<DatatableSort>([]);
 
   dataTypeName = input('item');
   dataTypeNamePlural = input<string>();
@@ -103,23 +106,21 @@ export class DatatableComponent implements OnDestroy {
 
   private allColumns: Signal<ColDefWithExtra[]>;
   private defaultColumnSettings: Signal<ColumnSettings>;
-  private columnSettings: WritableSignal<ColumnSettings> = signal({ selected: [], order: []}, {equal: isEqual});
+  private activeColumnSettings: Signal<ColumnSettings>;
 
   private gridDataSource: Signal<DatatableSource|undefined>;
   private dataLoading = signal(false);
-  private loading: Signal<boolean>;
 
-  private sortModel: WritableSignal<DatatableSort> = signal([], {equal: isEqual});
   private filterModel: WritableSignal<DatatableFilter> = signal({}, {equal: isEqual});
 
-  private gridApi?: GridApi;
+  private gridApi = signal<GridApi | undefined>(undefined);
   private modalRef?: NgbModalRef;
   private isDestroyed = false;
   private unsubscribe$ = new Subject<void>();
 
   constructor() {
     this.colDefs = computed(() => (
-      getVisibleColDefs(this.allColumns(), this.columnSettings()))
+      getVisibleColDefs(this.allColumns(), this.activeColumnSettings()))
     );
 
     this.defaultColDef = computed(() => ({
@@ -141,13 +142,15 @@ export class DatatableComponent implements OnDestroy {
       getDefaultColumnSettings(this.allColumns(), this.enableColumnSelection()))
     );
 
+    this.activeColumnSettings = computed(() => (
+      this.columnSettings() || this.defaultColumnSettings()
+    ), {equal: isEqual});
+
     this.gridDataSource = computed(() => (
       this.datasource()
         ? { ...this.datasource(), getRows: this.getRows.bind(this) }
         : undefined
     ));
-
-    this.loading = computed(() => (this.columnsLoading() || this.dataLoading()));
 
     this.initEffects();
   }
@@ -160,17 +163,10 @@ export class DatatableComponent implements OnDestroy {
   }
 
   onGridReady(params: GridReadyEvent) {
-    this.gridApi = params.api;
-    this.gridApi.setFilterModel(this.filterModel());
-    this.gridApi.setGridOption('datasource', this.gridDataSource());
-    this.gridApi.setGridOption('loading', this.loading());
+    this.gridApi.set(params.api);
   }
 
   dragStopped(e: DragStoppedEvent) {
-    if (!this.gridApi) {
-      return;
-    }
-
     const colId = e.target.attributes.getNamedItem('col-id')?.value;
     if (!colId) {
       return;
@@ -180,7 +176,7 @@ export class DatatableComponent implements OnDestroy {
 
     this.columnSettings.set({
       selected: currentVisible,
-      order: getOrderAfterColumnMove(this.columnSettings().order, this.columnSettings().selected, currentVisible, colId)
+      order: getOrderAfterColumnMove(this.activeColumnSettings().order, this.activeColumnSettings().selected, currentVisible, colId)
     });
   }
 
@@ -192,7 +188,7 @@ export class DatatableComponent implements OnDestroy {
     });
 
     this.modalRef.componentInstance.columns.set(this.allColumns());
-    this.modalRef.componentInstance.settings.set(this.columnSettings());
+    this.modalRef.componentInstance.settings.set(this.activeColumnSettings());
     this.modalRef.componentInstance.defaultSettings.set(this.defaultColumnSettings());
 
     from(this.modalRef.result).subscribe({
@@ -232,23 +228,46 @@ export class DatatableComponent implements OnDestroy {
       });
   }
 
-  refresh() {
-    this.gridApi?.refreshInfiniteCache();
-  }
-
   private initEffects() {
     effect(() => {
-      const defaultSettings = this.defaultColumnSettings();
+      this.gridApi()?.setGridOption('columnDefs', this.colDefs());
+    });
+
+    effect(() => {
+      this.gridApi()?.setGridOption('defaultColDef', this.defaultColDef());
+    });
+
+    effect(() => {
+      this.gridApi()?.applyColumnState({
+        state: this.sortModel(),
+        defaultState: { sort: null }
+      });
+    });
+
+    effect(() => {
+      this.gridApi()?.setGridOption('datasource', this.gridDataSource());
+    });
+
+    effect(() => {
+      this.gridApi()?.setGridOption('loading', this.dataLoading());
+    });
+
+    effect(() => {
+      if (this.columnSettings() || this.columnsLoading()) {
+        return;
+      }
 
       let storedSettings: ColumnSettings|undefined;
       if (this.enableColumnSelection()) {
         storedSettings = this.settingsStoreService.getStoredColumnSettings(
           this.settingsKey(),
-          defaultSettings
+          this.defaultColumnSettings()
         );
       }
 
-      this.columnSettings.set(storedSettings || defaultSettings);
+      if (storedSettings) {
+        this.columnSettings.set(storedSettings);
+      }
     });
 
     effect(() => {
@@ -266,27 +285,15 @@ export class DatatableComponent implements OnDestroy {
         ...this.settingsStoreService.getStoredFilters(this.settingsKey())
       };
       this.filterModel.set(filterModel);
-      this.gridApi?.setFilterModel(filterModel);
+      this.gridApi()?.setFilterModel(filterModel);
     });
 
     effect(() => {
-      if (!this.columnsLoading()) {
-        this.settingsStoreService.storeFilters(
-          this.settingsKey(),
-          this.filterModel(),
-          this.allColumns(),
-        );
-      }
-    });
-
-    effect(() => {
-      const datasource = this.gridDataSource();
-      this.gridApi?.setGridOption('datasource', datasource);
-    });
-
-    effect(() => {
-      const loading = this.loading();
-      this.gridApi?.setGridOption('loading', loading);
+      this.settingsStoreService.storeFilters(
+        this.settingsKey(),
+        this.filterModel(),
+        this.allColumns(),
+      );
     });
   }
 
@@ -346,10 +353,11 @@ export class DatatableComponent implements OnDestroy {
   }
 
   private getVisibleCols(): string[] {
-    if (!this.gridApi) {
+    const gridApi = this.gridApi();
+    if (!gridApi) {
       return [];
     }
-    return this.gridApi
+    return gridApi
       .getAllDisplayedColumns()
       .map((c) => c.getColId());
   }

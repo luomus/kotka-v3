@@ -3,6 +3,29 @@
     pageTitle="Search specimens"
     containerClass="container-fluid"
   >
+    <div kuiMainContentHeader class="header-layout">
+      <div class="header-left-group">
+        <h1 data-cy="main-header">Search specimens</h1>
+      </div>
+      <div>
+        <div class="input-group">
+          <input
+            type="text"
+            class="form-control"
+            [ngModel]="searchLink()"
+            readonly
+          />
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            title="Copy search link to clipboard"
+            (click)="copySearchLinkToClipboard()"
+          >
+            <i class="fa fa-link"></i>
+          </button>
+        </div>
+      </div>
+    </div>
     <div class="row g-3 content-row">
       <div class="col-12 col-md-3 col-lg-2 content-column">
         <aside class="specimen-sidebar">
@@ -27,8 +50,8 @@
 
           <kotka-aggregations
             class="sidebar-aggregations"
+            [(selected)]="filtersValue"
             [aggregates]="aggregateResults || []"
-            (selectedChange)="onAggregationFiltersChange($event)"
           ></kotka-aggregations>
         </aside>
       </div>
@@ -57,17 +80,12 @@
             [index]="index()"
             [columns]="fieldData.columns"
             [columnsLoading]="fieldData.fieldsLoading"
+            [(columnSettings)]="columnSettings"
             [enableFileExport]="true"
             [enableColumnSelection]="true"
             [disableFilter]="true"
-            [extraSearchQuery]="searchQuery()"
-            [extraSortModel]="index() ? [] : [{
-                colId: 'dateCreated',
-                sort:  'desc'
-              }, {
-                colId: 'id',
-                sort:  'desc'
-              }]"
+            [searchQuery]="searchQuery()"
+            [(sortModel)]="sortModel"
             [aggregateBy]="aggregateBy()"
             (loadData)="onDataLoad($event)"
             (invalidQueryError)="onInvalidQueryError()"

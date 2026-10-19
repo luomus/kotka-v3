@@ -19,7 +19,7 @@ export class DatatableSettingsStoreService {
     return undefined;
   }
 
-  storeColumnSettings(settingsKey: string|undefined, columnSettings: ColumnSettings) {
+  storeColumnSettings(settingsKey: string|undefined, columnSettings: ColumnSettings|undefined) {
     if (settingsKey) {
       this.storage.store(settingsKey + '-columns', columnSettings);
     }

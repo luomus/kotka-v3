@@ -1,10 +1,12 @@
-import { Component, inject, output, input, effect, Signal, computed, signal } from '@angular/core';
+import { Component, inject, output, input, effect, Signal, computed, signal, model } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   DatatableSource,
   GetRowsParams,
   DatatableColumn,
-  DatatableFilter, DatatableSort
+  DatatableFilter,
+  DatatableSort,
+  ColumnSettings
 } from '../models/models';
 import { DatatableComponent } from '../datatable/datatable.component';
 import { DatatableRow, DocumentDatatableDataService } from '../services/document-datatable-data.service';
@@ -48,6 +50,8 @@ export class DocumentDatatableComponent<
 
   columns = input<DatatableColumn[]>([]);
   columnsLoading = input<boolean>(false);
+  columnSettings = model<ColumnSettings | undefined>(undefined);
+  sortModel = model<DatatableSort>([]);
 
   enableFileExport = input<boolean>();
   enableColumnSelection = input<boolean>();
@@ -55,8 +59,7 @@ export class DocumentDatatableComponent<
 
   defaultFilterModel = input<DatatableFilter>({});
 
-  extraSortModel = input<DatatableSort>([]);
-  extraSearchQuery = input<string>();
+  searchQuery = input<string>();
   aggregateBy = input<S extends IndexType ? AggregateBy[] : never>();
 
   datasource = signal<DatatableSource | undefined>(undefined);
@@ -83,24 +86,23 @@ export class DocumentDatatableComponent<
           this.dataType(),
           this.index(),
           this.columns(),
-          this.extraSortModel(),
-          this.extraSearchQuery(),
+          this.searchQuery(),
           this.aggregateBy(),
         )
       );
     });
   }
 
-  private getDataSource(dataType: T, index: S | undefined, columns: DatatableColumn[], extraSortModel: DatatableSort, extraSearchQuery?: string, aggregateBy?: AggregateBy[]): DatatableSource {
+  private getDataSource(dataType: T, index: S | undefined, columns: DatatableColumn[], searchQuery?: string, aggregateBy?: AggregateBy[]): DatatableSource {
     return {
       getRows: (params: GetRowsParams) => {
         const searchParams = this.dataService.getSearchParams(
           columns,
           params.startRow,
           params.endRow,
-          params.sortModel.concat(extraSortModel),
+          params.sortModel,
           params.filterModel,
-          extraSearchQuery,
+          searchQuery,
         );
 
         return this.dataService

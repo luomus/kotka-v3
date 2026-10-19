@@ -3,15 +3,15 @@ import {
   Component,
   computed,
   effect,
-  inject,
+  inject, model,
   OnDestroy,
   Signal,
   signal,
 } from '@angular/core';
 import {
-  ColDefWithExtra,
+  ColDefWithExtra, ColumnSettings,
   DatatableColumn,
-  DatatableLoadedData,
+  DatatableLoadedData, DatatableSort,
   DocumentDatatableComponent,
   getUriColumnOptions,
 } from '@kotka/ui/datatable';
@@ -19,13 +19,12 @@ import {
   KotkaDocumentType, Document, IndexType, SearchResponse, FieldAggregate, SearchField,
   SearchResultKey
 } from '@kotka/shared/models';
-import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
+import { MainContentComponent, MainContentHeaderDirective, SpinnerComponent } from '@kotka/ui/components';
 import { FormsModule } from '@angular/forms';
 import {
   AggregateBy,
   ApiClient, DataTypeNamePipePipe,
-  IteratorSearchParams,
-  SearchResultIteratorService
+  IteratorSearchParams, Logger, SearchResultIteratorService, ToastService, WINDOW
 } from '@kotka/ui/core';
 import { SpecimenLabelDesignerComponent } from '../specimen-label-designer/specimen-label-designer.component';
 import { AggregationsComponent, FieldValue } from './aggregations.component';
@@ -33,15 +32,16 @@ import {
   AggregationsSettings,
   AggregationsSettingsModalComponent,
 } from './aggregations-settings-modal.component';
+import { SpecimenLinkService } from './specimen-link.service';
 import { from, Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { map, startWith, switchMap } from 'rxjs/operators';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { BuilderQuery, builderQueryToQueryString, groupToQueryString, joinQueryStrings,
-  SearchGroup, SearchQuery, SpecimenSearchComponent
+import { BuilderQuery, builderQueryToQueryString, joinQueryStrings, parseIdQuery, SearchQuery, SpecimenSearchComponent
 } from '@kotka/ui/search';
 import { NgbAlert, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { isEqual } from 'lodash';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 
 interface FieldData {
   fields: SearchField[];
@@ -51,6 +51,13 @@ interface FieldData {
   allAggregateColumns: DatatableColumn[];
   fieldsLoading: boolean;
 }
+
+export const INDEX_OPTIONS: IndexType[] = [
+  'unit',
+  'identification',
+  'typeSpecimen',
+  'sample',
+];
 
 const DEFAULT_SELECTED_FIELDS: Record<IndexType, SearchResultKey[]> = {
   unit: ['documentID', 'locality', 'taxon'],
@@ -106,25 +113,28 @@ const INITIAL_FIELD_DATA: FieldData = {
     SpecimenSearchComponent,
     NgbAlert,
     DataTypeNamePipePipe,
+    MainContentHeaderDirective,
   ],
 })
 export class SpecimenTableComponent implements OnDestroy {
   private apiClient = inject(ApiClient);
   private searchResultIteratorService = inject(SearchResultIteratorService);
   private modalService = inject(NgbModal);
+  private specimenLinkService = inject(SpecimenLinkService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private window = inject(WINDOW);
+  private toastService = inject(ToastService);
+  private logger = inject(Logger);
 
   dataType: KotkaDocumentType.specimen = KotkaDocumentType.specimen;
   index = signal<IndexType>('unit');
   searchQuery: Signal<string>;
+  searchLink: Signal<string>;
 
   searchError?: string;
 
-  indexOptions: IndexType[] = [
-    'unit',
-    'identification',
-    'typeSpecimen',
-    'sample',
-  ];
+  indexOptions = INDEX_OPTIONS;
 
   aggregateValidFields = computed(() =>
     this.aggregateFields().filter(
@@ -145,7 +155,12 @@ export class SpecimenTableComponent implements OnDestroy {
 
   aggregateResults?: FieldAggregate[];
 
+  idSearchText = signal<string>('');
+  idSearchTextParseError = signal<string>('');
+
   fieldData: Signal<FieldData>;
+  columnSettings = model<ColumnSettings | undefined>(undefined);
+  sortModel = model<DatatableSort>([]);
 
   showLabelDesigner = signal(false);
   labelDesignerData$?: Observable<Document[]>;
@@ -154,7 +169,7 @@ export class SpecimenTableComponent implements OnDestroy {
     equal: isEqual,
   });
 
-  private filtersSearchQuery = signal('');
+  filtersValue = signal<FieldValue[]>([]);
   private idSearchQuery = signal<BuilderQuery>({
     groups: [],
     joinOperator: 'AND',
@@ -168,9 +183,22 @@ export class SpecimenTableComponent implements OnDestroy {
     this.searchQuery = computed(() =>
       joinQueryStrings(
         'AND',
-        this.filtersSearchQuery(),
+        this.filtersValueToSearchQuery(this.filtersValue()),
         builderQueryToQueryString(this.idSearchQuery()),
         this.inputSearchQuery(),
+      ),
+    );
+
+    this.searchLink = computed(() =>
+      this.specimenLinkService.getSearchLink(
+        this.index(),
+        this.aggregateValidFields(),
+        this.aggregateSize(),
+        this.filtersValue(),
+        this.idSearchText(),
+        this.inputSearchQuery(),
+        this.columnSettings()?.selected || [],
+        this.sortModel(),
       ),
     );
 
@@ -195,27 +223,27 @@ export class SpecimenTableComponent implements OnDestroy {
       ),
       { initialValue: INITIAL_FIELD_DATA },
     );
+
+    this.applyQueryParamsToState(this.route.snapshot.queryParams);
   }
 
   ngOnDestroy() {
     this.modalRef?.close();
   }
 
-  onAggregationFiltersChange(fieldValues: FieldValue[] = []) {
-    const searchGroup: SearchGroup = {
-      criteria: fieldValues.map((fieldValue) => ({
-        field: fieldValue.field,
-        operator: 'equals',
-        value: `${fieldValue.value}`,
-      })),
-      joinOperator: 'AND',
-    };
-
-    this.filtersSearchQuery.set(groupToQueryString(searchGroup).result);
-  }
-
   onSearch(searchQuery: SearchQuery) {
-    this.idSearchQuery.set(searchQuery.idSearchQuery);
+    this.idSearchTextParseError.set('');
+
+    let idSearchQuery: BuilderQuery;
+    try {
+      idSearchQuery = parseIdQuery(searchQuery.idSearchText);
+    } catch (e: any) {
+      this.idSearchTextParseError.set(e?.message || 'Failed to parse ID query');
+      return;
+    }
+
+    this.idSearchText.set(searchQuery.idSearchText);
+    this.idSearchQuery.set(idSearchQuery);
     this.inputSearchQuery.set(searchQuery.textSearchQuery);
   }
 
@@ -275,6 +303,19 @@ export class SpecimenTableComponent implements OnDestroy {
     this.searchError = 'Invalid query!';
   }
 
+  copySearchLinkToClipboard() {
+    const searchLink = this.searchLink();
+    this.window.navigator.clipboard.writeText(searchLink).then(
+      () => {
+        this.toastService.showSuccess('Search link copied to clipboard');
+      },
+      (err) => {
+        this.logger.error('Failed to copy search link to clipboard', err);
+        this.toastService.showError('Failed to copy search link to clipboard');
+      },
+    );
+  }
+
   private getFieldData(index: IndexType): Observable<FieldData> {
     const defaultSelectedFields: string[] = DEFAULT_SELECTED_FIELDS[index];
     const specialColumns: Record<string, DatatableColumn> = SPECIAL_COLUMNS;
@@ -320,5 +361,63 @@ export class SpecimenTableComponent implements OnDestroy {
       }),
       startWith(INITIAL_FIELD_DATA),
     );
+  }
+
+  private filtersValueToSearchQuery(fieldValues: FieldValue[]): string {
+    return builderQueryToQueryString({
+      groups: [
+        {
+          criteria: fieldValues.map((fieldValue) => ({
+            field: fieldValue.field,
+            operator: 'equals',
+            value: `${fieldValue.value}`,
+          })),
+          joinOperator: 'AND',
+        },
+      ],
+      joinOperator: 'AND',
+    });
+  }
+
+  private applyQueryParamsToState(queryParams: Params) {
+    if (Object.keys(queryParams).length === 0) {
+      return;
+    }
+
+    const parsedParams = this.specimenLinkService.parseSearchLinkParams(queryParams);
+
+    if (parsedParams.index) {
+      this.index.set(parsedParams.index);
+    }
+    if (parsedParams.aggregateFields) {
+      this.aggregateFields.set(parsedParams.aggregateFields);
+    }
+    if (parsedParams.aggregateSize) {
+      this.aggregateSize.set(parsedParams.aggregateSize);
+    }
+    if (parsedParams.aggregateValues) {
+      this.filtersValue.set(parsedParams.aggregateValues);
+    }
+    if (parsedParams.idSearchText) {
+      this.idSearchText.set(parsedParams.idSearchText);
+    }
+    if (parsedParams.inputSearchQuery) {
+      this.inputSearchQuery.set(parsedParams.inputSearchQuery);
+    }
+    if (parsedParams.selectedFields) {
+      this.columnSettings.set({
+        selected: parsedParams.selectedFields,
+        order: []
+      });
+    }
+    if (parsedParams.sort) {
+      this.sortModel.set(parsedParams.sort);
+    }
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {},
+      replaceUrl: true,
+    });
   }
 }

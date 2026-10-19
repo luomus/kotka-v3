@@ -1,6 +1,19 @@
 @use "sass:map";
 @import "styles/bootstrap";
 
+.header-layout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .header-left-group {
+    display: flex;
+    align-items: center;
+    gap: map.get($spacers, 2);
+  }
+}
+
+
 .content-row {
   padding-top: $spacer;
   padding-bottom: $spacer;
