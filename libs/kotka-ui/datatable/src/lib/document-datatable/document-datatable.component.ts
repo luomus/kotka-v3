@@ -48,16 +48,18 @@ export class DocumentDatatableComponent<
   dataType = input.required<T>();
   index = input<S>();
 
-  columns = input<DatatableColumn[]>([]);
+  columns = input<DatatableColumn[] | undefined>(undefined);
   columnsLoading = input<boolean>(false);
   columnSettings = model<ColumnSettings | undefined>(undefined);
-  sortModel = model<DatatableSort>([]);
+  filterModel = model<DatatableFilter | undefined>(undefined);
+  sortModel = model<DatatableSort | undefined>(undefined);
 
   enableFileExport = input<boolean>();
   enableColumnSelection = input<boolean>();
   disableFilter = input<boolean>();
 
   defaultFilterModel = input<DatatableFilter>({});
+  defaultSortModel = input<DatatableSort>([]);
 
   searchQuery = input<string>();
   aggregateBy = input<S extends IndexType ? AggregateBy[] : never>();
@@ -93,7 +95,11 @@ export class DocumentDatatableComponent<
     });
   }
 
-  private getDataSource(dataType: T, index: S | undefined, columns: DatatableColumn[], searchQuery?: string, aggregateBy?: AggregateBy[]): DatatableSource {
+  private getDataSource(dataType: T, index: S | undefined, columns?: DatatableColumn[], searchQuery?: string, aggregateBy?: AggregateBy[]): DatatableSource | undefined {
+    if (!columns) {
+      return undefined;
+    }
+
     return {
       getRows: (params: GetRowsParams) => {
         const searchParams = this.dataService.getSearchParams(

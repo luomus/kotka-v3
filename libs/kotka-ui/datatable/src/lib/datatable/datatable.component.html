@@ -1,44 +1,43 @@
-@if (!columnsLoading()) {
-  <div class="d-flex flex-wrap mb-1">
-    <kui-total-count
-      class="align-self-end"
-      [value]="totalCount()"
-      [dataTypeName]="dataTypeName()"
-      [dataTypeNamePlural]="dataTypeNamePlural()"
-    ></kui-total-count>
-    <div class="ms-auto">
-      @if (enableFileExport()) {
-        <button
-          class="btn btn-secondary position-relative"
-          (click)="exportData()"
-          [disabled]="exportLoading()"
-          data-cy="export-data"
-        >
-          <kui-spinner [overlay]="true" [spinning]="exportLoading()">
-            Export data
-          </kui-spinner>
-        </button>
-      }
-      @if (enableColumnSelection()) {
-        <button
-          class="btn btn-secondary"
-          (click)="openColumnSettingsModal()"
-          data-cy="select-columns"
-        >
-          <i class="fa-solid fa-gear"></i> Select columns
-        </button>
-      }
-    </div>
+<div class="d-flex flex-wrap mb-1">
+  <kui-total-count
+    class="align-self-end"
+    [value]="totalCount()"
+    [dataTypeName]="dataTypeName()"
+    [dataTypeNamePlural]="dataTypeNamePlural()"
+  ></kui-total-count>
+  <div class="ms-auto">
+    @if (enableFileExport()) {
+      <button
+        class="btn btn-secondary position-relative"
+        (click)="exportData()"
+        [disabled]="loading() || exportLoading()"
+        data-cy="export-data"
+      >
+        <kui-spinner [overlay]="true" [spinning]="exportLoading()">
+          Export data
+        </kui-spinner>
+      </button>
+    }
+    @if (enableColumnSelection()) {
+      <button
+        class="btn btn-secondary"
+        [disabled]="columnsLoading()"
+        (click)="openColumnSettingsModal()"
+        data-cy="select-columns"
+      >
+        <i class="fa-solid fa-gear"></i> Select columns
+      </button>
+    }
   </div>
-  <ag-grid-angular
-    style="width: 100%; height: 100%"
-    class="ag-theme-alpine grid"
-    [modules]="modules"
-    [components]="components"
-    [gridOptions]="gridOptions"
-    (dragStopped)="dragStopped($event)"
-    (gridReady)="onGridReady($event)"
-  ></ag-grid-angular>
-} @else {
-  <kui-spinner></kui-spinner>
-}
+</div>
+<ag-grid-angular
+  style="width: 100%; height: 100%"
+  class="ag-theme-alpine grid"
+  [modules]="modules"
+  [components]="components"
+  [gridOptions]="gridOptions"
+  (dragStopped)="onDragStopped($event)"
+  (gridReady)="onGridReady($event)"
+  (filterChanged)="onFilterChanged()"
+  (sortChanged)="onSortChanged()"
+></ag-grid-angular>

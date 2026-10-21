@@ -9,8 +9,8 @@ import { cloneDeep } from 'lodash';
 export class DatatableSettingsStoreService {
   private storage = inject(LocalStorageService);
 
-  getStoredColumnSettings(settingsKey: string|undefined, defaultSettings: ColumnSettings): ColumnSettings|undefined {
-    if (settingsKey) {
+  getStoredColumnSettings(settingsKey: string, defaultSettings?: ColumnSettings): ColumnSettings | undefined {
+    if (settingsKey && defaultSettings) {
       const settings = this.storage.retrieve(settingsKey + '-columns');
       if (settings) {
         return this.getCleanedColumnSettings(settings, defaultSettings);
@@ -19,13 +19,13 @@ export class DatatableSettingsStoreService {
     return undefined;
   }
 
-  storeColumnSettings(settingsKey: string|undefined, columnSettings: ColumnSettings|undefined) {
-    if (settingsKey) {
+  storeColumnSettings(settingsKey: string, columnSettings?: ColumnSettings) {
+    if (settingsKey && columnSettings) {
       this.storage.store(settingsKey + '-columns', columnSettings);
     }
   }
 
-  getStoredFilters(settingsKey: string|undefined): DatatableFilter {
+  getStoredFilters(settingsKey: string): DatatableFilter {
     if (!settingsKey) {
       return {};
     }
@@ -34,11 +34,11 @@ export class DatatableSettingsStoreService {
   }
 
   storeFilters(
-    settingsKey: string|undefined,
-    filterModel: DatatableFilter,
-    allColumns: ColDefWithExtra[],
+    settingsKey: string,
+    filterModel?: DatatableFilter,
+    allColumns?: ColDefWithExtra[],
   ) {
-    if (!settingsKey) {
+    if (!settingsKey || !filterModel || !allColumns) {
       return;
     }
 

@@ -1,16 +1,20 @@
-<kui-datatable
-  [style.height]="'100%'"
-  [columns]="columns()"
-  [columnsLoading]="columnsLoading()"
-  [(columnSettings)]="columnSettings"
-  [(sortModel)]="sortModel"
-  [datasource]="datasource()"
-  [enableFileExport]="enableFileExport()"
-  [enableColumnSelection]="enableColumnSelection()"
-  [disableFilter]="disableFilter()"
-  [settingsKey]="settingsKey()"
-  [dataTypeName]="dataType() | dataTypeName: false: false: index()"
-  [dataTypeNamePlural]="dataType() | dataTypeName: false: true: index()"
-  [defaultFilterModel]="defaultFilterModel()"
->
-</kui-datatable>
+@if (settingsKey(); as settingsKey) {
+  <kui-datatable
+    [style.height]="'100%'"
+    [columns]="columns()"
+    [columnsLoading]="columnsLoading()"
+    [(columnSettings)]="columnSettings"
+    [(filterModel)]="filterModel"
+    [(sortModel)]="sortModel"
+    [datasource]="datasource()"
+    [enableFileExport]="enableFileExport()"
+    [enableColumnSelection]="enableColumnSelection()"
+    [disableFilter]="disableFilter()"
+    [settingsKey]="settingsKey"
+    [dataTypeName]="dataType() | dataTypeName: false: false: index()"
+    [dataTypeNamePlural]="dataType() | dataTypeName: false: true: index()"
+    [defaultFilterModel]="defaultFilterModel()"
+    [defaultSortModel]="defaultSortModel()"
+  >
+  </kui-datatable>
+}

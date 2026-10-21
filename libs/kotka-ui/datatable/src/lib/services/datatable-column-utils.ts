@@ -10,7 +10,11 @@ export function getColId(col: DatatableColumn): string {
   return colId;
 }
 
-export function getProcessedColumns(columns: DatatableColumn[]): ColDefWithExtra[] {
+export function getProcessedColumns(columns?: DatatableColumn[]): ColDefWithExtra[] | undefined {
+  if (!columns) {
+    return undefined;
+  }
+
   columns = [...columns].sort((a, b) => {
     const lockPositionA = a.lockPosition === true ? 'left' : a.lockPosition || undefined;
     const lockPositionB = b.lockPosition === true ? 'left' : b.lockPosition || undefined;
@@ -39,11 +43,19 @@ export function getProcessedColumns(columns: DatatableColumn[]): ColDefWithExtra
   });
 }
 
-export function getVisibleColDefs(columns: ColDefWithExtra[], settings: ColumnSettings): ColDef[] {
+export function getVisibleColDefs(columns?: ColDefWithExtra[], settings?: ColumnSettings): ColDef[] | undefined {
+  if (!columns || !settings) {
+    return undefined;
+  }
+
   return getColDefsFromColumns(columns, settings);
 }
 
-export function getDefaultColumnSettings(columns: ColDefWithExtra[], columnSelectionEnabled?: boolean): ColumnSettings {
+export function getDefaultColumnSettings(columns?: ColDefWithExtra[], columnSelectionEnabled?: boolean): ColumnSettings | undefined {
+  if (!columns) {
+    return undefined;
+  }
+
   const selectedColumns = columnSelectionEnabled
     ? columns.filter(col => col.defaultSelected)
     : columns;

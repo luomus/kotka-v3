@@ -44,11 +44,11 @@ import { isEqual } from 'lodash';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 
 interface FieldData {
-  fields: SearchField[];
-  fieldMap: Record<string, SearchField>;
-  columns: DatatableColumn[];
-  allAggregateFields: string[];
-  allAggregateColumns: DatatableColumn[];
+  fields?: SearchField[];
+  fieldMap?: Record<string, SearchField>;
+  columns?: DatatableColumn[];
+  allAggregateFields?: string[];
+  allAggregateColumns?: DatatableColumn[];
   fieldsLoading: boolean;
 }
 
@@ -89,11 +89,6 @@ const SPECIAL_COLUMNS: Partial<Record<SearchResultKey, DatatableColumn>> = {
 };
 
 const INITIAL_FIELD_DATA: FieldData = {
-  fields: [],
-  fieldMap: {},
-  columns: [],
-  allAggregateFields: [],
-  allAggregateColumns: [],
   fieldsLoading: true,
 };
 
@@ -138,13 +133,13 @@ export class SpecimenTableComponent implements OnDestroy {
 
   aggregateValidFields = computed(() =>
     this.aggregateFields().filter(
-      (field) => this.fieldData().fieldMap[field] !== undefined,
+      (field) => this.fieldData().fieldMap?.[field] !== undefined,
     ),
   );
   aggregateBy: Signal<AggregateBy[]> = computed(() =>
     this.aggregateValidFields().map((field) => ({
       field,
-      aggregateField: this.fieldData().fieldMap[field]?.hasRaw
+      aggregateField: this.fieldData().fieldMap?.[field]?.hasRaw
         ? `${field}.raw`
         : field,
       aggregateSize: this.aggregateSize(),
@@ -314,6 +309,10 @@ export class SpecimenTableComponent implements OnDestroy {
         this.toastService.showError('Failed to copy search link to clipboard');
       },
     );
+  }
+
+  onIndexChange() {
+    this.columnSettings.set(undefined);
   }
 
   private getFieldData(index: IndexType): Observable<FieldData> {
