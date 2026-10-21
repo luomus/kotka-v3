@@ -13,11 +13,12 @@ export class FormViewUtils {
     data = cloneDeep(data);
 
     let removedFields = [
-      '$.id',
-      '$.dateCreated',
-      '$.dateEdited',
-      '$.creator',
-      '$.editor',
+      '$..id',
+      '$..dateCreated',
+      '$..dateEdited',
+      '$..creator',
+      '$..editor',
+      '$..publicityRestrictions',
     ];
     removedFields = [...removedFields, ...(excludedFields || [])];
 
