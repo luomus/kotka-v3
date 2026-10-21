@@ -60,10 +60,10 @@ export const INDEX_OPTIONS: IndexType[] = [
 ];
 
 const DEFAULT_SELECTED_FIELDS: Record<IndexType, SearchResultKey[]> = {
-  unit: ['documentID', 'locality', 'taxon'],
-  identification: ['documentID', 'locality', 'taxon'],
-  typeSpecimen: ['documentID', 'locality', 'taxon'],
-  sample: ['documentID', 'id', 'recordParts', 'taxon'],
+  unit: ['documentQName', 'locality', 'taxon'],
+  identification: ['documentQName', 'locality', 'taxon'],
+  typeSpecimen: ['documentQName', 'locality', 'taxon'],
+  sample: ['documentQName', 'id', 'recordParts', 'taxon'],
 };
 
 const DEFAULT_AGGREGATE_FIELDS: string[] = [
@@ -76,7 +76,7 @@ const DEFAULT_AGGREGATE_FIELDS: string[] = [
 const DEFAULT_AGGREGATE_SIZE = 10;
 
 const SPECIAL_COLUMNS: Partial<Record<SearchResultKey, DatatableColumn>> = {
-  documentID: {
+  documentQName: {
     ...getUriColumnOptions({
       editRouterLink: ['..', 'edit'],
       showViewLink: true,
