@@ -65,6 +65,9 @@
         @if (fieldData(); as fieldData) {
           <kui-specimen-search
             class="specimen-search"
+            [text]="inputSearchQuery()"
+            [idSearchText]="idSearchText()"
+            [idSearchTextParseError]="idSearchTextParseError()"
             [fields]="fieldData.fields || []"
             (search)="onSearch($event)"
           >

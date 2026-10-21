@@ -169,7 +169,7 @@ export class SpecimenTableComponent implements OnDestroy {
     groups: [],
     joinOperator: 'AND',
   });
-  private inputSearchQuery = signal('');
+  inputSearchQuery = signal('');
 
   private activeSearchParams?: IteratorSearchParams;
   private modalRef?: NgbModalRef;
