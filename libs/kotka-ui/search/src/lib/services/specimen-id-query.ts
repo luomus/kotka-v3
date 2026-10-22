@@ -48,11 +48,11 @@ function rangeToSearchGroup(idParts: ParsedIdentifierParts, end?: string): Searc
   }
 
   const criteria: IdSearchCriteria[] = [];
-  if (idParts.domain) {
+  if (idParts.prefix) {
     criteria.push({
       field: 'domain',
       operator: 'equals',
-      value: idParts.domain
+      value: idParts.prefix
     });
   }
   if (idParts.namespace) {
@@ -96,11 +96,11 @@ function rangeToSearchGroup(idParts: ParsedIdentifierParts, end?: string): Searc
 
 function identifierToSearchGroup(idParts: ParsedIdentifierParts): SearchGroup {
   const criteria: IdSearchCriteria[] = [];
-  if (idParts.domain) {
+  if (idParts.prefix) {
     criteria.push({
       field: 'domain',
       operator: 'equals',
-      value: idParts.domain
+      value: idParts.prefix
     });
   }
   if (idParts.id) {

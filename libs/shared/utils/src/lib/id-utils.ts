@@ -1,5 +1,5 @@
 export interface ParsedIdentifierParts {
-  domain?: string,
+  prefix?: string,
   id?: string,
   namespace?: string,
   objectID?: string
@@ -54,12 +54,23 @@ export function getUri(value: string): string {
   return defaultDomain + value;
 }
 
-export function getDomainAndIdWithoutPrefix(value: string): string[] {
-  if (typeof value !== 'string' || value === '' || value.indexOf('http') === 0) return ['', value];
+export function getDomainAndId(value: string): string[] {
+  if (value === '') return ['', value];
 
-  if (value.includes(':')) {
+  if (value.includes('/')) {
+    const lastSlashIndex = value.lastIndexOf('/');
+    const domain = value.substring(0, lastSlashIndex + 1);
+    if (!idPrefixMap[domain]) {
+      return ['', value];
+    }
+    const id = value.substring(lastSlashIndex + 1);
+    return [domain, id];
+  } else if (value.includes(':')) {
     const [prefix, id] = value.split(':');
-    const domain = domainMap[prefix + ':'] || defaultDomain;
+    const domain = domainMap[prefix + ':'];
+    if (!domain) {
+      return ['', value];
+    }
     return [domain, id];
   }
 
@@ -97,21 +108,21 @@ export function parseAndValidateIdentifierParts(value: string, defaultToObjectID
 
   if (value.includes('/')) {
     const lastSlashIndex = value.lastIndexOf('/');
-    const fullDomain = value.substring(0, lastSlashIndex + 1);
+    const domain = value.substring(0, lastSlashIndex + 1);
     const id = value.substring(lastSlashIndex + 1);
 
-    if (!idPrefixMap[fullDomain]) {
-      throw new Error(`Invalid domain: ${fullDomain}`);
+    if (!idPrefixMap[domain]) {
+      throw new Error(`Invalid domain: ${domain}`);
     }
-    const domain = idPrefixMap[fullDomain];
+    const prefix = idPrefixMap[domain];
 
-    result = { domain, ...parseIdPart(id, defaultToObjectID) };
+    result = { prefix, ...parseIdPart(id, defaultToObjectID) };
   } else if (value.includes(':')) {
     const firstColonIndex = value.indexOf(':');
-    const domain = value.substring(0, firstColonIndex);
+    const prefix = value.substring(0, firstColonIndex);
     const id = value.substring(firstColonIndex + 1);
 
-    result = { domain, ...parseIdPart(id, defaultToObjectID) };
+    result = { prefix, ...parseIdPart(id, defaultToObjectID) };
   } else {
     result = parseIdPart(value, defaultToObjectID);
   }
@@ -148,8 +159,8 @@ function parseIdPart(id: string, defaultToObjectID: boolean): Pick<ParsedIdentif
 }
 
 function validateIdParts(idParts: ParsedIdentifierParts) {
-  if (idParts.domain && !acceptedPrefixes.includes(idParts.domain)) {
-    throw new Error(`Invalid domain: ${idParts.domain}`);
+  if (idParts.prefix && !acceptedPrefixes.includes(idParts.prefix)) {
+    throw new Error(`Invalid domain: ${idParts.prefix}`);
   }
   if (idParts.namespace && !/^[a-zA-Z0-9-]+$/.test(idParts.namespace)) {
     throw new Error(`Invalid namespace: ${idParts.namespace}`);
