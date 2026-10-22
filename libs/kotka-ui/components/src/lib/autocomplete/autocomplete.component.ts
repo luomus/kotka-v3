@@ -106,12 +106,13 @@ export class AutocompleteComponent {
       ) {
         this.loading = true;
 
-        this.fetchResultsFunc()(value).subscribe((result) => {
-          if (result.length < 1) {
+        this.fetchResultsFunc()(value).subscribe((results) => {
+          const typeaheadValue = results.filter(r => r.key === value)[0];
+          if (typeaheadValue) {
+            this.typeaheadValue = typeaheadValue;
+          } else {
             this.typeaheadValue = '';
             this.value.set(undefined);
-          } else {
-            this.typeaheadValue = result.filter((r => r.key === value))[0] || result[0];
           }
 
           this.loading = false;
