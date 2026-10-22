@@ -1,0 +1,23 @@
+<div class="header-layout">
+  <div class="header-left-group">
+    <h1 data-cy="main-header">Search specimens</h1>
+  </div>
+  <div>
+    <div class="input-group">
+      <input
+        type="text"
+        class="form-control"
+        [ngModel]="searchLink()"
+        readonly
+      />
+      <button
+        class="btn btn-outline-secondary"
+        type="button"
+        title="Copy search link to clipboard"
+        (click)="copySearchLinkToClipboard()"
+      >
+        <i class="fa fa-link"></i>
+      </button>
+    </div>
+  </div>
+</div>

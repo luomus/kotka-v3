@@ -1,7 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component, inject,
-  input, model, output,
+  input, model, output, signal,
 
 } from '@angular/core';
 import { SearchField } from '@kotka/shared/models';
@@ -12,9 +12,15 @@ import { builderQueryToQueryString } from '../services/query-stringify';
 import { UserService } from '@kotka/ui/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
+import { parseIdQuery } from '../services/specimen-id-query';
+
+export interface IdSearchValue {
+  text: string;
+  query: BuilderQuery;
+}
 
 export interface SearchQuery {
-  idSearchText: string;
+  idSearchValue: IdSearchValue,
   textSearchQuery: string;
 }
 
@@ -27,11 +33,12 @@ export interface SearchQuery {
 export class SpecimenSearchComponent {
   private userService = inject(UserService);
 
-  text = model<string>('');
   fields = input<SearchField[]>([]);
 
+  text = model<string>('');
   idSearchText = model<string>('');
-  idSearchTextParseError = model<string>('');
+
+  idSearchTextParseError = signal<string>('');
 
   search = output<SearchQuery>();
 
@@ -67,8 +74,21 @@ export class SpecimenSearchComponent {
   }
 
   onSearch(textSearchQuery: string) {
+    this.idSearchTextParseError.set('');
+
+    let idSearchQuery: BuilderQuery;
+    try {
+      idSearchQuery = parseIdQuery(this.idSearchText());
+    } catch (e: any) {
+      this.idSearchTextParseError.set(e?.message || 'Failed to parse ID query');
+      return;
+    }
+
     this.search.emit({
-      idSearchText: this.idSearchText(),
+      idSearchValue: {
+        text: this.idSearchText(),
+        query: idSearchQuery,
+      },
       textSearchQuery,
     });
   }

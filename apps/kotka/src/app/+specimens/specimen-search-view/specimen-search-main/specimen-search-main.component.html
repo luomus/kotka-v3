@@ -1,0 +1,50 @@
+<div class="row g-3 content-row">
+  <div class="col-12 col-md-3 col-lg-2 content-column">
+    <aside class="specimen-sidebar">
+      <kotka-specimen-search-filters
+        [(index)]="index"
+        [(aggregateFields)]="aggregateFields"
+        [(aggregateSize)]="aggregateSize"
+        [(filtersValue)]="filtersValue"
+        [aggregateResults]="aggregateResults()"
+        [fieldData]="fieldData()"
+        [defaultAggregateFields]="defaultAggregateFields()"
+        [defaultAggregateSize]="defaultAggregateSize()"
+      ></kotka-specimen-search-filters>
+    </aside>
+  </div>
+  <div class="col-12 col-md-9 col-lg-10 content-column main-content-column">
+    @if (fieldData(); as fieldData) {
+      <kui-specimen-search
+        class="specimen-search"
+        [text]="textSearchQuery()"
+        [idSearchText]="idSearchValue().text"
+        [fields]="fieldData.fields || []"
+        (search)="onSearch($event)"
+      >
+      </kui-specimen-search>
+      @if (searchError()) {
+        <ngb-alert type="danger" [dismissible]="false">
+          <strong>Error:</strong> {{ searchError() }}
+        </ngb-alert>
+      }
+      <kui-document-datatable
+        class="specimen-datatable"
+        [dataType]="dataType"
+        [index]="index()"
+        [columns]="fieldData.columns"
+        [columnsLoading]="fieldData.fieldsLoading"
+        [(columnSettings)]="columnSettings"
+        [enableFileExport]="true"
+        [enableColumnSelection]="true"
+        [disableFilter]="true"
+        [searchQuery]="searchQuery()"
+        [(sortModel)]="sortModel"
+        [aggregateBy]="aggregateBy()"
+        (loadData)="onDataLoad($event)"
+        (invalidQueryError)="onInvalidQueryError()"
+      >
+      </kui-document-datatable>
+    }
+  </div>
+</div>

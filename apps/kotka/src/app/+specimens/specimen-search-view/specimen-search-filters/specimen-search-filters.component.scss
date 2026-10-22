@@ -1,0 +1,7 @@
+@use "sass:map";
+@import "../../../../../../../styles/bootstrap";
+
+.filters-label {
+  font-weight: $font-weight-semibold;
+  margin-bottom: map.get($spacers, 1);
+}

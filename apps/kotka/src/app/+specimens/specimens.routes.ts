@@ -1,7 +1,7 @@
 import { Routes, UrlMatchResult, UrlSegment } from '@angular/router';
 import { SpecimenFormComponent } from './specimen-form/specimen-form.component';
 import { ComponentCanDeactivateGuard, formMatcher } from '@kotka/ui/core';
-import { SpecimenTableComponent } from './specimen-table/specimen-table.component';
+import { SpecimenSearchViewComponent } from './specimen-search-view/specimen-search-view/specimen-search-view.component';
 import { SpecimenVersionHistoryComponent } from './specimen-version-history/specimen-version-history.component';
 import { BranchSearchComponent } from './branch-search/branch-search.component';
 import { NotFoundComponent } from '@kotka/ui/base';
@@ -30,7 +30,7 @@ export const specimensRoutes: Routes = [
       {
         path: 'search',
         pathMatch: 'full',
-        component: SpecimenTableComponent,
+        component: SpecimenSearchViewComponent,
       },
       {
         path: 'search-branch',

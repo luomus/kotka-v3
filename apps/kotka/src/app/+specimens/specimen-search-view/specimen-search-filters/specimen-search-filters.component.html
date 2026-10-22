@@ -1,0 +1,23 @@
+<div>
+  <label class="form-label filters-label" for="specimen-result-type">Result type:</label>
+  <select id="specimen-result-type" class="form-select" [(ngModel)]="index">
+    @for (indexOption of indexOptions; track $index) {
+      <option [ngValue]="indexOption">{{ dataType | dataTypeName: true: false: indexOption }}</option>
+    }
+  </select>
+</div>
+
+<hr>
+<button
+  class="btn btn-sm btn-outline-secondary w-100 mb-2"
+  [disabled]="!aggregateResults()"
+  (click)="openAggregateSettingsModal()"
+  data-cy="select-aggregate-fields"
+>
+  <i class="fa-solid fa-gear"></i> Select filters
+</button>
+
+<kotka-aggregations
+  [(selected)]="filtersValue"
+  [aggregates]="aggregateResults() || []"
+></kotka-aggregations>
