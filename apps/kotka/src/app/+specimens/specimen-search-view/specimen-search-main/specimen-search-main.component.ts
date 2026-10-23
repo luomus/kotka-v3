@@ -62,6 +62,8 @@ export class SpecimenSearchMainComponent implements OnDestroy {
   fieldData =  input.required<FieldData>();
   defaultAggregateFields = input.required<string[]>();
   defaultAggregateSize = input.required<number>();
+  minAggregateSize = input.required<number>();
+  maxAggregateSize = input.required<number>();
 
   loadData = output<DatatableLoadedData<KotkaDocumentType.specimen, IndexType>>();
 
@@ -93,7 +95,6 @@ export class SpecimenSearchMainComponent implements OnDestroy {
   }
 
   onSearch(searchQuery: SearchQuery) {
-    this.searchError.set(undefined);
     this.idSearchValue.set(searchQuery.idSearchValue);
     this.textSearchQuery.set(searchQuery.textSearchQuery);
   }
@@ -103,6 +104,7 @@ export class SpecimenSearchMainComponent implements OnDestroy {
   }
 
   onDataLoad(data: DatatableLoadedData<KotkaDocumentType.specimen, IndexType>) {
+    this.searchError.set(undefined);
     this.aggregateResults.set(data.result.aggregates);
     this.loadData.emit(data);
   }

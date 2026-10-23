@@ -6,7 +6,7 @@ import {
   inject,
   model,
   Signal,
-  signal
+  signal, untracked
 } from '@angular/core';
 import {
   ColDefWithExtra,
@@ -17,7 +17,7 @@ import {
   getUriColumnOptions
 } from '@kotka/ui/datatable';
 import {
-  Document,
+  Document, FieldAggregate,
   IndexType,
   KotkaDocumentType,
   SearchField,
@@ -38,6 +38,7 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SpecimenSearchMainComponent } from '../specimen-search-main/specimen-search-main.component';
 import { SpecimenSearchHeaderComponent } from '../specimen-search-header/specimen-search-header.component';
 import { IdSearchValue, parseIdQuery } from '@kotka/ui/search';
+import { getColId } from '@kotka/ui/datatable';
 
 export interface FieldData {
   fields?: SearchField[];
@@ -116,6 +117,8 @@ export class SpecimenSearchViewComponent {
 
   defaultAggregateFields = DEFAULT_AGGREGATE_FIELDS;
   defaultAggregateSize = DEFAULT_AGGREGATE_SIZE;
+  minAggregateSize = 1;
+  maxAggregateSize = 100;
 
   searchLink: Signal<string>;
 
@@ -125,6 +128,13 @@ export class SpecimenSearchViewComponent {
   private activeSearchParams?: IteratorSearchParams;
 
   constructor() {
+    this.fieldData = toSignal(
+      toObservable(this.index).pipe(
+        switchMap((index) => this.getFieldData(index)),
+      ),
+      { initialValue: INITIAL_FIELD_DATA },
+    );
+
     this.searchLink = computed(() =>
       this.specimenLinkService.getSearchLink(
         this.index(),
@@ -137,6 +147,10 @@ export class SpecimenSearchViewComponent {
         this.sortModel(),
       ),
     );
+
+    effect(() => {
+      this.onFieldDataChange();
+    });
 
     effect(() => {
       if (this.showLabelDesigner()) {
@@ -153,17 +167,10 @@ export class SpecimenSearchViewComponent {
       }
     });
 
-    this.fieldData = toSignal(
-      toObservable(this.index).pipe(
-        switchMap((index) => this.getFieldData(index)),
-      ),
-      { initialValue: INITIAL_FIELD_DATA },
-    );
-
     this.applyQueryParamsToState(this.route.snapshot.queryParams);
   }
 
-  onDataLoad(data: DatatableLoadedData) {
+  onDataLoad(data: DatatableLoadedData<KotkaDocumentType.specimen, IndexType>) {
     const searchParams: IteratorSearchParams = {
       sort: data.searchParams.sort,
       searchQuery: data.searchParams.searchQuery,
@@ -176,6 +183,8 @@ export class SpecimenSearchViewComponent {
       searchParams,
       true,
     );
+
+    this.onAggregatesChange(data.result.aggregates);
   }
 
   onIndexChange() {
@@ -242,7 +251,7 @@ export class SpecimenSearchViewComponent {
     if (parsedParams.aggregateFields) {
       this.aggregateFields.set(parsedParams.aggregateFields);
     }
-    if (parsedParams.aggregateSize) {
+    if (parsedParams.aggregateSize !== undefined && parsedParams.aggregateSize >= this.minAggregateSize && parsedParams.aggregateSize <= this.maxAggregateSize) {
       this.aggregateSize.set(parsedParams.aggregateSize);
     }
     if (parsedParams.filtersValue) {
@@ -254,9 +263,9 @@ export class SpecimenSearchViewComponent {
     if (parsedParams.textSearchQuery) {
       this.textSearchQuery.set(parsedParams.textSearchQuery);
     }
-    if (parsedParams.selectedFields) {
+    if (parsedParams.selectedColumns) {
       this.columnSettings.set({
-        selected: parsedParams.selectedFields,
+        selected: parsedParams.selectedColumns,
         order: []
       });
     }
@@ -269,5 +278,53 @@ export class SpecimenSearchViewComponent {
       queryParams: {},
       replaceUrl: true,
     });
+  }
+
+  private onFieldDataChange() {
+    if (this.fieldData().fieldsLoading) {
+      return;
+    }
+
+    const colIds = this.fieldData().columns?.map(col => getColId(col)) || [];
+
+    const aggregateFields = untracked(this.aggregateFields).filter(field => this.fieldData()?.allAggregateFields?.includes(field));
+    if (aggregateFields.length !== this.aggregateFields().length) {
+      this.aggregateFields.set(aggregateFields);
+    }
+
+    const filtersValue = untracked(this.filtersValue).filter(filter => this.fieldData()?.fieldMap?.[filter.field]);
+    if (filtersValue.length !== this.filtersValue().length) {
+      this.filtersValue.set(filtersValue);
+    }
+
+    const columnSettings = untracked(this.columnSettings);
+    let selected: string[] = [];
+    if (columnSettings) {
+      selected = columnSettings.selected.filter(field => colIds.includes(field));
+      const order = columnSettings.order.filter(field => colIds.includes(field));
+      if (selected.length !== columnSettings.selected.length || order.length !== columnSettings.order.length) {
+        this.columnSettings.set({
+          selected,
+          order
+        });
+      }
+    }
+
+    const sortModel = untracked(this.sortModel).filter(sort => selected.includes(sort.colId));
+    if (sortModel.length !== this.sortModel().length) {
+      this.sortModel.set(sortModel);
+    }
+  }
+
+  private onAggregatesChange(aggregates: FieldAggregate[]) {
+    const aggregateMap = aggregates.reduce((map, aggregate) => {
+      map[aggregate.field] = aggregate;
+      return map;
+    }, <Record<string, FieldAggregate>>{});
+
+    const filtersValue = this.filtersValue().filter(filter => aggregateMap[filter.field]?.values.some(value => value.value === filter.value));
+    if (filtersValue.length !== this.filtersValue().length) {
+      this.filtersValue.set(filtersValue);
+    }
   }
 }

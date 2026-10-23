@@ -33,9 +33,9 @@ export interface SearchQuery {
 export class SpecimenSearchComponent {
   private userService = inject(UserService);
 
-  fields = input<SearchField[]>([]);
+  fields = input<SearchField[] | undefined>(undefined);
 
-  text = model<string>('');
+  searchQuery = model<string>('');
   idSearchText = model<string>('');
 
   idSearchTextParseError = signal<string>('');
@@ -68,12 +68,12 @@ export class SpecimenSearchComponent {
       joinOperator: 'AND'
     };
 
-    this.text.set(builderQueryToQueryString(newQuery));
+    this.searchQuery.set(builderQueryToQueryString(newQuery));
     this.idSearchText.set('');
-    this.onSearch(this.text());
+    this.onSearch(this.searchQuery());
   }
 
-  onSearch(textSearchQuery: string) {
+  onSearch(searchQuery: string) {
     this.idSearchTextParseError.set('');
 
     let idSearchQuery: BuilderQuery;
@@ -89,7 +89,7 @@ export class SpecimenSearchComponent {
         text: this.idSearchText(),
         query: idSearchQuery,
       },
-      textSearchQuery,
+      textSearchQuery: searchQuery,
     });
   }
 

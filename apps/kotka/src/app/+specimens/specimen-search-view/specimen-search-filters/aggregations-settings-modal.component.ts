@@ -52,7 +52,7 @@ export class AggregationsSettingsModalComponent {
   filterSize = model<number | null>(10);
   defaultFilterSize = model(10);
 
-  minFilterSize = model(0);
+  minFilterSize = model(1);
   maxFilterSize = model(100);
 
   onConfirm(columnSettings: ColumnSettings) {

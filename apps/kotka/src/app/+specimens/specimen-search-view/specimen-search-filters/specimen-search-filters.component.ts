@@ -57,8 +57,11 @@ export class SpecimenSearchFiltersComponent implements OnDestroy {
 
   aggregateResults = input<FieldAggregate[]>();
   fieldData =  input.required<FieldData>();
+
   defaultAggregateFields = input.required<string[]>();
   defaultAggregateSize = input.required<number>();
+  minAggregateSize = input.required<number>();
+  maxAggregateSize = input.required<number>();
 
   loadData = output<DatatableLoadedData<KotkaDocumentType.specimen, IndexType>>();
 
@@ -94,6 +97,8 @@ export class SpecimenSearchFiltersComponent implements OnDestroy {
     this.modalRef.componentInstance.defaultFilterSize.set(
       this.defaultAggregateSize(),
     );
+    this.modalRef.componentInstance.minFilterSize.set(this.minAggregateSize());
+    this.modalRef.componentInstance.maxFilterSize.set(this.maxAggregateSize());
 
     from(this.modalRef.result).subscribe({
       next: (settings: AggregationsSettings) => {

@@ -7,7 +7,7 @@ import { WINDOW } from '@kotka/ui/core';
 import { DatatableSort } from '@kotka/ui/datatable';
 import { IdSearchValue, parseIdQuery } from '@kotka/ui/search';
 
-type SearchLinkParamKeys = 'index' | 'aggregateFields' | 'aggregateSize' | 'filters' | 'idSearch' | 'query' | 'selectedFields' | 'sort';
+type SearchLinkParamKeys = 'index' | 'aggregateFields' | 'aggregateSize' | 'filters' | 'idSearch' | 'query' | 'selected' | 'sort';
 
 type SearchLinkParams = { [key in SearchLinkParamKeys | string]?: string | number | boolean };
 
@@ -18,7 +18,7 @@ interface ParsedSearchLinkParams {
   filtersValue?: FieldValue[];
   idSearchValue?: IdSearchValue;
   textSearchQuery?: string;
-  selectedFields?: string[];
+  selectedColumns?: string[];
   sort?: DatatableSort;
 }
 
@@ -37,7 +37,7 @@ export class SpecimenLinkService {
     filtersValue: FieldValue[],
     idSearchValue: IdSearchValue,
     textSearchQuery: string,
-    selectedFields: string[],
+    selectedColumns: string[],
     sort: DatatableSort
   ): string {
     const queryParams: SearchLinkParams = {
@@ -45,7 +45,7 @@ export class SpecimenLinkService {
       aggregateFields: aggregateFields.join(','),
       aggregateSize,
       ...this.filtersValueToParams(filtersValue),
-      selectedFields: selectedFields.join(','),
+      selected: selectedColumns.join(','),
     };
     if (idSearchValue.text) {
       queryParams.idSearch = idSearchValue.text;
@@ -73,7 +73,7 @@ export class SpecimenLinkService {
     const filtersValue = this.parseFiltersValueParam(queryParams);
     const idSearchValue = this.parseIdSearchParam(queryParams.idSearch);
     const textSearchQuery = this.parseStringParam(queryParams.query);
-    const selectedFields = this.parseStringArrayParam(queryParams.selectedFields);
+    const selectedColumns = this.parseStringArrayParam(queryParams.selected);
     const sort = this.parseSortParam(queryParams.sort);
 
     return {
@@ -83,7 +83,7 @@ export class SpecimenLinkService {
       filtersValue,
       idSearchValue,
       textSearchQuery,
-      selectedFields,
+      selectedColumns,
       sort,
     };
   }
@@ -129,10 +129,13 @@ export class SpecimenLinkService {
     if (typeof param !== 'string') {
       return undefined;
     }
-    return param.split(',').map(s => {
+    return param.split(',').reduce((result, s) => {
       const [colId, sortOrder] = s.split(' ');
-      return { colId, sort: sortOrder as 'asc' | 'desc' };
-    });
+      if (colId && (sortOrder === 'asc' || sortOrder === 'desc')) {
+        result.push({ colId, sort: sortOrder });
+      }
+      return result;
+    }, <DatatableSort>[]);
   }
 
   private parseStringParam(param: any): string | undefined {

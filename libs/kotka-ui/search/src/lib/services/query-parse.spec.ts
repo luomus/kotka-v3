@@ -157,6 +157,10 @@ describe('Invalid queries', () => {
     expect(() => queryStringToBuilderQuery('NOT a:*1')).toThrow();
   });
 
+  it('throws when value is missing', () => {
+    expect(() => queryStringToBuilderQuery('a:')).toThrow();
+  });
+
   it('throws when a value is empty', () => {
     expect(() => queryStringToBuilderQuery('a:""')).toThrow();
   });

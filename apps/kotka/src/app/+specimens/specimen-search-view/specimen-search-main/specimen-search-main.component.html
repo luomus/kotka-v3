@@ -10,6 +10,8 @@
         [fieldData]="fieldData()"
         [defaultAggregateFields]="defaultAggregateFields()"
         [defaultAggregateSize]="defaultAggregateSize()"
+        [minAggregateSize]="minAggregateSize()"
+        [maxAggregateSize]="maxAggregateSize()"
       ></kotka-specimen-search-filters>
     </aside>
   </div>
@@ -17,9 +19,9 @@
     @if (fieldData(); as fieldData) {
       <kui-specimen-search
         class="specimen-search"
-        [text]="textSearchQuery()"
+        [searchQuery]="textSearchQuery()"
         [idSearchText]="idSearchValue().text"
-        [fields]="fieldData.fields || []"
+        [fields]="fieldData.fields"
         (search)="onSearch($event)"
       >
       </kui-specimen-search>
