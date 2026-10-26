@@ -38,6 +38,7 @@ import {
 import { DatatableSettingsStoreService } from '../services/datatable-settings-store.service';
 import { DialogService, Logger } from '@kotka/ui/core';
 import { isEqual } from 'lodash';
+import { getCleanedColumnSettings } from '../services/datatable-settings-utls';
 
 ModuleRegistry.registerModules([
   CsvExportModule,
@@ -109,6 +110,7 @@ export class DatatableComponent implements OnDestroy {
   private hasColDefs: Signal<boolean>;
   private allColumns: Signal<ColDefWithExtra[] | undefined>;
   private defaultColumnSettings: Signal<ColumnSettings | undefined>;
+  private lockedColIds: Signal<string[] | undefined>;
 
   private gridDataSource: Signal<DatatableSource | undefined>;
   private dataLoading = signal(false);
@@ -147,6 +149,10 @@ export class DatatableComponent implements OnDestroy {
     );
 
     this.hasColDefs = computed(() => (this.colDefs() !== undefined));
+
+    this.lockedColIds = computed(() => (
+      this.allColumns()?.filter(col => col.lockPosition).map(col => col.colId)
+    ));
 
     this.gridDataSource = computed(() => (
       this.hasColDefs() && this.datasource()
@@ -287,19 +293,30 @@ export class DatatableComponent implements OnDestroy {
     });
 
     effect(() => {
-      if (this.columnSettings()) {
-        return;
-      }
+      const columnSettings = this.columnSettings();
 
-      let storedSettings: ColumnSettings | undefined;
-      if (this.enableColumnSelection()) {
-        storedSettings = this.settingsStoreService.getStoredColumnSettings(
-          this.settingsKey(),
-          this.defaultColumnSettings()
+      if (columnSettings) {
+        const cleanedSettings = getCleanedColumnSettings(
+          columnSettings,
+          this.defaultColumnSettings(),
+          this.lockedColIds()
         );
-      }
 
-      this.columnSettings.set(storedSettings || this.defaultColumnSettings());
+        if (!isEqual(cleanedSettings, columnSettings)) {
+          this.columnSettings.set(cleanedSettings);
+        }
+      } else {
+        let storedSettings: ColumnSettings | undefined;
+        if (this.enableColumnSelection()) {
+          storedSettings = this.settingsStoreService.getStoredColumnSettings(
+            this.settingsKey(),
+            this.defaultColumnSettings(),
+            this.lockedColIds()
+          );
+        }
+
+        this.columnSettings.set(storedSettings || this.defaultColumnSettings());
+      }
     });
 
     effect(() => {

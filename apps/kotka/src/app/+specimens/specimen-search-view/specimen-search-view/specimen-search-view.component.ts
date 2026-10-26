@@ -266,7 +266,7 @@ export class SpecimenSearchViewComponent {
     if (parsedParams.selectedColumns) {
       this.columnSettings.set({
         selected: parsedParams.selectedColumns,
-        order: []
+        order: parsedParams.selectedColumns
       });
     }
     if (parsedParams.sort) {

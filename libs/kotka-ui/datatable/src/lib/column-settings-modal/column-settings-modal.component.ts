@@ -23,6 +23,7 @@ import { ColDefWithExtra, ColumnSettings } from '../models/models';
 import { AgGridAngular } from '@ag-grid-community/angular';
 import { FormsModule } from '@angular/forms';
 import { getOrderAfterColumnMove } from '../services/datatable-column-utils';
+import { moveInArray, sortByOrder } from '../services/datatable-settings-utls';
 
 const comparator = (order: string[]) => (
   columnA: ColDefWithExtra,
@@ -30,12 +31,6 @@ const comparator = (order: string[]) => (
 ): number => {
   return order.indexOf(columnA.colId) - order.indexOf(columnB.colId);
 };
-
-function moveInArray(arr: any[], fromIndex: number, toIndex: number) {
-  const element = arr[fromIndex];
-  arr.splice(fromIndex, 1);
-  arr.splice(toIndex, 0, element);
-}
 
 @Component({
   selector: 'kui-column-settings-modal',
@@ -76,11 +71,10 @@ export class ColumnSettingsModalComponent {
   });
 
   private lockedPositions = computed(() => {
-    const originalOrder = this.columns().map((col) => col.colId);
     return this.columns().reduce(
-      (result, col) => {
+      (result, col, idx) => {
         if (col.lockPosition) {
-          result[col.colId] = originalOrder.indexOf(col.colId);
+          result[col.colId] = idx;
         }
         return result;
       },
@@ -133,9 +127,7 @@ export class ColumnSettingsModalComponent {
   onConfirm() {
     const selected = [...this.selected()];
     const order = this.order();
-    selected.sort(
-      (colId1, colId2) => order.indexOf(colId1) - order.indexOf(colId2),
-    );
+    sortByOrder(selected, order);
 
     this.confirmClick.emit({ selected, order });
 
@@ -205,15 +197,14 @@ export class ColumnSettingsModalComponent {
 
     // restore locked positions
     for (const colId of Object.keys(this.lockedPositions())) {
-      const lockedIdx = this.lockedPositions()[colId];
       const currentIdx = order.indexOf(colId);
-      if (currentIdx !== lockedIdx) {
-        moveInArray(order, currentIdx, lockedIdx);
-      }
+      const lockedIdx = this.lockedPositions()[colId];
+      moveInArray(order, currentIdx, lockedIdx);
     }
+
     visibleOrder = order.filter((colId) => visibleOrder.includes(colId));
 
-    this.settings.set({ ...this.settings(), order: order });
+    this.settings.set({ ...this.settings(), order });
     this.visibleOrder.set(visibleOrder);
 
     this.draggedRow = undefined;
