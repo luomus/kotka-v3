@@ -1,5 +1,5 @@
 ARG TARGET
-FROM node:20 as builder
+FROM node:22 as builder
 ARG CONFIGURATION=production
 ENV NODE_ENV build
 ENV CYPRESS_INSTALL_BINARY 0
@@ -39,7 +39,7 @@ RUN chmod a+r /usr/share/nginx/html/favicon.ico
 EXPOSE 8080
 
 
-FROM node:20 as kotka-api
+FROM node:22 as kotka-api
 ENV NODE_ENV production
 ENV HOST "0.0.0.0"
 
