@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Router, UrlSerializer } from '@angular/router';
 import { FieldValue } from '../specimen-search-filters/aggregations.component';
-import { IndexType } from '@kotka/shared/models';
+import { AggregationBucketKey, IndexType } from '@kotka/shared/models';
 import { INDEX_OPTIONS } from '../specimen-search-main/specimen-search-main.component';
 import { WINDOW } from '@kotka/ui/core';
 import { DatatableSort } from '@kotka/ui/datatable';
@@ -88,13 +88,19 @@ export class SpecimenLinkService {
     };
   }
 
-  private filtersValueToParams(filtersValue: FieldValue[]): Record<string, any> {
-    const result: Record<string, any> = {};
+  private filtersValueToParams(filtersValue: FieldValue[]): Record<string, AggregationBucketKey[]> {
+    const result: Record<string, AggregationBucketKey[]> = {};
 
-    return filtersValue.reduce((params, value) => {
-      params[`filters.${value.field}`] = value.value;
-      return params;
+    filtersValue.reduce((res, value) => {
+      const key = `filters.${value.field}`;
+      if (!res[key]) {
+        res[key] = [];
+      }
+      res[key].push(value.value);
+      return res;
     }, result);
+
+    return result;
   }
 
   private stringifySort(sort: DatatableSort): string {
@@ -102,14 +108,25 @@ export class SpecimenLinkService {
   }
 
   private parseFiltersValueParam(queryParams: SearchLinkParams): FieldValue[] | undefined {
-    const filtersValue: FieldValue[] | undefined = Object.keys(queryParams)
-      .filter(key => key.startsWith('filters.'))
-      .map(key => ({
-        field: key.replace('filters.', ''),
-        value: queryParams[key],
-      }))
-      .filter((value): value is FieldValue => value.value !== undefined);
-    return filtersValue.length > 0 ? filtersValue : undefined;
+    const result: FieldValue[] = [];
+
+    Object.keys(queryParams)
+      .reduce((res, key) => {
+        if (key.startsWith('filters.')) {
+          const field = key.replace('filters.', '');
+          const value = queryParams[key];
+          if (value !== undefined) {
+            if (Array.isArray(value)) {
+              value.forEach((v) => res.push({ field, value: v }));
+            } else {
+              res.push({ field, value });
+            }
+          }
+        }
+        return res;
+      }, result);
+    
+    return result.length > 0 ? result : undefined;
   }
 
   private parseIdSearchParam(param: any): IdSearchValue | undefined {

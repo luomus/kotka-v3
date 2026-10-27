@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, model, Signal } from '@angular/core';
 import { AggregationBucketKey, AggregateValue, FieldAggregate } from '@kotka/shared/models';
+import { FieldData } from '../specimen-search-view/specimen-search-view.component';
 
 export interface FieldValue {
   field: string;
@@ -20,7 +21,7 @@ interface FieldAggregatesWithSelected extends FieldAggregate {
     @for (aggregate of aggregatesWithSelected(); track $index) {
       <div class="mt-2">
         <strong>
-          {{ aggregate.field }}
+          {{ fieldData().fieldMap?.[aggregate.field]?.label }}
           ({{ aggregate.countUnprecise ? '~' : '' }}{{ aggregate.count }})
         </strong>
         @for (value of aggregate.values; track $index) {
@@ -54,18 +55,19 @@ export class AggregationsComponent {
   selected = model<FieldValue[]>();
 
   aggregates = input<FieldAggregate[]>([]);
+  fieldData = input.required<FieldData>();
 
   aggregatesWithSelected: Signal<FieldAggregatesWithSelected[]>;
 
   constructor() {
     this.aggregatesWithSelected = computed(() =>
-      this.aggregates().map(result => ({
+      this.aggregates().map((result) => ({
         ...result,
-        values: result.values.map(value => ({
+        values: result.values.map((value) => ({
           ...value,
           selected: this.isSelected(result.field, value.value),
-        }))
-      }))
+        })),
+      })),
     );
   }
 
