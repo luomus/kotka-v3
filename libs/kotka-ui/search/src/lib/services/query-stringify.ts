@@ -1,5 +1,5 @@
 import {
-  BuilderQuery, JoinOperator,
+  BuilderQuery,
   SearchCriteria,
   SearchGroup,
   SearchOperator,
@@ -174,12 +174,4 @@ export function getRemovedCharacters(operator?: SearchOperator): string[] {
   } else {
     return REMOVED_CHARACTERS;
   }
-}
-
-export function joinQueryStrings(joinOperator: JoinOperator, ...queries: string[]): string {
-  queries = queries.filter(Boolean);
-  if (queries.length > 1) {
-    queries = queries.map(query => `(${query})`);
-  }
-  return queries.join(` ${joinOperator} `);
 }

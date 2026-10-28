@@ -12,34 +12,42 @@ interface Terms {
   [key: string]: Value[];
 }
 
-interface Bool {
+export interface Bool {
   must?: Query[];
   should?: Query[];
+  filter?: Query[];
 }
 
-interface TermQuery {
+export interface TermQuery {
   term: Term|TermWithExtra;
 }
 
-interface TermsQuery {
+export interface TermsQuery {
   terms: Terms & ExtraOptions;
 }
 
-interface WildcardQuery {
+export interface WildcardQuery {
   wildcard: Term|TermWithExtra;
 }
 
-interface BooleanQuery {
+export interface BooleanQuery {
   bool: Bool;
 }
 
-interface QueryStringQuery {
+export interface QueryStringQuery {
   query_string: {
     query: string;
   }
 }
 
-type Query = TermQuery|TermsQuery|WildcardQuery|BooleanQuery|QueryStringQuery;
+export interface GeoDistanceQuery {
+  geo_distance: {
+    distance: number;
+    [key: string]: { lat: number; lon: number } | number;
+  }
+}
+
+export type Query = TermQuery|TermsQuery|WildcardQuery|BooleanQuery|QueryStringQuery|GeoDistanceQuery;
 
 export type Aggs = { [key: string]: {
   terms?: { field: string, size?: number };

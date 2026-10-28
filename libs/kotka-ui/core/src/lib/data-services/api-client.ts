@@ -13,7 +13,7 @@ import {
   StorePatch,
   StoreVersion,
   MediaType,
-  Media, IndexType, SearchResult, SearchField, Aggs, SearchResponse, RawSearchResponse, Aggregations, FieldAggregate
+  Media, IndexType, SearchResult, SearchField, Aggs, SearchResponse, RawSearchResponse, Aggregations, FieldAggregate,
 } from '@kotka/shared/models';
 import { Observable, of, switchMap, forkJoin } from 'rxjs';
 import { apiBase, lajiApiBase} from './constants';
@@ -27,6 +27,7 @@ import { map } from 'rxjs/operators';
 import { get, set } from 'lodash';
 import { LOGIN_REDIRECT_ENABLED } from '../interceptors';
 import { ElasticsearchQuery } from '@kotka/shared/models';
+import { queryStringToObject } from '../util-services';
 
 export interface SearchParams {
   searchQuery?: string | ElasticsearchQuery;
@@ -47,20 +48,6 @@ export const COUNT_PRECISION_THRESHOLD = 10000;
 const path = apiBase + '/';
 const authPath = apiBase + '/auth/';
 const lajiApiPath = lajiApiBase + '/';
-
-export const searchQueryStringToObject = (searchQuery: string): ElasticsearchQuery => {
-  if (!searchQuery) {
-    return {};
-  }
-
-  return {
-    query: {
-      query_string: {
-        query: searchQuery,
-      },
-    }
-  };
-};
 
 @Injectable({
   providedIn: 'root',
@@ -118,7 +105,7 @@ export class ApiClient {
 
     if (searchQuery && typeof searchQuery === 'string') {
       if (searchQuery.length > 500) {
-        searchQuery = searchQueryStringToObject(searchQuery);
+        searchQuery = queryStringToObject(searchQuery);
       } else {
         params = params.set('q', searchQuery);
       }
@@ -234,7 +221,7 @@ export class ApiClient {
     }
 
     if (typeof searchQuery === 'string') {
-      searchQuery = searchQueryStringToObject(searchQuery);
+      searchQuery = queryStringToObject(searchQuery);
     } else {
       searchQuery = searchQuery || {};
     }

@@ -11,6 +11,7 @@ import {
 import { DatatableComponent } from '../datatable/datatable.component';
 import { DatatableRow, DocumentDatatableDataService } from '../services/document-datatable-data.service';
 import {
+  ElasticsearchQuery,
   IndexType,
   KotkaDocumentType,
 } from '@kotka/shared/models';
@@ -40,7 +41,7 @@ export interface DatatableLoadedData<
 })
 export class DocumentDatatableComponent<
   T extends KotkaDocumentType = KotkaDocumentType,
-  S extends T extends KotkaDocumentType.specimen ? IndexType : never = never
+  S extends T extends KotkaDocumentType.specimen ? IndexType : never = never,
 > {
   private dataService = inject(DocumentDatatableDataService);
   private userService = inject(UserService);
@@ -61,7 +62,7 @@ export class DocumentDatatableComponent<
   defaultFilterModel = input<DatatableFilter>({});
   defaultSortModel = input<DatatableSort>([]);
 
-  searchQuery = input<string>();
+  searchQuery = input<string | ElasticsearchQuery>();
   aggregateBy = input<S extends IndexType ? AggregateBy[] : never>();
 
   datasource = signal<DatatableSource | undefined>(undefined);
@@ -90,12 +91,18 @@ export class DocumentDatatableComponent<
           this.columns(),
           this.searchQuery(),
           this.aggregateBy(),
-        )
+        ),
       );
     });
   }
 
-  private getDataSource(dataType: T, index: S | undefined, columns?: DatatableColumn[], searchQuery?: string, aggregateBy?: AggregateBy[]): DatatableSource | undefined {
+  private getDataSource(
+    dataType: T,
+    index: S | undefined,
+    columns?: DatatableColumn[],
+    searchQuery?: string | ElasticsearchQuery,
+    aggregateBy?: AggregateBy[],
+  ): DatatableSource | undefined {
     if (!columns) {
       return undefined;
     }
@@ -112,7 +119,8 @@ export class DocumentDatatableComponent<
         );
 
         return this.dataService
-          .getRows<T, S>(dataType, index, searchParams, aggregateBy).pipe(
+          .getRows<T, S>(dataType, index, searchParams, aggregateBy)
+          .pipe(
             catchError((err) => {
               if (err.status === 400) {
                 this.invalidQueryError.emit(err);
@@ -122,7 +130,10 @@ export class DocumentDatatableComponent<
             }),
           )
           .subscribe((result) => {
-            params.successCallback(result?.member || [], result?.totalItems || 0);
+            params.successCallback(
+              result?.member || [],
+              result?.totalItems || 0,
+            );
             if (result) {
               this.loadData.emit({ searchParams, result });
             }

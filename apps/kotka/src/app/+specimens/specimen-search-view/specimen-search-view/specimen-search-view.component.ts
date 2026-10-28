@@ -27,7 +27,10 @@ import { MainContentComponent, MainContentHeaderDirective, SpinnerComponent } fr
 import { FormsModule } from '@angular/forms';
 import { ApiClient, IteratorSearchParams, SearchResultIteratorService } from '@kotka/ui/core';
 import { SpecimenLabelDesignerComponent } from '../../specimen-label-designer/specimen-label-designer.component';
-import { FieldValue } from '../specimen-search-filters/aggregations.component';
+import {
+  FieldData,
+  SpecimenSearchFilters,
+} from '../models/models';
 import { SpecimenLinkService } from '../service/specimen-link.service';
 import { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
@@ -39,15 +42,6 @@ import { SpecimenSearchMainComponent } from '../specimen-search-main/specimen-se
 import { SpecimenSearchHeaderComponent } from '../specimen-search-header/specimen-search-header.component';
 import { IdSearchValue, parseIdQuery } from '@kotka/ui/search';
 import { getColId } from '@kotka/ui/datatable';
-
-export interface FieldData {
-  fields?: SearchField[];
-  fieldMap?: Record<string, SearchField>;
-  columns?: DatatableColumn[];
-  allAggregateFields?: string[];
-  allAggregateColumns?: DatatableColumn[];
-  fieldsLoading: boolean;
-}
 
 const INITIAL_FIELD_DATA: FieldData = {
   fieldsLoading: true,
@@ -109,7 +103,7 @@ export class SpecimenSearchViewComponent {
     equal: isEqual,
   });
   aggregateSize = signal<number>(DEFAULT_AGGREGATE_SIZE);
-  filtersValue = signal<FieldValue[]>([]);
+  filters = signal<SpecimenSearchFilters>({ fieldValues: [] });
   idSearchValue = signal<IdSearchValue>({ text: '', query: parseIdQuery('') });
   textSearchQuery = signal('');
   columnSettings = model<ColumnSettings | undefined>(undefined);
@@ -140,7 +134,7 @@ export class SpecimenSearchViewComponent {
         this.index(),
         this.aggregateFields(),
         this.aggregateSize(),
-        this.filtersValue(),
+        this.filters(),
         this.idSearchValue(),
         this.textSearchQuery(),
         this.columnSettings()?.selected || [],
@@ -149,7 +143,13 @@ export class SpecimenSearchViewComponent {
     );
 
     effect(() => {
-      this.onFieldDataChange();
+      this.onFieldDataChange(
+        this.fieldData(),
+        untracked(this.aggregateFields),
+        untracked(this.filters),
+        untracked(this.columnSettings),
+        untracked(this.sortModel),
+      );
     });
 
     effect(() => {
@@ -195,47 +195,49 @@ export class SpecimenSearchViewComponent {
     const defaultSelectedFields: string[] = DEFAULT_SELECTED_FIELDS[index];
     const specialColumns: Record<string, DatatableColumn> = SPECIAL_COLUMNS;
 
-    return this.apiClient.getSearchFields(KotkaDocumentType.specimen, index).pipe(
-      map((fields) => {
-        const fieldMap: Record<string, SearchField> = fields.reduce(
-          (result, field) => {
-            result[field.field] = field;
-            return result;
-          },
-          <Record<string, SearchField>>{},
-        );
+    return this.apiClient
+      .getSearchFields(KotkaDocumentType.specimen, index)
+      .pipe(
+        map((fields) => {
+          const fieldMap: Record<string, SearchField> = fields.reduce(
+            (result, field) => {
+              result[field.field] = field;
+              return result;
+            },
+            <Record<string, SearchField>>{},
+          );
 
-        const columns: DatatableColumn[] = fields.map((field) => ({
-          headerName: field.label || field.field,
-          field: field.field,
-          sortField: field.hasRaw ? `${field.field}.raw` : field.field,
-          ...(specialColumns[field.field] || {}),
-          defaultSelected: defaultSelectedFields.includes(field.field),
-        }));
-
-        const allAggregateColumns: ColDefWithExtra[] = fields
-          .filter((field) => field.hasRaw || field.type === 'keyword')
-          .map((field) => ({
-            colId: field.field,
+          const columns: DatatableColumn[] = fields.map((field) => ({
             headerName: field.label || field.field,
             field: field.field,
+            sortField: field.hasRaw ? `${field.field}.raw` : field.field,
+            ...(specialColumns[field.field] || {}),
+            defaultSelected: defaultSelectedFields.includes(field.field),
           }));
 
-        const allAggregateFields: string[] = allAggregateColumns.map(
-          (col) => col.colId,
-        );
+          const allAggregateColumns: ColDefWithExtra[] = fields
+            .filter((field) => field.hasRaw || field.type === 'keyword')
+            .map((field) => ({
+              colId: field.field,
+              headerName: field.label || field.field,
+              field: field.field,
+            }));
 
-        return {
-          fields,
-          fieldMap,
-          columns,
-          allAggregateColumns,
-          allAggregateFields,
-          fieldsLoading: false,
-        };
-      }),
-      startWith(INITIAL_FIELD_DATA),
-    );
+          const allAggregateFields: string[] = allAggregateColumns.map(
+            (col) => col.colId,
+          );
+
+          return {
+            fields,
+            fieldMap,
+            columns,
+            allAggregateColumns,
+            allAggregateFields,
+            fieldsLoading: false,
+          };
+        }),
+        startWith(INITIAL_FIELD_DATA),
+      );
   }
 
   private applyQueryParamsToState(queryParams: Params) {
@@ -243,7 +245,8 @@ export class SpecimenSearchViewComponent {
       return;
     }
 
-    const parsedParams = this.specimenLinkService.parseSearchLinkParams(queryParams);
+    const parsedParams =
+      this.specimenLinkService.parseSearchLinkParams(queryParams);
 
     if (parsedParams.index) {
       this.index.set(parsedParams.index);
@@ -251,11 +254,15 @@ export class SpecimenSearchViewComponent {
     if (parsedParams.aggregateFields) {
       this.aggregateFields.set(parsedParams.aggregateFields);
     }
-    if (parsedParams.aggregateSize !== undefined && parsedParams.aggregateSize >= this.minAggregateSize && parsedParams.aggregateSize <= this.maxAggregateSize) {
+    if (
+      parsedParams.aggregateSize !== undefined &&
+      parsedParams.aggregateSize >= this.minAggregateSize &&
+      parsedParams.aggregateSize <= this.maxAggregateSize
+    ) {
       this.aggregateSize.set(parsedParams.aggregateSize);
     }
-    if (parsedParams.filtersValue) {
-      this.filtersValue.set(parsedParams.filtersValue);
+    if (parsedParams.filters) {
+      this.filters.set(parsedParams.filters);
     }
     if (parsedParams.idSearchValue) {
       this.idSearchValue.set(parsedParams.idSearchValue);
@@ -266,7 +273,7 @@ export class SpecimenSearchViewComponent {
     if (parsedParams.selectedColumns) {
       this.columnSettings.set({
         selected: parsedParams.selectedColumns,
-        order: parsedParams.selectedColumns
+        order: parsedParams.selectedColumns,
       });
     }
     if (parsedParams.sort) {
@@ -280,51 +287,82 @@ export class SpecimenSearchViewComponent {
     });
   }
 
-  private onFieldDataChange() {
-    if (this.fieldData().fieldsLoading) {
+  private onFieldDataChange(
+    fieldData: FieldData,
+    aggregateFields: string[],
+    filters: SpecimenSearchFilters,
+    columnSettings: ColumnSettings | undefined,
+    sortModel: DatatableSort
+  ) {
+    if (fieldData.fieldsLoading) {
       return;
     }
 
-    const colIds = this.fieldData().columns?.map(col => getColId(col)) || [];
+    const colIds = fieldData.columns?.map((col) => getColId(col)) || [];
 
-    const aggregateFields = untracked(this.aggregateFields).filter(field => this.fieldData()?.allAggregateFields?.includes(field));
-    if (aggregateFields.length !== this.aggregateFields().length) {
-      this.aggregateFields.set(aggregateFields);
+    const newAggregateFields = aggregateFields.filter((field) =>
+      fieldData.allAggregateFields?.includes(field),
+    );
+    if (newAggregateFields.length !== aggregateFields.length) {
+      this.aggregateFields.set(newAggregateFields);
     }
 
-    const filtersValue = untracked(this.filtersValue).filter(filter => this.fieldData()?.fieldMap?.[filter.field]);
-    if (filtersValue.length !== this.filtersValue().length) {
-      this.filtersValue.set(filtersValue);
+    const fieldValues = filters.fieldValues.filter(
+      (filter) => fieldData.fieldMap?.[filter.field],
+    );
+    if (fieldValues.length !== filters.fieldValues.length) {
+      this.filters.update((filters) => ({
+        ...filters,
+        fieldValues,
+      }));
     }
 
-    const columnSettings = untracked(this.columnSettings);
     let selected: string[] = [];
     if (columnSettings) {
-      selected = columnSettings.selected.filter(field => colIds.includes(field));
-      const order = columnSettings.order.filter(field => colIds.includes(field));
-      if (selected.length !== columnSettings.selected.length || order.length !== columnSettings.order.length) {
+      selected = columnSettings.selected.filter((field) =>
+        colIds.includes(field),
+      );
+      const order = columnSettings.order.filter((field) =>
+        colIds.includes(field),
+      );
+      if (
+        selected.length !== columnSettings.selected.length ||
+        order.length !== columnSettings.order.length
+      ) {
         this.columnSettings.set({
           selected,
-          order
+          order,
         });
       }
     }
 
-    const sortModel = untracked(this.sortModel).filter(sort => selected.includes(sort.colId));
-    if (sortModel.length !== this.sortModel().length) {
-      this.sortModel.set(sortModel);
+    const newSortModel = sortModel.filter((sort) =>
+      selected.includes(sort.colId),
+    );
+    if (newSortModel.length !== sortModel.length) {
+      this.sortModel.set(newSortModel);
     }
   }
 
   private onAggregatesChange(aggregates: FieldAggregate[]) {
-    const aggregateMap = aggregates.reduce((map, aggregate) => {
-      map[aggregate.field] = aggregate;
-      return map;
-    }, <Record<string, FieldAggregate>>{});
+    const aggregateMap = aggregates.reduce(
+      (map, aggregate) => {
+        map[aggregate.field] = aggregate;
+        return map;
+      },
+      <Record<string, FieldAggregate>>{},
+    );
 
-    const filtersValue = this.filtersValue().filter(filter => aggregateMap[filter.field]?.values.some(value => value.value === filter.value));
-    if (filtersValue.length !== this.filtersValue().length) {
-      this.filtersValue.set(filtersValue);
+    const fieldValues = this.filters().fieldValues.filter((filter) =>
+      aggregateMap[filter.field]?.values.some(
+        (value) => value.value === filter.value,
+      ),
+    );
+    if (fieldValues.length !== this.filters().fieldValues.length) {
+      this.filters.update((filters) => ({
+        ...filters,
+        fieldValues,
+      }));
     }
   }
 }

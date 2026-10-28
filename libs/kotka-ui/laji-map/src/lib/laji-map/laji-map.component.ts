@@ -7,15 +7,20 @@ import {
   viewChild,
   effect,
   OnDestroy,
+  output,
+  Signal,
+  computed,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { Logger } from '@kotka/ui/core';
-import { DataOptions, Options } from '@luomus/laji-map';
+import { DataOptions, Options, Lang, LajiMapEvent } from '@luomus/laji-map';
 
 @Component({
   selector: 'kui-laji-map',
   imports: [],
   template: '<div #lajiMap class="laji-map"></div>',
   styleUrls: ['./laji-map.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LajiMapComponent implements OnDestroy {
   private zone = inject(NgZone);
@@ -24,21 +29,49 @@ export class LajiMapComponent implements OnDestroy {
   data = input<DataOptions>();
   options = input<Options>();
 
+  drawEvent = output<LajiMapEvent[]>();
+
   elemRef = viewChild<ElementRef<HTMLDivElement>>('lajiMap');
 
+  private mapOptions: Signal<Options | undefined>;
   private map: any;
 
   constructor() {
-    effect(() => {
+    this.mapOptions = computed(() => {
       const elem = this.elemRef();
-      const data = this.data();
-      const options = this.options();
-
       if (!elem) {
+        return undefined;
+      }
+
+      const options = {
+        ...this.options(),
+        draw: {
+          ...this.options()?.draw,
+          onChange: this.onDrawChange.bind(this),
+        },
+      };
+
+      return {
+        lang: Lang.en,
+        rootElem: elem.nativeElement,
+        data: this.data(),
+        ...options,
+      };
+    });
+
+    effect(() => {
+      const mapOptions = this.mapOptions();
+      if (!mapOptions) {
         return;
       }
 
-      this.initMap(elem, data, options);
+      if (this.map) {
+        this.zone.run(() => {
+          this.map.setOptions(mapOptions);
+        });
+      } else {
+        this.initMap(mapOptions);
+      }
     });
   }
 
@@ -48,23 +81,23 @@ export class LajiMapComponent implements OnDestroy {
     });
   }
 
-  initMap(elem: ElementRef, data?: DataOptions, options?: Options) {
+  initMap(mapOptions: Options) {
     import('@luomus/laji-map').then(({ LajiMap }) => {
       this.zone.runOutsideAngular(() => {
         this.map?.destroy();
 
-        const mapOptions: any = {
-          lang: 'en',
-          rootElem: elem.nativeElement,
-          data,
-          ...options,
-        };
         try {
           this.map = new LajiMap(mapOptions);
         } catch (e) {
           this.logger.error('Map initialization failed', e);
         }
       });
+    });
+  }
+
+  private onDrawChange(data: LajiMapEvent[]) {
+    this.zone.run(() => {
+      this.drawEvent.emit(data);
     });
   }
 }

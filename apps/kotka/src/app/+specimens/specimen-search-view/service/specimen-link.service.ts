@@ -1,21 +1,31 @@
 import { inject, Injectable } from '@angular/core';
 import { Router, UrlSerializer } from '@angular/router';
-import { FieldValue } from '../specimen-search-filters/aggregations.component';
-import { AggregationBucketKey, IndexType } from '@kotka/shared/models';
+import {
+  FieldValue,
+  LocationFilter,
+  SpecimenSearchFilters,
+} from '../models/models';
+import {
+  IndexType,
+} from '@kotka/shared/models';
 import { INDEX_OPTIONS } from '../specimen-search-main/specimen-search-main.component';
 import { WINDOW } from '@kotka/ui/core';
 import { DatatableSort } from '@kotka/ui/datatable';
 import { IdSearchValue, parseIdQuery } from '@kotka/ui/search';
+import { areValidWGS84Coordinates } from '@kotka/shared/utils';
 
-type SearchLinkParamKeys = 'index' | 'aggregateFields' | 'aggregateSize' | 'filters' | 'idSearch' | 'query' | 'selected' | 'sort';
+const FIELD_PARAM_PREFIX = 'field.';
 
-type SearchLinkParams = { [key in SearchLinkParamKeys | string]?: string | number | boolean };
+type FieldParamKey = `field.${string}`;
+type SearchLinkParamKeys = 'index' | 'aggFields' | 'aggSize' | 'id' | 'query' | 'cols' | 'sort' | 'loc' | FieldParamKey;
+
+type SearchLinkParams = { [key in SearchLinkParamKeys]?: any };
 
 interface ParsedSearchLinkParams {
   index?: IndexType;
   aggregateFields?: string[];
   aggregateSize?: number;
-  filtersValue?: FieldValue[];
+  filters?: SpecimenSearchFilters;
   idSearchValue?: IdSearchValue;
   textSearchQuery?: string;
   selectedColumns?: string[];
@@ -34,7 +44,7 @@ export class SpecimenLinkService {
     index: IndexType,
     aggregateFields: string[],
     aggregateSize: number,
-    filtersValue: FieldValue[],
+    filters: SpecimenSearchFilters,
     idSearchValue: IdSearchValue,
     textSearchQuery: string,
     selectedColumns: string[],
@@ -42,13 +52,13 @@ export class SpecimenLinkService {
   ): string {
     const queryParams: SearchLinkParams = {
       index,
-      aggregateFields: aggregateFields.join(','),
-      aggregateSize,
-      ...this.filtersValueToParams(filtersValue),
-      selected: selectedColumns.join(','),
+      aggFields: aggregateFields.join(','),
+      aggSize: aggregateSize,
+      ...this.filtersToParams(filters),
+      cols: selectedColumns.join(','),
     };
     if (idSearchValue.text) {
-      queryParams.idSearch = idSearchValue.text;
+      queryParams.id = idSearchValue.text;
     }
     if (textSearchQuery) {
       queryParams.query = textSearchQuery;
@@ -68,19 +78,19 @@ export class SpecimenLinkService {
 
   parseSearchLinkParams(queryParams: SearchLinkParams): ParsedSearchLinkParams {
     const index = this.isValidIndex(queryParams.index) ? queryParams.index : undefined;
-    const aggregateFields = this.parseStringArrayParam(queryParams.aggregateFields);
-    const aggregateSize = this.parseNumberParam(queryParams.aggregateSize);
-    const filtersValue = this.parseFiltersValueParam(queryParams);
-    const idSearchValue = this.parseIdSearchParam(queryParams.idSearch);
+    const aggregateFields = this.parseStringArrayParam(queryParams.aggFields);
+    const aggregateSize = this.parseIntegerParam(queryParams.aggSize);
+    const filters = this.parseFilters(queryParams);
+    const idSearchValue = this.parseIdSearchParam(queryParams.id);
     const textSearchQuery = this.parseStringParam(queryParams.query);
-    const selectedColumns = this.parseStringArrayParam(queryParams.selected);
+    const selectedColumns = this.parseStringArrayParam(queryParams.cols);
     const sort = this.parseSortParam(queryParams.sort);
 
     return {
       index,
       aggregateFields,
       aggregateSize,
-      filtersValue,
+      filters,
       idSearchValue,
       textSearchQuery,
       selectedColumns,
@@ -88,11 +98,19 @@ export class SpecimenLinkService {
     };
   }
 
-  private filtersValueToParams(filtersValue: FieldValue[]): Record<string, AggregationBucketKey[]> {
-    const result: Record<string, AggregationBucketKey[]> = {};
+  private filtersToParams(filters: SpecimenSearchFilters): SearchLinkParams {
+    const params = this.fieldValuesToParams(filters.fieldValues);
+    if (filters.location) {
+      params.loc = [filters.location.latitude, filters.location.longitude, filters.location.radius].join(',');
+    }
+    return params;
+  }
+
+  private fieldValuesToParams(filtersValue: FieldValue[]): SearchLinkParams {
+    const result: SearchLinkParams = {};
 
     filtersValue.reduce((res, value) => {
-      const key = `filters.${value.field}`;
+      const key: FieldParamKey = `${FIELD_PARAM_PREFIX}${value.field}`;
       if (!res[key]) {
         res[key] = [];
       }
@@ -107,13 +125,45 @@ export class SpecimenLinkService {
     return sort.map(s => `${s.colId} ${s.sort}`).join(',');
   }
 
-  private parseFiltersValueParam(queryParams: SearchLinkParams): FieldValue[] | undefined {
+  parseFilters(queryParams: SearchLinkParams): SpecimenSearchFilters | undefined {
+    const location = this.parseLocationParam(queryParams.loc);
+    const fieldValues = this.parseFieldValues(queryParams);
+
+    if (!location && !fieldValues) {
+      return undefined;
+    }
+
+    return { location, fieldValues: fieldValues || [] };
+  }
+
+  private parseLocationParam(param: any): LocationFilter | undefined {
+    if (typeof param !== 'string') {
+      return undefined;
+    }
+
+    const parts = param.split(',');
+    if (parts.length !== 3) {
+      return undefined;
+    }
+
+    const latitude = parseFloat(parts[0]);
+    const longitude = parseFloat(parts[1]);
+    const radius = parseFloat(parts[2]);
+
+    if (!areValidWGS84Coordinates(latitude, longitude) || isNaN(radius) || radius <= 0) {
+      return undefined;
+    }
+
+    return { latitude, longitude, radius };
+  }
+
+  private parseFieldValues(queryParams: SearchLinkParams): FieldValue[] | undefined {
     const result: FieldValue[] = [];
 
     Object.keys(queryParams)
       .reduce((res, key) => {
-        if (key.startsWith('filters.')) {
-          const field = key.replace('filters.', '');
+        if (this.isFieldParamKey(key)) {
+          const field = key.replace(FIELD_PARAM_PREFIX, '');
           const value = queryParams[key];
           if (value !== undefined) {
             if (Array.isArray(value)) {
@@ -125,7 +175,7 @@ export class SpecimenLinkService {
         }
         return res;
       }, result);
-    
+
     return result.length > 0 ? result : undefined;
   }
 
@@ -169,12 +219,16 @@ export class SpecimenLinkService {
     return undefined;
   }
 
-  private parseNumberParam(param: any): number | undefined {
+  private parseIntegerParam(param: any): number | undefined {
     const num = parseInt(param, 10);
     return isNaN(num) ? undefined : num;
   }
 
   private isValidIndex(index: any): index is IndexType {
     return INDEX_OPTIONS.includes(index);
+  }
+
+  private isFieldParamKey(key: string): key is FieldParamKey {
+    return key.startsWith(FIELD_PARAM_PREFIX);
   }
 }

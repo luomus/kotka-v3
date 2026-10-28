@@ -13,17 +13,22 @@ import {
   DocumentDatatableComponent,
 } from '@kotka/ui/datatable';
 import {
-  KotkaDocumentType, IndexType, FieldAggregate
+  KotkaDocumentType,
+  IndexType,
+  FieldAggregate,
+  ElasticsearchQuery,
 } from '@kotka/shared/models';
 import { FormsModule } from '@angular/forms';
 import {
   AggregateBy,
 } from '@kotka/ui/core';
-import { FieldValue } from '../specimen-search-filters/aggregations.component';
+import {
+  FieldData,
+  SpecimenSearchFilters,
+} from '../models/models';
 import { IdSearchValue, SearchQuery, SpecimenSearchComponent
 } from '@kotka/ui/search';
 import { NgbAlert, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { FieldData } from '../specimen-search-view/specimen-search-view.component';
 import { SpecimenSearchFiltersComponent } from '../specimen-search-filters/specimen-search-filters.component';
 import { getSpecimenSearchQuery } from '../service/specimen-search-query-utils';
 
@@ -53,21 +58,22 @@ export class SpecimenSearchMainComponent implements OnDestroy {
   index = model.required<IndexType>();
   aggregateFields = model.required<string[]>();
   aggregateSize = model.required<number>();
-  filtersValue = model.required<FieldValue[]>();
+  filters = model.required<SpecimenSearchFilters>();
   idSearchValue = model.required<IdSearchValue>();
   textSearchQuery = model.required<string>();
   columnSettings = model.required<ColumnSettings | undefined>();
   sortModel = model.required<DatatableSort>();
 
-  fieldData =  input.required<FieldData>();
+  fieldData = input.required<FieldData>();
   defaultAggregateFields = input.required<string[]>();
   defaultAggregateSize = input.required<number>();
   minAggregateSize = input.required<number>();
   maxAggregateSize = input.required<number>();
 
-  loadData = output<DatatableLoadedData<KotkaDocumentType.specimen, IndexType>>();
+  loadData =
+    output<DatatableLoadedData<KotkaDocumentType.specimen, IndexType>>();
 
-  searchQuery: Signal<string>;
+  searchQuery: Signal<string | ElasticsearchQuery>;
   aggregateBy: Signal<AggregateBy[]>;
   aggregateResults = signal<FieldAggregate[] | undefined>(undefined);
   searchError = signal<string | undefined>(undefined);
@@ -76,7 +82,11 @@ export class SpecimenSearchMainComponent implements OnDestroy {
 
   constructor() {
     this.searchQuery = computed(() =>
-      getSpecimenSearchQuery(this.filtersValue(), this.idSearchValue(), this.textSearchQuery())
+      getSpecimenSearchQuery(
+        this.filters(),
+        this.idSearchValue(),
+        this.textSearchQuery(),
+      ),
     );
 
     this.aggregateBy = computed(() =>

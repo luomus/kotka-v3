@@ -1,16 +1,55 @@
-import { FieldValue } from '../specimen-search-filters/aggregations.component';
-import { builderQueryToQueryString, IdSearchValue, joinQueryStrings } from '@kotka/ui/search';
+import { FieldValue, SpecimenSearchFilters } from '../models/models';
+import { builderQueryToQueryString, IdSearchValue } from '@kotka/ui/search';
+import { Bool, ElasticsearchQuery } from '@kotka/shared/models';
+import { joinQueryStrings } from '@kotka/ui/core';
 
-export function getSpecimenSearchQuery(filtersValue: FieldValue[], idSearchValue: IdSearchValue, textSearchQuery: string): string {
-  return joinQueryStrings(
+export function getSpecimenSearchQuery(
+  filters: SpecimenSearchFilters,
+  idSearchValue: IdSearchValue,
+  textSearchQuery: string,
+): string | ElasticsearchQuery {
+  const queryString = joinQueryStrings(
     'AND',
-    filtersValueToSearchQuery(filtersValue),
+    fieldValuesToSearchQuery(filters.fieldValues),
     builderQueryToQueryString(idSearchValue.query),
     textSearchQuery,
   );
+
+  if (!filters.location) {
+    return queryString;
+  }
+
+  const bool: Bool = {};
+  bool['filter'] = [
+    {
+      geo_distance: {
+        distance: filters.location.radius,
+        wgs84Location: {
+          lat: filters.location.latitude,
+          lon: filters.location.longitude,
+        },
+      },
+    },
+  ];
+
+  if (queryString) {
+    bool['must'] = [
+      {
+        query_string: {
+          query: queryString,
+        },
+      },
+    ];
+  }
+
+  return {
+    query: {
+      bool
+    },
+  };
 }
 
-function filtersValueToSearchQuery(fieldValues: FieldValue[]): string {
+function fieldValuesToSearchQuery(fieldValues: FieldValue[]): string {
   return builderQueryToQueryString({
     groups: [
       {

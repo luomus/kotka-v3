@@ -1,6 +1,10 @@
 import { convertLatLng } from '@luomus/laji-map/lib/utils';
 import { MYCoordinateSystems } from '@luomus/laji-schema';
 
+export function areValidWGS84Coordinates(latitude: number, longitude: number): boolean {
+  return latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180;
+}
+
 export function convertCoordinatesToWGS84(latitude: string | number, longitude: string | number, coordinateSystem: MYCoordinateSystems): [number, number] | undefined {
   let lat: number | undefined;
   let lng: number | undefined;
@@ -18,7 +22,7 @@ export function convertCoordinatesToWGS84(latitude: string | number, longitude: 
   }
 
   if (isNumber(lat) && isNumber(lng)) {
-    if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+    if (areValidWGS84Coordinates(lat, lng)) {
       return [lat, lng];
     }
   }

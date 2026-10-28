@@ -8,14 +8,20 @@ import {
   isDateFilterModel
 } from '../models/models';
 import { inject, Injectable } from '@angular/core';
-import { AggregateBy, ApiClient, SearchParams } from '@kotka/ui/core';
+import {
+  joinQueryStringToObject,
+  AggregateBy,
+  ApiClient,
+  joinQueryStrings,
+  SearchParams,
+} from '@kotka/ui/core';
 import {
   builderQueryToQueryString,
-  joinQueryStrings,
   SearchCriteria,
   SearchGroup,
 } from '@kotka/ui/search';
 import {
+  ElasticsearchQuery,
   IndexType,
   KotkaDocument,
   KotkaDocumentType,
@@ -38,11 +44,18 @@ type ColIdFieldMap = Record<string, { sortField: string; filterField: string }>;
 export class DocumentDatatableDataService {
   private apiClient = inject(ApiClient);
 
-  getRows<
-    T extends KotkaDocumentType,
-    S extends IndexType | undefined
-  >(type: T, index: S | undefined, searchParams: SearchParams, aggregateBy?: AggregateBy[]): Observable<DatatableRow<T, S>>;
-  getRows(type: KotkaDocumentType, index: IndexType | undefined, searchParams: SearchParams, aggregateBy?: AggregateBy[]): Observable<DatatableRow> {
+  getRows<T extends KotkaDocumentType, S extends IndexType | undefined>(
+    type: T,
+    index: S | undefined,
+    searchParams: SearchParams,
+    aggregateBy?: AggregateBy[],
+  ): Observable<DatatableRow<T, S>>;
+  getRows(
+    type: KotkaDocumentType,
+    index: IndexType | undefined,
+    searchParams: SearchParams,
+    aggregateBy?: AggregateBy[],
+  ): Observable<DatatableRow> {
     if (index) {
       if (type !== KotkaDocumentType.specimen) {
         throw new Error(
@@ -58,7 +71,7 @@ export class DocumentDatatableDataService {
         searchParams.pageSize,
         searchParams.sort,
         undefined,
-        aggregateBy
+        aggregateBy,
       );
     }
 
@@ -77,7 +90,7 @@ export class DocumentDatatableDataService {
     endRow: number,
     sortModel: DatatableSort,
     filterModel: DatatableFilter,
-    extraSearchQuery = ''
+    searchQuery: string | ElasticsearchQuery = '',
   ): SearchParams {
     const pageSize = endRow - startRow;
     const page = startRow / pageSize + 1;
@@ -88,10 +101,9 @@ export class DocumentDatatableDataService {
       filterModel,
       colIdFieldMap,
     );
-    const searchQuery = joinQueryStrings('AND', extraSearchQuery, filterSearchQuery);
 
     return {
-      searchQuery,
+      searchQuery: this.joinQueries(searchQuery, filterSearchQuery),
       page,
       pageSize,
       sort,
@@ -139,7 +151,10 @@ export class DocumentDatatableDataService {
   ): string {
     return sortModel
       .map(
-        (sort) => (colIdFieldMap[sort.colId]?.sortField || sort.colId) + ' ' + sort.sort,
+        (sort) =>
+          (colIdFieldMap[sort.colId]?.sortField || sort.colId) +
+          ' ' +
+          sort.sort,
       )
       .join(',');
   }
@@ -197,9 +212,7 @@ export class DocumentDatatableDataService {
     }
 
     if (!filterModel.type) {
-      throw new Error(
-        'Filter type is required!',
-      );
+      throw new Error('Filter type is required!');
     }
 
     let value: string;
@@ -217,5 +230,17 @@ export class DocumentDatatableDataService {
 
   private getDateFilter(searchQuery?: string | null): string {
     return searchQuery ? searchQuery.split(' ')[0] : '';
+  }
+
+  private joinQueries(searchQuery: string | ElasticsearchQuery, filterSearchQuery: string): string | ElasticsearchQuery {
+    if (!filterSearchQuery) {
+      return searchQuery;
+    }
+
+    if (typeof searchQuery === 'string') {
+      return joinQueryStrings('AND', searchQuery, filterSearchQuery);
+    } else {
+      return joinQueryStringToObject(searchQuery, filterSearchQuery);
+    }
   }
 }

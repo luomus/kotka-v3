@@ -5,12 +5,8 @@ import {
   input,
   model,
   OnDestroy,
-  output,
   signal,
 } from '@angular/core';
-import {
-  DatatableLoadedData,
-} from '@kotka/ui/datatable';
 import {
   KotkaDocumentType, IndexType, FieldAggregate
 } from '@kotka/shared/models';
@@ -18,14 +14,23 @@ import { FormsModule } from '@angular/forms';
 import {
   DataTypeNamePipePipe
 } from '@kotka/ui/core';
-import { AggregationsComponent, FieldValue } from './aggregations.component';
+import { AggregationsComponent } from './aggregations.component';
 import {
   AggregationsSettings,
   AggregationsSettingsModalComponent,
 } from './aggregations-settings-modal.component';
 import { from } from 'rxjs';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { FieldData } from '../specimen-search-view/specimen-search-view.component';
+import {
+  LocationFilterModalComponent,
+} from './location-filter-modal.component';
+import {
+  FieldData,
+  FieldValue,
+  LocationFilter,
+  SpecimenSearchFilters,
+} from '../models/models';
+import { DecimalPipe } from '@angular/common';
 
 export const INDEX_OPTIONS: IndexType[] = [
   'unit',
@@ -43,6 +48,7 @@ export const INDEX_OPTIONS: IndexType[] = [
     FormsModule,
     AggregationsComponent,
     DataTypeNamePipePipe,
+    DecimalPipe,
   ],
 })
 export class SpecimenSearchFiltersComponent implements OnDestroy {
@@ -53,17 +59,15 @@ export class SpecimenSearchFiltersComponent implements OnDestroy {
   index = model.required<IndexType>();
   aggregateFields = model.required<string[]>();
   aggregateSize = model.required<number>();
-  filtersValue = model.required<FieldValue[]>();
+  filters = model.required<SpecimenSearchFilters>();
 
   aggregateResults = input<FieldAggregate[]>();
-  fieldData =  input.required<FieldData>();
+  fieldData = input.required<FieldData>();
 
   defaultAggregateFields = input.required<string[]>();
   defaultAggregateSize = input.required<number>();
   minAggregateSize = input.required<number>();
   maxAggregateSize = input.required<number>();
-
-  loadData = output<DatatableLoadedData<KotkaDocumentType.specimen, IndexType>>();
 
   aggregateFieldOrder = signal<string[] | undefined>(undefined);
 
@@ -73,6 +77,40 @@ export class SpecimenSearchFiltersComponent implements OnDestroy {
 
   ngOnDestroy() {
     this.modalRef?.close();
+  }
+
+  onFieldValuesChange(fieldValues: FieldValue[]) {
+    this.filters.update((filters) => ({
+      ...filters,
+      fieldValues,
+    }));
+  }
+
+  removeLocationFilter() {
+    this.filters.update((filters) => ({
+      ...filters,
+      location: undefined,
+    }));
+  }
+
+  openLocationFilterModal() {
+    this.modalRef = this.modalService.open(LocationFilterModalComponent, {
+      size: 'md',
+      windowClass: 'd-flex',
+      modalDialogClass: 'd-flex w-100',
+    });
+
+    this.modalRef.componentInstance.locationFilter.set(this.filters().location);
+
+    from(this.modalRef.result).subscribe({
+      next: (locationFilter?: LocationFilter) => {
+        this.filters.update((filters) => ({
+          ...filters,
+          location: locationFilter,
+        }));
+      },
+      error: () => undefined,
+    });
   }
 
   openAggregateSettingsModal() {
