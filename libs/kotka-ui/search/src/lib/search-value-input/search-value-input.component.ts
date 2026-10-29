@@ -11,11 +11,12 @@ import {
   AutocompleteResult,
   KotkaDocumentType,
   SearchField,
+  BOOLEAN_TYPES,
+  DATE_TYPES,
 } from '@kotka/shared/models';
 import { AutocompleteComponent, DatepickerComponent } from '@kotka/ui/components';
 import { ApiClient, HighlightMatchPipe } from '@kotka/ui/core';
 import { catchError, map, Observable, of } from 'rxjs';
-import { BOOLEAN_TYPES, DATE_TYPES } from '../constants';
 
 const SUGGESTION_LIMIT = 10;
 

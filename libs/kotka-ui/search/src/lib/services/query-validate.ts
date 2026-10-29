@@ -1,7 +1,6 @@
 import { BuilderQuery } from '../models';
-import { SearchField } from '@kotka/shared/models';
+import { SearchField, BOOLEAN_TYPES, DATE_TYPES } from '@kotka/shared/models';
 import { getOperatorsForType } from '../pipes/operators-for-field.pipe';
-import { BOOLEAN_TYPES, DATE_TYPES } from '../constants';
 
 export function validateBuilderQueryValues(query: BuilderQuery, fieldMap: Record<string, SearchField>): BuilderQuery {
   query.groups.forEach((group) => {

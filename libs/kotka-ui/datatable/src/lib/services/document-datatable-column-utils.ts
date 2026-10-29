@@ -13,6 +13,7 @@ import {
   URICellRendererComponent,
   URICellRendererParams,
 } from '../renderers/uri-cell-renderer.component';
+import { MapCellRendererComponent } from '../renderers/map-cell-renderer.component';
 
 export function getUriColumnOptions(params?: URICellRendererParams): DatatableColumn {
   return {
@@ -38,9 +39,13 @@ export function getBooleanColumnOptions(): DatatableColumn {
   };
 }
 
-export function getDateColumnOptions(): DatatableColumn {
+export function getDateColumnOptions(includeTime?: boolean, isUTC?: boolean): DatatableColumn {
   return {
     cellRenderer: DateCellRendererComponent,
+    cellRendererParams: {
+      format: includeTime ? 'dd.MM.yyyy HH:mm' : 'dd.MM.yyyy',
+      isUTC,
+    },
     filter: 'agDateColumnFilter',
     filterParams: {
       inRangeFloatingFilterDateFormat: 'DD.MM.YYYY',
@@ -73,5 +78,14 @@ export function getAutocompleteColumnOptions(type: AutocompleteFilterParams['typ
     suppressFloatingFilterButton: true,
     suppressHeaderFilterButton: true,
     sortable: false
+  };
+}
+
+export function getGeoPointColumnOptions(): DatatableColumn {
+  return {
+    cellRenderer: MapCellRendererComponent,
+    width: 170,
+    flex: 0,
+    sortable: false,
   };
 }

@@ -1,5 +1,11 @@
 import { keyBy } from 'lodash';
 import { SearchOperator, SearchOperatorInfo } from './models';
+import {
+  BOOLEAN_TYPES,
+  DATE_TYPES,
+  NUMERIC_TYPES,
+  TEXT_TYPES,
+} from '@kotka/shared/models';
 
 
 export const SEARCH_OPERATORS: SearchOperatorInfo[] = [
@@ -62,8 +68,4 @@ export const NUMERIC_OPERATORS = SEARCH_OPERATORS.filter((op) =>
 );
 export const DATE_OPERATORS = NUMERIC_OPERATORS;
 
-export const TEXT_TYPES: string[] = ['keyword', 'wildcard', 'text'];
-export const BOOLEAN_TYPES: string[] = ['boolean'];
-export const DATE_TYPES: string[] = ['date', 'date_nanos'];
-export const NUMERIC_TYPES: string[] = ['long', 'integer', 'short', 'byte', 'double', 'float', 'half_float', 'scaled_float', 'unsigned_long'];
 export const QUERY_STRING_SUPPORTED_TYPES: string[] = [...TEXT_TYPES, ...BOOLEAN_TYPES, ...DATE_TYPES, ...NUMERIC_TYPES];

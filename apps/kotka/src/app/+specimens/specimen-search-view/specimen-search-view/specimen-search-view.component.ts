@@ -14,15 +14,21 @@ import {
   DatatableColumn,
   DatatableLoadedData,
   DatatableSort,
+  getBooleanColumnOptions,
+  getDateColumnOptions,
+  getGeoPointColumnOptions,
   getUriColumnOptions,
-  MapCellRendererComponent,
 } from '@kotka/ui/datatable';
 import {
-  Document, FieldAggregate,
+  BOOLEAN_TYPES,
+  DATE_TYPES,
+  Document,
+  FieldAggregate,
+  GEO_POINT_TYPES,
   IndexType,
   KotkaDocumentType,
   SearchField,
-  SearchResultKey
+  SearchResultKey,
 } from '@kotka/shared/models';
 import { MainContentComponent, MainContentHeaderDirective, SpinnerComponent } from '@kotka/ui/components';
 import { FormsModule } from '@angular/forms';
@@ -72,11 +78,12 @@ const SPECIAL_COLUMNS: Partial<Record<SearchResultKey, DatatableColumn>> = {
     }),
     lockPosition: 'left'
   },
-  wgs84Location: {
-    cellRenderer: MapCellRendererComponent,
-    width: 170,
-    flex: 0
-  }
+  dateCreated: {
+    ...getDateColumnOptions(true, true),
+  },
+  dateEdited: {
+    ...getDateColumnOptions(true, true),
+  },
 };
 
 @Component({
@@ -213,13 +220,25 @@ export class SpecimenSearchViewComponent {
             <Record<string, SearchField>>{},
           );
 
-          const columns: DatatableColumn[] = fields.map((field) => ({
-            headerName: field.label || field.field,
-            field: field.field,
-            sortField: field.hasRaw ? `${field.field}.raw` : field.field,
-            ...(specialColumns[field.field] || {}),
-            defaultSelected: defaultSelectedFields.includes(field.field),
-          }));
+          const columns: DatatableColumn[] = fields.map((field) => {
+            let baseColumn: Partial<DatatableColumn> = {};
+            if (DATE_TYPES.includes(field.type)) {
+              baseColumn = getDateColumnOptions();
+            } else if (BOOLEAN_TYPES.includes(field.type)) {
+              baseColumn = getBooleanColumnOptions();
+            } else if (GEO_POINT_TYPES.includes(field.type)) {
+              baseColumn = getGeoPointColumnOptions();
+            }
+
+            return {
+              headerName: field.label || field.field,
+              field: field.field,
+              sortField: field.hasRaw ? `${field.field}.raw` : field.field,
+              ...baseColumn,
+              ...(specialColumns[field.field] || {}),
+              defaultSelected: defaultSelectedFields.includes(field.field),
+            };
+          });
 
           const allAggregateColumns: ColDefWithExtra[] = fields
             .filter((field) => field.hasRaw || field.type === 'keyword')
