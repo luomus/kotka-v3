@@ -1,4 +1,15 @@
-import { Component, computed, effect, inject, Injector, input, model, OnDestroy, signal, Signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  Injector,
+  input,
+  model,
+  OnDestroy,
+  signal,
+  Signal,
+} from '@angular/core';
 import {
   ColDef as AgGridColDef,
   DragStoppedEvent,
@@ -55,7 +66,7 @@ interface GridReadyEvent {
   selector: 'kui-datatable',
   templateUrl: './datatable.component.html',
   styleUrls: ['./datatable.component.scss'],
-  imports: [TotalCountComponent, SpinnerComponent, AgGridAngular]
+  imports: [TotalCountComponent, SpinnerComponent, AgGridAngular],
 })
 export class DatatableComponent implements OnDestroy {
   private modalService = inject(NgbModal);
@@ -111,6 +122,7 @@ export class DatatableComponent implements OnDestroy {
   private allColumns: Signal<ColDefWithExtra[] | undefined>;
   private defaultColumnSettings: Signal<ColumnSettings | undefined>;
   private lockedColIds: Signal<string[] | undefined>;
+  private rowHeight: Signal<number | undefined>;
 
   private gridDataSource: Signal<DatatableSource | undefined>;
   private dataLoading = signal(false);
@@ -121,12 +133,10 @@ export class DatatableComponent implements OnDestroy {
   private unsubscribe$ = new Subject<void>();
 
   constructor() {
-    this.loading = computed(() => (
-      this.dataLoading() || this.columnsLoading()
-    ));
+    this.loading = computed(() => this.dataLoading() || this.columnsLoading());
 
-    this.colDefs = computed(() => (
-      getVisibleColDefs(this.allColumns(), this.columnSettings()))
+    this.colDefs = computed(() =>
+      getVisibleColDefs(this.allColumns(), this.columnSettings()),
     );
 
     this.defaultColDef = computed(() => ({
@@ -137,28 +147,38 @@ export class DatatableComponent implements OnDestroy {
       filter: !this.disableFilter(),
       floatingFilter: !this.disableFilter(),
       suppressHeaderMenuButton: true,
-      lockVisible: !this.enableColumnSelection()
+      lockVisible: !this.enableColumnSelection(),
     }));
 
-    this.allColumns = computed(() => (
-      getProcessedColumns(this.columns()))
+    this.allColumns = computed(() => getProcessedColumns(this.columns()));
+
+    this.defaultColumnSettings = computed(() =>
+      getDefaultColumnSettings(this.allColumns(), this.enableColumnSelection()),
     );
 
-    this.defaultColumnSettings = computed(() => (
-      getDefaultColumnSettings(this.allColumns(), this.enableColumnSelection()))
+    this.hasColDefs = computed(() => this.colDefs() !== undefined);
+
+    this.lockedColIds = computed(() =>
+      this.allColumns()
+        ?.filter((col) => col.lockPosition)
+        .map((col) => col.colId),
     );
 
-    this.hasColDefs = computed(() => (this.colDefs() !== undefined));
+    this.rowHeight = computed(
+      () =>
+        this.colDefs()?.reduce((minHeight, col) => {
+          const rowHeight = col.cellRenderer?.getMinimumRowHeight?.();
+          return rowHeight !== undefined
+            ? Math.max(minHeight, rowHeight)
+            : minHeight;
+        }, 0) || undefined,
+    );
 
-    this.lockedColIds = computed(() => (
-      this.allColumns()?.filter(col => col.lockPosition).map(col => col.colId)
-    ));
-
-    this.gridDataSource = computed(() => (
+    this.gridDataSource = computed(() =>
       this.hasColDefs() && this.datasource()
         ? { ...this.datasource(), getRows: this.getRows.bind(this) }
-        : undefined
-    ));
+        : undefined,
+    );
 
     this.initEffects();
   }
@@ -182,7 +202,8 @@ export class DatatableComponent implements OnDestroy {
   }
 
   onSortChanged() {
-    const newSort = this.gridApi()?.getColumnState()
+    const newSort = this.gridApi()
+      ?.getColumnState()
       .filter((col) => !!col.sort)
       .map((col) => ({ colId: col.colId, sort: col.sort! }));
 
@@ -199,10 +220,19 @@ export class DatatableComponent implements OnDestroy {
 
     const currentVisible = this.getVisibleCols();
 
-    this.columnSettings.update(columnSettings => (columnSettings ? {
-      selected: currentVisible,
-      order: getOrderAfterColumnMove(columnSettings.order, columnSettings.selected, currentVisible, colId)
-    } : undefined));
+    this.columnSettings.update((columnSettings) =>
+      columnSettings
+        ? {
+            selected: currentVisible,
+            order: getOrderAfterColumnMove(
+              columnSettings.order,
+              columnSettings.selected,
+              currentVisible,
+              colId,
+            ),
+          }
+        : undefined,
+    );
   }
 
   openColumnSettingsModal() {
@@ -239,19 +269,19 @@ export class DatatableComponent implements OnDestroy {
     const sortModel = this.sortModel();
     const filterModel = this.filterModel();
 
-    if (!colDefs || !datasource || totalCount === undefined || !sortModel || !filterModel) {
+    if (
+      !colDefs ||
+      !datasource ||
+      totalCount === undefined ||
+      !sortModel ||
+      !filterModel
+    ) {
       return;
     }
 
     this.exportLoading.set(true);
     this.datatableExportService
-      .exportData(
-        colDefs,
-        datasource,
-        totalCount,
-        sortModel,
-        filterModel,
-      )
+      .exportData(colDefs, datasource, totalCount, sortModel, filterModel)
       .subscribe({
         next: () => {
           this.exportLoading.set(false);
@@ -274,13 +304,21 @@ export class DatatableComponent implements OnDestroy {
     });
 
     effect(() => {
+      try {
+        this.gridApi()?.setGridOption('rowHeight', this.rowHeight());
+      } catch (e) {
+        // ignore the error as it doesn't seem to affect the grid
+      }
+    });
+
+    effect(() => {
       this.gridApi()?.setFilterModel(this.filterModel() || null);
     });
 
     effect(() => {
       this.gridApi()?.applyColumnState({
         state: this.sortModel(),
-        defaultState: { sort: null }
+        defaultState: { sort: null },
       });
     });
 
@@ -299,7 +337,7 @@ export class DatatableComponent implements OnDestroy {
         const cleanedSettings = getCleanedColumnSettings(
           columnSettings,
           this.defaultColumnSettings(),
-          this.lockedColIds()
+          this.lockedColIds(),
         );
 
         if (!isEqual(cleanedSettings, columnSettings)) {
@@ -311,7 +349,7 @@ export class DatatableComponent implements OnDestroy {
           storedSettings = this.settingsStoreService.getStoredColumnSettings(
             this.settingsKey(),
             this.defaultColumnSettings(),
-            this.lockedColIds()
+            this.lockedColIds(),
           );
         }
 
@@ -326,7 +364,7 @@ export class DatatableComponent implements OnDestroy {
 
       const filterModel = {
         ...this.defaultFilterModel(),
-        ...this.settingsStoreService.getStoredFilters(this.settingsKey())
+        ...this.settingsStoreService.getStoredFilters(this.settingsKey()),
       };
       this.filterModel.set(filterModel);
     });
@@ -343,7 +381,7 @@ export class DatatableComponent implements OnDestroy {
       if (this.enableColumnSelection()) {
         this.settingsStoreService.storeColumnSettings(
           this.settingsKey(),
-          this.columnSettings()
+          this.columnSettings(),
         );
       }
     });
@@ -352,7 +390,7 @@ export class DatatableComponent implements OnDestroy {
       this.settingsStoreService.storeFilters(
         this.settingsKey(),
         this.filterModel(),
-        this.allColumns()
+        this.allColumns(),
       );
     });
   }
@@ -414,8 +452,6 @@ export class DatatableComponent implements OnDestroy {
     if (!gridApi) {
       return [];
     }
-    return gridApi
-      .getAllDisplayedColumns()
-      .map((c) => c.getColId());
+    return gridApi.getAllDisplayedColumns().map((c) => c.getColId());
   }
 }

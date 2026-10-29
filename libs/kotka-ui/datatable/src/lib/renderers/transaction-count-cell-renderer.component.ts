@@ -12,12 +12,12 @@ interface RendererExtraParams {
 type RendererParams = ICellRendererParams & RendererExtraParams;
 
 @Component({
-  selector: 'kui-transaction-count-renderer',
+  selector: 'kui-transaction-count-cell-renderer',
   template: ' <span title="{{ result }}">{{ result }}</span> ',
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TransactionCountRendererComponent extends CellRendererComponent<RendererParams> {
+export class TransactionCountCellRendererComponent extends CellRendererComponent<RendererParams> {
   result?: number;
 
   override paramsChange() {
@@ -27,7 +27,7 @@ export class TransactionCountRendererComponent extends CellRendererComponent<Ren
     }
 
     const transaction: SpecimenTransaction = this.params.data;
-    this.result = TransactionCountRendererComponent.getTransactionCount(
+    this.result = TransactionCountCellRendererComponent.getTransactionCount(
       transaction,
       this.params.type,
     );
@@ -40,7 +40,7 @@ export class TransactionCountRendererComponent extends CellRendererComponent<Ren
   ): string {
     return (
       '' +
-      TransactionCountRendererComponent.getTransactionCount(row, params.type)
+      TransactionCountCellRendererComponent.getTransactionCount(row, params.type)
     );
   }
 

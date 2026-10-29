@@ -14,7 +14,8 @@ import {
   DatatableColumn,
   DatatableLoadedData,
   DatatableSort,
-  getUriColumnOptions
+  getUriColumnOptions,
+  MapCellRendererComponent,
 } from '@kotka/ui/datatable';
 import {
   Document, FieldAggregate,
@@ -70,6 +71,11 @@ const SPECIAL_COLUMNS: Partial<Record<SearchResultKey, DatatableColumn>> = {
       showViewLink: true,
     }),
     lockPosition: 'left'
+  },
+  wgs84Location: {
+    cellRenderer: MapCellRendererComponent,
+    width: 170,
+    flex: 0
   }
 };
 

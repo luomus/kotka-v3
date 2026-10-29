@@ -3,11 +3,11 @@ import {
   DatatableColumn,
   DateCellRendererComponent,
   DocumentDatatableComponent,
-  DueDaysRendererComponent,
+  DueDaysCellRendererComponent,
   getAutocompleteColumnOptions,
   getDateColumnOptions,
   getEnumColumnOptions, getUriColumnOptions,
-  TransactionCountRendererComponent,
+  TransactionCountCellRendererComponent,
   YearFloatingFilterComponent
 } from '@kotka/ui/datatable';
 import { FormService } from '@kotka/ui/core';
@@ -149,7 +149,7 @@ export class TransactionTableComponent {
       {
         colId: 'balance',
         headerName: 'Balance',
-        cellRenderer: TransactionCountRendererComponent,
+        cellRenderer: TransactionCountCellRendererComponent,
         cellRendererParams: {
           type: 'balance',
         },
@@ -159,7 +159,7 @@ export class TransactionTableComponent {
       {
         colId: 'totalCount',
         headerName: 'Total count',
-        cellRenderer: TransactionCountRendererComponent,
+        cellRenderer: TransactionCountCellRendererComponent,
         cellRendererParams: {
           type: 'total',
         },
@@ -169,7 +169,7 @@ export class TransactionTableComponent {
       {
         colId: 'returnedCount',
         headerName: 'Returned count',
-        cellRenderer: TransactionCountRendererComponent,
+        cellRenderer: TransactionCountCellRendererComponent,
         cellRendererParams: {
           type: 'returned',
         },
@@ -180,7 +180,7 @@ export class TransactionTableComponent {
         colId: 'dueDays',
         headerName: 'Due days',
         field: 'dueDate',
-        cellRenderer: DueDaysRendererComponent,
+        cellRenderer: DueDaysCellRendererComponent,
         filter: false,
       },
       {
