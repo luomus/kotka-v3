@@ -44,7 +44,7 @@ export class TaxonLinkingService {
     private readonly cacheService: CacheService
   ) {}
 
-  public async updateTaxonLinking(batchSize = 1000) {
+  public async updateTaxonLinking(batchSize = 10000) {
     const taxonString = await lastValueFrom(this.httpService.get<string>(process.env['TAXON_LINKING_URL']!).pipe(map(response => response.data)));
 
     let lineStart = 0;
@@ -66,7 +66,8 @@ export class TaxonLinkingService {
 
       if (batchCnt >= batchSize) {
         cnt += batchCnt;
-        await this.esClientService.indexBulk(bulk);
+        batchCnt = 0;
+        await this.esClientService.executeBulk(bulk);
         bulk = {};
       }
 
@@ -76,7 +77,7 @@ export class TaxonLinkingService {
 
     if (bulk.body?.length) {
       cnt += batchCnt;
-      await this.esClientService.indexBulk(bulk);
+      await this.esClientService.executeBulk(bulk);
     }
 
     return cnt;

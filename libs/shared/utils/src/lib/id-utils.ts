@@ -26,11 +26,11 @@ export const defaultPrefix = 'tun';
 export const acceptedPrefixes = ['luomus', 'zmuo', 'herbo', 'utu', 'gbif-dataset', 'tun'];
 export type QnamePrefix = 'luomus' | 'zmuo' | 'herbo' | 'utu' | 'gbif-dataset' | 'tun'
 
-export function getId(value: string): string {
+export function getId(value: string, useDefaultPrefix = false): string {
   if (typeof value !== 'string' || value === '') return value;
 
   if (value.indexOf(defaultDomain) === 0) {
-    return value.replace(defaultDomain, '');
+    return value.replace(defaultDomain, useDefaultPrefix ? defaultPrefix + ':' : '');
   } else if (value.indexOf('http') === 0) {
     Object.keys(domainMap).map(key => {
       value = value.replace(domainMap[key], key);

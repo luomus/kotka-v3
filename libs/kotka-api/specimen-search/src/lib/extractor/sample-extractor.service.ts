@@ -74,7 +74,8 @@ export class SampleExtractorService extends BaseExtractorService {
 
     for (const key in row) {
       let newKey;
-      if (key === 'id') newKey = 'sampleID';
+
+      if (key === 'id') newKey = 'id';
       else newKey = (key.startsWith('sample') ? key : `sample${key.charAt(0).toUpperCase()}${key.slice(1)}`) as keyof ElasticSample;
 
       (newRow[newKey] as any) = row[key as keyof Omit<Sample, 'preparations'>];

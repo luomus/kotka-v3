@@ -111,7 +111,7 @@ export const specimenConfig: ExtractorConfig = {
         level: 'document',
       },
       documentID: {
-        label: 'Document ID without domain',
+        label: 'Identifier',
         level: 'document',
       },
       documentQName: {

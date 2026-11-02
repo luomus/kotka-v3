@@ -3,7 +3,7 @@ import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { ExtractorInterface } from './extractor.interface';
 import { StoreObject } from '@luomus/laji-schema/models';
 import { BulkRequest, IndicesIndexSettings, MappingTypeMapping, SearchRequest } from '@elastic/elasticsearch/lib/api/types';
-import { ElasticIndex, SearchField } from '@kotka/shared/models';
+import { ElasticAlias, ElasticIndex, SearchField } from '@kotka/shared/models';
 
 interface SearchQuery {
   index: string;
@@ -17,15 +17,49 @@ interface SearchQuery {
 
 @Injectable()
 export class EsClientService {
-  constructor(private readonly elasticsearchService: ElasticsearchService) {}
+  constructor(
+    private readonly elasticsearchService: ElasticsearchService
+  ) {}
+
+  async onModuleInit() {
+    await this.setIngestPipeline();
+  }
+
+  async setIngestPipeline() {
+    const pipeline = await this.elasticsearchService.ingest.getPipeline({
+      id: 'ingest_timestamp_pipeline',
+    }).catch((e) => {
+      if (e.statusCode === 404) {
+        return undefined;
+      }
+      throw e;
+    });
+
+    if (pipeline) {
+      return;
+    }
+
+    return await this.elasticsearchService.ingest.putPipeline({
+      id: 'ingest_timestamp_pipeline',
+      processors: [
+        {
+          set: {
+            field: "_source.ingest_timestamp",
+            override: true,
+            value: "{{_ingest.timestamp}}"
+          }
+        }
+      ]
+    });
+  }
 
   hasSelectedFields(query: SearchQuery): boolean {
     return !!(query.fields || query?.body?._source);
   }
 
-  getSearchBody(base: any, query: SearchQuery, size: number, page: number) {
-    base.size = size;
-    base.from = (page - 1) * size;
+  getSearchBody(base: any, query: SearchQuery, size?: number, page?: number) {
+    if (size) base.size = size;
+    if (page && size) base.from = (page - 1) * size;
 
     if (query.query) {
       if (!base.query) {
@@ -90,7 +124,7 @@ export class EsClientService {
     };
   }
 
-  async _search(query: SearchQuery) {
+  async _search(query: SearchQuery, rawResponse: boolean = false): Promise<Record<string, any>> {
     const size = query.body?.size ?? query.pageSize ?? 20;
     const page = Math.max(
       query.body?.from && size ?
@@ -101,7 +135,7 @@ export class EsClientService {
     return await this.search({
       index: query.index,
       body: this.getSearchBody(query.body ?? {}, query, size, page)
-    }).then(res => this.getResponse(size, page, query, res));
+    }).then(res => rawResponse ? res : this.getResponse(size, page, query, res));
   }
 
   async search(search: SearchRequest) {
@@ -114,7 +148,11 @@ export class EsClientService {
     });
   }
 
-  async deleteIndex(index: ElasticIndex | ElasticIndex[]) {
+  async deleteIndex(index: ElasticIndex | ElasticAlias) {
+    const exists = await this.hasIndex(index);
+
+    if (!exists) return;
+
     await this.elasticsearchService.indices.delete({
       index,
       allow_no_indices: true,
@@ -122,7 +160,17 @@ export class EsClientService {
     });
   }
 
-  async createIndex(index: ElasticIndex, mappings: MappingTypeMapping, settings: IndicesIndexSettings) {
+  async deleteIndices(indices: ElasticIndex[] | ElasticAlias[]) {
+    for (const index of indices) {
+      await this.deleteIndex(index);
+    }
+  }
+
+  async createIndex(index: ElasticAlias, mappings: MappingTypeMapping, settings: IndicesIndexSettings) {
+    const exists = await this.hasIndex(index);
+
+    if (exists) return;
+
     await this.elasticsearchService.indices.create({
       index,
       mappings,
@@ -130,21 +178,73 @@ export class EsClientService {
     });
   }
 
-  async prepareIndex(extractor: ExtractorInterface) {
+  async prepareIndex(extractor: ExtractorInterface, migrate: boolean = false) {
     const index = extractor.getIndex();
 
-    if (!(await this.hasIndex(index))) {
-      await this.createIndex(index, extractor.getMapping(), extractor.getSettings());
-    }
+    const [oldAlias, newAlias] = await this.getAliasNames(index);
 
+    if (oldAlias) {
+      if (migrate) await this.migrateIndex(index, oldAlias, newAlias, extractor);
+    } else {
+      await this.createIndex(newAlias, extractor.getMapping(), extractor.getSettings());
+      await this.updateAlias(index, oldAlias, newAlias);
+    }
 
     const relatedExtracts = extractor.getRelatedExtracts();
 
     if (relatedExtracts) {
       for (const relatedExtract of relatedExtracts) {
-        await this.prepareIndex(relatedExtract);
+        await this.prepareIndex(relatedExtract, migrate);
       }
     }
+  }
+
+  private async migrateIndex(
+    index: ElasticIndex,
+    oldAlias: ElasticAlias,
+    newAlias: ElasticAlias,
+    extractor: ExtractorInterface
+  ): Promise<void> {
+    try {
+      await this.elasticsearchService.indices.putMapping({ index: oldAlias, body: { mapping: extractor.getMapping(), settings: extractor.getSettings() }});
+      return;
+    } catch (e) {
+      // pass
+    }
+
+    console.log(`\nNEED TO REINDEX ${index}`);
+    await this.deleteIndex(newAlias);
+    await this.createIndex(newAlias, extractor.getMapping(), extractor.getSettings());
+    await this.elasticsearchService.reindex({
+      timeout: '2h',
+      refresh: false,
+      wait_for_completion: true,
+      source: { index: oldAlias },
+      dest: { index: newAlias, op_type: 'create' }
+      },
+      {
+        requestTimeout: '2h'
+      }
+    );
+    await this.updateAlias(index, oldAlias, newAlias);
+    await this.elasticsearchService.reindex(
+    {
+      source: { index: oldAlias, query: {
+        range: {
+          "@timestamp": {
+            gte: "now-6h/h"
+          }
+        }
+      }},
+      dest: { index: newAlias, op_type: 'create' },
+      wait_for_completion: true,
+      refresh: false
+    },
+    {
+      requestTimeout: '2h',
+    },
+    );
+    await this.deleteIndex(oldAlias);
   }
 
   async indexSingle(result: StoreObject, extractor: ExtractorInterface) {
@@ -153,7 +253,7 @@ export class EsClientService {
 
     await extractor.addToBulk(result, bulk);
 
-    return await this.indexBulk(bulk);
+    return await this.executeBulk(bulk);
   }
 
   async indexMany(results: StoreObject[], extractor: ExtractorInterface) {
@@ -164,27 +264,42 @@ export class EsClientService {
       await extractor.addToBulk(result, bulk);
     }
 
-    return await this.indexBulk(bulk);
+    return await this.executeBulk(bulk);
   }
 
-  async indexBulk(bulk: BulkRequest) {
-    return await this.elasticsearchService.bulk(bulk);
+  async executeBulk(bulk: BulkRequest, refresh: 'wait_for' | 'true' | 'false' = 'wait_for') {
+    return await this.elasticsearchService.bulk({...bulk, refresh});
   }
 
-  async deleteByQueryString(query: string, indices: ElasticIndex[]) {
-    return await this.elasticsearchService.deleteByQuery({
-      index: indices.join(','),
-      query: {
-        bool: {
-          must: [
-            {
-              query_string: {
-                query
-              }
-            }
-          ]
-        }
+  async deleteById(id: string, index: string, refresh: 'wait_for' | 'true' | 'false' = 'wait_for') {
+    return await this.elasticsearchService.delete({
+      index,
+      id,
+      refresh: refresh,
+    });
+  };
+
+  async deleteByBulk(ids: { id: string, index: string }[]) {
+    const bulk: BulkRequest = {};
+
+    for (const { id, index } of ids) {
+      if (!bulk.body || !Array.isArray(bulk.body)) {
+        bulk.body = [];
       }
+
+      bulk.body.push({ delete: { _index: index, _id: id } });
+    }
+
+    return await this.executeBulk(bulk);
+  }
+
+  async deleteByQuery(query: any) {
+    return await this.elasticsearchService.deleteByQuery({
+      index: query.index,
+      body: this.getSearchBody(query.body ?? {}, query),
+      allow_no_indices: true,
+      ignore_unavailable: true,
+      refresh: true
     });
   }
 
@@ -200,24 +315,23 @@ export class EsClientService {
         cnt = bulk.body?.length ? bulk.body?.length / 2 : 0;
         extractor.addToBulk(result, bulk);
         if (cnt >  batchSize) {
-          await this.indexBulk(bulk);
+          await this.executeBulk(bulk);
           bulk = {};
         }
         //TODO Progress bar tracking?
     }
 
     if (bulk.body?.length) {
-      await this.indexBulk(bulk);
+      await this.executeBulk(bulk);
     }
   }
 
-  async getMappedFields(index: string) {
-    const mapping = (await this.elasticsearchService.indices.getMapping({
+  async getMappedFields(index: ElasticIndex) {
+    const mapping = Object.values(await this.elasticsearchService.indices.getMapping({
       index,
       allow_no_indices: true,
       ignore_unavailable: true,
-    }))?.[index]?.mappings as MappingTypeMapping;
-
+    }))[0]?.mappings as MappingTypeMapping;
 
     if (!mapping) {
       return [];
@@ -242,5 +356,54 @@ export class EsClientService {
         }
       });
     }
+  }
+
+  private updateAlias(
+    index: ElasticIndex,
+    oldAlias: ElasticAlias | undefined,
+    newAlias: ElasticAlias
+  ) {
+    const oldIndexAction = { remove: { alias: index, index: oldAlias } };
+
+    return this.elasticsearchService.indices.updateAliases({
+      actions: [
+        ...(oldAlias ? [oldIndexAction] : []),
+        { add: { alias: index, index: newAlias, is_write_index: true } },
+      ],
+    });
+  }
+
+  async getAliases(index?: string) {
+    return await this.elasticsearchService.indices.getAlias({ index }).catch((e) => {
+      if (e.meta.body.status === 404) {
+        return {};
+      }
+      throw e;
+    });
+  }
+
+  async getAliasNames(index: ElasticIndex): Promise<[ElasticAlias | undefined, ElasticAlias]> {
+    const aliases: { [alias: string]: ElasticAlias } = {};
+    const body = await this.getAliases(index);
+
+    Object.keys(body).forEach((alias) => {
+      aliases[Object.keys(body[alias]?.aliases)[0]] = alias as ElasticAlias;
+    });
+
+    if (!aliases[index]) {
+      return [undefined, this.getNextFreeIndex(index, 1)];
+    }
+
+    const alias = aliases[index].split('_');
+    const last = parseInt(alias.pop() as string);
+
+    return [
+      aliases[index],
+      await this.getNextFreeIndex(index, (last % 2) + 1),
+    ];
+  }
+
+  getNextFreeIndex(index: ElasticIndex, indexNumber: number): ElasticAlias {
+    return `${index}_${indexNumber}`;
   }
 }

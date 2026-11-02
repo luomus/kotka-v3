@@ -1,5 +1,5 @@
 import { Document, Gathering, Identification, Sample, TypeSpecimen, Unit, Measurement, Preparation, ListResponse } from '@luomus/laji-schema/models';
-import { KeysOfUnion } from './util-models';
+import { AsArray, KeysOfUnion } from './util-models';
 
 type StoreKeys = 'isPartOf' | '@type' | '@context';
 type EsIdFields = {
@@ -11,8 +11,6 @@ type EsIdFields = {
   objectID: number;
   id: string;
 };
-
-type AsArray<T> = [T] extends [Array<any>] ? T : ([T] extends [undefined] ? T : T[]);
 
 export type EsMeasurement = Omit<Measurement, StoreKeys | 'id'>;
 
@@ -112,6 +110,7 @@ export type ElasticSampleRow = ElasticBaseUnit & ElasticSample;
 export type IndexType = 'unit' | 'identification' | 'typeSpecimen' | 'sample';
 
 export type ElasticIndex = `specimen_${Lowercase<IndexType>}` | 'autocomplete' | 'taxon';
+export type ElasticAlias = `specimen_${Lowercase<IndexType>}_${number}` | `autocomplete_${number}` | `taxon_${number}`;
 export const specimenIndices: ElasticIndex[] = ['specimen_unit', 'specimen_identification', 'specimen_typespecimen', 'specimen_sample'];
 export const indices: ElasticIndex[] = ['specimen_unit', 'specimen_identification', 'specimen_typespecimen', 'specimen_sample', 'autocomplete', 'taxon'];
 

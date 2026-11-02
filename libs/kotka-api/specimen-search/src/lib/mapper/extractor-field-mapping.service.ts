@@ -320,7 +320,7 @@ export class ExtractorFieldMappingService {
     if (path.includes('sample')) {
       if (path.includes('measurement')) return;
 
-      if (key === 'id') key = 'sampleID';
+      if (key === 'id') return;
       else key = key.startsWith('sample') ? key : `sample${key.charAt(0).toUpperCase() + key.slice(1)}`;
     }
 

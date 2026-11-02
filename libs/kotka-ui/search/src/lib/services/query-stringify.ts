@@ -5,33 +5,11 @@ import {
   SearchOperator,
 } from '../models';
 import { SEARCH_OPERATOR_MAP } from '../constants';
+import { ESCAPED_CHARACTERS } from '@kotka/shared/models';
 
 const EQUALS_OPERATORS: SearchOperator[] = ['equals', 'notEqual'];
 const RANGE_OPERATORS: SearchOperator[] = ['greaterThan', 'greaterThanOrEqual', 'lessThan', 'lessThanOrEqual', 'inRange'];
 
-export const ESCAPED_CHARACTERS: string[] = [
-  '\\',
-  '*',
-  '?',
-  '+',
-  '-',
-  '&&',
-  '||',
-  '!',
-  '(',
-  ')',
-  '{',
-  '}',
-  '[',
-  ']',
-  '^',
-  '~',
-  ':',
-  '"',
-  '=',
-  '/',
-  ' ',
-];
 export const REMOVED_CHARACTERS: string[] = ['>', '<'];
 
 export function builderQueryToQueryString(query: BuilderQuery): string {

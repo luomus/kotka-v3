@@ -65,7 +65,7 @@ export const sampleConfig: ExtractorConfig = {
       level: 'sample',
     },
     sampleDocumentID: {
-      label: 'Sample ID without domain',
+      label: 'Sample identifier',
       level: 'sample',
     },
     sampleDocumentQName: {
@@ -82,10 +82,6 @@ export const sampleConfig: ExtractorConfig = {
     },
     sampleObjectID: {
       label: 'Sample ID numerical part',
-      level: 'sample',
-    },
-    sampleID: {
-      label: 'Sample ID',
       level: 'sample',
     },
     sampleMeasurement: {

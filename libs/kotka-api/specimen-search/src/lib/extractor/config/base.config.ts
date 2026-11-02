@@ -49,6 +49,9 @@ export const baseConfig = {
     ],
     'date_detection': false,
     'properties': {
+      'ingest_timestamp': {
+        'type': 'date',
+      },
       'id': {
         'type': 'keyword'
       },
@@ -171,6 +174,7 @@ export const baseConfig = {
     }
   },
   elasticSettings: {
+    default_pipeline: 'ingest_timestamp_pipeline',
     number_of_shards: SHARDS,
     number_of_replicas: REPLICAS,
     max_result_window: 5000000,

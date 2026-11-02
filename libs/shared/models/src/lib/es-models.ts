@@ -1,3 +1,27 @@
+export const ESCAPED_CHARACTERS = [
+  '\\',
+  '*',
+  '?',
+  '+',
+  '-',
+  '&&',
+  '||',
+  '!',
+  '(',
+  ')',
+  '{',
+  '}',
+  '[',
+  ']',
+  '^',
+  '~',
+  ':',
+  '"',
+  '=',
+  '/',
+  ' ',
+];
+
 type Value = string|number|boolean;
 
 interface ExtraOptions {

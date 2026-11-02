@@ -42,7 +42,12 @@ export class AutocompleteExtractorService implements ExtractorInterface {
             }
           }
         },
-      ]
+      ],
+      properties: {
+        ingest_timestamp: {
+          type: 'date'
+        }
+      }
     } as MappingTypeMapping;
   }
 
@@ -50,6 +55,7 @@ export class AutocompleteExtractorService implements ExtractorInterface {
     return {
       number_of_replicas: REPLICAS,
       number_of_shards: SHARDS,
+      default_pipeline: 'ingest_timestamp_pipeline',
     };
   }
 

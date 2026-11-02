@@ -7,13 +7,12 @@ import {
 import { Observable, tap } from 'rxjs';
 import { Document } from '@kotka/shared/models';
 import { EsClientService } from '@kotka/api/elasticsearch';
-import { SpecimenExtractorService } from '@kotka/api/specimen-search';
+import { SpecimenSearchService } from '@kotka/api/specimen-search';
 
 @Injectable()
 export class SpecimenIndexerInterceptor implements NestInterceptor {
   constructor(
-    private readonly elasticClient: EsClientService,
-    private readonly specimenExtractorService: SpecimenExtractorService
+    private readonly specimenSearchService: SpecimenSearchService,
   ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
@@ -21,12 +20,16 @@ export class SpecimenIndexerInterceptor implements NestInterceptor {
       tap(async (data: any) => {
         const req = context.switchToHttp().getRequest();
 
-        if (!((req.method === 'POST' && !req.path?.includes('_search')) || req.method === 'PUT')) {
+        if (!((req.method === 'POST' && !req.path?.includes('_search')) || req.method === 'PUT' || req.method === 'DELETE')) {
           return;
         }
 
         try {
-          await this.elasticClient.indexSingle(data as Document, this.specimenExtractorService);
+          if (req.method === 'DELETE') {
+            return await this.specimenSearchService.deleteByDocumentQNames([data.documentQName]);
+          }
+
+          await this.specimenSearchService.indexSingle(data as Document);
         } catch (error) {
           console.error('Error indexing specimen:', error);
         }

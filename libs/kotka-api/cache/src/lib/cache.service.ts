@@ -31,12 +31,6 @@ export class CacheService {
 
     const lock = await this.acquireLock(cacheKey);
     try {
-      const cachedData = await this.cacheService.get(cacheKey);
-
-      if (cachedData) {
-        return cachedData;
-      }
-
       const data = await getDataFunc();
 
       if (isMultiSet) {
