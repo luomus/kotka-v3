@@ -3,6 +3,7 @@ https://docs.nestjs.com/controllers#controllers
 */
 
 import { LajiStoreService, OldKotkaApiService, TriplestoreService, ValidationService } from '@kotka/api/services';
+import { PublicityRestrictionInterceptor } from './interceptors/publicity-restriction.interceptor';
 import {
   Controller,
   Get,
@@ -47,6 +48,7 @@ const type = KotkaObjectFullType.document;
   AssociatedTaxaToUnitInterceptor,
   CollectionAccessibleToUserInterceptor,
   SpecimenConvertDataToOldFormatInterceptor,
+  PublicityRestrictionInterceptor,
   SpecimenIdJoinerInterceptor,
   SpecimenIndexerInterceptor,
   SpecimenImageInterceptor,

@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { Observable, tap } from 'rxjs';
 import { Document } from '@kotka/shared/models';
-import { EsClientService } from '@kotka/api/elasticsearch';
 import { SpecimenSearchService } from '@kotka/api/specimen-search';
 
 @Injectable()

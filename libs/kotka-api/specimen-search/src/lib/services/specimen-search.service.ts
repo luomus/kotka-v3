@@ -3,7 +3,7 @@ import { SpecimenExtractorService } from '../extractor/specimen-extractor.servic
 import { EsClientService, AutocompleteExtractorService } from '@kotka/api/elasticsearch';
 import { Document, ElasticDocument, IndexType, ElasticIndex, ESCAPED_CHARACTERS, KotkaObjectFullType } from '@kotka/shared/models';
 import { ExtractorFieldMappingService } from '../mapper/extractor-field-mapping.service';
-import { getId, defaultPrefix } from 'libs/shared/utils/src/lib/id-utils';
+import { getId } from '@kotka/shared/utils';
 import { BulkResponse } from '@elastic/elasticsearch/lib/api/types';
 import { LajiStoreService } from '@kotka/api/services';
 import { lastValueFrom, map } from 'rxjs';
@@ -53,7 +53,7 @@ export class SpecimenSearchService {
           if (esErrorCallback) {
             esErrorCallback({ status: 404, message: `No document found with id: ${ids[0]}` });
           } else {
-            console.warn(`No document found with given id`);
+            console.warn('No document found with given id');
           }
           return 0;
         } else {
@@ -117,15 +117,13 @@ export class SpecimenSearchService {
     const indexRes = await this.esClientService.indexSingle(specimen as ElasticDocument, this.specimenExtractorService);
 
     if (!indexRes.errors) {
-      const id = specimen.id;
-
       await this.deleteRemovedParts([specimen.id], indexRes);
     }
 
     return indexRes;
   }
 
-  async indexMany(specimens: Document[], removeDeleted?: boolean) {
+  async indexMany(specimens: Document[]) {
     const indexRes = await this.esClientService.indexMany(specimens as ElasticDocument[], this.specimenExtractorService);
 
     if (!indexRes.errors) {
@@ -141,12 +139,12 @@ export class SpecimenSearchService {
     const indexed: { [key: string]: IndexType } = {};
 
     indexResult.items?.forEach(item => {
-      if (item?.index?._index === this.autocompleteExtractorService.getIndex()) {
+      if (!item.index || item?.index._index === this.autocompleteExtractorService.getIndex()) {
         return;
       }
 
-      const index = item?.index?._index!;
-      const indexID = item?.index?._id!;
+      const index = item.index._index!;
+      const indexID = item.index._id!;
 
       indexed[indexID] = index as IndexType;
     });
