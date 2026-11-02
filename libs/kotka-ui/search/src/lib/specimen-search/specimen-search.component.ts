@@ -52,6 +52,8 @@ export class SpecimenSearchComponent {
       label: 'Taxon or Synonyms',
       type: 'keyword',
       fields: ['taxon', 'taxa', 'synonyms'],
+      hasAutocomplete: true,
+      autocompleteField: 'taxon'
     },
   ];
 

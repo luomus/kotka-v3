@@ -45,5 +45,5 @@ export interface BuilderQuery {
 export interface MultiSearchField extends SearchField {
   fields: string[];
   hasRaw?: false;
-  hasAutocomplete?: false;
+  autocompleteField?: string;
 }
