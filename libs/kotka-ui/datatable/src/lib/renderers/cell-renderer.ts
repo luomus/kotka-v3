@@ -41,4 +41,8 @@ export class CellRendererComponent<
   static fetchDataToCache(col: ColDef, data: any[], injector: Injector): Observable<any> {
     return of(undefined);
   }
+
+  static getMinimumRowHeight(): number {
+    return 0;
+  }
 }

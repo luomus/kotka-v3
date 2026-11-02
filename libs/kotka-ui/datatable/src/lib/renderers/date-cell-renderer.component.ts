@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CellRendererComponent } from './cell-renderer';
 import { ICellRendererParams } from '@ag-grid-community/core';
-import { DatePipe, formatDate } from '@angular/common';
+import { formatDate } from '@angular/common';
 
 interface RendererExtraParams {
   format?: string;
+  isUTC?: boolean;
 }
 
 type RendererParams = ICellRendererParams & RendererExtraParams;
@@ -14,16 +15,22 @@ const DEFAULT_FORMAT = 'dd.MM.yyyy';
 @Component({
   selector: 'kui-date-cell-renderer',
   template: `
-    <span title="{{ params.value | date: params.format || defaultFormat }}">{{
-      params.value | date: params.format || defaultFormat
-    }}</span>
+    <span title="{{ displayValue }}">{{ displayValue }}</span>
   `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DatePipe]
 })
 export class DateCellRendererComponent extends CellRendererComponent<RendererParams> {
-  defaultFormat = DEFAULT_FORMAT;
+  displayValue = '';
+
+  override paramsChange() {
+    if (!this.params.value) {
+      this.displayValue = '';
+      return;
+    }
+
+    this.displayValue = DateCellRendererComponent.getExportValue(this.params.value, this.params.data, this.params);
+  }
 
   static override getExportValue(
     value: string | undefined,
@@ -34,6 +41,6 @@ export class DateCellRendererComponent extends CellRendererComponent<RendererPar
       return '';
     }
 
-    return formatDate(value, params?.format || DEFAULT_FORMAT, 'en_US');
+    return formatDate(value, params?.format || DEFAULT_FORMAT, 'en_US') + (params?.isUTC ? ' UTC' : '');
   }
 }

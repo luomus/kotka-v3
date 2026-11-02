@@ -1,12 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { KotkaDocument, KotkaDocumentType } from '@kotka/shared/models';
-import { ApiClient, SearchParams, searchQueryStringToObject } from './api-client';
+import { ApiClient, SearchParams } from './api-client';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { LocalStorageService } from 'ngx-webstorage';
 import { UserService } from './index';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { isKeyOfObject } from '../util-services';
+import { isKeyOfObject, queryStringToObject } from '../util-services';
 
 export type IteratorSearchParams = Pick<SearchParams, 'sort'|'searchQuery'>;
 
@@ -71,7 +71,7 @@ export class SearchResultIteratorService {
     const sorts = this.sortsFromString(searchParams.sort, reverse);
     const sort = this.sortsToString(sorts);
 
-    let searchQuery = typeof searchParams.searchQuery === 'string' ? searchQueryStringToObject(searchParams.searchQuery) : searchParams.searchQuery;
+    let searchQuery = typeof searchParams.searchQuery === 'string' ? queryStringToObject(searchParams.searchQuery) : searchParams.searchQuery;
     const searchAfter = this.getSearchAfter(data, sorts);
     searchQuery = {
       ...(searchQuery || {}),

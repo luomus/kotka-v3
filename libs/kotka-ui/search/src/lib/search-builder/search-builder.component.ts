@@ -68,7 +68,6 @@ export class SearchBuilderComponent {
     effect(() => {
       if (this.text() !== untracked(this.activeText)) {
         this.setFromQueryString(this.text());
-        this.activeText.set(this.text());
       }
     });
 
@@ -176,5 +175,6 @@ export class SearchBuilderComponent {
       query.groups.push(createGroup());
     }
     this.query.set(query);
+    this.activeText.set(queryString);
   }
 }

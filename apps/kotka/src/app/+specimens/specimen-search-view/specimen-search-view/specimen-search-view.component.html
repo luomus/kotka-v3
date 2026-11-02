@@ -1,0 +1,36 @@
+@if (!showLabelDesigner()) {
+  <kui-main-content
+    pageTitle="Search specimens"
+    containerClass="container-fluid"
+  >
+    <kotka-specimen-search-header
+      kuiMainContentHeader
+      [searchLink]="searchLink()"
+    ></kotka-specimen-search-header>
+    <kotka-specimen-search-main
+      [(index)]="index"
+      [(aggregateFields)]="aggregateFields"
+      [(aggregateSize)]="aggregateSize"
+      [(filters)]="filters"
+      [(idSearchValue)]="idSearchValue"
+      [(textSearchQuery)]="textSearchQuery"
+      [(columnSettings)]="columnSettings"
+      [(sortModel)]="sortModel"
+      [fieldData]="fieldData()"
+      [defaultAggregateFields]="defaultAggregateFields"
+      [defaultAggregateSize]="defaultAggregateSize"
+      [minAggregateSize]="minAggregateSize"
+      [maxAggregateSize]="maxAggregateSize"
+      (indexChange)="onIndexChange()"
+      (loadData)="onDataLoad($event)"
+    ></kotka-specimen-search-main>
+  </kui-main-content>
+} @else {
+  @if (labelDesignerData$ | async; as labelDesignerData) {
+    <kotka-specimen-label-designer
+      [documents]="labelDesignerData"
+    ></kotka-specimen-label-designer>
+  } @else {
+    <kui-spinner></kui-spinner>
+  }
+}

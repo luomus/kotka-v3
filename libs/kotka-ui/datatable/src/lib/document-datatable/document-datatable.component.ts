@@ -1,14 +1,17 @@
-import { Component, inject, output, input, effect, Signal, computed, signal } from '@angular/core';
+import { Component, inject, output, input, effect, Signal, computed, signal, model } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   DatatableSource,
   GetRowsParams,
   DatatableColumn,
-  DatatableFilter, DatatableSort
+  DatatableFilter,
+  DatatableSort,
+  ColumnSettings
 } from '../models/models';
 import { DatatableComponent } from '../datatable/datatable.component';
 import { DatatableRow, DocumentDatatableDataService } from '../services/document-datatable-data.service';
 import {
+  ElasticsearchQuery,
   IndexType,
   KotkaDocumentType,
 } from '@kotka/shared/models';
@@ -38,7 +41,7 @@ export interface DatatableLoadedData<
 })
 export class DocumentDatatableComponent<
   T extends KotkaDocumentType = KotkaDocumentType,
-  S extends T extends KotkaDocumentType.specimen ? IndexType : never = never
+  S extends T extends KotkaDocumentType.specimen ? IndexType : never = never,
 > {
   private dataService = inject(DocumentDatatableDataService);
   private userService = inject(UserService);
@@ -46,17 +49,20 @@ export class DocumentDatatableComponent<
   dataType = input.required<T>();
   index = input<S>();
 
-  columns = input<DatatableColumn[]>([]);
+  columns = input<DatatableColumn[] | undefined>(undefined);
   columnsLoading = input<boolean>(false);
+  columnSettings = model<ColumnSettings | undefined>(undefined);
+  filterModel = model<DatatableFilter | undefined>(undefined);
+  sortModel = model<DatatableSort | undefined>(undefined);
 
   enableFileExport = input<boolean>();
   enableColumnSelection = input<boolean>();
   disableFilter = input<boolean>();
 
   defaultFilterModel = input<DatatableFilter>({});
+  defaultSortModel = input<DatatableSort>([]);
 
-  extraSortModel = input<DatatableSort>([]);
-  extraSearchQuery = input<string>();
+  searchQuery = input<string | ElasticsearchQuery>();
   aggregateBy = input<S extends IndexType ? AggregateBy[] : never>();
 
   datasource = signal<DatatableSource | undefined>(undefined);
@@ -83,28 +89,38 @@ export class DocumentDatatableComponent<
           this.dataType(),
           this.index(),
           this.columns(),
-          this.extraSortModel(),
-          this.extraSearchQuery(),
+          this.searchQuery(),
           this.aggregateBy(),
-        )
+        ),
       );
     });
   }
 
-  private getDataSource(dataType: T, index: S | undefined, columns: DatatableColumn[], extraSortModel: DatatableSort, extraSearchQuery?: string, aggregateBy?: AggregateBy[]): DatatableSource {
+  private getDataSource(
+    dataType: T,
+    index: S | undefined,
+    columns?: DatatableColumn[],
+    searchQuery?: string | ElasticsearchQuery,
+    aggregateBy?: AggregateBy[],
+  ): DatatableSource | undefined {
+    if (!columns) {
+      return undefined;
+    }
+
     return {
       getRows: (params: GetRowsParams) => {
         const searchParams = this.dataService.getSearchParams(
           columns,
           params.startRow,
           params.endRow,
-          params.sortModel.concat(extraSortModel),
+          params.sortModel,
           params.filterModel,
-          extraSearchQuery,
+          searchQuery,
         );
 
         return this.dataService
-          .getRows<T, S>(dataType, index, searchParams, aggregateBy).pipe(
+          .getRows<T, S>(dataType, index, searchParams, aggregateBy)
+          .pipe(
             catchError((err) => {
               if (err.status === 400) {
                 this.invalidQueryError.emit(err);
@@ -114,7 +130,10 @@ export class DocumentDatatableComponent<
             }),
           )
           .subscribe((result) => {
-            params.successCallback(result?.member || [], result?.totalItems || 0);
+            params.successCallback(
+              result?.member || [],
+              result?.totalItems || 0,
+            );
             if (result) {
               this.loadData.emit({ searchParams, result });
             }

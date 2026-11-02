@@ -29,6 +29,8 @@ const criteriaLevelAllowedPreviousTypes: Record<
   value: [null, 'joinOperator', 'negation', 'field'],
   group: [],
 };
+const groupLevelAllowedLastTypes: TermType[] = ['group'];
+const criteriaLevelAllowedLastTypes: TermType[] = ['value'];
 
 
 export function queryStringToBuilderQuery(queryString: string): BuilderQuery {
@@ -85,6 +87,10 @@ function termsToBuilderQuery(terms: Term[]): BuilderQuery {
     i++;
   }
 
+  if (!groupLevelAllowedLastTypes.includes(previousType)) {
+    throw new Error('Order of the search terms is not valid');
+  }
+
   return { groups, joinOperator: joinOperator || 'AND', };
 }
 
@@ -120,6 +126,10 @@ function termsToSearchGroup(terms: Term[]): SearchGroup {
     }
 
     previousType = type;
+  }
+
+  if (!criteriaLevelAllowedLastTypes.includes(previousType)) {
+    throw new Error('Order of the search terms is not valid');
   }
 
   return { criteria: criteria, joinOperator: joinOperator || 'AND' };

@@ -10,7 +10,7 @@
       <button
         class="btn btn-secondary position-relative"
         (click)="exportData()"
-        [disabled]="exportLoading()"
+        [disabled]="loading() || exportLoading()"
         data-cy="export-data"
       >
         <kui-spinner [overlay]="true" [spinning]="exportLoading()">
@@ -36,8 +36,8 @@
   [modules]="modules"
   [components]="components"
   [gridOptions]="gridOptions"
-  [columnDefs]="colDefs()"
-  [defaultColDef]="defaultColDef()"
-  (dragStopped)="dragStopped($event)"
+  (dragStopped)="onDragStopped($event)"
   (gridReady)="onGridReady($event)"
+  (filterChanged)="onFilterChanged()"
+  (sortChanged)="onSortChanged()"
 ></ag-grid-angular>

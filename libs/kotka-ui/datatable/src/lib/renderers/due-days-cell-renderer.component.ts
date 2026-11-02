@@ -2,12 +2,12 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CellRendererComponent } from './cell-renderer';
 
 @Component({
-  selector: 'kui-due-days-renderer',
-  template: ' <span title="{{ result }}">{{ result }}</span> ',
+  selector: 'kui-due-days-cell-renderer',
+  template: '<span title="{{ result }}">{{ result }}</span>',
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DueDaysRendererComponent extends CellRendererComponent {
+export class DueDaysCellRendererComponent extends CellRendererComponent {
   result?: number;
 
   override paramsChange() {
@@ -16,7 +16,7 @@ export class DueDaysRendererComponent extends CellRendererComponent {
       return;
     }
 
-    this.result = DueDaysRendererComponent.getDueDate(this.params.value);
+    this.result = DueDaysCellRendererComponent.getDueDate(this.params.value);
   }
 
   static override getExportValue(value: string | undefined): string {
@@ -24,7 +24,7 @@ export class DueDaysRendererComponent extends CellRendererComponent {
       return '';
     }
 
-    return '' + DueDaysRendererComponent.getDueDate(value);
+    return '' + DueDaysCellRendererComponent.getDueDate(value);
   }
 
   private static getDueDate(value: string) {

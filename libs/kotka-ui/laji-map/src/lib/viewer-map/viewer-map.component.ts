@@ -37,8 +37,8 @@ export class ViewerMapComponent implements OnDestroy {
     zoomToData: { maxZoom: 4 },
     controls: {
       location: false,
-      geocoding: false
-    } as any, // TODO remove any after laji-map type fixed
+      geocoding: false,
+    },
   };
 
   private modalService = inject(NgbModal);

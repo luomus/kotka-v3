@@ -1,21 +1,26 @@
 import {
   ChangeDetectionStrategy,
   Component, inject,
-  input, model, output,
-  signal,
+  input, model, output, signal,
+
 } from '@angular/core';
 import { SearchField } from '@kotka/shared/models';
 import { SearchComponent } from '../search/search.component';
 import { IdSearchComponent } from '../id-search/id-search.component';
-import { parseIdQuery } from '../services/specimen-id-query';
 import { BuilderQuery } from '../models';
 import { builderQueryToQueryString } from '../services/query-stringify';
 import { UserService } from '@kotka/ui/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
+import { parseIdQuery } from '../services/specimen-id-query';
+
+export interface IdSearchValue {
+  text: string;
+  query: BuilderQuery;
+}
 
 export interface SearchQuery {
-  idSearchQuery: BuilderQuery;
+  idSearchValue: IdSearchValue,
   textSearchQuery: string;
 }
 
@@ -28,10 +33,11 @@ export interface SearchQuery {
 export class SpecimenSearchComponent {
   private userService = inject(UserService);
 
-  text = model<string>('');
-  fields = input<SearchField[]>([]);
+  fields = input<SearchField[] | undefined>(undefined);
 
-  idSearchText = signal<string>('');
+  searchQuery = model<string>('');
+  idSearchText = model<string>('');
+
   idSearchTextParseError = signal<string>('');
 
   search = output<SearchQuery>();
@@ -62,12 +68,12 @@ export class SpecimenSearchComponent {
       joinOperator: 'AND'
     };
 
-    this.text.set(builderQueryToQueryString(newQuery));
+    this.searchQuery.set(builderQueryToQueryString(newQuery));
     this.idSearchText.set('');
-    this.onSearch(this.text());
+    this.onSearch(this.searchQuery());
   }
 
-  onSearch(textSearchQuery: string) {
+  onSearch(searchQuery: string) {
     this.idSearchTextParseError.set('');
 
     let idSearchQuery: BuilderQuery;
@@ -79,8 +85,11 @@ export class SpecimenSearchComponent {
     }
 
     this.search.emit({
-      idSearchQuery,
-      textSearchQuery,
+      idSearchValue: {
+        text: this.idSearchText(),
+        query: idSearchQuery,
+      },
+      textSearchQuery: searchQuery,
     });
   }
 

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { CellRendererComponent } from './cell-renderer';
-import { getDomainAndIdWithoutPrefix, getUri } from '@kotka/shared/utils';
+import { getDomainAndId, getUri } from '@kotka/shared/utils';
 import { RouterLink } from '@angular/router';
 
 
@@ -108,7 +108,7 @@ export class URICellRendererComponent extends CellRendererComponent<RendererPara
       return;
     }
 
-    const [domain, id] = getDomainAndIdWithoutPrefix(this.params.value);
+    const [domain, id] = getDomainAndId(this.params.value);
     const uri = domain + id;
 
     this.domain = domain;

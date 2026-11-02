@@ -1,0 +1,51 @@
+<div>
+  <label class="form-label filters-label" for="specimen-result-type">Result type:</label>
+  <select id="specimen-result-type" class="form-select" [(ngModel)]="index">
+    @for (indexOption of indexOptions; track $index) {
+      <option [ngValue]="indexOption">{{ dataType | dataTypeName: true: false: indexOption }}</option>
+    }
+  </select>
+</div>
+<hr>
+
+<div>
+  <button
+    class="btn btn-sm btn-outline-secondary w-100 mb-2"
+    (click)="openLocationFilterModal()"
+  >
+    <i class="fa-solid fa-location-dot"></i> Filter by location
+  </button>
+  @if (filters().location; as location) {
+    <div>
+      <strong>Location filter:</strong><br>
+      {{ location.latitude | number:'1.5' }},
+      {{ location.longitude | number:'1.5' }}
+      · {{ location.radius / 1000 | number:'1.0-2' }} km
+      <button
+        type="button"
+        class="btn btn-danger btn-sm"
+        aria-label="Remove location filter"
+        (click)="removeLocationFilter()"
+      >
+        <i class="fa fa-xmark"></i>
+      </button>
+    </div>
+  }
+</div>
+<hr>
+
+<button
+  class="btn btn-sm btn-outline-secondary w-100 mb-2"
+  [disabled]="!aggregateResults()"
+  (click)="openAggregateSettingsModal()"
+  data-cy="select-aggregate-fields"
+>
+  <i class="fa-solid fa-gear"></i> Select filters
+</button>
+
+<kotka-aggregations
+  [fieldValues]="filters().fieldValues"
+  [aggregates]="aggregateResults() || []"
+  [fieldData]="fieldData()"
+  (fieldValuesChange)="onFieldValuesChange($event)"
+></kotka-aggregations>

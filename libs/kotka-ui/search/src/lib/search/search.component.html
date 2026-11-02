@@ -22,18 +22,22 @@
   </div>
 
   <div class="card-body">
-    @if (mode() === 'builder') {
-      <kui-search-builder
-        [fields]="filteredFields()"
-        [fieldMap]="filteredFieldsMap()"
-        [(text)]="text"
-      ></kui-search-builder>
+    @if (fields()) {
+      @if (mode() === 'builder') {
+        <kui-search-builder
+          [fields]="filteredFields()"
+          [fieldMap]="filteredFieldsMap()"
+          [(text)]="text"
+        ></kui-search-builder>
+      } @else {
+        <kui-text-search
+          [fields]="filteredFields()"
+          [fieldMap]="filteredFieldsMap()"
+          [(text)]="text"
+        ></kui-text-search>
+      }
     } @else {
-      <kui-text-search
-        [fields]="filteredFields()"
-        [fieldMap]="filteredFieldsMap()"
-        [(text)]="text"
-      ></kui-text-search>
+      <kui-spinner></kui-spinner>
     }
   </div>
 </div>

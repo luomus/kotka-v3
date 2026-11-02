@@ -2,12 +2,12 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  inject,
-  TemplateRef,
-  signal,
-  input,
   effect,
+  inject,
+  input,
   model,
+  signal,
+  TemplateRef
 } from '@angular/core';
 import { AutocompleteResult } from '@kotka/shared/models';
 import {
@@ -19,7 +19,7 @@ import {
   OperatorFunction,
   Subject,
   switchMap,
-  tap,
+  tap
 } from 'rxjs';
 import { NgbTypeahead, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
@@ -106,12 +106,13 @@ export class AutocompleteComponent {
       ) {
         this.loading = true;
 
-        this.fetchResultsFunc()(value).subscribe((result) => {
-          if (result.length < 1) {
+        this.fetchResultsFunc()(value).subscribe((results) => {
+          const typeaheadValue = results.filter(r => r.key === value)[0];
+          if (typeaheadValue) {
+            this.typeaheadValue = typeaheadValue;
+          } else {
             this.typeaheadValue = '';
             this.value.set(undefined);
-          } else {
-            this.typeaheadValue = result[0];
           }
 
           this.loading = false;

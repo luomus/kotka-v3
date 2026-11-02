@@ -3,7 +3,7 @@
   [idSearchTextParseError]="idSearchTextParseError()"
 ></kui-id-search>
 <kui-search
-  [(text)]="text"
+  [searchQuery]="searchQuery()"
   [fields]="fields()"
   (search)="onSearch($event)"
   (clear)="onClear()"

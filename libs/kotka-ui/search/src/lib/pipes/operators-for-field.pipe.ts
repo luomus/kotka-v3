@@ -2,15 +2,17 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { SearchOperatorInfo } from '../models';
 import {
   BOOLEAN_OPERATORS,
-  BOOLEAN_TYPES,
   DATE_OPERATORS,
-  DATE_TYPES,
   NUMERIC_OPERATORS,
-  NUMERIC_TYPES,
   TEXT_OPERATORS,
-  TEXT_TYPES,
 } from '../constants';
-import { SearchField } from '@kotka/shared/models';
+import {
+  SearchField,
+  BOOLEAN_TYPES,
+  DATE_TYPES,
+  NUMERIC_TYPES,
+  TEXT_TYPES,
+} from '@kotka/shared/models';
 
 export function getOperatorsForType(type?: string): SearchOperatorInfo[] {
   if (type === undefined || TEXT_TYPES.includes(type)) {

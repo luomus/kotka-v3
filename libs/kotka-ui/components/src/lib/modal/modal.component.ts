@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  input,
+} from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -15,7 +20,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
         <i class="fa fa-xmark"></i>
       </button>
     </div>
-    <div class="modal-body">
+    <div class="modal-body" [class]="bodyClass()">
       <ng-content></ng-content>
     </div>
     <div class="modal-footer">
@@ -28,4 +33,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class ModalComponent {
   modal = inject(NgbActiveModal);
+
+  bodyClass = input<string>();
 }

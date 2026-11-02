@@ -1,8 +1,8 @@
 import {
   ChangeDetectionStrategy,
-  Component, computed, inject,
-  input, model, output, Signal,
-  signal, viewChild,
+  Component, computed, effect, inject,
+  input, output, Signal,
+  signal, untracked, viewChild,
 } from '@angular/core';
 import { SearchBuilderComponent } from '../search-builder/search-builder.component';
 import { TextSearchComponent } from '../text-search/text-search.component';
@@ -11,12 +11,13 @@ import { DialogService } from '@kotka/ui/core';
 import { SearchField } from '@kotka/shared/models';
 import { QUERY_STRING_SUPPORTED_TYPES } from '../constants';
 import { validateBuilderQueryValues } from '../services/query-validate';
+import { SpinnerComponent } from '@kotka/ui/components';
 
 type SearchMode = 'builder' | 'text';
 
 @Component({
   selector: 'kui-search',
-  imports: [SearchBuilderComponent, TextSearchComponent],
+  imports: [SearchBuilderComponent, TextSearchComponent, SpinnerComponent],
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,9 +25,10 @@ type SearchMode = 'builder' | 'text';
 export class SearchComponent {
   private dialogService = inject(DialogService);
 
-  text = model<string>('');
-  fields = input<SearchField[]>([]);
+  searchQuery = input<string>('');
+  fields = input<SearchField[] | undefined>(undefined);
 
+  text = signal('');
   filteredFields: Signal<SearchField[]>;
   mode = signal<SearchMode>('builder');
 
@@ -43,23 +45,29 @@ export class SearchComponent {
   private builder = viewChild(SearchBuilderComponent);
 
   constructor() {
-    this.filteredFields = computed(() => this.fields().filter(field => QUERY_STRING_SUPPORTED_TYPES.includes(field.type)));
+    this.filteredFields = computed(() => (this.fields() || []).filter(field => QUERY_STRING_SUPPORTED_TYPES.includes(field.type)));
+
+    effect(() => {
+      if (!this.fields()) {
+        return;
+      }
+
+      this.text.set(this.searchQuery());
+
+      if (untracked(this.mode) === 'builder' && !this.isValidQueryForBuilder(this.searchQuery())) {
+        this.mode.set('text');
+      }
+    });
   }
 
   setMode(mode: SearchMode) {
-    if (mode === 'builder') {
-      try {
-        const query = queryStringToBuilderQuery(this.text());
-        validateBuilderQueryValues(query, this.filteredFieldsMap());
-      } catch (e) {
-        console.warn('Failed to parse query string', e);
-        this.dialogService.alert(
-          'Query contains features that are not supported by the builder. Please use the advanced search or modify the query.',
-        );
-        return;
-      }
+    if (mode === 'builder' && !this.isValidQueryForBuilder(this.text())) {
+      this.dialogService.alert(
+        'Query contains features that are not supported by the builder. Please use the advanced search or modify the query.',
+      );
+    } else {
+      this.mode.set(mode);
     }
-    this.mode.set(mode);
   }
 
   onSearchClick() {
@@ -71,5 +79,16 @@ export class SearchComponent {
     this.text.set('');
     this.clear.emit();
     this.onSearchClick();
+  }
+
+  private isValidQueryForBuilder(query: string): boolean {
+    try {
+      const builderQuery = queryStringToBuilderQuery(query);
+      validateBuilderQueryValues(builderQuery, this.filteredFieldsMap());
+      return true;
+    } catch (e) {
+      console.warn('Failed to parse query string', e);
+      return false;
+    }
   }
 }

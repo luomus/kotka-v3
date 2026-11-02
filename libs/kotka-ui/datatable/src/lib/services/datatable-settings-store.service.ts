@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { LocalStorageService } from 'ngx-webstorage';
 import { ColDefWithExtra, ColumnSettings, DatatableFilter } from '../models/models';
 import { cloneDeep } from 'lodash';
+import { getCleanedColumnSettings } from './datatable-settings-utls';
 
 @Injectable({
   providedIn: 'root',
@@ -9,23 +10,23 @@ import { cloneDeep } from 'lodash';
 export class DatatableSettingsStoreService {
   private storage = inject(LocalStorageService);
 
-  getStoredColumnSettings(settingsKey: string|undefined, defaultSettings: ColumnSettings): ColumnSettings|undefined {
-    if (settingsKey) {
+  getStoredColumnSettings(settingsKey: string, defaultSettings?: ColumnSettings, lockedCols?: string[]): ColumnSettings | undefined {
+    if (settingsKey && defaultSettings && lockedCols) {
       const settings = this.storage.retrieve(settingsKey + '-columns');
       if (settings) {
-        return this.getCleanedColumnSettings(settings, defaultSettings);
+        return getCleanedColumnSettings(settings, defaultSettings, lockedCols);
       }
     }
     return undefined;
   }
 
-  storeColumnSettings(settingsKey: string|undefined, columnSettings: ColumnSettings) {
-    if (settingsKey) {
+  storeColumnSettings(settingsKey: string, columnSettings?: ColumnSettings) {
+    if (settingsKey && columnSettings) {
       this.storage.store(settingsKey + '-columns', columnSettings);
     }
   }
 
-  getStoredFilters(settingsKey: string|undefined): DatatableFilter {
+  getStoredFilters(settingsKey: string): DatatableFilter {
     if (!settingsKey) {
       return {};
     }
@@ -34,11 +35,11 @@ export class DatatableSettingsStoreService {
   }
 
   storeFilters(
-    settingsKey: string|undefined,
-    filterModel: DatatableFilter,
-    allColumns: ColDefWithExtra[],
+    settingsKey: string,
+    filterModel?: DatatableFilter,
+    allColumns?: ColDefWithExtra[],
   ) {
-    if (!settingsKey) {
+    if (!settingsKey || !filterModel || !allColumns) {
       return;
     }
 
@@ -52,30 +53,5 @@ export class DatatableSettingsStoreService {
     if (Object.keys(columnFilters).length > 0) {
       this.storage.store(settingsKey + '-filters', columnFilters);
     }
-  }
-
-  private getCleanedColumnSettings(settings: ColumnSettings, defaultSettings: ColumnSettings): ColumnSettings {
-    let { selected, order } = settings;
-    const allColIds = defaultSettings.order;
-
-    if (selected) {
-      selected = selected.filter((colId) => allColIds.includes(colId));
-    } else {
-      selected = defaultSettings.selected;
-    }
-
-    if (order) {
-      order = order.filter((colId) => allColIds.includes(colId)) as string[];
-
-      allColIds.forEach((colId, idx) => {
-        if (!order!.includes(colId)) {
-          order!.splice(idx, 0, colId);
-        }
-      });
-    } else {
-      order = defaultSettings.order;
-    }
-
-    return { selected, order };
   }
 }
