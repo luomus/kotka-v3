@@ -4,10 +4,10 @@ import {
   input, model, output, signal,
 
 } from '@angular/core';
-import { SearchField } from '@kotka/shared/models';
+import { SearchField, SearchResultKey } from '@kotka/shared/models';
 import { SearchComponent } from '../search/search.component';
 import { IdSearchComponent } from '../id-search/id-search.component';
-import { BuilderQuery } from '../models';
+import { BuilderQuery, MultiSearchField } from '../models';
 import { builderQueryToQueryString } from '../services/query-stringify';
 import { UserService } from '@kotka/ui/core';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -22,6 +22,10 @@ export interface IdSearchValue {
 export interface SearchQuery {
   idSearchValue: IdSearchValue,
   textSearchQuery: string;
+}
+
+interface SpecimenMultiSearchField extends MultiSearchField {
+  fields: SearchResultKey[];
 }
 
 @Component({
@@ -42,8 +46,19 @@ export class SpecimenSearchComponent {
 
   search = output<SearchQuery>();
 
+  builderMultiSearchFields: SpecimenMultiSearchField[] = [
+    {
+      field: 'taxonOrSynonyms',
+      label: 'Taxon or Synonyms',
+      type: 'keyword',
+      fields: ['taxon', 'taxa', 'synonyms'],
+    },
+  ];
+
   private userName = toSignal(
-    this.userService.getCurrentLoggedInUser().pipe(map(user => this.userService.formatUserName(user.fullName)))
+    this.userService
+      .getCurrentLoggedInUser()
+      .pipe(map((user) => this.userService.formatUserName(user.fullName))),
   );
 
   onMyNewSpecimensClick() {
@@ -54,18 +69,18 @@ export class SpecimenSearchComponent {
             {
               field: 'editor',
               operator: 'equals',
-              value: this.userName() || ''
+              value: this.userName() || '',
             },
             {
               field: 'dateEdited',
               operator: 'equals',
-              value: new Date().toISOString().split('T')[0]
-            }
+              value: new Date().toISOString().split('T')[0],
+            },
           ],
-          joinOperator: 'AND'
-        }
+          joinOperator: 'AND',
+        },
       ],
-      joinOperator: 'AND'
+      joinOperator: 'AND',
     };
 
     this.searchQuery.set(builderQueryToQueryString(newQuery));

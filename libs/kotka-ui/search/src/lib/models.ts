@@ -1,11 +1,22 @@
-import { ISimpleFilterModel, JoinOperator as GridJoinOperator } from '@ag-grid-community/core';
+import {
+  ISimpleFilterModel,
+  JoinOperator as GridJoinOperator,
+} from '@ag-grid-community/core';
+import { SearchField } from '@kotka/shared/models';
 
 export type JoinOperator = GridJoinOperator;
 
 export type SearchOperator = Exclude<
   ISimpleFilterModel['type'],
-  null | undefined
+  null | undefined | 'empty' | 'notEmpty'
 >;
+
+export type SearchOperatorWithNegation = Extract<SearchOperator, 'notEqual' | 'notContains' | 'blank'>;
+export type SearchOperatorWithoutNegation = Exclude<SearchOperator, SearchOperatorWithNegation>;
+
+export const isSearchOperatorWithNegation = (operator: SearchOperator): operator is SearchOperatorWithNegation => {
+  return ['notEqual', 'notContains', 'blank'].includes(operator);
+};
 
 export interface SearchOperatorInfo {
   id: SearchOperator;
@@ -29,4 +40,10 @@ export interface SearchGroup {
 export interface BuilderQuery {
   groups: SearchGroup[];
   joinOperator: JoinOperator;
+}
+
+export interface MultiSearchField extends SearchField {
+  fields: string[];
+  hasRaw?: false;
+  hasAutocomplete?: false;
 }

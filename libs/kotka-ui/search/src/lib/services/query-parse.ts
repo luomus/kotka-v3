@@ -1,10 +1,21 @@
 import {
   BuilderQuery,
+  isSearchOperatorWithNegation,
   JoinOperator,
+  MultiSearchField,
   SearchCriteria,
-  SearchGroup
+  SearchGroup,
+  SearchOperator,
+  SearchOperatorWithoutNegation,
 } from '../models';
 import { getParsedTerms, Term, ValueType } from './query-parse-terms';
+import { isEqual, keyBy, uniqWith } from 'lodash';
+import { getJoinOperatorForMultiSearchField } from './query-stringify';
+import {
+  NEGATED_OPERATOR,
+  SEARCH_OPERATOR_MAP,
+  UNNEGATED_OPERATOR,
+} from '../constants';
 
 
 type TermType = Term['type'] | null;
@@ -32,12 +43,14 @@ const criteriaLevelAllowedPreviousTypes: Record<
 const groupLevelAllowedLastTypes: TermType[] = ['group'];
 const criteriaLevelAllowedLastTypes: TermType[] = ['value'];
 
-
-export function queryStringToBuilderQuery(queryString: string): BuilderQuery {
-  const terms = getParsedTerms(queryString);
+export function queryStringToBuilderQuery(queryString: string, multiFields: MultiSearchField[]): BuilderQuery {
+  let terms = getParsedTerms(queryString);
   if (terms.length === 0) {
     return { groups: [], joinOperator: 'AND' };
   }
+
+  const multiFieldByFirstField = keyBy(multiFields, 'fields[0]');
+  terms = flattenMultiFieldGroupTerms(terms, multiFieldByFirstField);
 
   const hasGroups = terms.filter(term => term.type === 'group').length > 0;
 
@@ -136,66 +149,139 @@ function termsToSearchGroup(terms: Term[]): SearchGroup {
 }
 
 function getCriteria(field: string, value: string, value2: string | undefined, valueType: ValueType, isNegated = false): SearchCriteria {
-  if (!value) {
-    throw new Error('Empty values are not supported');
-  }
+  let operator: SearchOperator = valueType;
 
   if (field === '_exists_') {
-    return {
-      field: value,
-      value: '',
-      operator: isNegated ? 'blank' : 'notBlank'
-    };
-  } else if (valueType === 'equals') {
-    return {
-      field,
-      value,
-      operator: isNegated ? 'notEqual' : 'equals'
-    };
-  } else if (valueType === 'contains') {
-    return {
-      field,
-      value,
-      operator: isNegated ? 'notContains' : 'contains',
-    };
-  } else if (valueType === 'endsWith') {
-    if (isNegated) {
-      throw new Error(
-        'Negation is not supported with "ends with" operator',
-      );
+    if (valueType !== 'equals') {
+      throw new Error('Only exact field values are supported for _exists_ operator');
     }
-    return { field, value, operator: 'endsWith' };
-  } else if (valueType === 'startsWith') {
-    if (isNegated) {
-      throw new Error(
-        'Negation is not supported with "starts with" operator',
-      );
-    }
-    return { field, value, operator: 'startsWith' };
+
+    field = value;
+    value = '';
+    operator = 'notBlank';
   }
 
   if (isNegated) {
-    throw new Error(`Negation is not supported with "${valueType}" operator`);
-  }
-
-  const partlyRangeOperators: ValueType[] = ['greaterThan', 'greaterThanOrEqual', 'lessThan', 'lessThanOrEqual'];
-  if (partlyRangeOperators.includes(valueType)) {
-    return {
-      field,
-      value,
-      operator: valueType
-    };
-  } else if (valueType === 'inRange') {
-    if (!value2) {
-      throw new Error('Empty values are not supported');
+    const negatedOperator = NEGATED_OPERATOR[operator];
+    if (!negatedOperator) {
+      throw new Error(`Negation is not supported with "${operator}" operator`);
     }
-    return {
-      field,
-      value,
-      value2,
-      operator: 'inRange'
-    };
+    operator = negatedOperator;
   }
 
-  throw new Error('Unknown value type: ' + valueType);
+  const operatorInfo = SEARCH_OPERATOR_MAP[operator];
+  if (operatorInfo.noValue && value) {
+    throw new Error(`Operator "${operator}" does not support values`);
+  } else if (!operatorInfo.noValue && !value) {
+    throw new Error(`Operator "${operator}" requires a value`);
+  } else if (operatorInfo.twoValues && !value2) {
+    throw new Error(`Operator "${operator}" requires two values`);
+  }
+
+  return {
+    field,
+    value,
+    value2,
+    operator
+  };
+}
+
+function flattenMultiFieldGroupTerms(
+  terms: Term[],
+  multiFieldByFirstField: Record<string, MultiSearchField>,
+): Term[] {
+  let result: Term[] = [];
+
+  for (const term of terms) {
+    if (term.type === 'group') {
+      let group: SearchGroup | undefined;
+      try {
+        group = termsToSearchGroup(term.value);
+      } catch (e) {
+        group = undefined;
+      }
+
+      if (group) {
+        const multiFieldCriteria = getMatchingMultiFieldCriteria(group, multiFieldByFirstField);
+        if (multiFieldCriteria) {
+          result = result.concat(criteriaToTerms(multiFieldCriteria));
+          continue;
+        }
+      }
+
+      term.value = flattenMultiFieldGroupTerms(term.value, multiFieldByFirstField);
+    }
+
+    result.push(term);
+  }
+
+  return result;
+}
+
+function getMatchingMultiFieldCriteria(group: SearchGroup, multiFieldByFirstField: Record<string, MultiSearchField>): SearchCriteria | undefined {
+  const { criteria, joinOperator } = group;
+  const fields = criteria.map((c) => c.field);
+  const multiFieldCandidate = multiFieldByFirstField[fields[0]];
+
+  if (isEqual(fields, multiFieldCandidate?.fields)) {
+    const uniqueMultiFieldCriteria = uniqWith(
+      criteria.map((c) => ({
+        ...c,
+        field: multiFieldCandidate.field,
+      })),
+      isEqual,
+    );
+
+    if (uniqueMultiFieldCriteria.length === 1) {
+      const multiFieldCriteria = uniqueMultiFieldCriteria[0];
+      if (joinOperator === getJoinOperatorForMultiSearchField(multiFieldCriteria.operator)) {
+        return multiFieldCriteria;
+      }
+    }
+  }
+
+  return undefined;
+}
+
+function criteriaToTerms(criteria: SearchCriteria): Term[] {
+  const result: Term[] = [];
+
+  const { field, operator, value, value2 } = criteria;
+
+  let operatorWithoutNegation: SearchOperatorWithoutNegation;
+  if (isSearchOperatorWithNegation(operator)) {
+    result.push({
+      type: 'negation',
+      value: 'NOT',
+    });
+
+    operatorWithoutNegation = UNNEGATED_OPERATOR[operator];
+  } else {
+    operatorWithoutNegation = operator;
+  }
+
+  if (operatorWithoutNegation === 'notBlank') {
+    result.push({
+      type: 'field',
+      value: '_exists_',
+    });
+    result.push({
+      type: 'value',
+      value: field,
+      valueType: 'equals',
+    });
+    return result;
+  }
+
+  result.push({
+    type: 'field',
+    value: field,
+  });
+  result.push({
+    type: 'value',
+    value,
+    value2,
+    valueType: operatorWithoutNegation,
+  });
+  return result;
 }

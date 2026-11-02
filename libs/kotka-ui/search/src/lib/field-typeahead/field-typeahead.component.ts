@@ -1,13 +1,18 @@
 import {
   ChangeDetectionStrategy,
-  Component,
+  Component, computed,
   input,
-  model,
+  model, Signal,
 } from '@angular/core';
 import { AutocompleteComponent } from '@kotka/ui/components';
 import { Observable, of } from 'rxjs';
 import { AutocompleteResult, SearchField } from '@kotka/shared/models';
 import { HighlightMatchPipe } from '@kotka/ui/core';
+import { MultiSearchField } from '../models';
+
+interface FieldTypeaheadOption extends AutocompleteResult {
+  hideKey?: boolean;
+}
 
 @Component({
   selector: 'kui-field-typeahead',
@@ -24,9 +29,11 @@ import { HighlightMatchPipe } from '@kotka/ui/core';
     <ng-template #resultTemplate let-option="result" let-term="term">
       <span>
         <span [innerHTML]="option.value | highlightMatch: term"></span>
-        <small class="text-muted">
-          (<span [innerHTML]="option.key | highlightMatch: term"></span>)
-        </small>
+        @if (!option.hideKey) {
+          <small class="text-muted">
+            (<span [innerHTML]="option.key | highlightMatch: term"></span>)
+          </small>
+        }
       </span>
     </ng-template>
   `,
@@ -42,30 +49,45 @@ import { HighlightMatchPipe } from '@kotka/ui/core';
 })
 export class FieldTypeaheadComponent {
   fields = input.required<SearchField[]>();
+  multiFields = input<MultiSearchField[]>([]);
   value = model<string>('');
   placeholder = input('Search...');
 
+  options: Signal<FieldTypeaheadOption[]>;
+
   fetchResultsFunc = this.fetchResults.bind(this);
 
-  private fetchResults(term: string): Observable<AutocompleteResult[]> {
+  constructor() {
+    this.options = computed(() => (
+      [
+        ...this.multiFields().map((multiField) => ({
+          key: multiField.field,
+          value: multiField.label || multiField.field,
+          hideKey: true,
+        })),
+        ...this.fields().map((field) => ({
+          key: field.field,
+          value: field.label || field.field,
+        })),
+      ]
+    ));
+  }
+
+  private fetchResults(term: string): Observable<FieldTypeaheadOption[]> {
     term = term.trim().toLowerCase();
 
-    const results: AutocompleteResult[] = this.fields()
+    const results = this.options()
       .filter(
-        (field) =>
-          field.label?.toLowerCase().includes(term)
-          || field.field?.toLowerCase().includes(term)
+        (option) =>
+          option.value.toLowerCase().includes(term)
+          || option.key.toLowerCase().includes(term)
       )
-      .map((field) => ({
-        key: field.field,
-        value: field.label || field.field,
-      }))
       .sort((a, b) => this.scoreMatch(a, term) - this.scoreMatch(b, term));
 
     return of(results);
   }
 
-  private scoreMatch(result: AutocompleteResult, term: string): number {
+  private scoreMatch(result: FieldTypeaheadOption, term: string): number {
     const label = result.value.toLowerCase();
     const key = result.key.toLowerCase();
 

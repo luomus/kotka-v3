@@ -215,6 +215,10 @@ export class DocumentDatatableDataService {
       throw new Error('Filter type is required!');
     }
 
+    if (filterModel.type === 'empty') {
+      throw new Error('Filter type ' + filterModel.type + ' is not supported!');
+    }
+
     let value: string;
     let value2: string | undefined;
 

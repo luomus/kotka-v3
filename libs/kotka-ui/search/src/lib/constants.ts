@@ -1,5 +1,10 @@
 import { keyBy } from 'lodash';
-import { SearchOperator, SearchOperatorInfo } from './models';
+import {
+  SearchOperator,
+  SearchOperatorInfo,
+  SearchOperatorWithNegation,
+  SearchOperatorWithoutNegation,
+} from './models';
 import {
   BOOLEAN_TYPES,
   DATE_TYPES,
@@ -27,6 +32,24 @@ export const SEARCH_OPERATORS: SearchOperatorInfo[] = [
 export const SEARCH_OPERATOR_MAP = <Record<SearchOperator, SearchOperatorInfo>>(
   keyBy(SEARCH_OPERATORS, 'id')
 );
+
+export const NEGATED_OPERATOR: Record<SearchOperatorWithoutNegation, SearchOperatorWithNegation | null> = {
+  equals: 'notEqual',
+  contains: 'notContains',
+  notBlank: 'blank',
+  startsWith: null,
+  endsWith: null,
+  greaterThan: null,
+  greaterThanOrEqual: null,
+  lessThan: null,
+  lessThanOrEqual: null,
+  inRange: null,
+};
+export const UNNEGATED_OPERATOR: Record<SearchOperatorWithNegation, SearchOperatorWithoutNegation> = {
+  notEqual: 'equals',
+  notContains: 'contains',
+  blank: 'notBlank',
+};
 
 const textOperators: SearchOperator[] = [
   'equals',

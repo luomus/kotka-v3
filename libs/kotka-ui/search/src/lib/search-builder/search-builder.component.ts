@@ -1,18 +1,14 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  effect,
   input,
   model,
-  signal,
-  untracked,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FieldTypeaheadComponent } from '../field-typeahead/field-typeahead.component';
-import { builderQueryToQueryString } from '../services/query-stringify';
-import { queryStringToBuilderQuery } from '../services/query-parse';
 import {
   BuilderQuery,
+  MultiSearchField,
   SearchCriteria,
   SearchGroup,
   SearchOperator,
@@ -21,23 +17,21 @@ import {
 import { SEARCH_OPERATORS } from '../constants';
 import { CriteriaCanHaveValuePipe } from '../pipes/criteria-can-have-value.pipe';
 import { SearchField } from '@kotka/shared/models';
-import { OperatorsForFieldPipe, getOperatorsForType } from '../pipes/operators-for-field.pipe';
+import { OperatorsForFieldPipe, getOperatorsForField } from '../pipes/operators-for-field.pipe';
 import { SearchValueInputComponent } from '../search-value-input/search-value-input.component';
-import { validateBuilderQueryValues } from '../services/query-validate';
 
 
-function createCriteria(): SearchCriteria {
+export function createCriteria(): SearchCriteria {
   return { field: '', operator: 'equals', value: '' };
 }
 
-function createGroup(): SearchGroup {
+export function createGroup(): SearchGroup {
   return { criteria: [createCriteria()], joinOperator: 'AND' };
 }
 
-function createBuilderQuery(): BuilderQuery {
+export function createBuilderQuery(): BuilderQuery {
   return { groups: [createGroup()], joinOperator: 'AND' };
 }
-
 
 @Component({
   selector: 'kui-search-builder',
@@ -53,43 +47,21 @@ function createBuilderQuery(): BuilderQuery {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchBuilderComponent {
-  text = model<string>('');
+  query = model<BuilderQuery | null>(createBuilderQuery());
 
-  fields = input<SearchField[]>([]);
-  fieldMap = input<Record<string, SearchField>>({});
-
-  query = signal<BuilderQuery | null>(null);
+  fields = input.required<SearchField[]>();
+  fieldMap = input.required<Record<string, SearchField>>();
+  multiFields = input.required<MultiSearchField[]>();
+  multiFieldMap = input.required<Record<string, MultiSearchField>>();
 
   operators = SEARCH_OPERATORS;
-
-  private activeText = signal<string | null>(null);
-
-  constructor() {
-    effect(() => {
-      if (this.text() !== untracked(this.activeText)) {
-        this.setFromQueryString(this.text());
-      }
-    });
-
-    effect(() => {
-      if (this.query()) {
-        const newText = builderQueryToQueryString(this.query()!);
-        this.text.set(newText);
-        this.activeText.set(newText);
-      }
-    });
-  }
-
-  clear() {
-    this.query.set(createBuilderQuery());
-  }
 
   setField(groupIdx: number, criteriaIdx: number, field: string) {
     this.modifyQuery((query) => {
       const criteria = query.groups[groupIdx].criteria[criteriaIdx];
       criteria.field = field;
 
-      const operators = getOperatorsForType(field ? this.fieldMap()[field]?.type : undefined);
+      const operators = getOperatorsForField(field, this.fieldMap(), this.multiFieldMap());
       if (!operators.some(operator => operator.id === criteria.operator)) {
         criteria.operator = 'equals';
       }
@@ -157,24 +129,5 @@ export class SearchBuilderComponent {
       modify(clone);
       return clone;
     });
-  }
-
-  setFromQueryString(queryString: string) {
-    let query: BuilderQuery;
-
-    try {
-      query = queryStringToBuilderQuery(queryString);
-      validateBuilderQueryValues(query, this.fieldMap());
-    } catch (e) {
-      console.warn('Failed to parse query string', e);
-      this.query.set(null);
-      return;
-    }
-
-    if (query.groups.length === 0) {
-      query.groups.push(createGroup());
-    }
-    this.query.set(query);
-    this.activeText.set(queryString);
   }
 }

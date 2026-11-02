@@ -2,13 +2,15 @@ import {
   ChangeDetectionStrategy,
   Component, computed, effect, inject,
   input, output, Signal,
-  signal, untracked, viewChild,
+  signal, untracked,
 } from '@angular/core';
-import { SearchBuilderComponent } from '../search-builder/search-builder.component';
+import { SearchBuilderComponent, createBuilderQuery, createGroup } from '../search-builder/search-builder.component';
 import { TextSearchComponent } from '../text-search/text-search.component';
 import { queryStringToBuilderQuery } from '../services/query-parse';
-import { DialogService } from '@kotka/ui/core';
+import { builderQueryToQueryString } from '../services/query-stringify';
+import { DialogService, toMap } from '@kotka/ui/core';
 import { SearchField } from '@kotka/shared/models';
+import { BuilderQuery, MultiSearchField } from '../models';
 import { QUERY_STRING_SUPPORTED_TYPES } from '../constants';
 import { validateBuilderQueryValues } from '../services/query-validate';
 import { SpinnerComponent } from '@kotka/ui/components';
@@ -27,68 +29,100 @@ export class SearchComponent {
 
   searchQuery = input<string>('');
   fields = input<SearchField[] | undefined>(undefined);
+  builderMultiFields = input<MultiSearchField[]>([]);
 
-  text = signal('');
-  filteredFields: Signal<SearchField[]>;
   mode = signal<SearchMode>('builder');
+  text = signal('');
+  builderQuery = signal<BuilderQuery | null>(null);
+  filteredFields: Signal<SearchField[]>;
 
-  filteredFieldsMap = computed(() => this.filteredFields().reduce(
-    (result, field) => {
-      result[field.field] = field;
-      return result;
-    }, <Record<string, SearchField>>{})
+  filteredFieldMap = computed(() => toMap(this.filteredFields(), 'field'));
+  builderMultiFieldMap = computed(() =>
+    toMap(this.builderMultiFields(), 'field'),
   );
 
   search = output<string>();
   clear = output<void>();
 
-  private builder = viewChild(SearchBuilderComponent);
-
   constructor() {
-    this.filteredFields = computed(() => (this.fields() || []).filter(field => QUERY_STRING_SUPPORTED_TYPES.includes(field.type)));
+    this.filteredFields = computed(() =>
+      (this.fields() || []).filter((field) =>
+        QUERY_STRING_SUPPORTED_TYPES.includes(field.type),
+      ),
+    );
 
     effect(() => {
       if (!this.fields()) {
         return;
       }
 
-      this.text.set(this.searchQuery());
+      const searchQuery = this.searchQuery();
 
-      if (untracked(this.mode) === 'builder' && !this.isValidQueryForBuilder(this.searchQuery())) {
-        this.mode.set('text');
-      }
+      untracked(() => {
+        this.builderQuery.set(this.queryStringToValidBuilderQuery(searchQuery));
+        this.text.set(searchQuery);
+
+        if (this.mode() === 'builder' && !this.builderQuery()) {
+          this.mode.set('text');
+        }
+      });
     });
   }
 
   setMode(mode: SearchMode) {
-    if (mode === 'builder' && !this.isValidQueryForBuilder(this.text())) {
-      this.dialogService.alert(
-        'Query contains features that are not supported by the builder. Please use the advanced search or modify the query.',
-      );
+    if (mode === 'builder') {
+      const builderQuery = this.queryStringToValidBuilderQuery(this.text());
+
+      if (!builderQuery) {
+        this.dialogService.alert(
+          'Query contains features that are not supported by the builder. Please use the advanced search or modify the query.',
+        );
+        return;
+      }
+
+      this.builderQuery.set(builderQuery);
     } else {
-      this.mode.set(mode);
+      this.text.set(builderQueryToQueryString(this.builderQuery(), this.builderMultiFieldMap()));
     }
+
+    this.mode.set(mode);
   }
 
   onSearchClick() {
-    this.search.emit(this.text());
+    const searchQuery = this.mode() === 'builder'
+      ? builderQueryToQueryString(this.builderQuery(), this.builderMultiFieldMap())
+      : this.text();
+
+    this.search.emit(searchQuery);
   }
 
   onClearClick() {
-    this.builder()?.clear();
+    this.builderQuery.set(createBuilderQuery());
     this.text.set('');
     this.clear.emit();
     this.onSearchClick();
   }
 
-  private isValidQueryForBuilder(query: string): boolean {
+  private queryStringToValidBuilderQuery(query: string): BuilderQuery | null {
     try {
-      const builderQuery = queryStringToBuilderQuery(query);
-      validateBuilderQueryValues(builderQuery, this.filteredFieldsMap());
-      return true;
+      const builderQuery = queryStringToBuilderQuery(
+        query,
+        this.builderMultiFields(),
+      );
+      validateBuilderQueryValues(
+        builderQuery,
+        this.filteredFieldMap(),
+        this.builderMultiFieldMap(),
+      );
+
+      if (builderQuery.groups.length === 0) {
+        builderQuery.groups.push(createGroup());
+      }
+
+      return builderQuery;
     } catch (e) {
       console.warn('Failed to parse query string', e);
-      return false;
+      return null;
     }
   }
 }

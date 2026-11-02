@@ -1,5 +1,8 @@
 import {
   BuilderQuery,
+  isSearchOperatorWithNegation,
+  JoinOperator,
+  MultiSearchField,
   SearchCriteria,
   SearchGroup,
   SearchOperator,
@@ -12,37 +15,71 @@ const RANGE_OPERATORS: SearchOperator[] = ['greaterThan', 'greaterThanOrEqual', 
 
 export const REMOVED_CHARACTERS: string[] = ['>', '<'];
 
-export function builderQueryToQueryString(query: BuilderQuery): string {
+export function builderQueryToQueryString(
+  query: BuilderQuery | null,
+  multiFieldMap: Record<string, MultiSearchField> = {},
+): string {
+  if (!query) {
+    return '';
+  }
+
   const results = query.groups
-    .map(group => groupToQueryString(group))
-    .filter(result => !!result.result);
+    .map(group => groupToQueryString(group, multiFieldMap))
+    .filter(result => !!result);
 
   if (results.length === 0) {
     return '';
   } else if (results.length === 1) {
-    return results[0].result;
+    return results[0];
   } else {
     return results
-      .map((result) =>
-        result.hasMultiple ? `(${result.result})` : result.result,
-      )
+      .map(result => `(${result})`)
       .join(` ${query.joinOperator} `);
   }
 }
 
-export function groupToQueryString(group: SearchGroup): { result: string, hasMultiple: boolean} {
+function groupToQueryString(
+  group: SearchGroup,
+  multiFieldMap: Record<string, MultiSearchField> = {},
+): string {
   const results = group.criteria
-    .map((criteria) => criteriaToQueryString(criteria))
+    .map((criteria) => criteriaToQueryString(criteria, multiFieldMap))
     .filter((queryString) => !!queryString);
 
-  if (results.length < 2) {
-    return { result: results[0] || '', hasMultiple: false };
+  if (results.length === 0) {
+    return '';
+  } else if (results.length === 1) {
+    return results[0];
   } else {
-    return { result: results.join(` ${group.joinOperator} `), hasMultiple: true };
+    return results.join(` ${group.joinOperator} `);
   }
 }
 
-export function criteriaToQueryString(criteria: SearchCriteria): string {
+function criteriaToQueryString(
+  criteria: SearchCriteria,
+  multiFieldMap: Record<string, MultiSearchField> = {},
+): string {
+  const multiField = multiFieldMap[criteria.field];
+
+  if (!multiField) {
+    return basicCriteriaToQueryString(criteria);
+  }
+
+  const results = multiField.fields
+    .map((field) => basicCriteriaToQueryString({ ...criteria, field }))
+    .filter((queryString) => !!queryString);
+
+  if (results.length === 0) {
+    return '';
+  } else if (results.length === 1) {
+    return results[0];
+  } else {
+    const joinOperator = getJoinOperatorForMultiSearchField(criteria.operator);
+    return `(${results.join(` ${joinOperator} `)})`;
+  }
+}
+
+function basicCriteriaToQueryString(criteria: SearchCriteria): string {
   const field = criteria.field;
 
   const operatorInfo = SEARCH_OPERATOR_MAP[criteria.operator];
@@ -53,56 +90,48 @@ export function criteriaToQueryString(criteria: SearchCriteria): string {
     return '';
   }
 
-  if (criteria.operator === 'blank' || criteria.operator === 'notBlank') {
-    if (!field) {
-      return '';
-    }
-    let result = `_exists_:${field}`;
-    if (criteria.operator === 'blank') {
-      result = `NOT ${result}`;
-    }
-    return result;
+  let queryString = getQueryStringBase(criteria.operator, field, value, value2);
+  if (queryString && isSearchOperatorWithNegation(criteria.operator)) {
+    queryString = `NOT ${queryString}`;
   }
+  return queryString;
+}
 
+function getQueryStringBase(
+  operator: SearchOperator,
+  field: string,
+  value: string,
+  value2?: string,
+): string {
   const prefix = field ? `${field}:` : '';
 
-  switch (criteria.operator) {
-    case 'contains': {
+  switch (operator) {
+    case 'notBlank':
+    case 'blank':
+      return field ? `_exists_:${field}` : '';
+    case 'contains':
+    case 'notContains':
       return `${prefix}*${value}*`;
-    }
-    case 'notContains': {
-      return `NOT ${prefix}*${value}*`;
-    }
-    case 'equals': {
+    case 'equals':
+    case 'notEqual':
       return `${prefix}"${value}"`;
-    }
-    case 'notEqual': {
-      return `NOT ${prefix}"${value}"`;
-    }
-    case 'startsWith': {
+    case 'startsWith':
       return `${prefix}${value}*`;
-    }
-    case 'endsWith': {
+    case 'endsWith':
       return `${prefix}*${value}`;
-    }
-    case 'greaterThan': {
+    case 'greaterThan':
       return `${prefix}{${value} TO *}`;
-    }
-    case 'greaterThanOrEqual': {
+    case 'greaterThanOrEqual':
       return `${prefix}[${value} TO *]`;
-    }
-    case 'lessThan': {
+    case 'lessThan':
       return `${prefix}{* TO ${value}}`;
-    }
-    case 'lessThanOrEqual': {
+    case 'lessThanOrEqual':
       return `${prefix}[* TO ${value}]`;
-    }
-    case 'inRange': {
+    case 'inRange':
       return `${prefix}[${value} TO ${value2}]`;
-    }
     default: {
       throw new Error(
-        'Filter type ' + criteria.operator + ' is not supported!',
+        'Filter type ' + operator + ' is not supported!',
       );
     }
   }
@@ -151,5 +180,15 @@ export function getRemovedCharacters(operator?: SearchOperator): string[] {
     return [']', '}'];
   } else {
     return REMOVED_CHARACTERS;
+  }
+}
+
+export function getJoinOperatorForMultiSearchField(
+  operator: SearchOperator,
+): JoinOperator {
+  if (isSearchOperatorWithNegation(operator)) {
+    return 'AND';
+  } else {
+    return 'OR';
   }
 }

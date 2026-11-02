@@ -25,15 +25,17 @@
     @if (fields()) {
       @if (mode() === 'builder') {
         <kui-search-builder
+          [(query)]="builderQuery"
           [fields]="filteredFields()"
-          [fieldMap]="filteredFieldsMap()"
-          [(text)]="text"
+          [fieldMap]="filteredFieldMap()"
+          [multiFields]="builderMultiFields()"
+          [multiFieldMap]="builderMultiFieldMap()"
         ></kui-search-builder>
       } @else {
         <kui-text-search
-          [fields]="filteredFields()"
-          [fieldMap]="filteredFieldsMap()"
           [(text)]="text"
+          [fields]="filteredFields()"
+          [fieldMap]="filteredFieldMap()"
         ></kui-text-search>
       }
     } @else {

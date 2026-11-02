@@ -1,7 +1,11 @@
-import { JoinOperator, SearchOperator } from '../models';
+import {
+  JoinOperator,
+  SearchOperator,
+  SearchOperatorWithoutNegation,
+} from '../models';
 import { getEscapedCharacters, getRemovedCharacters } from './query-stringify';
 
-export type ValueType = Exclude<SearchOperator, 'empty' | 'notEmpty' | 'notEquals' | 'notContains'>;
+export type ValueType = Exclude<SearchOperatorWithoutNegation, 'notBlank'>;
 
 export type Term = {
   type: 'field';

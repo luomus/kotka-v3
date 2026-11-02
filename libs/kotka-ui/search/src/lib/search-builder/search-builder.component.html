@@ -29,6 +29,7 @@
               <kui-field-typeahead
                 placeholder="Any field"
                 [fields]="fields()"
+                [multiFields]="multiFields()"
                 [value]="criteria.field"
                 (valueChange)="setField(groupIdx, critIdx, $event)"
               ></kui-field-typeahead>
@@ -40,7 +41,7 @@
                 [ngModel]="criteria.operator"
                 (ngModelChange)="setOperator(groupIdx, critIdx, $event)"
               >
-                @for (operator of (criteria.field | operatorsForField: fieldMap()); track operator.id) {
+                @for (operator of (criteria.field | operatorsForField: fieldMap() : multiFieldMap()); track operator.id) {
                   <option [value]="operator.id">{{ operator.label }}</option>
                 }
               </select>
@@ -51,7 +52,7 @@
                 <div class="col">
                   @if (criteria | criteriaCanHaveValue) {
                     <kui-search-value-input
-                      [field]="fieldMap()[criteria.field]"
+                      [field]="fieldMap()[criteria.field] || multiFieldMap()[criteria.field]"
                       [value]="criteria.value"
                       (valueChange)="setValue(groupIdx, critIdx, $event)"
                     ></kui-search-value-input>
@@ -63,7 +64,7 @@
                   </div>
                   <div class="col">
                     <kui-search-value-input
-                      [field]="fieldMap()[criteria.field]"
+                      [field]="fieldMap()[criteria.field] || multiFieldMap()[criteria.field]"
                       [value]="criteria.value2 || ''"
                       (valueChange)="setValue(groupIdx, critIdx, $event, true)"
                     ></kui-search-value-input>

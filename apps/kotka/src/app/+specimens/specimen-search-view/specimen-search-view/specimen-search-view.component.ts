@@ -32,7 +32,7 @@ import {
 } from '@kotka/shared/models';
 import { MainContentComponent, MainContentHeaderDirective, SpinnerComponent } from '@kotka/ui/components';
 import { FormsModule } from '@angular/forms';
-import { ApiClient, IteratorSearchParams, SearchResultIteratorService } from '@kotka/ui/core';
+import { ApiClient, IteratorSearchParams, SearchResultIteratorService, toMap } from '@kotka/ui/core';
 import { SpecimenLabelDesignerComponent } from '../../specimen-label-designer/specimen-label-designer.component';
 import {
   FieldData,
@@ -212,13 +212,7 @@ export class SpecimenSearchViewComponent {
       .getSearchFields(KotkaDocumentType.specimen, index)
       .pipe(
         map((fields) => {
-          const fieldMap: Record<string, SearchField> = fields.reduce(
-            (result, field) => {
-              result[field.field] = field;
-              return result;
-            },
-            <Record<string, SearchField>>{},
-          );
+          const fieldMap: Record<string, SearchField> = toMap(fields, 'field');
 
           const columns: DatatableColumn[] = fields.map((field) => {
             let baseColumn: Partial<DatatableColumn> = {};
@@ -370,13 +364,7 @@ export class SpecimenSearchViewComponent {
   }
 
   private onAggregatesChange(aggregates: FieldAggregate[]) {
-    const aggregateMap = aggregates.reduce(
-      (map, aggregate) => {
-        map[aggregate.field] = aggregate;
-        return map;
-      },
-      <Record<string, FieldAggregate>>{},
-    );
+    const aggregateMap = toMap(aggregates, 'field');
 
     const fieldValues = this.filters().fieldValues.filter((filter) =>
       aggregateMap[filter.field]?.values.some(

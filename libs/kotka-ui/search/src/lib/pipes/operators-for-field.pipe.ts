@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { SearchOperatorInfo } from '../models';
+import { MultiSearchField, SearchOperatorInfo } from '../models';
 import {
   BOOLEAN_OPERATORS,
   DATE_OPERATORS,
@@ -27,12 +27,34 @@ export function getOperatorsForType(type?: string): SearchOperatorInfo[] {
   return [];
 }
 
+export function getOperatorsForField(
+  field: string,
+  fieldMap: Record<string, SearchField>,
+  multiFieldMap: Record<string, MultiSearchField> = {},
+): SearchOperatorInfo[] {
+  if (!field) {
+    return getOperatorsForType(undefined);
+  }
+
+  if (fieldMap[field]) {
+    return getOperatorsForType(fieldMap[field].type);
+  } else if (multiFieldMap[field]) {
+    return getOperatorsForType(multiFieldMap[field].type);
+  } else {
+    return getOperatorsForType(undefined);
+  }
+}
+
 @Pipe({
   name: 'operatorsForField',
   pure: true,
 })
 export class OperatorsForFieldPipe implements PipeTransform {
-  transform(field: string, fieldMap: Record<string, SearchField>): SearchOperatorInfo[] {
-    return getOperatorsForType(field ? fieldMap[field]?.type : undefined);
+  transform(
+    field: string,
+    fieldMap: Record<string, SearchField>,
+    multiFieldMap: Record<string, MultiSearchField> = {},
+  ): SearchOperatorInfo[] {
+    return getOperatorsForField(field, fieldMap, multiFieldMap);
   }
 }
