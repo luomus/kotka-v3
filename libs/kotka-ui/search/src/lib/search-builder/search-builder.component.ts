@@ -2,7 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   input,
-  model,
+  model, output,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FieldTypeaheadComponent } from '../field-typeahead/field-typeahead.component';
@@ -40,7 +40,7 @@ export function createBuilderQuery(): BuilderQuery {
     FieldTypeaheadComponent,
     SearchValueInputComponent,
     CriteriaCanHaveValuePipe,
-    OperatorsForFieldPipe
+    OperatorsForFieldPipe,
   ],
   templateUrl: './search-builder.component.html',
   styleUrls: ['./search-builder.component.scss'],
@@ -54,6 +54,8 @@ export class SearchBuilderComponent {
   multiFields = input.required<MultiSearchField[]>();
   multiFieldMap = input.required<Record<string, MultiSearchField>>();
 
+  enterSubmit = output<void>();
+
   operators = SEARCH_OPERATORS;
 
   setField(groupIdx: number, criteriaIdx: number, field: string) {
@@ -61,8 +63,12 @@ export class SearchBuilderComponent {
       const criteria = query.groups[groupIdx].criteria[criteriaIdx];
       criteria.field = field;
 
-      const operators = getOperatorsForField(field, this.fieldMap(), this.multiFieldMap());
-      if (!operators.some(operator => operator.id === criteria.operator)) {
+      const operators = getOperatorsForField(
+        field,
+        this.fieldMap(),
+        this.multiFieldMap(),
+      );
+      if (!operators.some((operator) => operator.id === criteria.operator)) {
         criteria.operator = 'equals';
       }
     });
@@ -74,7 +80,12 @@ export class SearchBuilderComponent {
     });
   }
 
-  setValue(groupIdx: number, criteriaIdx: number, value: string, isSecondValue = false) {
+  setValue(
+    groupIdx: number,
+    criteriaIdx: number,
+    value: string,
+    isSecondValue = false,
+  ) {
     this.modifyQuery((query) => {
       if (isSecondValue) {
         query.groups[groupIdx].criteria[criteriaIdx].value2 = value;

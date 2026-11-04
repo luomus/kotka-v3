@@ -5,6 +5,7 @@ import {
   inject,
   input,
   model,
+  output,
   Signal,
   signal,
 } from '@angular/core';
@@ -92,6 +93,8 @@ export class TextSearchComponent {
   fieldMap = input<Record<string, SearchField>>({});
 
   text = model<string>('');
+
+  enterSubmit = output<void>();
 
   currentToken = signal('');
   suggestions = signal<AutocompleteSuggestions>([]);

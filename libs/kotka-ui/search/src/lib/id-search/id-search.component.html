@@ -6,6 +6,7 @@
   [(ngModel)]="idSearchText"
   placeholder="Identifier: eg. HT.30..33 or HT.31,HT.42,HT.50"
   [class.is-invalid]="!!idSearchTextParseError()"
+  (keydown.enter)="onEnter($event)"
 ></textarea>
 @if (idSearchTextParseError(); as searchError) {
   <div class="invalid-feedback">

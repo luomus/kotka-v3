@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component, input,
   model,
+  output,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
@@ -15,4 +16,15 @@ import { FormsModule } from '@angular/forms';
 export class IdSearchComponent {
   idSearchText = model<string>('');
   idSearchTextParseError = input<string>('');
+
+  enterSubmit = output<void>();
+
+  onEnter(event: Event) {
+    if (event instanceof KeyboardEvent && event.shiftKey) {
+      return;
+    }
+
+    event.preventDefault();
+    this.enterSubmit.emit();
+  }
 }

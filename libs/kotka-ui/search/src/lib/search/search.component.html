@@ -30,12 +30,14 @@
           [fieldMap]="validFieldMap()"
           [multiFields]="builderMultiFields()"
           [multiFieldMap]="builderMultiFieldMap()"
+          (enterSubmit)="onSearchClick()"
         ></kui-search-builder>
       } @else {
         <kui-text-search
           [(text)]="text"
           [fields]="validFields()"
           [fieldMap]="validFieldMap()"
+          (enterSubmit)="onSearchClick()"
         ></kui-text-search>
       }
     } @else {

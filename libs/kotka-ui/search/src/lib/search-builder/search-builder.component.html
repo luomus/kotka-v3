@@ -32,6 +32,7 @@
                 [multiFields]="multiFields()"
                 [value]="criteria.field"
                 (valueChange)="setField(groupIdx, critIdx, $event)"
+                (keydown.enter)="enterSubmit.emit()"
               ></kui-field-typeahead>
             </div>
 
@@ -40,6 +41,7 @@
                 class="form-select"
                 [ngModel]="criteria.operator"
                 (ngModelChange)="setOperator(groupIdx, critIdx, $event)"
+                (keydown.enter)="enterSubmit.emit()"
               >
                 @for (operator of (criteria.field | operatorsForField: fieldMap() : multiFieldMap()); track operator.id) {
                   <option [value]="operator.id">{{ operator.label }}</option>
@@ -55,6 +57,7 @@
                       [field]="fieldMap()[criteria.field] || multiFieldMap()[criteria.field]"
                       [value]="criteria.value"
                       (valueChange)="setValue(groupIdx, critIdx, $event)"
+                      (keydown.enter)="enterSubmit.emit()"
                     ></kui-search-value-input>
                   }
                 </div>
@@ -67,6 +70,7 @@
                       [field]="fieldMap()[criteria.field] || multiFieldMap()[criteria.field]"
                       [value]="criteria.value2 || ''"
                       (valueChange)="setValue(groupIdx, critIdx, $event, true)"
+                      (keydown.enter)="enterSubmit.emit()"
                     ></kui-search-value-input>
                   </div>
                 }

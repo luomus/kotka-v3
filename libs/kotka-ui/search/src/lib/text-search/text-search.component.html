@@ -4,5 +4,6 @@
   [token]="currentToken()"
   [loading]="suggestionsLoading()"
   (contextChange)="updateSuggestions($event)"
+  (enterSubmit)="enterSubmit.emit()"
 ></kui-autocomplete-textarea>
 
