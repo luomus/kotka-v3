@@ -43,7 +43,7 @@ export class SearchComponent {
   builderDefaultQuery = input<BuilderQuery | null>(null);
 
   search = output<string>();
-  clear = output<void>();
+  clear = output<string>();
 
   mode = signal<SearchMode>('builder');
   text = signal('');
@@ -110,8 +110,7 @@ export class SearchComponent {
   onClearClick() {
     this.lastBuilderSnapshot = null;
     this.onSearchQueryChange('');
-    this.clear.emit();
-    this.onSearchClick();
+    this.clear.emit('');
   }
 
   private onSearchQueryChange(searchQuery: string) {

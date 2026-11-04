@@ -23,6 +23,7 @@
         [idSearchText]="idSearchValue().text"
         [fields]="fieldData.fields"
         (search)="onSearch($event)"
+        (clear)="onClear($event)"
       >
       </kui-specimen-search>
       @if (searchError()) {

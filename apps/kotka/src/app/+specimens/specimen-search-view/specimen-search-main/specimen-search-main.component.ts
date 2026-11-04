@@ -109,6 +109,11 @@ export class SpecimenSearchMainComponent implements OnDestroy {
     this.textSearchQuery.set(searchQuery.textSearchQuery);
   }
 
+  onClear(searchQuery: SpecimenSearchQuery) {
+    this.filters.set({ fieldValues: [] });
+    this.onSearch(searchQuery);
+  }
+
   onInvalidQueryError() {
     this.searchError.set('Invalid query!');
   }

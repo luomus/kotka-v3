@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component, inject,
   input, model, output, signal,
-
 } from '@angular/core';
 import { SearchField } from '@kotka/shared/models';
 import { SearchComponent } from '../search/search.component';
@@ -36,6 +35,7 @@ export class SpecimenSearchComponent {
   idSearchTextParseError = signal<string>('');
 
   search = output<SpecimenSearchQuery>();
+  clear = output<SpecimenSearchQuery>();
 
   builderMultiSearchFields: SpecimenMultiSearchField[] = [
     {
@@ -126,8 +126,16 @@ export class SpecimenSearchComponent {
     });
   }
 
-  onClear() {
+  onClear(searchQuery: string) {
     this.idSearchText.set('');
     this.idSearchTextParseError.set('');
+
+    this.clear.emit({
+      idSearchValue: {
+        text: this.idSearchText(),
+        query: parseIdQuery(this.idSearchText()),
+      },
+      textSearchQuery: searchQuery,
+    });
   }
 }
