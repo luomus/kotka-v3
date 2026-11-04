@@ -1,15 +1,15 @@
 import { ParsedIdentifierParts, parseAndValidateIdentifierParts } from '@kotka/shared/utils';
-import { BuilderQuery, SearchCriteria, SearchGroup } from '../models';
-import { ElasticDocument } from '@kotka/shared/models';
+import {
+  SpecimenIdQuery,
+} from '../models';
 
-interface IdSearchCriteria extends SearchCriteria {
-  field: keyof Pick<ElasticDocument, 'domain' | 'namespace' | 'objectID' | 'documentID'>;
-}
+type SpecimenIdQueryGroup = SpecimenIdQuery['groups'][number];
+type SpecimenIdQueryCriteria = SpecimenIdQueryGroup['criteria'][number];
 
-export function parseIdQuery(idQuery: string): BuilderQuery {
+export function parseIdQuery(idQuery: string): SpecimenIdQuery {
   const terms = idQuery.trim().split(/(?:\s|,)+/);
 
-  const groups: SearchGroup[] = terms.map(term => {
+  const groups: SpecimenIdQueryGroup[] = terms.map(term => {
     if (term.includes('..')) {
       const lastIndex = term.lastIndexOf('..');
       const startPart = term.substring(0, lastIndex);
@@ -37,7 +37,7 @@ export function parseIdQuery(idQuery: string): BuilderQuery {
   };
 }
 
-function rangeToSearchGroup(idParts: ParsedIdentifierParts, end?: string): SearchGroup {
+function rangeToSearchGroup(idParts: ParsedIdentifierParts, end?: string): SpecimenIdQueryGroup {
   let start = idParts.objectID;
   if (
     (!start && !end) ||
@@ -47,7 +47,7 @@ function rangeToSearchGroup(idParts: ParsedIdentifierParts, end?: string): Searc
     throw new Error('Invalid range: start and end must be numeric');
   }
 
-  const criteria: IdSearchCriteria[] = [];
+  const criteria: SpecimenIdQueryCriteria[] = [];
   if (idParts.prefix) {
     criteria.push({
       field: 'domain',
@@ -94,8 +94,8 @@ function rangeToSearchGroup(idParts: ParsedIdentifierParts, end?: string): Searc
   };
 }
 
-function identifierToSearchGroup(idParts: ParsedIdentifierParts): SearchGroup {
-  const criteria: IdSearchCriteria[] = [];
+function identifierToSearchGroup(idParts: ParsedIdentifierParts): SpecimenIdQueryGroup {
+  const criteria: SpecimenIdQueryCriteria[] = [];
   if (idParts.prefix) {
     criteria.push({
       field: 'domain',

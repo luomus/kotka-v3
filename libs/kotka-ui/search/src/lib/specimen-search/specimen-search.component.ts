@@ -4,29 +4,20 @@ import {
   input, model, output, signal,
 
 } from '@angular/core';
-import { SearchField, SearchResultKey } from '@kotka/shared/models';
+import { SearchField } from '@kotka/shared/models';
 import { SearchComponent } from '../search/search.component';
 import { IdSearchComponent } from '../id-search/id-search.component';
-import { BuilderQuery, MultiSearchField } from '../models';
+import {
+  SpecimenBuilderQuery,
+  SpecimenIdQuery,
+  SpecimenMultiSearchField,
+  SpecimenSearchQuery,
+} from '../models';
 import { builderQueryToQueryString } from '../services/query-stringify';
 import { UserService } from '@kotka/ui/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { parseIdQuery } from '../services/specimen-id-query';
-
-export interface IdSearchValue {
-  text: string;
-  query: BuilderQuery;
-}
-
-export interface SearchQuery {
-  idSearchValue: IdSearchValue,
-  textSearchQuery: string;
-}
-
-interface SpecimenMultiSearchField extends MultiSearchField {
-  fields: SearchResultKey[];
-}
 
 @Component({
   selector: 'kui-specimen-search',
@@ -44,7 +35,7 @@ export class SpecimenSearchComponent {
 
   idSearchTextParseError = signal<string>('');
 
-  search = output<SearchQuery>();
+  search = output<SpecimenSearchQuery>();
 
   builderMultiSearchFields: SpecimenMultiSearchField[] = [
     {
@@ -53,9 +44,34 @@ export class SpecimenSearchComponent {
       type: 'keyword',
       fields: ['taxon', 'taxa', 'synonyms'],
       hasAutocomplete: true,
-      autocompleteField: 'taxon'
+      autocompleteField: 'taxon',
     },
   ];
+  builderDefaultQuery: SpecimenBuilderQuery = {
+    groups: [
+      {
+        criteria: [
+          {
+            field: 'taxonOrSynonyms',
+            operator: 'equals',
+            value: '',
+          },
+          {
+            field: 'originalSpecimenID',
+            operator: 'equals',
+            value: '',
+          },
+          {
+            field: 'collection',
+            operator: 'equals',
+            value: '',
+          }
+        ],
+        joinOperator: 'AND',
+      },
+    ],
+    joinOperator: 'AND',
+  };
 
   private userName = toSignal(
     this.userService
@@ -64,7 +80,7 @@ export class SpecimenSearchComponent {
   );
 
   onMyNewSpecimensClick() {
-    const newQuery: BuilderQuery = {
+    const newQuery: SpecimenBuilderQuery = {
       groups: [
         {
           criteria: [
@@ -93,7 +109,7 @@ export class SpecimenSearchComponent {
   onSearch(searchQuery: string) {
     this.idSearchTextParseError.set('');
 
-    let idSearchQuery: BuilderQuery;
+    let idSearchQuery: SpecimenIdQuery;
     try {
       idSearchQuery = parseIdQuery(this.idSearchText());
     } catch (e: any) {

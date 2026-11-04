@@ -47,7 +47,7 @@ import { isEqual } from 'lodash';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SpecimenSearchMainComponent } from '../specimen-search-main/specimen-search-main.component';
 import { SpecimenSearchHeaderComponent } from '../specimen-search-header/specimen-search-header.component';
-import { IdSearchValue, parseIdQuery } from '@kotka/ui/search';
+import { SpecimenIdSearchValue, parseIdQuery } from '@kotka/ui/search';
 import { getColId } from '@kotka/ui/datatable';
 
 const INITIAL_FIELD_DATA: FieldData = {
@@ -117,7 +117,7 @@ export class SpecimenSearchViewComponent {
   });
   aggregateSize = signal<number>(DEFAULT_AGGREGATE_SIZE);
   filters = signal<SpecimenSearchFilters>({ fieldValues: [] });
-  idSearchValue = signal<IdSearchValue>({ text: '', query: parseIdQuery('') });
+  idSearchValue = signal<SpecimenIdSearchValue>({ text: '', query: parseIdQuery('') });
   textSearchQuery = signal('');
   columnSettings = model<ColumnSettings | undefined>(undefined);
   sortModel = model<DatatableSort>([]);

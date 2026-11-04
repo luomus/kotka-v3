@@ -11,7 +11,7 @@ import {
 import { INDEX_OPTIONS } from '../specimen-search-main/specimen-search-main.component';
 import { WINDOW } from '@kotka/ui/core';
 import { DatatableSort } from '@kotka/ui/datatable';
-import { IdSearchValue, parseIdQuery } from '@kotka/ui/search';
+import { SpecimenIdSearchValue, parseIdQuery } from '@kotka/ui/search';
 import { areValidWGS84Coordinates } from '@kotka/shared/utils';
 
 const FIELD_PARAM_PREFIX = 'field.';
@@ -26,7 +26,7 @@ interface ParsedSearchLinkParams {
   aggregateFields?: string[];
   aggregateSize?: number;
   filters?: SpecimenSearchFilters;
-  idSearchValue?: IdSearchValue;
+  idSearchValue?: SpecimenIdSearchValue;
   textSearchQuery?: string;
   selectedColumns?: string[];
   sort?: DatatableSort;
@@ -45,7 +45,7 @@ export class SpecimenLinkService {
     aggregateFields: string[],
     aggregateSize: number,
     filters: SpecimenSearchFilters,
-    idSearchValue: IdSearchValue,
+    idSearchValue: SpecimenIdSearchValue,
     textSearchQuery: string,
     selectedColumns: string[],
     sort: DatatableSort
@@ -179,7 +179,7 @@ export class SpecimenLinkService {
     return result.length > 0 ? result : undefined;
   }
 
-  private parseIdSearchParam(param: any): IdSearchValue | undefined {
+  private parseIdSearchParam(param: any): SpecimenIdSearchValue | undefined {
     const text = this.parseStringParam(param);
     if (!text) {
       return undefined;

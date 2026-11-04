@@ -77,7 +77,6 @@
               <button
                 type="button"
                 class="btn btn-danger btn-sm"
-                [disabled]="group.criteria.length === 1 && query.groups.length === 1"
                 (click)="group.criteria.length > 1 ? removeCriteria(groupIdx, critIdx) : removeGroup(groupIdx)"
                 aria-label="Close"
               >

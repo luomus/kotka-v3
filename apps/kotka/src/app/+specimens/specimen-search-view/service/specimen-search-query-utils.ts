@@ -1,11 +1,11 @@
 import { FieldValue, SpecimenSearchFilters } from '../models/models';
-import { builderQueryToQueryString, IdSearchValue } from '@kotka/ui/search';
+import { builderQueryToQueryString, SpecimenIdSearchValue } from '@kotka/ui/search';
 import { Bool, ElasticsearchQuery } from '@kotka/shared/models';
 import { joinQueryStrings } from '@kotka/ui/core';
 
 export function getSpecimenSearchQuery(
   filters: SpecimenSearchFilters,
-  idSearchValue: IdSearchValue,
+  idSearchValue: SpecimenIdSearchValue,
   textSearchQuery: string,
 ): string | ElasticsearchQuery {
   const queryString = joinQueryStrings(

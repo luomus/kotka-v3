@@ -26,16 +26,16 @@
       @if (mode() === 'builder') {
         <kui-search-builder
           [(query)]="builderQuery"
-          [fields]="filteredFields()"
-          [fieldMap]="filteredFieldMap()"
+          [fields]="validFields()"
+          [fieldMap]="validFieldMap()"
           [multiFields]="builderMultiFields()"
           [multiFieldMap]="builderMultiFieldMap()"
         ></kui-search-builder>
       } @else {
         <kui-text-search
           [(text)]="text"
-          [fields]="filteredFields()"
-          [fieldMap]="filteredFieldMap()"
+          [fields]="validFields()"
+          [fieldMap]="validFieldMap()"
         ></kui-text-search>
       }
     } @else {
