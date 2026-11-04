@@ -19,6 +19,7 @@ import { BuilderQuery, MultiSearchField, SearchGroup } from '../models';
 import { QUERY_STRING_SUPPORTED_TYPES } from '../constants';
 import { validateBuilderQueryValues } from '../services/query-validate';
 import { SpinnerComponent } from '@kotka/ui/components';
+import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap';
 
 type SearchMode = 'builder' | 'text';
 
@@ -29,7 +30,12 @@ interface BuilderQuerySnapshot {
 
 @Component({
   selector: 'kui-search',
-  imports: [SearchBuilderComponent, TextSearchComponent, SpinnerComponent],
+  imports: [
+    SearchBuilderComponent,
+    TextSearchComponent,
+    SpinnerComponent,
+    NgbCollapse,
+  ],
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,6 +54,8 @@ export class SearchComponent {
   mode = signal<SearchMode>('builder');
   text = signal('');
   builderQuery = signal<BuilderQuery | null>(null);
+  collapsed = signal(false);
+  contentHidden = signal(false);
 
   validFields = computed(() =>
     (this.fields() || []).filter((field) =>
@@ -73,6 +81,24 @@ export class SearchComponent {
       const searchQuery = this.searchQuery();
       untracked(() => this.onSearchQueryChange(searchQuery));
     });
+  }
+
+  onHeaderClick(event: MouseEvent) {
+    const target = event.target;
+
+    if (
+      target instanceof Element &&
+      !target.closest('[data-collapse-toggle]') &&
+      target.closest('button')
+    ) {
+      return;
+    }
+
+    this.collapsed.update((collapsed) => !collapsed);
+
+    if (!this.collapsed()) {
+      this.contentHidden.set(false);
+    }
   }
 
   setMode(mode: SearchMode) {
@@ -164,7 +190,9 @@ export class SearchComponent {
     }
   }
 
-  private getValidBuilderQuery(builderQuery: BuilderQuery | null): BuilderQuery {
+  private getValidBuilderQuery(
+    builderQuery: BuilderQuery | null,
+  ): BuilderQuery {
     if (!builderQuery) {
       return createBuilderQuery();
     }

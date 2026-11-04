@@ -1,61 +1,84 @@
 <div class="card mt-2 mb-2">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <div class="btn-group" role="group" aria-label="Search mode">
+  <div
+    class="card-header"
+    [class.border-0]="collapsed() && contentHidden()"
+    (click)="onHeaderClick($event)"
+  >
+    <div>
       <button
-        class="btn btn-outline-secondary"
-        [class.active]="mode() === 'builder'"
-        [attr.aria-pressed]="mode() === 'builder'"
-        (click)="setMode('builder')"
+        type="button"
+        class="btn btn-link text-secondary"
+        data-collapse-toggle
+        [attr.aria-expanded]="!collapsed()"
+        [title]="collapsed() ? 'Expand search' : 'Collapse search'"
+        [attr.aria-label]="collapsed() ? 'Expand search' : 'Collapse search'"
       >
-        Search builder
+        <i class="fa" [class.fa-chevron-right]="collapsed()" [class.fa-chevron-down]="!collapsed()"></i>
       </button>
-      <button
-        class="btn btn-outline-secondary"
-        [class.active]="mode() === 'text'"
-        [attr.aria-pressed]="mode() === 'text'"
-        (click)="setMode('text')"
-      >
-        Advanced search
-      </button>
+      <h5 class="card-title d-inline">Search query</h5>
     </div>
-    <ng-content select="[kuiSearchHeaderActions]"></ng-content>
+    <div [ngbCollapse]="collapsed()" [animation]="false" class="m-auto">
+      <div class="btn-group mode-select" role="group" aria-label="Search mode">
+        <button
+          class="btn btn-outline-secondary"
+          [class.active]="mode() === 'builder'"
+          [attr.aria-pressed]="mode() === 'builder'"
+          (click)="setMode('builder')"
+        >
+          Search builder
+        </button>
+        <button
+          class="btn btn-outline-secondary"
+          [class.active]="mode() === 'text'"
+          [attr.aria-pressed]="mode() === 'text'"
+          (click)="setMode('text')"
+        >
+          Advanced search
+        </button>
+      </div>
+    </div>
+    <div [ngbCollapse]="collapsed()" [animation]="false" class="header-actions">
+      <ng-content select="[kuiSearchHeaderActions]"></ng-content>
+    </div>
   </div>
 
-  <div class="card-body">
-    @if (fields()) {
-      @if (mode() === 'builder') {
-        <kui-search-builder
-          [(query)]="builderQuery"
-          [fields]="validFields()"
-          [fieldMap]="validFieldMap()"
-          [multiFields]="builderMultiFields()"
-          [multiFieldMap]="builderMultiFieldMap()"
-          (enterSubmit)="onSearchClick()"
-        ></kui-search-builder>
+  <div [ngbCollapse]="collapsed()" (hidden)="contentHidden.set(true)">
+    <div class="card-body">
+      @if (fields()) {
+        @if (mode() === 'builder') {
+          <kui-search-builder
+            [(query)]="builderQuery"
+            [fields]="validFields()"
+            [fieldMap]="validFieldMap()"
+            [multiFields]="builderMultiFields()"
+            [multiFieldMap]="builderMultiFieldMap()"
+            (enterSubmit)="onSearchClick()"
+          ></kui-search-builder>
+        } @else {
+          <kui-text-search
+            [(text)]="text"
+            [fields]="validFields()"
+            [fieldMap]="validFieldMap()"
+            (enterSubmit)="onSearchClick()"
+          ></kui-text-search>
+        }
       } @else {
-        <kui-text-search
-          [(text)]="text"
-          [fields]="validFields()"
-          [fieldMap]="validFieldMap()"
-          (enterSubmit)="onSearchClick()"
-        ></kui-text-search>
+        <kui-spinner></kui-spinner>
       }
-    } @else {
-      <kui-spinner></kui-spinner>
-    }
-  </div>
-  <div class="card-footer">
-    <button
-      class="btn btn-primary me-1"
-      (click)="onSearchClick()"
-    >
-      Search
-    </button>
-    <button
-      class="btn btn-outline-secondary"
-      (click)="onClearClick()"
-    >
-      Clear all
-    </button>
+    </div>
+    <div class="card-footer">
+      <button
+        class="btn btn-primary me-1"
+        (click)="onSearchClick()"
+      >
+        Search
+      </button>
+      <button
+        class="btn btn-outline-secondary"
+        (click)="onClearClick()"
+      >
+        Clear all
+      </button>
+    </div>
   </div>
 </div>
