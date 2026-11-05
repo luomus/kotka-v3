@@ -1,5 +1,22 @@
 import { ColumnSettings } from '../models/models';
 
+export const colIdComparator =
+  (order: string[]) =>
+  (colIdA: string, colIdB: string): number => {
+    const indexA = order.indexOf(colIdA);
+    const indexB = order.indexOf(colIdB);
+
+    if (indexA === -1 && indexB === -1) {
+      return 0;
+    } else if (indexA === -1) {
+      return 1;
+    } else if (indexB === -1) {
+      return -1;
+    }
+
+    return indexA - indexB;
+  };
+
 export function getCleanedColumnSettings(settings: ColumnSettings, defaultSettings?: ColumnSettings, lockedCols?: string[]): ColumnSettings {
   if (!defaultSettings || !lockedCols) {
     return settings;
@@ -36,13 +53,9 @@ export function getCleanedColumnSettings(settings: ColumnSettings, defaultSettin
     moveInArray(order, currentIdx, lockedIdx);
   }
 
-  sortByOrder(selected, order);
+  selected.sort(colIdComparator(order));
 
   return { selected, order };
-}
-
-export function sortByOrder(selected: string[], order: string[]) {
-  selected.sort((colIdA, colIdB) => order.indexOf(colIdA) - order.indexOf(colIdB));
 }
 
 export function moveInArray(arr: any[], fromIndex: number, toIndex: number): void {

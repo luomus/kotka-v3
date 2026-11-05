@@ -12,6 +12,7 @@
     [(ngModel)]="searchText"
   />
   <ag-grid-angular
+    #columnSettingsGrid
     id="columnSettingsGrid"
     class="ag-theme-alpine grid overflow-y-auto headerless-table borderless-table"
     [gridOptions]="gridOptions"
