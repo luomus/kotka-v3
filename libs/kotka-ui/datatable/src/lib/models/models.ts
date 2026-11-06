@@ -5,14 +5,7 @@ import {
   IGetRowsParams,
   TextFilterModel,
 } from '@ag-grid-community/core';
-
-export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
-
-export type TupleUnion<U extends string, R extends any[] = []> = {
-  [S in U]: Exclude<U, S> extends never
-    ? [...R, S]
-    : TupleUnion<Exclude<U, S>, [...R, S]>;
-}[U];
+import { PartialBy } from '@kotka/shared/models';
 
 export interface SortModel {
   colId: string;

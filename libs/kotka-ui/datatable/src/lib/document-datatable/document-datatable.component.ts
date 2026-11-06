@@ -62,6 +62,7 @@ export class DocumentDatatableComponent<
   defaultFilterModel = input<DatatableFilter>({});
   defaultSortModel = input<DatatableSort>([]);
 
+  extraSortModel = input<DatatableSort>([]);
   searchQuery = input<string | ElasticsearchQuery>();
   aggregateBy = input<S extends IndexType ? AggregateBy[] : never>();
 
@@ -89,6 +90,7 @@ export class DocumentDatatableComponent<
           this.dataType(),
           this.index(),
           this.columns(),
+          this.extraSortModel(),
           this.searchQuery(),
           this.aggregateBy(),
         ),
@@ -100,6 +102,7 @@ export class DocumentDatatableComponent<
     dataType: T,
     index: S | undefined,
     columns?: DatatableColumn[],
+    extraSortModel?: DatatableSort,
     searchQuery?: string | ElasticsearchQuery,
     aggregateBy?: AggregateBy[],
   ): DatatableSource | undefined {
@@ -113,7 +116,7 @@ export class DocumentDatatableComponent<
           columns,
           params.startRow,
           params.endRow,
-          params.sortModel,
+          params.sortModel.concat(extraSortModel || []),
           params.filterModel,
           searchQuery,
         );

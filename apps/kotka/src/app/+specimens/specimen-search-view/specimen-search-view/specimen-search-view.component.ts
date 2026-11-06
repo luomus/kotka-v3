@@ -6,7 +6,8 @@ import {
   inject,
   model,
   Signal,
-  signal, untracked
+  signal,
+  untracked,
 } from '@angular/core';
 import {
   ColDefWithExtra,
@@ -15,6 +16,7 @@ import {
   DatatableLoadedData,
   DatatableSort,
   getBooleanColumnOptions,
+  getColId,
   getDateColumnOptions,
   getGeoPointColumnOptions,
   getUriColumnOptions,
@@ -28,16 +30,23 @@ import {
   IndexType,
   KotkaDocumentType,
   SearchField,
+  SearchResult,
   SearchResultKey,
 } from '@kotka/shared/models';
-import { MainContentComponent, MainContentHeaderDirective, SpinnerComponent } from '@kotka/ui/components';
-import { FormsModule } from '@angular/forms';
-import { ApiClient, IteratorSearchParams, SearchResultIteratorService, toMap } from '@kotka/ui/core';
-import { SpecimenLabelDesignerComponent } from '../../specimen-label-designer/specimen-label-designer.component';
 import {
-  FieldData,
-  SpecimenSearchFilters,
-} from '../models/models';
+  MainContentComponent,
+  MainContentHeaderDirective,
+  SpinnerComponent,
+} from '@kotka/ui/components';
+import { FormsModule } from '@angular/forms';
+import {
+  ApiClient,
+  IteratorSearchParams,
+  SearchResultIteratorService,
+  toMap,
+} from '@kotka/ui/core';
+import { SpecimenLabelDesignerComponent } from '../../specimen-label-designer/specimen-label-designer.component';
+import { FieldData, SpecimenSearchFilters } from '../models/models';
 import { SpecimenLinkService } from '../service/specimen-link.service';
 import { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
@@ -47,8 +56,7 @@ import { isEqual } from 'lodash';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SpecimenSearchMainComponent } from '../specimen-search-main/specimen-search-main.component';
 import { SpecimenSearchHeaderComponent } from '../specimen-search-header/specimen-search-header.component';
-import { SpecimenIdSearchValue, parseIdQuery } from '@kotka/ui/search';
-import { getColId } from '@kotka/ui/datatable';
+import { parseIdQuery, SpecimenIdSearchValue } from '@kotka/ui/search';
 
 const INITIAL_FIELD_DATA: FieldData = {
   fieldsLoading: true,
@@ -69,22 +77,6 @@ const DEFAULT_AGGREGATE_FIELDS: string[] = [
   'typeStatus',
 ];
 const DEFAULT_AGGREGATE_SIZE = 10;
-
-const SPECIAL_COLUMNS: Partial<Record<SearchResultKey, DatatableColumn>> = {
-  documentURI: {
-    ...getUriColumnOptions({
-      editRouterLink: ['..', 'edit'],
-      showViewLink: true,
-    }),
-    lockPosition: 'left'
-  },
-  dateCreated: {
-    ...getDateColumnOptions(true, true),
-  },
-  dateEdited: {
-    ...getDateColumnOptions(true, true),
-  },
-};
 
 @Component({
   selector: 'kotka-search-view',
@@ -117,7 +109,10 @@ export class SpecimenSearchViewComponent {
   });
   aggregateSize = signal<number>(DEFAULT_AGGREGATE_SIZE);
   filters = signal<SpecimenSearchFilters>({ fieldValues: [] });
-  idSearchValue = signal<SpecimenIdSearchValue>({ text: '', query: parseIdQuery('') });
+  idSearchValue = signal<SpecimenIdSearchValue>({
+    text: '',
+    query: parseIdQuery(''),
+  });
   textSearchQuery = signal('');
   columnSettings = model<ColumnSettings | undefined>(undefined);
   sortModel = model<DatatableSort>([]);
@@ -126,6 +121,16 @@ export class SpecimenSearchViewComponent {
   defaultAggregateSize = DEFAULT_AGGREGATE_SIZE;
   minAggregateSize = 1;
   maxAggregateSize = 100;
+  extraSortModel: DatatableSort = [
+    {
+      colId: 'dateCreated',
+      sort: 'desc',
+    },
+    {
+      colId: 'id',
+      sort: 'desc',
+    },
+  ];
 
   searchLink: Signal<string>;
 
@@ -133,6 +138,23 @@ export class SpecimenSearchViewComponent {
   labelDesignerData$?: Observable<Document[]>;
 
   private activeSearchParams?: IteratorSearchParams;
+
+  private specialColumns: Partial<Record<SearchResultKey, DatatableColumn>> = {
+    documentURI: {
+      ...getUriColumnOptions({
+        editRouterLink: ['..', 'edit'],
+        showViewLink: true,
+        onRowSelect: this.onRowSelect.bind(this),
+      }),
+      lockPosition: 'left',
+    },
+    dateCreated: {
+      ...getDateColumnOptions(true, true),
+    },
+    dateEdited: {
+      ...getDateColumnOptions(true, true),
+    },
+  };
 
   constructor() {
     this.fieldData = toSignal(
@@ -184,17 +206,17 @@ export class SpecimenSearchViewComponent {
   }
 
   onDataLoad(data: DatatableLoadedData<KotkaDocumentType.specimen, IndexType>) {
-    const searchParams: IteratorSearchParams = {
+    const searchParams: IteratorSearchParams | undefined = data.searchParams.sort ? {
+      index: this.index(),
       sort: data.searchParams.sort,
       searchQuery: data.searchParams.searchQuery,
-    };
+    } : undefined;
 
     this.activeSearchParams = searchParams;
 
     this.searchResultIteratorService.setSearchParams(
       KotkaDocumentType.specimen,
       searchParams,
-      true,
     );
 
     this.onAggregatesChange(data.result.aggregates);
@@ -206,7 +228,7 @@ export class SpecimenSearchViewComponent {
 
   private getFieldData(index: IndexType): Observable<FieldData> {
     const defaultSelectedFields: string[] = DEFAULT_SELECTED_FIELDS[index];
-    const specialColumns: Record<string, DatatableColumn> = SPECIAL_COLUMNS;
+    const specialColumns: Record<string, DatatableColumn> = this.specialColumns;
 
     return this.apiClient
       .getSearchFields(KotkaDocumentType.specimen, index)
@@ -311,7 +333,7 @@ export class SpecimenSearchViewComponent {
     aggregateFields: string[],
     filters: SpecimenSearchFilters,
     columnSettings: ColumnSettings | undefined,
-    sortModel: DatatableSort
+    sortModel: DatatableSort,
   ) {
     if (fieldData.fieldsLoading) {
       return;
@@ -377,5 +399,15 @@ export class SpecimenSearchViewComponent {
         fieldValues,
       }));
     }
+  }
+
+  private onRowSelect(result: SearchResult) {
+    const sort = result._sort;
+    const currentData = sort ? { documentURI: result.documentURI, sort } : undefined;
+
+    this.searchResultIteratorService.setCurrentData(
+      KotkaDocumentType.specimen,
+      currentData
+    );
   }
 }

@@ -111,7 +111,7 @@ export class EsClientService {
     const lastPage = size > 0 ? Math.ceil(total / size) : 1;
 
     const members = this.hasSelectedFields(query) ?
-      res.hits.hits.map((hit: Record<string, any>) => hit._source) ?? [] :
+      res.hits.hits.map((hit: Record<string, any>) => ({...hit._source, _sort: hit.sort})) ?? [] :
       res.hits.hits.map((hit: Record<string, any>) => hit._id) ?? [];
 
     return {

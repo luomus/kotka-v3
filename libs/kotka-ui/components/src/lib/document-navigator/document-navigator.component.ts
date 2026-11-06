@@ -1,37 +1,35 @@
 import { Component, effect, inject, input, OnDestroy, signal } from '@angular/core';
 import {
-  KotkaDocument,
   KotkaDocumentType,
 } from '@kotka/shared/models';
 import { RouterLink } from '@angular/router';
 import { SpinnerComponent } from '../spinner/spinner.component';
-import { ToFullUriPipe, SearchResultIteratorService } from '@kotka/ui/core';
+import { DocumentSortData, SearchResultIteratorService } from '@kotka/ui/core';
 import { forkJoin, Subscription } from 'rxjs';
 
 interface NavigatorState {
   loading: boolean;
-  previousId?: string;
-  nextId?: string;
+  previous?: DocumentSortData;
+  next?: DocumentSortData;
 }
 
 @Component({
   selector: 'kui-document-navigator',
   template: `
-    @if (
-      navigatorState().loading ||
-      navigatorState().previousId ||
-      navigatorState().nextId
-    ) {
+    @if (navigatorState().loading ||
+    navigatorState().previous ||
+    navigatorState().next) {
       <kui-spinner
         [spinning]="navigatorState().loading"
         [hideContentWhileLoading]="true"
       >
         <div class="d-flex gap-0 d-sm-block">
-          @if (navigatorState().previousId) {
+          @if (navigatorState().previous; as previous) {
             <a
               class="btn btn-light flex-grow-1 me-1"
               [routerLink]="buttonRouterLink()"
-              [queryParams]="{ uri: navigatorState().previousId | toFullUri }"
+              [queryParams]="{ uri: previous.documentURI }"
+              (click)="onNavigationLinkClick(previous)"
             >
               <i class="fa fa-angle-left"></i>
             </a>
@@ -40,11 +38,12 @@ interface NavigatorState {
               <i class="fa fa-angle-left"></i>
             </button>
           }
-          @if (navigatorState().nextId) {
+          @if (navigatorState().next; as next) {
             <a
               class="btn btn-light flex-grow-1 ms-1"
               [routerLink]="buttonRouterLink()"
-              [queryParams]="{ uri: navigatorState().nextId | toFullUri }"
+              [queryParams]="{ uri: next.documentURI }"
+              (click)="onNavigationLinkClick(next)"
             >
               <i class="fa fa-angle-right"></i>
             </a>
@@ -57,7 +56,7 @@ interface NavigatorState {
       </kui-spinner>
     }
   `,
-  imports: [RouterLink, SpinnerComponent, ToFullUriPipe],
+  imports: [RouterLink, SpinnerComponent],
 })
 export class DocumentNavigatorComponent<
   T extends KotkaDocumentType = KotkaDocumentType,
@@ -66,7 +65,7 @@ export class DocumentNavigatorComponent<
   private searchResultIteratorService = inject(SearchResultIteratorService);
 
   dataType = input.required<T>();
-  data = input<KotkaDocument<T>>();
+  uri = input<string>();
   buttonRouterLink = input.required<string>();
 
   navigatorState = signal<NavigatorState>({ loading: false });
@@ -76,30 +75,39 @@ export class DocumentNavigatorComponent<
   constructor() {
     effect(() => {
       const type = this.dataType();
-      const doc = this.data();
+      const uri = this.uri();
 
-      if (doc) {
+      if (uri) {
         this.navigatorDataSub?.unsubscribe();
 
         this.navigatorState.set({ loading: true });
 
         this.navigatorDataSub = forkJoin([
-          this.searchResultIteratorService.getPrevious(type, doc),
-          this.searchResultIteratorService.getNext(type, doc),
+          this.searchResultIteratorService.getPrevious(type, uri),
+          this.searchResultIteratorService.getNext(type, uri),
         ]).subscribe({
-          next: ([previousId, nextId]) => {
-            this.navigatorState.set({ loading: false, previousId, nextId });
+          next: ([previous, next]) => {
+            this.navigatorState.set({ loading: false, previous, next });
           },
           error: () => {
             this.navigatorState.set({ loading: false });
           },
         });
+      } else {
+        this.navigatorState.set({ loading: false });
       }
     });
   }
 
   ngOnDestroy() {
     this.navigatorDataSub?.unsubscribe();
+  }
+
+  onNavigationLinkClick(data: DocumentSortData) {
+    this.searchResultIteratorService.setCurrentData(
+      this.dataType(),
+      data
+    );
   }
 }
 

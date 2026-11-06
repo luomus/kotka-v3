@@ -1,4 +1,5 @@
-import { ColDef, ColDefWithExtra, ColumnSettings, DatatableColumn, ExtraColDef, TupleUnion } from '../models/models';
+import { ColDef, ColDefWithExtra, ColumnSettings, DatatableColumn, ExtraColDef } from '../models/models';
+import { TupleUnion } from '@kotka/shared/models';
 
 type CustomColumnKeyList = TupleUnion<keyof ExtraColDef>;
 

@@ -8,7 +8,6 @@ import {
   KotkaDocumentType,
   Document as KotkaDocument,
   Gathering,
-  isDocument,
 } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
 import { FormViewContainerComponent } from '@kotka/ui/form-view';
@@ -102,7 +101,6 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
   formData = signal<FormData>(undefined);
   prevFormData = signal<FormData>(undefined);
   initialFormData = signal<FormData>(undefined);
-  initialDocument: Signal<KotkaDocument | undefined>;
 
   settingsStorageKey = signal<string | undefined>(undefined);
 
@@ -198,11 +196,6 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
     this.arrayFieldsToMonitorForDeletions = computed(() =>
       this.getArrayFieldsToMonitorForDeletions(this.unreliableFields()),
     );
-
-    this.initialDocument = computed(() => {
-      const initial = this.initialFormData();
-      return initial && isDocument(initial) ? initial : undefined;
-    });
 
     this.initEffects();
   }

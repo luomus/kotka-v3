@@ -69,6 +69,7 @@ export class SpecimenSearchMainComponent implements OnDestroy {
   defaultAggregateSize = input.required<number>();
   minAggregateSize = input.required<number>();
   maxAggregateSize = input.required<number>();
+  extraSortModel = input.required<DatatableSort>();
 
   loadData =
     output<DatatableLoadedData<KotkaDocumentType.specimen, IndexType>>();
