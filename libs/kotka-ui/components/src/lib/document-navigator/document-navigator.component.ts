@@ -5,7 +5,7 @@ import {
 import { RouterLink } from '@angular/router';
 import { SpinnerComponent } from '../spinner/spinner.component';
 import { DocumentSortData, SearchResultIteratorService } from '@kotka/ui/core';
-import { forkJoin, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 interface NavigatorState {
   loading: boolean;
@@ -82,12 +82,9 @@ export class DocumentNavigatorComponent<
 
         this.navigatorState.set({ loading: true });
 
-        this.navigatorDataSub = forkJoin([
-          this.searchResultIteratorService.getPrevious(type, uri),
-          this.searchResultIteratorService.getNext(type, uri),
-        ]).subscribe({
-          next: ([previous, next]) => {
-            this.navigatorState.set({ loading: false, previous, next });
+        this.navigatorDataSub = this.searchResultIteratorService.getState(type, uri).subscribe({
+          next: (state) => {
+            this.navigatorState.set({ loading: false, ...state });
           },
           error: () => {
             this.navigatorState.set({ loading: false });
