@@ -150,7 +150,7 @@ export class DatatableComponent implements OnDestroy {
       lockVisible: !this.enableColumnSelection(),
     }));
 
-    this.allColumns = computed(() => getProcessedColumns(this.columns()));
+    this.allColumns = computed(() => getProcessedColumns(this.columns(), this.disableFilter()));
 
     this.defaultColumnSettings = computed(() =>
       getDefaultColumnSettings(this.allColumns(), this.enableColumnSelection()),
