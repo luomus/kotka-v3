@@ -1,6 +1,7 @@
 @if (uri$ | async; as uri) {
   <kotka-specimen-viewer
     [uri]="uri"
+    [sortId]="sortId$ | async"
   ></kotka-specimen-viewer>
 } @else {
   <kotka-not-found></kotka-not-found>

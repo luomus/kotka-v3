@@ -34,6 +34,7 @@ export class SpecimenViewerComponent {
   private specimenViewerDataService = inject(SpecimenViewerDataService);
 
   uri = input.required<string>();
+  sortId = input<string>();
 
   dataType = KotkaDocumentType.specimen;
 

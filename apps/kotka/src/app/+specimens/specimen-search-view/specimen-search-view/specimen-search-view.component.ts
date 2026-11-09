@@ -41,6 +41,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import {
   ApiClient,
+  DocumentSortData,
   IteratorSearchParams,
   SearchResultIteratorService,
   toMap,
@@ -144,6 +145,14 @@ export class SpecimenSearchViewComponent {
       ...getUriColumnOptions({
         editRouterLink: ['..', 'edit'],
         showViewLink: true,
+        getEditRouterQueryParams: (data: SearchResult) => ({
+          uri: data.documentURI,
+          sortId: data.id,
+        }),
+        getViewRouterQueryParams: (data: SearchResult) => ({
+          uri: data.documentURI,
+          sortId: data.id,
+        }),
         onRowSelect: this.onRowSelect.bind(this),
       }),
       lockPosition: 'left',
@@ -206,11 +215,14 @@ export class SpecimenSearchViewComponent {
   }
 
   onDataLoad(data: DatatableLoadedData<KotkaDocumentType.specimen, IndexType>) {
-    const searchParams: IteratorSearchParams | undefined = data.searchParams.sort ? {
-      index: this.index(),
-      sort: data.searchParams.sort,
-      searchQuery: data.searchParams.searchQuery,
-    } : undefined;
+    const searchParams: IteratorSearchParams | undefined = data.searchParams
+      .sort
+      ? {
+          index: this.index(),
+          sort: data.searchParams.sort,
+          searchQuery: data.searchParams.searchQuery,
+        }
+      : undefined;
 
     this.activeSearchParams = searchParams;
 
@@ -403,11 +415,13 @@ export class SpecimenSearchViewComponent {
 
   private onRowSelect(result: SearchResult) {
     const sort = result._sort;
-    const currentData = sort ? { documentURI: result.documentURI, sort } : undefined;
+    const currentData: DocumentSortData | undefined = sort
+      ? { id: result.id, documentURI: result.documentURI, sort }
+      : undefined;
 
     this.searchResultIteratorService.setCurrentData(
       KotkaDocumentType.specimen,
-      currentData
+      currentData,
     );
   }
 }

@@ -1,10 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import {
-  IndexType,
-  KotkaDocumentType, TupleUnion,
-} from '@kotka/shared/models';
+import { IndexType, KotkaDocumentType, TupleUnion } from '@kotka/shared/models';
 import { ApiClient, SearchParams } from './api-client';
-import { EMPTY, forkJoin, Observable, of } from 'rxjs';
+import { EMPTY, forkJoin, Observable, of, switchMap } from 'rxjs';
 import { expand, map, reduce } from 'rxjs/operators';
 import { LocalStorageService } from 'ngx-webstorage';
 import { UserService } from './index';
@@ -18,7 +15,7 @@ export interface IteratorSearchParams extends Pick<SearchParams, 'searchQuery'> 
 }
 
 export interface DocumentSortData {
-  key: string;
+  id: string;
   documentURI: string;
   sort: any[];
 }
@@ -46,9 +43,8 @@ const MAX_CACHE_SIZE = 1000;
 const MAX_PAGES_PER_FETCH = Math.ceil(MAX_CACHE_SIZE / PAGE_SIZE);
 
 function reverseSort(sort: string): string {
-  return sort.replace(
-    / (asc|desc)(,|$)/g, (match, c1) => (
-      match.replace(c1, c1 === 'asc' ? 'desc' : 'asc'))
+  return sort.replace(/ (asc|desc)(,|$)/g, (match, c1) =>
+    match.replace(c1, c1 === 'asc' ? 'desc' : 'asc'),
   );
 }
 
@@ -67,42 +63,82 @@ export class SearchResultIteratorService {
     [T in KotkaDocumentType]: IteratorData | null;
   }> = {};
 
-  setSearchParams(type: KotkaDocumentType, searchParams?: IteratorSearchParams) {
-    const data = searchParams && searchParams.sort.length > 0 ? { searchParams, cache: [] } : null;
+  setSearchParams(
+    type: KotkaDocumentType,
+    searchParams?: IteratorSearchParams,
+  ) {
+    const data =
+      searchParams && searchParams.sort.length > 0
+        ? { searchParams, cache: [] }
+        : null;
     this.setIteratorData(type, this.userId(), data);
   }
 
-  setCurrentData(type: KotkaDocumentType, data?: Omit<DocumentSortData, 'key'>) {
+  setCurrentData(type: KotkaDocumentType, data?: DocumentSortData) {
     const iteratorData = this.getIteratorData(type, this.userId());
     if (!iteratorData) {
       return;
     }
-    const currentData: DocumentSortData | undefined = data ? { ...data, key: this.getSortDataKey(data.sort) } : undefined;
-    this.setIteratorData(type, this.userId(), { ...iteratorData, currentData });
+    this.setIteratorData(type, this.userId(), {
+      ...iteratorData,
+      currentData: data,
+    });
   }
 
-  getState(type: KotkaDocumentType, currentURI: string): Observable<IteratorState> {
-    this.updateCurrentData(type, currentURI);
-
-    return forkJoin([
-      this.getNext(type, true),
-      this.getNext(type),
-    ]).pipe(map(([previous, next]) => ({ previous, next })));
+  getState(
+    type: KotkaDocumentType,
+    documentURI: string,
+    id: string,
+  ): Observable<IteratorState> {
+    return this.updateCurrentData(type, documentURI, id).pipe(
+      switchMap(() => forkJoin([this.getNext(type, true), this.getNext(type)])),
+      map(([previous, next]) => ({ previous, next })),
+    );
   }
 
-  private updateCurrentData(type: KotkaDocumentType, currentURI: string) {
+  private updateCurrentData(
+    type: KotkaDocumentType,
+    documentURI: string,
+    id: string,
+  ): Observable<void> {
     const iteratorData = this.getIteratorData(type, this.userId());
+    if (!iteratorData) {
+      return of(undefined);
+    }
 
     if (
-      iteratorData?.currentData &&
-      iteratorData.currentData.documentURI !== currentURI
+      !iteratorData?.currentData ||
+      iteratorData.currentData.id !== id ||
+      iteratorData.currentData.documentURI !== documentURI
     ) {
       const currentData = iteratorData.cache.find(
-        (data) => data.documentURI === currentURI,
+        (data) => data.id === id && data.documentURI === documentURI,
       );
+      if (currentData) {
+        this.setIteratorData(type, this.userId(), {
+          ...iteratorData,
+          currentData,
+        });
 
-      this.setIteratorData(type, this.userId(), { ...iteratorData, currentData });
+        return of(undefined);
+      }
+
+      return this.fetchPage(KotkaDocumentType.specimen, {
+        ...iteratorData.searchParams,
+        searchQuery: `id:"${id}" AND documentURI:"${documentURI}"`,
+      }).pipe(
+        map((result) => {
+          this.setIteratorData(type, this.userId(), {
+            ...iteratorData,
+            currentData: result.sortData[0],
+          });
+
+          return undefined;
+        }),
+      );
     }
+
+    return of(undefined);
   }
 
   private getNext(
@@ -121,7 +157,6 @@ export class SearchResultIteratorService {
     const { searchParams, currentData, cache } = iteratorData;
 
     if (!currentData) {
-      this.setIteratorData(type, this.userId(), null);
       return of(undefined);
     }
 
@@ -133,11 +168,19 @@ export class SearchResultIteratorService {
     return this.fetchSortData(type, searchParams, currentData, reverse).pipe(
       map((sortData) => {
         const iteratorData = this.getIteratorData(type, this.userId());
-        if (iteratorData?.searchParams !== searchParams || iteratorData?.currentData !== currentData) {
+        if (
+          iteratorData?.searchParams !== searchParams ||
+          iteratorData?.currentData !== currentData
+        ) {
           return undefined;
         }
 
-        const updatedCache = this.addDataToCache(iteratorData.cache, currentData, sortData, reverse);
+        const updatedCache = this.addDataToCache(
+          iteratorData.cache,
+          currentData,
+          sortData,
+          reverse,
+        );
 
         this.setIteratorData(type, this.userId(), {
           ...iteratorData,
@@ -154,9 +197,7 @@ export class SearchResultIteratorService {
     currentData: DocumentSortData,
     reverse = false,
   ): DocumentSortData | undefined {
-    const idx = cache.findIndex(
-      (data) => data.key === currentData.key,
-    );
+    const idx = cache.findIndex((data) => data.id === currentData.id);
     if (idx === -1) {
       return undefined;
     }
@@ -184,22 +225,16 @@ export class SearchResultIteratorService {
     newData: DocumentSortData[],
     reverse: boolean,
   ): DocumentSortData[] {
-    let idx = cache.findIndex(
-      (data) => data.key === currentData.key,
-    );
+    let idx = cache.findIndex((data) => data.id === currentData.id);
 
     if (idx === -1) {
       cache = [currentData];
       idx = 0;
     }
 
-    cache = reverse
-      ? cache.slice(idx)
-      : cache.slice(0, idx + 1);
+    cache = reverse ? cache.slice(idx) : cache.slice(0, idx + 1);
 
-    cache = reverse
-      ? [...newData.reverse(), ...cache]
-      : [...cache, ...newData];
+    cache = reverse ? [...newData.reverse(), ...cache] : [...cache, ...newData];
 
     if (cache.length > MAX_CACHE_SIZE) {
       cache = reverse
@@ -223,12 +258,21 @@ export class SearchResultIteratorService {
         const hasNewData = page.sortData.some(
           (doc) => doc.documentURI !== currentData.documentURI,
         );
-        return !hasNewData && page.hasMore && page.sortData.length > 0 && pageCount < MAX_PAGES_PER_FETCH
-          ? this.fetchPage(type, searchParams, page.sortData[page.sortData.length - 1].sort, reverse)
+        return !hasNewData &&
+          page.hasMore &&
+          page.sortData.length > 0 &&
+          pageCount < MAX_PAGES_PER_FETCH
+          ? this.fetchPage(
+              type,
+              searchParams,
+              page.sortData[page.sortData.length - 1].sort,
+              reverse,
+            )
           : EMPTY;
       }),
       reduce<FetchPageResult, DocumentSortData[]>(
-        (all, page) => [...all, ...page.sortData], []
+        (all, page) => [...all, ...page.sortData],
+        [],
       ),
     );
   }
@@ -236,8 +280,8 @@ export class SearchResultIteratorService {
   private fetchPage(
     type: KotkaDocumentType.specimen,
     searchParams: IteratorSearchParams,
-    searchAfter: any[],
-    reverse: boolean,
+    searchAfter?: any[],
+    reverse?: boolean,
   ): Observable<FetchPageResult> {
     let searchQuery =
       typeof searchParams.searchQuery === 'string'
@@ -259,7 +303,7 @@ export class SearchResultIteratorService {
         1,
         PAGE_SIZE,
         sort,
-        ['documentURI'],
+        ['id', 'documentURI'],
         undefined,
       )
       .pipe(
@@ -268,7 +312,7 @@ export class SearchResultIteratorService {
           for (const member of result.member) {
             if (member._sort) {
               sortData.push({
-                key: this.getSortDataKey(member._sort),
+                id: member.id,
                 documentURI: member.documentURI,
                 sort: member._sort,
               });
@@ -276,7 +320,7 @@ export class SearchResultIteratorService {
           }
           return {
             sortData,
-            hasMore: result.currentPage < result.lastPage
+            hasMore: result.member.length === PAGE_SIZE,
           };
         }),
       );
@@ -306,7 +350,9 @@ export class SearchResultIteratorService {
     type: KotkaDocumentType,
     userId: string | undefined,
   ): IteratorData | null {
-    const result: Omit<IteratorData, NonStoredKeys> | null = this.storage.retrieve(this.getIteratorDataStorageKey(type, userId)) || null;
+    const result: Omit<IteratorData, NonStoredKeys> | null =
+      this.storage.retrieve(this.getIteratorDataStorageKey(type, userId)) ||
+      null;
     return result ? { ...result, cache: [] } : null;
   }
 
@@ -317,7 +363,10 @@ export class SearchResultIteratorService {
   ) {
     const omittedKeys: TupleUnion<NonStoredKeys> = ['cache'];
     const dataToStore = data ? omit(data, omittedKeys) : null;
-    this.storage.store(this.getIteratorDataStorageKey(type, userId), dataToStore);
+    this.storage.store(
+      this.getIteratorDataStorageKey(type, userId),
+      dataToStore,
+    );
   }
 
   private getIteratorDataStorageKey(
@@ -328,9 +377,5 @@ export class SearchResultIteratorService {
       throw new Error('Missing user id!');
     }
     return `${type}-search-iterator-${userId}`;
-  }
-
-  private getSortDataKey(sort: any[]): string {
-    return JSON.stringify(sort);
   }
 }

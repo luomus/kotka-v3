@@ -28,7 +28,7 @@ interface NavigatorState {
             <a
               class="btn btn-light flex-grow-1 me-1"
               [routerLink]="buttonRouterLink()"
-              [queryParams]="{ uri: previous.documentURI }"
+              [queryParams]="{ uri: previous.documentURI, sortId: previous.id }"
               (click)="onNavigationLinkClick(previous)"
             >
               <i class="fa fa-angle-left"></i>
@@ -42,7 +42,7 @@ interface NavigatorState {
             <a
               class="btn btn-light flex-grow-1 ms-1"
               [routerLink]="buttonRouterLink()"
-              [queryParams]="{ uri: next.documentURI }"
+              [queryParams]="{ uri: next.documentURI, sortId: next.id }"
               (click)="onNavigationLinkClick(next)"
             >
               <i class="fa fa-angle-right"></i>
@@ -66,6 +66,7 @@ export class DocumentNavigatorComponent<
 
   dataType = input.required<T>();
   uri = input<string>();
+  sortId = input<string>();
   buttonRouterLink = input.required<string>();
 
   navigatorState = signal<NavigatorState>({ loading: false });
@@ -76,13 +77,14 @@ export class DocumentNavigatorComponent<
     effect(() => {
       const type = this.dataType();
       const uri = this.uri();
+      const sortId = this.sortId();
 
-      if (uri) {
+      if (uri && sortId) {
         this.navigatorDataSub?.unsubscribe();
 
         this.navigatorState.set({ loading: true });
 
-        this.navigatorDataSub = this.searchResultIteratorService.getState(type, uri).subscribe({
+        this.navigatorDataSub = this.searchResultIteratorService.getState(type, uri, sortId).subscribe({
           next: (state) => {
             this.navigatorState.set({ loading: false, ...state });
           },

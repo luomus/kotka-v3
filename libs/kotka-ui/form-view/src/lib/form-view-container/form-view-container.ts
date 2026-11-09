@@ -19,6 +19,7 @@ export class FormViewContainerComponent<
 {
   editMode = signal(false);
   dataURI = signal<string | undefined>(undefined);
+  sortId = signal<string | undefined>(undefined);
 
   copyData = signal<Partial<KotkaDocument<T>> | undefined>(undefined);
 
@@ -52,7 +53,7 @@ export class FormViewContainerComponent<
   onSaveSuccess(formData: KotkaDocument<T>) {
     this.router.navigate(['..', 'edit'], {
       relativeTo: this.activeRoute,
-      queryParams: { uri: getUri(formData.id || '') },
+      queryParams: { uri: getUri(formData.id || ''), sortId: this.sortId() },
     });
   }
 
@@ -75,9 +76,10 @@ export class FormViewContainerComponent<
   private setRouteParams() {
     const editMode = this.activeRoute.snapshot.url[0].path === 'edit';
     const dataURI = this.activeRoute.snapshot.queryParams['uri'];
-
+    const sortId = this.activeRoute.snapshot.queryParams['sortId'];
     this.editMode.set(editMode);
     this.dataURI.set(dataURI);
+    this.sortId.set(sortId);
     this.copyData.set(undefined);
   }
 }
