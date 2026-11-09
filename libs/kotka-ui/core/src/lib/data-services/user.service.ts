@@ -1,23 +1,18 @@
-import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, catchError, Observable, of, switchMap } from 'rxjs';
+import { Injectable, inject, signal, computed } from '@angular/core';
+import { catchError, Observable, of, switchMap } from 'rxjs';
 import { map, tap, distinctUntilChanged, share } from 'rxjs/operators';
 import { Person } from '@kotka/shared/models';
 import { apiBase } from './constants';
 import { ApiClient } from './api-client';
 import { WINDOW } from '../variables';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable } from '@angular/core/rxjs-interop';
 
-export interface IUserServiceState {
+export interface LoginState {
   user: Person | null;
   isLoggedIn: boolean | null;
 }
 
 const authPath = `${apiBase}/auth/`;
-
-let _state: IUserServiceState = {
-  user: null,
-  isLoggedIn: null,
-};
 
 @Injectable({
   providedIn: 'root',
@@ -26,21 +21,19 @@ export class UserService {
   private window = inject(WINDOW);
   private apiClient = inject(ApiClient);
 
-  private store = new BehaviorSubject<IUserServiceState>(_state);
-  private state$ = this.store.asObservable();
+  private state = signal<LoginState>({
+    user: null,
+    isLoggedIn: null,
+  });
 
-  user$ = this.state$.pipe(
-    map((state) => state.user),
-    distinctUntilChanged(),
-  );
+  user = computed(() => this.state().user);
+
   isLoggedIn$: Observable<boolean>;
-
-  user = toSignal(this.user$);
 
   constructor() {
     const profile$ = this.getSessionProfile().pipe(share());
 
-    this.isLoggedIn$ = this.state$.pipe(
+    this.isLoggedIn$ = toObservable(this.state).pipe(
       map((state) => state.isLoggedIn),
       switchMap((isLoggedIn) => {
         if (isLoggedIn === null) {
@@ -89,10 +82,6 @@ export class UserService {
   }
 
   private updateUser(user: Person | null) {
-    this.updateState({ ..._state, user, isLoggedIn: !!user });
-  }
-
-  private updateState(state: IUserServiceState) {
-    this.store.next((_state = state));
+    this.state.set({ ...this.state(), user, isLoggedIn: !!user });
   }
 }

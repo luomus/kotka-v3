@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { combineLatest, Observable, shareReplay } from 'rxjs';
+import { Observable, shareReplay } from 'rxjs';
 import { LajiForm } from '@kotka/shared/models';
 import { map, take } from 'rxjs/operators';
 import { UserService } from './user.service';
@@ -32,17 +32,21 @@ export class FormService {
   }
 
   getFormWithUserContext(formId: string): Observable<LajiForm.SchemaForm> {
-    return combineLatest([this.getForm(formId), this.userService.user$]).pipe(
-      map(([form, user]) => ({
-        ...form,
-        uiSchemaContext: {
-          userName: this.userService.formatUserName(user?.fullName),
-          userEmail: user?.emailAddress,
-          isAdmin: user?.role?.includes('MA.admin'),
-          imageDeletionAllowed: user && allowAllImageDeleteForUser(user),
-          ...form.uiSchemaContext,
-        },
-      })),
+    return this.getForm(formId).pipe(
+      map((form) => {
+        const user = this.userService.user();
+
+        return {
+          ...form,
+          uiSchemaContext: {
+            userName: this.userService.formatUserName(user?.fullName),
+            userEmail: user?.emailAddress,
+            isAdmin: user?.role?.includes('MA.admin'),
+            imageDeletionAllowed: user && allowAllImageDeleteForUser(user),
+            ...form.uiSchemaContext,
+          },
+        };
+      }),
       take(1),
     );
   }

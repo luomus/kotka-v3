@@ -1,11 +1,10 @@
-import { inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable } from '@angular/core';
 import { IndexType, KotkaDocumentType, TupleUnion } from '@kotka/shared/models';
 import { ApiClient, SearchParams } from './api-client';
 import { EMPTY, forkJoin, Observable, of, switchMap } from 'rxjs';
 import { expand, map, reduce } from 'rxjs/operators';
 import { LocalStorageService } from 'ngx-webstorage';
 import { UserService } from './index';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { queryStringToObject } from '../util-services';
 import { omit } from 'lodash';
 
@@ -56,9 +55,8 @@ export class SearchResultIteratorService {
   private apiClient = inject(ApiClient);
   private userService = inject(UserService);
 
-  private userId = toSignal(
-    this.userService.user$.pipe(map((user) => user?.id)),
-  );
+  private userId = computed(() => this.userService.user()?.id);
+
   private iteratorDataByType: Partial<{
     [T in KotkaDocumentType]: IteratorData | null;
   }> = {};

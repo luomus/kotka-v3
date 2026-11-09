@@ -177,17 +177,14 @@ export class ApiLabelService {
     let observable: Observable<string>;
 
     if (type === 'person') {
-      observable = this.userService.user$.pipe(
-        switchMap((user) => {
-          if (user && user.id === key) {
-            return of(user.fullName);
-          } else {
-            return this.apiCient
-              .getPerson(key)
-              .pipe(map((person) => person.fullName));
-          }
-        }),
-      );
+      const user = this.userService.user();
+      if (user && user.id === key) {
+        observable = of(user.fullName);
+      } else {
+        observable = this.apiCient
+          .getPerson(key)
+          .pipe(map((person) => person.fullName));
+      }
     } else if (type === 'organization') {
       observable = this.apiCient
         .getDocumentById(KotkaDocumentType.organization, key)
