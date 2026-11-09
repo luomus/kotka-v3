@@ -17,7 +17,7 @@ export class OldKotkaApiService {
   private baseUrl = process.env['OLD_KOTKA_URL'] + 'api';
 
   public getRange(range: string): Observable<AxiosResponse<RangeResult>> {
-    return this.httpService.get(`${this.baseUrl}/range/${range}`).pipe(
+    return this.httpService.get(`${this.baseUrl}/range/${encodeURIComponent(range)}`).pipe(
       map(result => result['data'])
     );
   }

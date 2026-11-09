@@ -45,9 +45,9 @@ export interface AggregateBy {
 
 export const COUNT_PRECISION_THRESHOLD = 10000;
 
-const path = apiBase + '/';
-const authPath = apiBase + '/auth/';
-const lajiApiPath = lajiApiBase + '/';
+const path = `${apiBase}/`;
+const authPath = `${apiBase}/auth/`;
+const lajiApiPath = `${lajiApiBase}/`;
 
 @Injectable({
   providedIn: 'root',
@@ -59,14 +59,16 @@ export class ApiClient {
     type: T,
     id: string,
   ): Observable<KotkaDocument<T>> {
-    return this.httpClient.get<KotkaDocument<T>>(path + type + '/' + id);
+    return this.httpClient.get<KotkaDocument<T>>(
+      `${path}${encodeURIComponent(type)}/${encodeURIComponent(id)}`,
+    );
   }
 
   createDocument<T extends KotkaDocumentType>(
     type: T,
     data: KotkaDocument<T>,
   ): Observable<KotkaDocument<T>> {
-    return this.httpClient.post<KotkaDocument<T>>(path + type, data);
+    return this.httpClient.post<KotkaDocument<T>>(`${path}${encodeURIComponent(type)}`, data);
   }
 
   updateDocument<T extends KotkaDocumentType>(
@@ -74,11 +76,16 @@ export class ApiClient {
     id: string,
     data: KotkaDocument<T>,
   ): Observable<KotkaDocument<T>> {
-    return this.httpClient.put<KotkaDocument<T>>(path + type + '/' + id, data);
+    return this.httpClient.put<KotkaDocument<T>>(
+      `${path}${encodeURIComponent(type)}/${encodeURIComponent(id)}`,
+      data,
+    );
   }
 
   deleteDocument(type: KotkaDocumentType, id: string): Observable<null> {
-    return this.httpClient.delete<null>(path + type + '/' + id);
+    return this.httpClient.delete<null>(
+      `${path}${encodeURIComponent(type)}/${encodeURIComponent(id)}`,
+    );
   }
 
   getDocumentList<
@@ -113,12 +120,12 @@ export class ApiClient {
 
     if (searchQuery && typeof searchQuery !== 'string') {
       return this.httpClient.post<ListResponse<Y>>(
-        path + type + '/_search',
+        `${path}${encodeURIComponent(type)}/_search`,
         searchQuery,
         { params },
       );
     } else {
-      return this.httpClient.get<ListResponse<Y>>(path + type, { params });
+      return this.httpClient.get<ListResponse<Y>>(`${path}${encodeURIComponent(type)}`, { params });
     }
   }
 
@@ -229,7 +236,7 @@ export class ApiClient {
     searchQuery = this.addAggregationsToSearchQuery(searchQuery, aggregateBy);
 
     return this.httpClient.post<RawSearchResponse<Y>>(
-      `${path}${type}/${index}/_search`,
+      `${path}${encodeURIComponent(type)}/${encodeURIComponent(index)}/_search`,
       searchQuery,
       { params },
     ).pipe(
@@ -244,7 +251,7 @@ export class ApiClient {
   }
 
   getSearchFields(type: KotkaDocumentType.specimen, index: IndexType): Observable<SearchField[]> {
-    return this.httpClient.get<SearchField[]>(`${path}${type}/${index}/fields`);
+    return this.httpClient.get<SearchField[]>(`${path}${encodeURIComponent(type)}/${encodeURIComponent(index)}/fields`);
   }
 
   getSearchAutocomplete(type: KotkaDocumentType.specimen, field: string, query: string, limit?: number): Observable<string[]> {
@@ -253,7 +260,7 @@ export class ApiClient {
       params = params.set('limit', limit);
     }
 
-    return this.httpClient.get<string[]>(`${path}${type}/autocomplete`, { params });
+    return this.httpClient.get<string[]>(`${path}${encodeURIComponent(type)}/autocomplete`, { params });
   }
 
   getDocumentVersionList(
@@ -261,7 +268,7 @@ export class ApiClient {
     id: string,
   ): Observable<StoreVersion[]> {
     return this.httpClient.get<StoreVersion[]>(
-      path + type + '/' + id + '/_ver',
+      `${path}${encodeURIComponent(type)}/${encodeURIComponent(id)}/_ver`,
     );
   }
 
@@ -271,7 +278,7 @@ export class ApiClient {
     version: number,
   ): Observable<KotkaDocument<T>> {
     return this.httpClient.get<KotkaDocument<T>>(
-      path + type + '/' + id + '/_ver/' + version,
+      `${path}${encodeURIComponent(type)}/${encodeURIComponent(id)}/_ver/${encodeURIComponent(version)}`,
     );
   }
 
@@ -282,9 +289,9 @@ export class ApiClient {
     version2: number,
   ): Observable<KotkaVersionDifferenceObject<KotkaDocument<T>>> {
     return this.httpClient
-      .get<
-        KotkaVersionDifference<KotkaDocument<T>>
-      >(path + type + '/' + id + '/_ver/' + version1 + '/diff/' + version2)
+      .get<KotkaVersionDifference<KotkaDocument<T>>>(
+        `${path}${encodeURIComponent(type)}/${encodeURIComponent(id)}/_ver/${encodeURIComponent(version1)}/diff/${encodeURIComponent(version2)}`
+      )
       .pipe(map((data) => this.convertVersionDifferenceFormat(data)));
   }
 
@@ -294,31 +301,31 @@ export class ApiClient {
   ): Observable<AutocompleteResult[]> {
     const params = new HttpParams().set('query', query);
     return this.httpClient.get<AutocompleteResult[]>(
-      `${path}${type}/autocomplete`,
+      `${path}${encodeURIComponent(type)}/autocomplete`,
       { params },
     );
   }
 
   getForm(formId: string): Observable<LajiForm.SchemaForm> {
     return this.httpClient.get<LajiForm.SchemaForm>(
-      `${lajiApiPath}forms/${formId}`,
+      `${lajiApiPath}forms/${encodeURIComponent(formId)}`,
     );
   }
 
   getFormInJsonFormat(formId: string): Observable<LajiForm.JsonForm> {
     const params = new HttpParams().set('format', 'json');
     return this.httpClient.get<LajiForm.JsonForm>(
-      `${lajiApiPath}forms/${formId}`,
+      `${lajiApiPath}forms/${encodeURIComponent(formId)}`,
       { params },
     );
   }
 
   getSpecimenRange(range: string): Observable<RangeResult> {
-    return this.httpClient.get<RangeResult>(`${path}specimen/range/${range}`);
+    return this.httpClient.get<RangeResult>(`${path}specimen/range/${encodeURIComponent(range)}`);
   }
 
   getCollection(id: string): Observable<Collection> {
-    return this.httpClient.get<Collection>(`${path}collection/${id}`);
+    return this.httpClient.get<Collection>(`${path}collection/${encodeURIComponent(id)}`);
   }
 
   getCollections(ids: string[]): Observable<Collection[]> {
@@ -337,11 +344,11 @@ export class ApiClient {
   }
 
   getPerson(id: string): Observable<Person> {
-    return this.httpClient.get<Person>(`${lajiApiPath}person/by-id/${id}`);
+    return this.httpClient.get<Person>(`${lajiApiPath}person/by-id/${encodeURIComponent(id)}`);
   }
 
   getMedia<T extends MediaType>(type: T, id: string): Observable<Media<T>> {
-    return this.httpClient.get<Media<T>>(`${path}media/${type}/${id}`);
+    return this.httpClient.get<Media<T>>(`${path}media/${encodeURIComponent(type)}/${encodeURIComponent(id)}`);
   }
 
   getMediaByIds<T extends MediaType>(
@@ -363,17 +370,17 @@ export class ApiClient {
   }
 
   getSessionProfile(): Observable<Person | null> {
-    return this.httpClient.get<Person>(authPath + 'user', {
+    return this.httpClient.get<Person>(`${authPath}user`, {
       context: new HttpContext().set(LOGIN_REDIRECT_ENABLED, false),
     });
   }
 
   login(): Observable<LoginResult> {
-    return this.httpClient.get<LoginResult>(authPath + 'postLogin');
+    return this.httpClient.get<LoginResult>(`${authPath}postLogin`);
   }
 
   logout(): Observable<void> {
-    return this.httpClient.get<void>(authPath + 'logout');
+    return this.httpClient.get<void>(`${authPath}logout`);
   }
 
   htmlToPdf(html: string): Observable<Blob> {

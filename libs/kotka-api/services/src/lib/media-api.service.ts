@@ -136,7 +136,7 @@ export class MediaApiService {
   }
 
   getMedia(id: string, type: MediaType) {
-    return this.httpService.get<Media>(`${this.urlBase}api/${type}/${id}`, this.baseConfig).pipe(
+    return this.httpService.get<Media>(`${this.urlBase}api/${encodeURIComponent(type)}/${encodeURIComponent(id)}`, this.baseConfig).pipe(
       map(res => res.data),
       catchError(e => {
         console.error(e);
@@ -146,7 +146,7 @@ export class MediaApiService {
   }
 
   findMediaByDocumentId(id: string, type: MediaType) {
-    return this.httpService.get<Media[]>(`${this.urlBase}api/${type}`, {...this.baseConfig, params: { documentIds: id }}).pipe(
+    return this.httpService.get<Media[]>(`${this.urlBase}api/${encodeURIComponent(type)}`, {...this.baseConfig, params: { documentIds: id }}).pipe(
       map(res => res.data),
       catchError(e => {
         console.error(e);
@@ -156,7 +156,7 @@ export class MediaApiService {
   }
 
   deleteMedia(id: string, type: MediaType) {
-    return this.httpService.delete(`${this.urlBase}api/${type}/${id}`, this.baseConfig).pipe(
+    return this.httpService.delete(`${this.urlBase}api/${encodeURIComponent(type)}/${encodeURIComponent(id)}`, this.baseConfig).pipe(
       map(res => res.data),
       catchError(e => {
         console.error(e);
@@ -166,7 +166,7 @@ export class MediaApiService {
   }
 
   postMetadata(type: MediaType, meta: NewMediaFile[]) {
-    return this.httpService.post<Media[]>(`${this.urlBase}api/${type}`, meta, this.baseConfig).pipe(
+    return this.httpService.post<Media[]>(`${this.urlBase}api/${encodeURIComponent(type)}`, meta, this.baseConfig).pipe(
       map(res => res.data),
       catchError(e => {
         console.error(e);
@@ -176,7 +176,7 @@ export class MediaApiService {
   }
 
   putMetadata(id: string, type: MediaType, meta: Meta) {
-    return this.httpService.put<Media>(`${this.urlBase}api/${type}/${id}`, meta, this.baseConfig).pipe(
+    return this.httpService.put<Media>(`${this.urlBase}api/${encodeURIComponent(type)}/${encodeURIComponent(id)}`, meta, this.baseConfig).pipe(
       catchError(e => {
         console.error(e);
         throw new InternalServerErrorException('Error updating media metadata to Media-API', e.message);
