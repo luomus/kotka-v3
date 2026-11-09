@@ -56,18 +56,21 @@ export class SpecimenViewerDataService {
 
     return combineLatest([
       this.formData$,
-      documentData$,
-      this.userService.getCurrentLoggedInUser(),
+      documentData$
     ]).pipe(
-      map(([formData, documentData, user]) => ({
-        specimenDataType: documentData.value?.datatype,
-        fields: formData.value?.fields,
-        document: documentData.value,
-        title: documentData.title,
-        showEditButton: documentData.value && allowEditForUser(documentData.value, user),
-        loading: formData.loading || documentData.loading,
-        error: formData.error || documentData.error,
-      })),
+      map(([formData, documentData]) => {
+        const user = this.userService.user();
+
+        return {
+          specimenDataType: documentData.value?.datatype,
+          fields: formData.value?.fields,
+          document: documentData.value,
+          title: documentData.title,
+          showEditButton: documentData.value && user ? allowEditForUser(documentData.value, user) : false,
+          loading: formData.loading || documentData.loading,
+          error: formData.error || documentData.error,
+        };
+      }),
       startWith({ loading: true }),
     );
   }

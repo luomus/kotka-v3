@@ -1,10 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, catchError, Observable, of, switchMap } from 'rxjs';
-import { map, tap, distinctUntilChanged, share, take } from 'rxjs/operators';
+import { map, tap, distinctUntilChanged, share } from 'rxjs/operators';
 import { Person } from '@kotka/shared/models';
 import { apiBase } from './constants';
 import { ApiClient } from './api-client';
 import { WINDOW } from '../variables';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 export interface IUserServiceState {
   user: Person | null;
@@ -34,6 +35,8 @@ export class UserService {
   );
   isLoggedIn$: Observable<boolean>;
 
+  user = toSignal(this.user$);
+
   constructor() {
     const profile$ = this.getSessionProfile().pipe(share());
 
@@ -50,15 +53,6 @@ export class UserService {
     );
   }
 
-  private getSessionProfile(): Observable<Person | null> {
-    return this.apiClient.getSessionProfile().pipe(
-      catchError(() => {
-        return of(null);
-      }),
-      tap((user) => this.updateUser(user)),
-    );
-  }
-
   login(): Observable<string> {
     return this.apiClient.login().pipe(
       tap((data) => this.updateUser(data.profile)),
@@ -68,14 +62,6 @@ export class UserService {
 
   logout() {
     return this.apiClient.logout().pipe(tap(() => this.updateUser(null)));
-  }
-
-  private updateUser(user: Person | null) {
-    this.updateState({ ..._state, user, isLoggedIn: !!user });
-  }
-
-  private updateState(state: IUserServiceState) {
-    this.store.next((_state = state));
   }
 
   redirectToLogin(next = ''): void {
@@ -93,19 +79,20 @@ export class UserService {
     return lastName + ', ' + firstName;
   }
 
-  isICTAdmin(user: Person): boolean {
-    return (user.role || []).includes('MA.admin');
+  private getSessionProfile(): Observable<Person | null> {
+    return this.apiClient.getSessionProfile().pipe(
+      catchError(() => {
+        return of(null);
+      }),
+      tap((user) => this.updateUser(user)),
+    );
   }
 
-  getCurrentLoggedInUser(): Observable<Person> {
-    return this.user$.pipe(
-      map((user) => {
-        if (!user) {
-          throw new Error('Missing user information!');
-        }
-        return user;
-      }),
-      take(1),
-    );
+  private updateUser(user: Person | null) {
+    this.updateState({ ..._state, user, isLoggedIn: !!user });
+  }
+
+  private updateState(state: IUserServiceState) {
+    this.store.next((_state = state));
   }
 }

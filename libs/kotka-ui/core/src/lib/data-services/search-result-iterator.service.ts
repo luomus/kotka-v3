@@ -123,7 +123,7 @@ export class SearchResultIteratorService {
         return of(undefined);
       }
 
-      return this.fetchPage(KotkaDocumentType.specimen, {
+      return this.fetchPage(type, {
         ...iteratorData.searchParams,
         searchQuery: `id:"${id}" AND documentURI:"${documentURI}"`,
       }).pipe(
@@ -145,10 +145,6 @@ export class SearchResultIteratorService {
     type: KotkaDocumentType,
     reverse = false,
   ): Observable<DocumentSortData | undefined> {
-    if (type !== KotkaDocumentType.specimen) {
-      return of(undefined);
-    }
-
     const iteratorData = this.getIteratorData(type, this.userId());
     if (!iteratorData) {
       return of(undefined);
@@ -246,7 +242,7 @@ export class SearchResultIteratorService {
   }
 
   private fetchSortData(
-    type: KotkaDocumentType.specimen,
+    type: KotkaDocumentType,
     searchParams: IteratorSearchParams,
     currentData: DocumentSortData,
     reverse: boolean,
@@ -278,11 +274,15 @@ export class SearchResultIteratorService {
   }
 
   private fetchPage(
-    type: KotkaDocumentType.specimen,
+    type: KotkaDocumentType,
     searchParams: IteratorSearchParams,
     searchAfter?: any[],
     reverse?: boolean,
   ): Observable<FetchPageResult> {
+    if (type !== KotkaDocumentType.specimen) {
+      return of({ sortData: [], hasMore: false });
+    }
+
     let searchQuery =
       typeof searchParams.searchQuery === 'string'
         ? queryStringToObject(searchParams.searchQuery)

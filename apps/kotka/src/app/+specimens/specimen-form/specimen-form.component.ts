@@ -102,7 +102,7 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
   prevFormData = signal<FormData>(undefined);
   initialFormData = signal<FormData>(undefined);
 
-  settingsStorageKey = signal<string | undefined>(undefined);
+  settingsStorageKey: Signal<string>;
 
   @ViewChild(FormViewComponent, { static: true })
   formView!: FormViewComponent<KotkaDocumentType.specimen>;
@@ -114,8 +114,8 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
 
   private arrayFieldsToMonitorForDeletions: Signal<string[]>;
 
-  private showOnlyBasicFieldsStorageKey = signal<string | undefined>(undefined);
-  private advancedFieldsStorageKey = signal<string | undefined>(undefined);
+  private showOnlyBasicFieldsStorageKey: Signal<string>;
+  private advancedFieldsStorageKey: Signal<string>;
 
   private document = inject(DOCUMENT);
   private userService = inject(UserService);
@@ -197,38 +197,38 @@ export class SpecimenFormComponent extends FormViewContainerComponent<KotkaDocum
       this.getArrayFieldsToMonitorForDeletions(this.unreliableFields()),
     );
 
+    this.settingsStorageKey = computed(
+      () => `specimen-form-${this.userService.user()?.id}-settings`,
+    );
+    this.showOnlyBasicFieldsStorageKey = computed(
+      () => `specimen-form-${this.userService.user()?.id}-show-only-basic-fields`,
+    );
+    this.advancedFieldsStorageKey = computed(
+      () => `specimen-form-${this.userService.user()?.id}-advanced-fields`,
+    );
+
     this.initEffects();
   }
 
   initEffects() {
-    this.userService.getCurrentLoggedInUser().subscribe((user) => {
-      this.settingsStorageKey.set(`specimen-form-${user.id}-settings`);
-      const showOnlyBasicFieldsKey = `specimen-form-${user.id}-show-only-basic-fields`;
-      const advancedFieldsKey = `specimen-form-${user.id}-advanced-fields`;
-
-      this.showOnlyBasicFieldsStorageKey.set(showOnlyBasicFieldsKey);
+    effect(() => {
       this.showOnlyBasicFields.set(
-        this.storage.retrieve(showOnlyBasicFieldsKey) ?? true,
+        this.storage.retrieve(this.showOnlyBasicFieldsStorageKey()) ?? true,
       );
+    });
 
-      this.advancedFieldsStorageKey.set(advancedFieldsKey);
+    effect(() => {
       this.advancedFields.set(
-        this.storage.retrieve(advancedFieldsKey) ?? defaultAdvancedFields,
+        this.storage.retrieve(this.advancedFieldsStorageKey()) ?? defaultAdvancedFields,
       );
     });
 
     effect(() => {
-      const key = this.showOnlyBasicFieldsStorageKey();
-      if (key) {
-        this.storage.store(key, this.showOnlyBasicFields());
-      }
+      this.storage.store(this.showOnlyBasicFieldsStorageKey(), this.showOnlyBasicFields());
     });
 
     effect(() => {
-      const key = this.advancedFieldsStorageKey();
-      if (key) {
-        this.storage.store(key, this.advancedFields());
-      }
+      this.storage.store(this.advancedFieldsStorageKey(), this.advancedFields());
     });
 
     effect(() => {

@@ -42,18 +42,19 @@ export class FormViewFacade<T extends KotkaMainDocumentType> extends FormFacade<
     return forkJoin([
       this.getAugmentedForm$(inputs),
       this.getInitialFormData$(inputs),
-      this.userService.getCurrentLoggedInUser(),
     ]).pipe(
-      map(([form, formData, user]) =>
-        this.getInitialFormState(form, {
+      map(([form, formData]) => {
+        const user = this.userService.user();
+
+        return this.getInitialFormState(form, {
           formData,
           editMode: inputs.editMode,
           hasChanges: inputs.hasChanges,
           allowCopy: inputs.allowCopy,
-          allowEdit: allowEditForUser(formData, user),
-          allowDelete: allowDeleteForUser(formData, user),
-        })
-      ),
+          allowEdit: user ? allowEditForUser(formData, user) : false,
+          allowDelete: user ? allowDeleteForUser(formData, user) : false,
+        });
+      }),
     );
   }
 
@@ -66,24 +67,21 @@ export class FormViewFacade<T extends KotkaMainDocumentType> extends FormFacade<
       }
       return this.getFormData$(inputs.dataType, inputs.dataURI);
     } else {
-      return this.getEmptyFormData$(inputs.formData);
+      return of(this.getEmptyFormData$(inputs.formData));
     }
   }
 
   private getEmptyFormData$(
     prefilledFormData?: Partial<KotkaDocument<T>>,
-  ): Observable<Partial<KotkaDocument<T>>> {
-    return this.userService.getCurrentLoggedInUser().pipe(
-      map((user) => {
-        const formData: Partial<KotkaDocument<T>> = {};
+  ): Partial<KotkaDocument<T>> {
+    const formData: Partial<KotkaDocument<T>> = {};
+    const user = this.userService.user();
 
-        if (user?.organisation && user.organisation.length === 1) {
-          formData.owner = user.organisation[0];
-        }
+    if (user?.organisation && user.organisation.length === 1) {
+      formData.owner = user.organisation[0];
+    }
 
-        return { ...formData, ...prefilledFormData };
-      }),
-    );
+    return { ...formData, ...prefilledFormData };
   }
 
   private getFormData$(dataType: T, dataURI?: string): Observable<Partial<KotkaDocument<T>>> {

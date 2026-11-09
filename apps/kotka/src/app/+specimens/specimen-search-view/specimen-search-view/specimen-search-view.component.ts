@@ -45,6 +45,7 @@ import {
   IteratorSearchParams,
   SearchResultIteratorService,
   toMap,
+  UserService,
 } from '@kotka/ui/core';
 import { SpecimenLabelDesignerComponent } from '../../specimen-label-designer/specimen-label-designer.component';
 import { FieldData, SpecimenSearchFilters } from '../models/models';
@@ -58,6 +59,18 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SpecimenSearchMainComponent } from '../specimen-search-main/specimen-search-main.component';
 import { SpecimenSearchHeaderComponent } from '../specimen-search-header/specimen-search-header.component';
 import { parseIdQuery, SpecimenIdSearchValue } from '@kotka/ui/search';
+import { LocalStorageService } from 'ngx-webstorage';
+
+interface SpecimenSearchState {
+  index: IndexType;
+  aggregateFields: string[];
+  aggregateSize: number;
+  filters: SpecimenSearchFilters;
+  idSearchValue: SpecimenIdSearchValue;
+  textSearchQuery: string;
+  columnSettings?: ColumnSettings;
+  sort: DatatableSort;
+}
 
 const INITIAL_FIELD_DATA: FieldData = {
   fieldsLoading: true,
@@ -101,6 +114,8 @@ export class SpecimenSearchViewComponent {
   private specimenLinkService = inject(SpecimenLinkService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private storage = inject(LocalStorageService);
+  private userService = inject(UserService);
 
   showLabelDesigner = signal(false);
 
@@ -137,6 +152,8 @@ export class SpecimenSearchViewComponent {
 
   fieldData: Signal<FieldData>;
   labelDesignerData$?: Observable<Document[]>;
+
+  private searchStateStorageKey: Signal<string>;
 
   private activeSearchParams?: IteratorSearchParams;
 
@@ -186,6 +203,10 @@ export class SpecimenSearchViewComponent {
       ),
     );
 
+    this.searchStateStorageKey = computed(
+      () => `specimen-search-state-${this.userService.user()?.id}`,
+    );
+
     effect(() => {
       this.onFieldDataChange(
         this.fieldData(),
@@ -211,7 +232,21 @@ export class SpecimenSearchViewComponent {
       }
     });
 
-    this.applyQueryParamsToState(this.route.snapshot.queryParams);
+    effect(() => {
+      const state: SpecimenSearchState = {
+        index: this.index(),
+        aggregateFields: this.aggregateFields(),
+        aggregateSize: this.aggregateSize(),
+        filters: this.filters(),
+        idSearchValue: this.idSearchValue(),
+        textSearchQuery: this.textSearchQuery(),
+        columnSettings: this.columnSettings(),
+        sort: this.sortModel(),
+      };
+      this.storage.store(this.searchStateStorageKey(), state);
+    });
+
+    this.initState();
   }
 
   onDataLoad(data: DatatableLoadedData<KotkaDocumentType.specimen, IndexType>) {
@@ -293,51 +328,75 @@ export class SpecimenSearchViewComponent {
       );
   }
 
+  private initState() {
+    const queryParams = this.route.snapshot.queryParams;
+    const hasQueryParams = Object.keys(queryParams).length > 0;
+
+    if (hasQueryParams) {
+      this.applyQueryParamsToState(queryParams);
+    } else {
+      const state: SpecimenSearchState | null = this.storage.retrieve(
+        this.searchStateStorageKey(),
+      );
+      if (state) {
+        this.applyState(state);
+      }
+    }
+  }
+
   private applyQueryParamsToState(queryParams: Params) {
     if (Object.keys(queryParams).length === 0) {
       return;
     }
 
-    const parsedParams =
-      this.specimenLinkService.parseSearchLinkParams(queryParams);
+    const parsedParams = this.specimenLinkService.parseSearchLinkParams(queryParams);
 
-    if (parsedParams.index) {
-      this.index.set(parsedParams.index);
-    }
-    if (parsedParams.aggregateFields) {
-      this.aggregateFields.set(parsedParams.aggregateFields);
-    }
-    if (
-      parsedParams.aggregateSize !== undefined &&
-      parsedParams.aggregateSize >= this.minAggregateSize &&
-      parsedParams.aggregateSize <= this.maxAggregateSize
-    ) {
-      this.aggregateSize.set(parsedParams.aggregateSize);
-    }
-    if (parsedParams.filters) {
-      this.filters.set(parsedParams.filters);
-    }
-    if (parsedParams.idSearchValue) {
-      this.idSearchValue.set(parsedParams.idSearchValue);
-    }
-    if (parsedParams.textSearchQuery) {
-      this.textSearchQuery.set(parsedParams.textSearchQuery);
-    }
-    if (parsedParams.selectedColumns) {
-      this.columnSettings.set({
-        selected: parsedParams.selectedColumns,
-        order: parsedParams.selectedColumns,
-      });
-    }
-    if (parsedParams.sort) {
-      this.sortModel.set(parsedParams.sort);
-    }
+    this.applyState({
+      ...parsedParams,
+      columnSettings: parsedParams.selectedColumns
+        ? {
+          selected: parsedParams.selectedColumns,
+          order: parsedParams.selectedColumns,
+        }
+        : undefined,
+    });
 
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {},
       replaceUrl: true,
     });
+  }
+
+  private applyState(state: Partial<SpecimenSearchState>) {
+    if (state.index) {
+      this.index.set(state.index);
+    }
+    if (state.aggregateFields) {
+      this.aggregateFields.set(state.aggregateFields);
+    }
+    if (
+      state.aggregateSize !== undefined &&
+      state.aggregateSize >= this.minAggregateSize &&
+      state.aggregateSize <= this.maxAggregateSize
+    ) {
+      this.aggregateSize.set(state.aggregateSize);
+    }
+    if (state.filters) {
+      this.filters.set(state.filters);
+    }
+    if (state.idSearchValue) {
+      this.idSearchValue.set(state.idSearchValue);
+    }
+    if (state.textSearchQuery !== undefined) {
+      this.textSearchQuery.set(state.textSearchQuery);
+    }
+    if (state.columnSettings) {
+      this.columnSettings.set(state.columnSettings);
+    }
+    if (state.sort) {
+      this.sortModel.set(state.sort);
+    }
   }
 
   private onFieldDataChange(

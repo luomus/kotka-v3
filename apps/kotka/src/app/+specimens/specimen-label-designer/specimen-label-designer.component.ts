@@ -1,4 +1,4 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import {
   botanical,
   fungi,
@@ -8,7 +8,7 @@ import {
   vertebrate,
 } from '@kotka/ui/label-designer';
 import { globals } from '../../../environments/globals';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { UserService } from '@kotka/ui/core';
 import { map, shareReplay, startWith, switchMap } from 'rxjs/operators';
 import { SpinnerComponent } from '@kotka/ui/components';
@@ -65,15 +65,11 @@ export class SpecimenLabelDesignerComponent {
   labelData$: Observable<LabelDataResult>;
   vm$: Observable<ViewModel>;
 
-  setupStorageKey = toSignal(
-    this.userService
-      .getCurrentLoggedInUser()
-      .pipe(map((user) => `ld-setup-${user.id}`)),
+  setupStorageKey = computed(() =>
+    `ld-setup-${this.userService.user()?.id}`
   );
-  colMapStorageKey = toSignal(
-    this.userService
-      .getCurrentLoggedInUser()
-      .pipe(map((user) => `ld-col-map-${user.id}`)),
+  colMapStorageKey = computed(() =>
+    `ld-col-map-${this.userService.user()?.id}`
   );
 
   templates = [fungi, insectaDet, vertebrate, botanical];

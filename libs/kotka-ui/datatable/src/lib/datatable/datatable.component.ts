@@ -9,6 +9,7 @@ import {
   OnDestroy,
   signal,
   Signal,
+  untracked,
 } from '@angular/core';
 import {
   ColDef as AgGridColDef,
@@ -296,11 +297,31 @@ export class DatatableComponent implements OnDestroy {
 
   private initEffects() {
     effect(() => {
-      this.gridApi()?.setGridOption('columnDefs', this.colDefs());
+      this.gridApi()?.setGridOption('defaultColDef', this.defaultColDef());
     });
 
     effect(() => {
-      this.gridApi()?.setGridOption('defaultColDef', this.defaultColDef());
+      this.gridApi()?.setGridOption('columnDefs', this.colDefs());
+
+      untracked(() => {
+        this.gridApi()?.applyColumnState({
+          state: this.sortModel(),
+          defaultState: { sort: null },
+        });
+
+        this.gridApi()?.setFilterModel(this.filterModel() || null);
+      });
+    });
+
+    effect(() => {
+      this.gridApi()?.applyColumnState({
+        state: this.sortModel(),
+        defaultState: { sort: null },
+      });
+    });
+
+    effect(() => {
+      this.gridApi()?.setFilterModel(this.filterModel() || null);
     });
 
     effect(() => {
@@ -309,17 +330,6 @@ export class DatatableComponent implements OnDestroy {
       } catch (e) {
         // ignore the error as it doesn't seem to affect the grid
       }
-    });
-
-    effect(() => {
-      this.gridApi()?.setFilterModel(this.filterModel() || null);
-    });
-
-    effect(() => {
-      this.gridApi()?.applyColumnState({
-        state: this.sortModel(),
-        defaultState: { sort: null },
-      });
     });
 
     effect(() => {

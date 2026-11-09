@@ -19,8 +19,6 @@ import { globals } from '../../../environments/globals';
 import { FormViewContainerComponent } from '@kotka/ui/form-view';
 import { TransactionPdfSheetsComponent } from '../transaction-pdf-sheets/transaction-pdf-sheets.component';
 import { CommonModule } from '@angular/common';
-import { map } from 'rxjs/operators';
-import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'kotka-transaction-form',
@@ -63,11 +61,7 @@ export class TransactionFormComponent
   constructor() {
     super();
 
-    this.userName = toSignal(
-      this.userService.getCurrentLoggedInUser().pipe(
-        map(user => user.fullName)
-      )
-    );
+    this.userName = computed(() => this.userService.user()?.fullName);
 
     this.mediaMetadata = computed(() => ({
       intellectualRights: 'MZ.intellectualRightsARR',

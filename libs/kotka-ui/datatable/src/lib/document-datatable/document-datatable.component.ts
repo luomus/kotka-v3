@@ -21,8 +21,7 @@ import {
   SearchParams,
   UserService,
 } from '@kotka/ui/core';
-import { catchError, map, of } from 'rxjs';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { catchError, of } from 'rxjs';
 
 
 export interface DatatableLoadedData<
@@ -75,9 +74,7 @@ export class DocumentDatatableComponent<
   private userId: Signal<string | undefined>;
 
   constructor() {
-    this.userId = toSignal(
-      this.userService.getCurrentLoggedInUser().pipe(map((user) => user.id)),
-    );
+    this.userId = computed(() => this.userService.user()?.id);
 
     this.settingsKey = computed(
       () =>

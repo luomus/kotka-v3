@@ -1,7 +1,12 @@
 import {
   ChangeDetectionStrategy,
-  Component, inject,
-  input, model, output, signal,
+  Component,
+  computed,
+  inject,
+  input,
+  model,
+  output,
+  signal,
 } from '@angular/core';
 import { SearchField } from '@kotka/shared/models';
 import { SearchComponent } from '../search/search.component';
@@ -14,8 +19,6 @@ import {
 } from '../models';
 import { builderQueryToQueryString } from '../services/query-stringify';
 import { UserService } from '@kotka/ui/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
 import { parseIdQuery } from '../services/specimen-id-query';
 
 @Component({
@@ -73,11 +76,7 @@ export class SpecimenSearchComponent {
     joinOperator: 'AND',
   };
 
-  private userName = toSignal(
-    this.userService
-      .getCurrentLoggedInUser()
-      .pipe(map((user) => this.userService.formatUserName(user.fullName))),
-  );
+  private userName = computed(() => (this.userService.formatUserName(this.userService.user()?.fullName)));
 
   onMyNewSpecimensClick() {
     const newQuery: SpecimenBuilderQuery = {
