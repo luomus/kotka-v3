@@ -8,7 +8,6 @@ import {
   inject,
   input,
   model,
-  NgZone,
   OnDestroy,
   output,
   Signal,
