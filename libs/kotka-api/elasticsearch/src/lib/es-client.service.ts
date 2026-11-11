@@ -44,9 +44,9 @@ export class EsClientService {
       processors: [
         {
           set: {
-            field: "_source.ingest_timestamp",
+            field: '_source.ingest_timestamp',
             override: true,
-            value: "{{_ingest.timestamp}}"
+            value: '{{_ingest.timestamp}}'
           }
         }
       ]
@@ -111,7 +111,7 @@ export class EsClientService {
     const lastPage = size > 0 ? Math.ceil(total / size) : 1;
 
     const members = this.hasSelectedFields(query) ?
-      res.hits.hits.map((hit: Record<string, any>) => hit._source) ?? [] :
+      res.hits.hits.map((hit: Record<string, any>) => ({...hit._source, _sort: hit.sort})) ?? [] :
       res.hits.hits.map((hit: Record<string, any>) => hit._id) ?? [];
 
     return {
@@ -124,7 +124,7 @@ export class EsClientService {
     };
   }
 
-  async _search(query: SearchQuery, rawResponse: boolean = false): Promise<Record<string, any>> {
+  async _search(query: SearchQuery, rawResponse = false): Promise<Record<string, any>> {
     const size = query.body?.size ?? query.pageSize ?? 20;
     const page = Math.max(
       query.body?.from && size ?
@@ -178,7 +178,7 @@ export class EsClientService {
     });
   }
 
-  async prepareIndex(extractor: ExtractorInterface, migrate: boolean = false) {
+  async prepareIndex(extractor: ExtractorInterface, migrate = false) {
     const index = extractor.getIndex();
 
     const [oldAlias, newAlias] = await this.getAliasNames(index);
@@ -231,8 +231,8 @@ export class EsClientService {
     {
       source: { index: oldAlias, query: {
         range: {
-          "@timestamp": {
-            gte: "now-6h/h"
+          '@timestamp': {
+            gte: 'now-6h/h'
           }
         }
       }},
@@ -277,7 +277,7 @@ export class EsClientService {
       id,
       refresh: refresh,
     });
-  };
+  }
 
   async deleteByBulk(ids: { id: string, index: string }[]) {
     const bulk: BulkRequest = {};

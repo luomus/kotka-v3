@@ -26,7 +26,7 @@ export interface AggregationsSettings extends ColumnSettings {
     >
       <div kuiColumnSettingsModalExtra class="mt-3">
         <label class="form-label mb-1 fw-semibold" for="filterSize">
-          Filter size:
+          Nbr of values displayed per field:
         </label>
         <input
           id="filterSize"

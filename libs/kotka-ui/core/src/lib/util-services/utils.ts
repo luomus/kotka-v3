@@ -1,6 +1,7 @@
 import { NavigationEnd, Router, UrlMatchResult, UrlSegment } from '@angular/router';
 import { concat, Observable, of } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
+import { keyBy } from 'lodash';
 
 export function formMatcher(segments: UrlSegment[]): UrlMatchResult|null {
   if (segments.length === 1 && ['add', 'edit'].includes(segments[0].path)) {
@@ -34,6 +35,10 @@ export function padDayOrMonth(value: number): string {
 export function getEnumValue(value: string | undefined, field: any, fieldType: 'json'|'schema' = 'json'): string {
   const valueOptions = fieldType === 'schema' ? getValueOptionsFromSchemaField(field) : field.options?.value_options;
   return valueOptions?.[value || ''] || '';
+}
+
+export function toMap<T extends Record<string, any>>(array: T[], key: keyof T): Record<string, T> {
+  return keyBy(array, key);
 }
 
 function getValueOptionsFromSchemaField(schemaField: any): Record<string, string> {

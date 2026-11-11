@@ -416,7 +416,7 @@ export class ExtractorFieldMappingService {
   }
 
   async getMetadataAlt(field: string) {
-    return await lastValueFrom(this.lajiApiService.get<{ results: { id: string, value: string }[] }>(`metadata/alts/${field}`).pipe(
+    return await lastValueFrom(this.lajiApiService.get<{ results: { id: string, value: string }[] }>(`metadata/alts/${encodeURIComponent(field)}`).pipe(
       map(res => res.data),
       map(res => res.results),
       map(res => {
@@ -430,7 +430,7 @@ export class ExtractorFieldMappingService {
 
   async getUser(userId: string) {
     try {
-      const fullName = await lastValueFrom(this.lajiApiService.get<Pick<Person, 'id' | 'fullName'>>(`person/${userId}`).pipe(map(res => res.data?.fullName)));
+      const fullName = await lastValueFrom(this.lajiApiService.get<Pick<Person, 'id' | 'fullName'>>(`person/${encodeURIComponent(userId)}`).pipe(map(res => res.data?.fullName)));
 
     if (!fullName) {
       return userId;

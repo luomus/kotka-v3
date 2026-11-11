@@ -49,6 +49,7 @@ export class AutocompleteTextareaComponent {
   loading = input<boolean>(false);
 
   contextChange = output<string>();
+  enterSubmit = output<void>();
 
   showSuggestions = signal(false);
   activeSuggestionIndex = signal(0);
@@ -129,13 +130,21 @@ export class AutocompleteTextareaComponent {
       return;
     }
 
-    const suggestions = this.suggestions();
-
-    if (this.isSpecialAutocomplete(suggestions)) {
+    if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+      this.submit(event);
       return;
     }
 
-    if (suggestions.length === 0) {
+    const suggestions = this.suggestions();
+    const hasVisibleSuggestions =
+      this.showSuggestions() &&
+      !this.isSpecialAutocomplete(suggestions) &&
+      suggestions.length > 0;
+
+    if (!hasVisibleSuggestions) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        this.submit(event);
+      }
       return;
     }
 
@@ -150,6 +159,9 @@ export class AutocompleteTextareaComponent {
         break;
       case 'Enter':
       case 'Tab': {
+        if (event.shiftKey) {
+          break;
+        }
         const suggestion = suggestions[this.activeSuggestionIndex()];
         if (suggestion) {
           event.preventDefault();
@@ -238,6 +250,12 @@ export class AutocompleteTextareaComponent {
       this.hideSuggestions();
       this.textareaRef()?.nativeElement.focus();
     }
+  }
+
+  private submit(event: KeyboardEvent) {
+    event.preventDefault();
+    this.hideSuggestions();
+    this.enterSubmit.emit();
   }
 
   private moveActive(suggestions: AutocompleteSuggestion[], delta: number) {

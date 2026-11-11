@@ -29,8 +29,10 @@
               <kui-field-typeahead
                 placeholder="Any field"
                 [fields]="fields()"
+                [multiFields]="multiFields()"
                 [value]="criteria.field"
                 (valueChange)="setField(groupIdx, critIdx, $event)"
+                (keydown.enter)="enterSubmit.emit()"
               ></kui-field-typeahead>
             </div>
 
@@ -39,8 +41,9 @@
                 class="form-select"
                 [ngModel]="criteria.operator"
                 (ngModelChange)="setOperator(groupIdx, critIdx, $event)"
+                (keydown.enter)="enterSubmit.emit()"
               >
-                @for (operator of (criteria.field | operatorsForField: fieldMap()); track operator.id) {
+                @for (operator of (criteria.field | operatorsForField: fieldMap() : multiFieldMap()); track operator.id) {
                   <option [value]="operator.id">{{ operator.label }}</option>
                 }
               </select>
@@ -51,9 +54,10 @@
                 <div class="col">
                   @if (criteria | criteriaCanHaveValue) {
                     <kui-search-value-input
-                      [field]="fieldMap()[criteria.field]"
+                      [field]="fieldMap()[criteria.field] || multiFieldMap()[criteria.field]"
                       [value]="criteria.value"
                       (valueChange)="setValue(groupIdx, critIdx, $event)"
+                      (keydown.enter)="enterSubmit.emit()"
                     ></kui-search-value-input>
                   }
                 </div>
@@ -63,9 +67,10 @@
                   </div>
                   <div class="col">
                     <kui-search-value-input
-                      [field]="fieldMap()[criteria.field]"
+                      [field]="fieldMap()[criteria.field] || multiFieldMap()[criteria.field]"
                       [value]="criteria.value2 || ''"
                       (valueChange)="setValue(groupIdx, critIdx, $event, true)"
+                      (keydown.enter)="enterSubmit.emit()"
                     ></kui-search-value-input>
                   </div>
                 }
@@ -76,7 +81,6 @@
               <button
                 type="button"
                 class="btn btn-danger btn-sm"
-                [disabled]="group.criteria.length === 1 && query.groups.length === 1"
                 (click)="group.criteria.length > 1 ? removeCriteria(groupIdx, critIdx) : removeGroup(groupIdx)"
                 aria-label="Close"
               >

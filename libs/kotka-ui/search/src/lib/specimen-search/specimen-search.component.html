@@ -1,12 +1,16 @@
 <kui-id-search
   [(idSearchText)]="idSearchText"
   [idSearchTextParseError]="idSearchTextParseError()"
+  (enterSubmit)="searchComponent.onSearchClick()"
 ></kui-id-search>
 <kui-search
+  #searchComponent
   [searchQuery]="searchQuery()"
   [fields]="fields()"
+  [builderMultiFields]="builderMultiSearchFields"
+  [builderDefaultQuery]="builderDefaultQuery"
   (search)="onSearch($event)"
-  (clear)="onClear()"
+  (clear)="onClear($event)"
 >
   <button
     kuiSearchHeaderActions

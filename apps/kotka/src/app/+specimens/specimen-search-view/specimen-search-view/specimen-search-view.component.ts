@@ -6,7 +6,8 @@ import {
   inject,
   model,
   Signal,
-  signal, untracked
+  signal,
+  untracked,
 } from '@angular/core';
 import {
   ColDefWithExtra,
@@ -15,6 +16,7 @@ import {
   DatatableLoadedData,
   DatatableSort,
   getBooleanColumnOptions,
+  getColId,
   getDateColumnOptions,
   getGeoPointColumnOptions,
   getUriColumnOptions,
@@ -28,16 +30,25 @@ import {
   IndexType,
   KotkaDocumentType,
   SearchField,
+  SearchResult,
   SearchResultKey,
 } from '@kotka/shared/models';
-import { MainContentComponent, MainContentHeaderDirective, SpinnerComponent } from '@kotka/ui/components';
-import { FormsModule } from '@angular/forms';
-import { ApiClient, IteratorSearchParams, SearchResultIteratorService } from '@kotka/ui/core';
-import { SpecimenLabelDesignerComponent } from '../../specimen-label-designer/specimen-label-designer.component';
 import {
-  FieldData,
-  SpecimenSearchFilters,
-} from '../models/models';
+  MainContentComponent,
+  MainContentHeaderDirective,
+  SpinnerComponent,
+} from '@kotka/ui/components';
+import { FormsModule } from '@angular/forms';
+import {
+  ApiClient,
+  DocumentSortData,
+  IteratorSearchParams,
+  SearchResultIteratorService,
+  toMap,
+  UserService,
+} from '@kotka/ui/core';
+import { SpecimenLabelDesignerComponent } from '../../specimen-label-designer/specimen-label-designer.component';
+import { FieldData, SpecimenSearchFilters } from '../models/models';
 import { SpecimenLinkService } from '../service/specimen-link.service';
 import { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
@@ -47,8 +58,19 @@ import { isEqual } from 'lodash';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SpecimenSearchMainComponent } from '../specimen-search-main/specimen-search-main.component';
 import { SpecimenSearchHeaderComponent } from '../specimen-search-header/specimen-search-header.component';
-import { IdSearchValue, parseIdQuery } from '@kotka/ui/search';
-import { getColId } from '@kotka/ui/datatable';
+import { parseIdQuery, SpecimenIdSearchValue } from '@kotka/ui/search';
+import { LocalStorageService } from 'ngx-webstorage';
+
+interface SpecimenSearchState {
+  index: IndexType;
+  aggregateFields: string[];
+  aggregateSize: number;
+  filters: SpecimenSearchFilters;
+  idSearchValue: SpecimenIdSearchValue;
+  textSearchQuery: string;
+  columnSettings?: ColumnSettings;
+  sort: DatatableSort;
+}
 
 const INITIAL_FIELD_DATA: FieldData = {
   fieldsLoading: true,
@@ -69,22 +91,6 @@ const DEFAULT_AGGREGATE_FIELDS: string[] = [
   'typeStatus',
 ];
 const DEFAULT_AGGREGATE_SIZE = 10;
-
-const SPECIAL_COLUMNS: Partial<Record<SearchResultKey, DatatableColumn>> = {
-  documentURI: {
-    ...getUriColumnOptions({
-      editRouterLink: ['..', 'edit'],
-      showViewLink: true,
-    }),
-    lockPosition: 'left'
-  },
-  dateCreated: {
-    ...getDateColumnOptions(true, true),
-  },
-  dateEdited: {
-    ...getDateColumnOptions(true, true),
-  },
-};
 
 @Component({
   selector: 'kotka-search-view',
@@ -108,6 +114,8 @@ export class SpecimenSearchViewComponent {
   private specimenLinkService = inject(SpecimenLinkService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private storage = inject(LocalStorageService);
+  private userService = inject(UserService);
 
   showLabelDesigner = signal(false);
 
@@ -117,7 +125,10 @@ export class SpecimenSearchViewComponent {
   });
   aggregateSize = signal<number>(DEFAULT_AGGREGATE_SIZE);
   filters = signal<SpecimenSearchFilters>({ fieldValues: [] });
-  idSearchValue = signal<IdSearchValue>({ text: '', query: parseIdQuery('') });
+  idSearchValue = signal<SpecimenIdSearchValue>({
+    text: '',
+    query: parseIdQuery(''),
+  });
   textSearchQuery = signal('');
   columnSettings = model<ColumnSettings | undefined>(undefined);
   sortModel = model<DatatableSort>([]);
@@ -126,13 +137,50 @@ export class SpecimenSearchViewComponent {
   defaultAggregateSize = DEFAULT_AGGREGATE_SIZE;
   minAggregateSize = 1;
   maxAggregateSize = 100;
+  extraSortModel: DatatableSort = [
+    {
+      colId: 'dateCreated',
+      sort: 'desc',
+    },
+    {
+      colId: 'id',
+      sort: 'desc',
+    },
+  ];
 
   searchLink: Signal<string>;
 
   fieldData: Signal<FieldData>;
   labelDesignerData$?: Observable<Document[]>;
 
+  private searchStateStorageKey: Signal<string>;
+
   private activeSearchParams?: IteratorSearchParams;
+
+  private specialColumns: Partial<Record<SearchResultKey, DatatableColumn>> = {
+    documentURI: {
+      ...getUriColumnOptions({
+        editRouterLink: ['..', 'edit'],
+        showViewLink: true,
+        getEditRouterQueryParams: (data: SearchResult) => ({
+          uri: data.documentURI,
+          sortId: data.id,
+        }),
+        getViewRouterQueryParams: (data: SearchResult) => ({
+          uri: data.documentURI,
+          sortId: data.id,
+        }),
+        onRowSelect: this.onRowSelect.bind(this),
+      }),
+      lockPosition: 'left',
+    },
+    dateCreated: {
+      ...getDateColumnOptions(true, true),
+    },
+    dateEdited: {
+      ...getDateColumnOptions(true, true),
+    },
+  };
 
   constructor() {
     this.fieldData = toSignal(
@@ -153,6 +201,10 @@ export class SpecimenSearchViewComponent {
         this.columnSettings()?.selected || [],
         this.sortModel(),
       ),
+    );
+
+    this.searchStateStorageKey = computed(
+      () => `specimen-search-state-${this.userService.user()?.id}`,
     );
 
     effect(() => {
@@ -180,21 +232,38 @@ export class SpecimenSearchViewComponent {
       }
     });
 
-    this.applyQueryParamsToState(this.route.snapshot.queryParams);
+    effect(() => {
+      const state: SpecimenSearchState = {
+        index: this.index(),
+        aggregateFields: this.aggregateFields(),
+        aggregateSize: this.aggregateSize(),
+        filters: this.filters(),
+        idSearchValue: this.idSearchValue(),
+        textSearchQuery: this.textSearchQuery(),
+        columnSettings: this.columnSettings(),
+        sort: this.sortModel(),
+      };
+      this.storage.store(this.searchStateStorageKey(), state);
+    });
+
+    this.initState();
   }
 
   onDataLoad(data: DatatableLoadedData<KotkaDocumentType.specimen, IndexType>) {
-    const searchParams: IteratorSearchParams = {
-      sort: data.searchParams.sort,
-      searchQuery: data.searchParams.searchQuery,
-    };
+    const searchParams: IteratorSearchParams | undefined = data.searchParams
+      .sort
+      ? {
+          index: this.index(),
+          sort: data.searchParams.sort,
+          searchQuery: data.searchParams.searchQuery,
+        }
+      : undefined;
 
     this.activeSearchParams = searchParams;
 
     this.searchResultIteratorService.setSearchParams(
       KotkaDocumentType.specimen,
       searchParams,
-      true,
     );
 
     this.onAggregatesChange(data.result.aggregates);
@@ -206,19 +275,13 @@ export class SpecimenSearchViewComponent {
 
   private getFieldData(index: IndexType): Observable<FieldData> {
     const defaultSelectedFields: string[] = DEFAULT_SELECTED_FIELDS[index];
-    const specialColumns: Record<string, DatatableColumn> = SPECIAL_COLUMNS;
+    const specialColumns: Record<string, DatatableColumn> = this.specialColumns;
 
     return this.apiClient
       .getSearchFields(KotkaDocumentType.specimen, index)
       .pipe(
         map((fields) => {
-          const fieldMap: Record<string, SearchField> = fields.reduce(
-            (result, field) => {
-              result[field.field] = field;
-              return result;
-            },
-            <Record<string, SearchField>>{},
-          );
+          const fieldMap: Record<string, SearchField> = toMap(fields, 'field');
 
           const columns: DatatableColumn[] = fields.map((field) => {
             let baseColumn: Partial<DatatableColumn> = {};
@@ -265,45 +328,38 @@ export class SpecimenSearchViewComponent {
       );
   }
 
+  private initState() {
+    const queryParams = this.route.snapshot.queryParams;
+    const hasQueryParams = Object.keys(queryParams).length > 0;
+
+    if (hasQueryParams) {
+      this.applyQueryParamsToState(queryParams);
+    } else {
+      const state: SpecimenSearchState | null = this.storage.retrieve(
+        this.searchStateStorageKey(),
+      );
+      if (state) {
+        this.applyState(state);
+      }
+    }
+  }
+
   private applyQueryParamsToState(queryParams: Params) {
     if (Object.keys(queryParams).length === 0) {
       return;
     }
 
-    const parsedParams =
-      this.specimenLinkService.parseSearchLinkParams(queryParams);
+    const parsedParams = this.specimenLinkService.parseSearchLinkParams(queryParams);
 
-    if (parsedParams.index) {
-      this.index.set(parsedParams.index);
-    }
-    if (parsedParams.aggregateFields) {
-      this.aggregateFields.set(parsedParams.aggregateFields);
-    }
-    if (
-      parsedParams.aggregateSize !== undefined &&
-      parsedParams.aggregateSize >= this.minAggregateSize &&
-      parsedParams.aggregateSize <= this.maxAggregateSize
-    ) {
-      this.aggregateSize.set(parsedParams.aggregateSize);
-    }
-    if (parsedParams.filters) {
-      this.filters.set(parsedParams.filters);
-    }
-    if (parsedParams.idSearchValue) {
-      this.idSearchValue.set(parsedParams.idSearchValue);
-    }
-    if (parsedParams.textSearchQuery) {
-      this.textSearchQuery.set(parsedParams.textSearchQuery);
-    }
-    if (parsedParams.selectedColumns) {
-      this.columnSettings.set({
-        selected: parsedParams.selectedColumns,
-        order: parsedParams.selectedColumns,
-      });
-    }
-    if (parsedParams.sort) {
-      this.sortModel.set(parsedParams.sort);
-    }
+    this.applyState({
+      ...parsedParams,
+      columnSettings: parsedParams.selectedColumns
+        ? {
+          selected: parsedParams.selectedColumns,
+          order: parsedParams.selectedColumns,
+        }
+        : undefined,
+    });
 
     this.router.navigate([], {
       relativeTo: this.route,
@@ -312,12 +368,43 @@ export class SpecimenSearchViewComponent {
     });
   }
 
+  private applyState(state: Partial<SpecimenSearchState>) {
+    if (state.index) {
+      this.index.set(state.index);
+    }
+    if (state.aggregateFields) {
+      this.aggregateFields.set(state.aggregateFields);
+    }
+    if (
+      state.aggregateSize !== undefined &&
+      state.aggregateSize >= this.minAggregateSize &&
+      state.aggregateSize <= this.maxAggregateSize
+    ) {
+      this.aggregateSize.set(state.aggregateSize);
+    }
+    if (state.filters) {
+      this.filters.set(state.filters);
+    }
+    if (state.idSearchValue) {
+      this.idSearchValue.set(state.idSearchValue);
+    }
+    if (state.textSearchQuery !== undefined) {
+      this.textSearchQuery.set(state.textSearchQuery);
+    }
+    if (state.columnSettings) {
+      this.columnSettings.set(state.columnSettings);
+    }
+    if (state.sort) {
+      this.sortModel.set(state.sort);
+    }
+  }
+
   private onFieldDataChange(
     fieldData: FieldData,
     aggregateFields: string[],
     filters: SpecimenSearchFilters,
     columnSettings: ColumnSettings | undefined,
-    sortModel: DatatableSort
+    sortModel: DatatableSort,
   ) {
     if (fieldData.fieldsLoading) {
       return;
@@ -370,13 +457,7 @@ export class SpecimenSearchViewComponent {
   }
 
   private onAggregatesChange(aggregates: FieldAggregate[]) {
-    const aggregateMap = aggregates.reduce(
-      (map, aggregate) => {
-        map[aggregate.field] = aggregate;
-        return map;
-      },
-      <Record<string, FieldAggregate>>{},
-    );
+    const aggregateMap = toMap(aggregates, 'field');
 
     const fieldValues = this.filters().fieldValues.filter((filter) =>
       aggregateMap[filter.field]?.values.some(
@@ -389,5 +470,17 @@ export class SpecimenSearchViewComponent {
         fieldValues,
       }));
     }
+  }
+
+  private onRowSelect(result: SearchResult) {
+    const sort = result._sort;
+    const currentData: DocumentSortData | undefined = sort
+      ? { id: result.id, documentURI: result.documentURI, sort }
+      : undefined;
+
+    this.searchResultIteratorService.setCurrentData(
+      KotkaDocumentType.specimen,
+      currentData,
+    );
   }
 }

@@ -1,11 +1,15 @@
-import { BuilderQuery } from '../models';
+import { BuilderQuery, MultiSearchField } from '../models';
 import { SearchField, BOOLEAN_TYPES, DATE_TYPES } from '@kotka/shared/models';
 import { getOperatorsForType } from '../pipes/operators-for-field.pipe';
 
-export function validateBuilderQueryValues(query: BuilderQuery, fieldMap: Record<string, SearchField>): BuilderQuery {
+export function validateBuilderQueryValues(
+  query: BuilderQuery,
+  fieldMap: Record<string, SearchField>,
+  multiFieldMap: Record<string, MultiSearchField>,
+): BuilderQuery {
   query.groups.forEach((group) => {
     group.criteria.forEach((criteria) => {
-      const field = fieldMap[criteria.field];
+      const field = fieldMap[criteria.field] || multiFieldMap[criteria.field];
       if (criteria.field && !field) {
         throw new Error(`Unknown field "${criteria.field}"`);
       }

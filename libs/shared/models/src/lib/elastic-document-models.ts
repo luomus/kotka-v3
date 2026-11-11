@@ -166,7 +166,7 @@ interface SearchResultMap {
   sample: ElasticSampleRow;
 }
 
-export type SearchResult<T extends IndexType = IndexType> = SearchResultMap[T];
+export type SearchResult<T extends IndexType = IndexType> = SearchResultMap[T] & { _sort?: any[] };
 export type SearchResultKey = KeysOfUnion<SearchResult>;
 
 export type AggregationBucketKey = string | number | boolean;

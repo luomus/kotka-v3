@@ -209,7 +209,7 @@ export class TriplestoreMapperService implements OnModuleInit {
   private async initContext(type: string) {
     try {
     const ctx = await lastValueFrom(this.storeService.getContext(this.normalizeJsonLdType(type)).pipe(map(res => res.data)));
-    const properties = await lastValueFrom(this.lajiApiService.get<Record<string, any>>(`metadata/classes/${type}/properties`).pipe(map(res => res.data?.results)));
+    const properties = await lastValueFrom(this.lajiApiService.get<Record<string, any>>(`metadata/classes/${encodeURIComponent(type)}/properties`).pipe(map(res => res.data?.results)));
     const ctx2 = { '@context': {} };
     const ctx3 = { '@context': {} };
     const ctx4 = {};

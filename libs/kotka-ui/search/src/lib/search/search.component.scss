@@ -1,0 +1,18 @@
+.card-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.mode-select {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+}
+
+.header-actions.show {
+  display: flex;
+  justify-content: flex-end;
+}

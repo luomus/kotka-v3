@@ -1,4 +1,5 @@
-import { ColDef, ColDefWithExtra, ColumnSettings, DatatableColumn, ExtraColDef, TupleUnion } from '../models/models';
+import { ColDef, ColDefWithExtra, ColumnSettings, DatatableColumn, ExtraColDef } from '../models/models';
+import { TupleUnion } from '@kotka/shared/models';
 
 type CustomColumnKeyList = TupleUnion<keyof ExtraColDef>;
 
@@ -10,7 +11,7 @@ export function getColId(col: DatatableColumn): string {
   return colId;
 }
 
-export function getProcessedColumns(columns?: DatatableColumn[]): ColDefWithExtra[] | undefined {
+export function getProcessedColumns(columns?: DatatableColumn[], disableFilter?: boolean): ColDefWithExtra[] | undefined {
   if (!columns) {
     return undefined;
   }
@@ -37,6 +38,10 @@ export function getProcessedColumns(columns?: DatatableColumn[]): ColDefWithExtr
     }
     if (!col.cellRenderer) {
       newCol.tooltipField = col.field;
+    }
+    if (disableFilter) {
+      newCol.filter = false;
+      newCol.floatingFilter = false;
     }
 
     return newCol;

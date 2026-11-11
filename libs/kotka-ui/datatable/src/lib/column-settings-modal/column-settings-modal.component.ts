@@ -2,13 +2,15 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  effect,
+  effect, ElementRef,
   inject,
   input,
   model,
   output,
+  Signal,
   signal,
   untracked,
+  viewChild,
 } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import {
@@ -23,13 +25,21 @@ import { ColDefWithExtra, ColumnSettings } from '../models/models';
 import { AgGridAngular } from '@ag-grid-community/angular';
 import { FormsModule } from '@angular/forms';
 import { getOrderAfterColumnMove } from '../services/datatable-column-utils';
-import { moveInArray, sortByOrder } from '../services/datatable-settings-utls';
+import { moveInArray, colIdComparator } from '../services/datatable-settings-utls';
 
-const comparator = (order: string[]) => (
+const colComparator = (order: string[]) => (
   columnA: ColDefWithExtra,
   columnB: ColDefWithExtra,
 ): number => {
   return order.indexOf(columnA.colId) - order.indexOf(columnB.colId);
+};
+
+const restoreLockedPositions = (order: string[], lockedPositions: Record<string, number>) => {
+  for (const colId of Object.keys(lockedPositions)) {
+    const currentIdx = order.indexOf(colId);
+    const lockedIdx = lockedPositions[colId];
+    moveInArray(order, currentIdx, lockedIdx);
+  }
 };
 
 @Component({
@@ -60,27 +70,16 @@ export class ColumnSettingsModalComponent {
   gridColDefs: ColDef[];
   gridOptions: GridOptions;
 
+  private gridElementRef = viewChild<AgGridAngular, ElementRef<HTMLElement>>(
+    'columnSettingsGrid',
+    { read: ElementRef },
+  );
+
   private selected = computed(() => this.settings().selected);
   private order = computed(() => this.settings().order);
 
-  private filteredColumns = computed(() => {
-    const searchText = this.searchText().toLowerCase();
-    return this.columns().filter((col) =>
-      col.headerName?.toLowerCase().includes(searchText),
-    );
-  });
-
-  private lockedPositions = computed(() => {
-    return this.columns().reduce(
-      (result, col, idx) => {
-        if (col.lockPosition) {
-          result[col.colId] = idx;
-        }
-        return result;
-      },
-      <Record<string, number>>{},
-    );
-  });
+  private filteredColumns: Signal<ColDefWithExtra[]>;
+  private lockedPositions: Signal<Record<string, number>>;
 
   private gridApi = signal<GridApi | undefined>(undefined);
   private visibleOrder = signal<string[]>([]);
@@ -97,6 +96,7 @@ export class ColumnSettingsModalComponent {
         flex: 1,
       },
     ];
+
     this.gridOptions = {
       rowDragManaged: true,
       animateRows: true,
@@ -109,25 +109,47 @@ export class ColumnSettingsModalComponent {
       },
     };
 
-    effect(() => {
-      const sortedRowData = [...this.filteredColumns()].sort(
-        comparator(this.order()),
+    this.filteredColumns = computed(() => {
+      const searchText = this.searchText().toLowerCase();
+      return this.columns().filter((col) =>
+        col.headerName?.toLowerCase().includes(searchText),
       );
-      this.visibleOrder.set(sortedRowData.map((col) => col.colId));
+    });
 
-      this.gridApi()?.setGridOption('rowData', sortedRowData);
-      this.updateSelectedNodes(untracked(this.selected));
+    this.lockedPositions = computed(() => {
+      return this.columns().reduce(
+        (result, col, idx) => {
+          if (col.lockPosition) {
+            result[col.colId] = idx;
+          }
+          return result;
+        },
+        <Record<string, number>>{},
+      );
     });
 
     effect(() => {
-      this.updateSelectedNodes(this.selected());
+      const gridApi = this.gridApi();
+      const rowData = [...this.filteredColumns()];
+
+      untracked(() => {
+        this.setRowData(gridApi, rowData);
+      });
+    });
+
+    effect(() => {
+      const selected = this.selected();
+
+      untracked(() => {
+        this.updateSelectedNodes(this.gridApi(), selected);
+      });
     });
   }
 
   onConfirm() {
     const selected = [...this.selected()];
     const order = this.order();
-    sortByOrder(selected, order);
+    selected.sort(colIdComparator(order));
 
     this.confirmClick.emit({ selected, order });
 
@@ -142,6 +164,7 @@ export class ColumnSettingsModalComponent {
 
   resetSettings() {
     this.settings.set(this.defaultSettings());
+    this.setRowData(this.gridApi(), this.filteredColumns());
     this.resetClick.emit();
   }
 
@@ -194,13 +217,7 @@ export class ColumnSettingsModalComponent {
       visibleOrder,
       this.draggedRow,
     );
-
-    // restore locked positions
-    for (const colId of Object.keys(this.lockedPositions())) {
-      const currentIdx = order.indexOf(colId);
-      const lockedIdx = this.lockedPositions()[colId];
-      moveInArray(order, currentIdx, lockedIdx);
-    }
+    restoreLockedPositions(order, this.lockedPositions());
 
     visibleOrder = order.filter((colId) => visibleOrder.includes(colId));
 
@@ -210,8 +227,30 @@ export class ColumnSettingsModalComponent {
     this.draggedRow = undefined;
   }
 
-  private updateSelectedNodes(selected: string[]) {
-    this.gridApi()?.forEachNode((node) => {
+  private setRowData(gridApi: GridApi | undefined, rowData: ColDefWithExtra[]) {
+    const order = [...this.order()];
+    order.sort(colIdComparator(this.selected()));
+    restoreLockedPositions(order, this.lockedPositions());
+
+    rowData.sort(colComparator(order));
+
+    this.settings.set({ ...this.settings(), order });
+    this.visibleOrder.set(rowData.map((col) => col.colId));
+
+    gridApi?.setGridOption('rowData', rowData);
+    this.updateSelectedNodes(gridApi, this.selected());
+
+    const gridElement = this.gridElementRef()?.nativeElement;
+    if (gridElement) {
+      gridElement.scrollTop = 0;
+    }
+  }
+
+  private updateSelectedNodes(
+    gridApi: GridApi | undefined,
+    selected: string[],
+  ) {
+    gridApi?.forEachNode((node) => {
       const isSelected = selected.includes(node.data.colId);
       if (node.isSelected() !== isSelected) {
         node.setSelected(isSelected);

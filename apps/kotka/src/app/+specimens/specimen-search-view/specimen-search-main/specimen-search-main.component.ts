@@ -26,7 +26,7 @@ import {
   FieldData,
   SpecimenSearchFilters,
 } from '../models/models';
-import { IdSearchValue, SearchQuery, SpecimenSearchComponent
+import { SpecimenIdSearchValue, SpecimenSearchQuery, SpecimenSearchComponent
 } from '@kotka/ui/search';
 import { NgbAlert, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { SpecimenSearchFiltersComponent } from '../specimen-search-filters/specimen-search-filters.component';
@@ -59,7 +59,7 @@ export class SpecimenSearchMainComponent implements OnDestroy {
   aggregateFields = model.required<string[]>();
   aggregateSize = model.required<number>();
   filters = model.required<SpecimenSearchFilters>();
-  idSearchValue = model.required<IdSearchValue>();
+  idSearchValue = model.required<SpecimenIdSearchValue>();
   textSearchQuery = model.required<string>();
   columnSettings = model.required<ColumnSettings | undefined>();
   sortModel = model.required<DatatableSort>();
@@ -69,6 +69,7 @@ export class SpecimenSearchMainComponent implements OnDestroy {
   defaultAggregateSize = input.required<number>();
   minAggregateSize = input.required<number>();
   maxAggregateSize = input.required<number>();
+  extraSortModel = input.required<DatatableSort>();
 
   loadData =
     output<DatatableLoadedData<KotkaDocumentType.specimen, IndexType>>();
@@ -104,9 +105,14 @@ export class SpecimenSearchMainComponent implements OnDestroy {
     this.modalRef?.close();
   }
 
-  onSearch(searchQuery: SearchQuery) {
+  onSearch(searchQuery: SpecimenSearchQuery) {
     this.idSearchValue.set(searchQuery.idSearchValue);
     this.textSearchQuery.set(searchQuery.textSearchQuery);
+  }
+
+  onClear(searchQuery: SpecimenSearchQuery) {
+    this.filters.set({ fieldValues: [] });
+    this.onSearch(searchQuery);
   }
 
   onInvalidQueryError() {

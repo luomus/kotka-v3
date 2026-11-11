@@ -1,7 +1,7 @@
 @if (!showLabelDesigner()) {
   <kui-main-content
     pageTitle="Search specimens"
-    containerClass="container-fluid"
+    containerClass="container-fluid pe-4"
   >
     <kotka-specimen-search-header
       kuiMainContentHeader
@@ -21,6 +21,7 @@
       [defaultAggregateSize]="defaultAggregateSize"
       [minAggregateSize]="minAggregateSize"
       [maxAggregateSize]="maxAggregateSize"
+      [extraSortModel]="extraSortModel"
       (indexChange)="onIndexChange()"
       (loadData)="onDataLoad($event)"
     ></kotka-specimen-search-main>

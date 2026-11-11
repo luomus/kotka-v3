@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import {
   LabelDesignerComponent,
   genericLabel,
@@ -9,9 +9,7 @@ import {
   SpecimenLabelDesignerService,
 } from '@kotka/ui/label-designer';
 import { globals } from '../../../environments/globals';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { UserService } from '@kotka/ui/core';
-import { map } from 'rxjs/operators';
 import { AsyncPipe } from '@angular/common';
 import { SpinnerComponent } from '@kotka/ui/components';
 
@@ -46,15 +44,11 @@ export class GenericLabelDesignerComponent {
 
   allFields = this.labelDesignerService.getAllFields(globals.specimenFormId);
 
-  setupStorageKey = toSignal(
-    this.userService
-      .getCurrentLoggedInUser()
-      .pipe(map((user) => `ld-generic-setup-${user.id}`)),
+  setupStorageKey = computed(() =>
+    `ld-generic-setup-${this.userService.user()?.id}`
   );
-  colMapStorageKey = toSignal(
-    this.userService
-      .getCurrentLoggedInUser()
-      .pipe(map((user) => `ld-col-map-${user.id}`)),
+  colMapStorageKey = computed(() =>
+    `ld-generic-col-map-${this.userService.user()?.id}`
   );
 
   templates = [genericLabel, fungi, insectaDet, vertebrate, botanical];

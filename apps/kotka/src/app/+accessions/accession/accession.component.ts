@@ -151,10 +151,10 @@ export class AccessionComponent
 
     this.vm$ = combineLatest([
       accession$,
-      branches$,
-      this.userService.getCurrentLoggedInUser(),
+      branches$
     ]).pipe(
-      map(([accession, branches, user]) => {
+      map(([accession, branches]) => {
+        const user = this.userService.user() ?? undefined;
         const loading = accession.loading || branches.loading;
         const error = accession.error || branches.error;
         const document = accession.value;
@@ -163,7 +163,7 @@ export class AccessionComponent
           title: accession.title,
           document,
           branches: branches.value,
-          allowEdit: document ? allowEditForUser(document, user) : false,
+          allowEdit: document && user ? allowEditForUser(document, user) : false,
           defaultBranchData: document
             ? { accessionID: document.id }
             : undefined,

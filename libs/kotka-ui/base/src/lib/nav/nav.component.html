@@ -13,7 +13,6 @@
       <div class="collapse navbar-collapse" id="collapsibleNavbar" [ngbCollapse]="isCollapsed">
         <ul class="navbar-nav me-auto">
           @if (userService.isLoggedIn$ | async) {
-
             <li ngbDropdown class="nav-item me-3 dropdown" routerLinkActive="active">
               <a class="nav-link" ngbDropdownToggle id="specimens-menu">Specimens <i class="fa fa-caret-down"></i></a>
               <ul class="dropdown-menu" ngbDropdownMenu role="menu" aria-labelledby="specimens-menu">
@@ -98,30 +97,22 @@
               </ul>
             </li>
 
-}
+          }
         </ul>
 
         <ul class="nav navbar-nav" routerLinkActive="active">
           @if (userService.isLoggedIn$ | async) {
-
-            @if (userService.user$ | async; as user;) {
-<li ngbDropdown class="nav-item dropdown" placement="bottom right">
-              <a class="nav-link" ngbDropdownToggle id="user-menu"><i class="fa fa-user"></i>&nbsp; {{ user.fullName }}</a>
+            <li ngbDropdown class="nav-item dropdown" placement="bottom right">
+              <a class="nav-link" ngbDropdownToggle id="user-menu"><i class="fa fa-user"></i>&nbsp; {{ userService.user()?.fullName }}</a>
               <ul class="dropdown-menu dropdown-menu-right" ngbDropdownMenu>
                 <li><a class="dropdown-item" id="user-logout" routerLink="/user/logout"><i class="fa fa-power-off"></i> Logout</a></li>
               </ul>
             </li>
-}
-
-} @else {
-
+          } @else {
             <a class="nav-link" href="/api/auth/login?next={{ currentPath }}">Login</a>
-
-}
-
+          }
         </ul>
       </div>
-
-}
+    }
   </div>
 </nav>

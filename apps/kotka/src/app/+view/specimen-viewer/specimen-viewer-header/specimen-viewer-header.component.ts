@@ -14,6 +14,7 @@ import { Document, SpecimenDataType } from '@kotka/shared/models';
 })
 export class SpecimenViewerHeaderComponent {
   uri = input.required<string>();
+  sortId = input<string>();
   pageTitle = input.required<string>();
   specimenDataType = input<SpecimenDataType | string>();
   document = input<Document>();

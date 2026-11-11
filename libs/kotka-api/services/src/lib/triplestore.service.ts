@@ -12,11 +12,11 @@ export class TriplestoreService {
   private baseUrl = process.env['TRIPLESTORE_URL'];
 
   public get(resource: string, params = {}) {
-    return this.httpService.get(this.baseUrl + resource, { headers: this.headers, params: Object.assign({}, this.baseParams, params) });
+    return this.httpService.get(this.baseUrl + encodeURIComponent(resource), { headers: this.headers, params: Object.assign({}, this.baseParams, params) });
   }
 
   public put(resource: string, body: string, params = {}) {
-    return this.httpService.put(this.baseUrl + resource, body, { headers: this.headers, params: Object.assign({}, this.baseParams, params) });
+    return this.httpService.put(this.baseUrl + encodeURIComponent(resource), body, { headers: this.headers, params: Object.assign({}, this.baseParams, params) });
   }
 
   public search(search: Record<string, string>, params = {}) {
@@ -24,7 +24,7 @@ export class TriplestoreService {
   }
 
   public delete(resource: string, params = {}) {
-    return this.httpService.delete(this.baseUrl + resource, { headers: this.headers, params: Object.assign({}, this.baseParams, params) });
+    return this.httpService.delete(this.baseUrl + encodeURIComponent(resource), { headers: this.headers, params: Object.assign({}, this.baseParams, params) });
   }
 
   public namespaces() {

@@ -17,8 +17,11 @@ import {
 import { AutocompleteComponent, DatepickerComponent } from '@kotka/ui/components';
 import { ApiClient, HighlightMatchPipe } from '@kotka/ui/core';
 import { catchError, map, Observable, of } from 'rxjs';
+import { MultiSearchField } from '../models';
 
 const SUGGESTION_LIMIT = 10;
+
+type NormalSearchField = SearchField & { autocompleteField?: undefined };
 
 type ValueInputType = 'date' | 'boolean' | 'autocomplete' | 'text';
 
@@ -36,7 +39,7 @@ type ValueInputType = 'date' | 'boolean' | 'autocomplete' | 'text';
 export class SearchValueInputComponent {
   private apiClient = inject(ApiClient);
 
-  field = input<SearchField>();
+  field = input<NormalSearchField | MultiSearchField>();
   value = model<string>('');
   placeholder = input('Value');
 
@@ -64,10 +67,12 @@ export class SearchValueInputComponent {
       return of([]);
     }
 
+    const autocompleteField = field.autocompleteField ? field.autocompleteField : field.field;
+
     return this.apiClient
       .getSearchAutocomplete(
         KotkaDocumentType.specimen,
-        field.field,
+        autocompleteField,
         term,
         SUGGESTION_LIMIT,
       )

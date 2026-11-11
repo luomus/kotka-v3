@@ -12,6 +12,7 @@ export interface URICellRendererParams {
   showViewLink?: boolean;
   viewRouterLink?: string[];
   getViewRouterQueryParams?: (data: any) => Record<string, string>;
+  onRowSelect?: (data: any) => void;
 }
 
 type RendererParams = ICellRendererParams & URICellRendererParams;
@@ -27,6 +28,7 @@ type RendererParams = ICellRendererParams & URICellRendererParams;
             class="btn btn-info edit-button"
             [routerLink]="editRouterLink"
             [queryParams]="editRouterQueryParams"
+            (click)="params.onRowSelect?.(params.data)"
           >
             <i class="fa fa-pen-to-square"></i>
           </a>
@@ -36,6 +38,7 @@ type RendererParams = ICellRendererParams & URICellRendererParams;
             class="view-link"
             [routerLink]="viewRouterLink"
             [queryParams]="viewRouterQueryParams"
+            (click)="params.onRowSelect?.(params.data)"
           >
             <small class="domain-value">{{ domain }}</small>
             <span class="id-value" title="{{ id }}">{{ id }}</span>

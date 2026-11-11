@@ -18,4 +18,5 @@ export class ViewComponent {
   private route = inject(ActivatedRoute);
 
   uri$ = this.route.queryParams.pipe(map((params) => params['uri']));
+  sortId$ = this.route.queryParams.pipe(map((params) => params['sortId']));
 }

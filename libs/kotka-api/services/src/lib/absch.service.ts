@@ -16,7 +16,7 @@ export class AbschService {
       return false;
     }
 
-    const url = `${this.baseUrl}documents/${match[1]}?include-deleted=true`;
+    const url = `${this.baseUrl}documents/${encodeURIComponent(match[1])}?include-deleted=true`;
     try {
       await lastValueFrom(this.httpService.get(url, { timeout: 30000 }));
     } catch (e: any) {

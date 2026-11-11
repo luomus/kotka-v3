@@ -23,6 +23,7 @@
         [idSearchText]="idSearchValue().text"
         [fields]="fieldData.fields"
         (search)="onSearch($event)"
+        (clear)="onClear($event)"
       >
       </kui-specimen-search>
       @if (searchError()) {
@@ -43,6 +44,7 @@
         [searchQuery]="searchQuery()"
         [(sortModel)]="sortModel"
         [aggregateBy]="aggregateBy()"
+        [extraSortModel]="extraSortModel()"
         (loadData)="onDataLoad($event)"
         (invalidQueryError)="onInvalidQueryError()"
       >

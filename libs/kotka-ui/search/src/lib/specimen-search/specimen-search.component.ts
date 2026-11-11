@@ -1,28 +1,25 @@
 import {
   ChangeDetectionStrategy,
-  Component, inject,
-  input, model, output, signal,
-
+  Component,
+  computed,
+  inject,
+  input,
+  model,
+  output,
+  signal,
 } from '@angular/core';
 import { SearchField } from '@kotka/shared/models';
 import { SearchComponent } from '../search/search.component';
 import { IdSearchComponent } from '../id-search/id-search.component';
-import { BuilderQuery } from '../models';
+import {
+  SpecimenBuilderQuery,
+  SpecimenIdQuery,
+  SpecimenMultiSearchField,
+  SpecimenSearchQuery,
+} from '../models';
 import { builderQueryToQueryString } from '../services/query-stringify';
 import { UserService } from '@kotka/ui/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
 import { parseIdQuery } from '../services/specimen-id-query';
-
-export interface IdSearchValue {
-  text: string;
-  query: BuilderQuery;
-}
-
-export interface SearchQuery {
-  idSearchValue: IdSearchValue,
-  textSearchQuery: string;
-}
 
 @Component({
   selector: 'kui-specimen-search',
@@ -40,32 +37,67 @@ export class SpecimenSearchComponent {
 
   idSearchTextParseError = signal<string>('');
 
-  search = output<SearchQuery>();
+  search = output<SpecimenSearchQuery>();
+  clear = output<SpecimenSearchQuery>();
 
-  private userName = toSignal(
-    this.userService.getCurrentLoggedInUser().pipe(map(user => this.userService.formatUserName(user.fullName)))
-  );
+  builderMultiSearchFields: SpecimenMultiSearchField[] = [
+    {
+      field: 'taxonOrSynonyms',
+      label: 'Taxon or Synonyms',
+      type: 'keyword',
+      fields: ['taxon', 'taxa', 'synonyms'],
+      hasAutocomplete: true,
+      autocompleteField: 'taxon',
+    },
+  ];
+  builderDefaultQuery: SpecimenBuilderQuery = {
+    groups: [
+      {
+        criteria: [
+          {
+            field: 'taxonOrSynonyms',
+            operator: 'equals',
+            value: '',
+          },
+          {
+            field: 'originalSpecimenID',
+            operator: 'equals',
+            value: '',
+          },
+          {
+            field: 'collection',
+            operator: 'equals',
+            value: '',
+          }
+        ],
+        joinOperator: 'AND',
+      },
+    ],
+    joinOperator: 'AND',
+  };
+
+  private userName = computed(() => (this.userService.formatUserName(this.userService.user()?.fullName)));
 
   onMyNewSpecimensClick() {
-    const newQuery: BuilderQuery = {
+    const newQuery: SpecimenBuilderQuery = {
       groups: [
         {
           criteria: [
             {
               field: 'editor',
               operator: 'equals',
-              value: this.userName() || ''
+              value: this.userName() || '',
             },
             {
               field: 'dateEdited',
               operator: 'equals',
-              value: new Date().toISOString().split('T')[0]
-            }
+              value: new Date().toISOString().split('T')[0],
+            },
           ],
-          joinOperator: 'AND'
-        }
+          joinOperator: 'AND',
+        },
       ],
-      joinOperator: 'AND'
+      joinOperator: 'AND',
     };
 
     this.searchQuery.set(builderQueryToQueryString(newQuery));
@@ -76,7 +108,7 @@ export class SpecimenSearchComponent {
   onSearch(searchQuery: string) {
     this.idSearchTextParseError.set('');
 
-    let idSearchQuery: BuilderQuery;
+    let idSearchQuery: SpecimenIdQuery;
     try {
       idSearchQuery = parseIdQuery(this.idSearchText());
     } catch (e: any) {
@@ -93,8 +125,16 @@ export class SpecimenSearchComponent {
     });
   }
 
-  onClear() {
+  onClear(searchQuery: string) {
     this.idSearchText.set('');
     this.idSearchTextParseError.set('');
+
+    this.clear.emit({
+      idSearchValue: {
+        text: this.idSearchText(),
+        query: parseIdQuery(this.idSearchText()),
+      },
+      textSearchQuery: searchQuery,
+    });
   }
 }
