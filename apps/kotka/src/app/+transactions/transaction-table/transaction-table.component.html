@@ -1,14 +1,16 @@
-<kui-main-content pageTitle="Transactions" containerClass="container-fluid">
-  <kui-spinner [spinning]="!columns">
-    @if (columns) {
-      <kui-document-datatable
-        style="height: calc(100vh - 200px)"
-        [dataType]="dataType"
-        [columns]="columns"
-        [enableFileExport]="true"
-        [enableColumnSelection]="true"
-        >
-      </kui-document-datatable>
-    }
-  </kui-spinner>
+<kui-main-content
+  pageTitle="Transactions"
+  containerClass="container-fluid"
+  [fillHeight]="true"
+  [hasBottomPadding]="true"
+>
+  <kui-document-datatable
+    class="datatable"
+    [dataType]="dataType"
+    [columns]="columns"
+    [columnsLoading]="!columns"
+    [enableFileExport]="true"
+    [enableColumnSelection]="true"
+  >
+  </kui-document-datatable>
 </kui-main-content>

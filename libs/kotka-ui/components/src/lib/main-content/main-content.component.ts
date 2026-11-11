@@ -7,7 +7,7 @@ import { Title } from '@angular/platform-browser';
   template: `
     <main
       [class]="containerClass()"
-      [ngClass]="{ 'with-bottom-margin': hasBottomMargin() }"
+      [ngClass]="{ 'with-bottom-padding': hasBottomPadding() }"
     >
       <div class="header-container pb-2 mt-4 mb-2 border-bottom">
         <ng-content select="[kuiMainContentHeader]">
@@ -20,6 +20,9 @@ import { Title } from '@angular/platform-browser';
     </main>
   `,
   styleUrls: ['./main-content.component.scss'],
+  host: {
+    '[class.fill-height]': 'fillHeight()',
+  },
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
 })
@@ -28,7 +31,8 @@ export class MainContentComponent {
 
   pageTitle = input.required<string>();
   containerClass = input('container-xl');
-  hasBottomMargin = input(false);
+  hasBottomPadding = input(false);
+  fillHeight = input(false);
 
   constructor() {
     effect(() => {

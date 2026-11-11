@@ -1,22 +1,29 @@
 @use "sass:map";
 @import "../../../../../../../styles/bootstrap";
 
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
+}
+
 .content-row {
   padding-top: $spacer;
-  padding-bottom: $spacer;
+
+  display: flex;
+  flex: 1 0 auto;
 }
 
 .main-content-column {
-  margin-bottom: 80px;
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
+  padding-bottom: var(--kotka-page-bottom-padding);
 }
 
 .specimen-search {
   display: block;
   margin-bottom: $spacer;
-}
-
-.specimen-datatable {
-  height: calc(100vh - 155px);
 }
 
 .specimen-sidebar {
@@ -25,17 +32,22 @@
   gap: map.get($spacers, 3);
   position: sticky;
   top: $spacer;
-  height: calc(100vh - #{$spacer * 2});
-  overflow-y: auto;
+  overflow: hidden;
   padding: $spacer;
   background-color: $gray-100;
   border: $border-width solid $border-color;
   border-radius: $border-radius-lg;
 }
 
+.specimen-datatable {
+  --kotka-datatable-min-height: 500px;
+  flex: 1 1 0;
+}
+
 @include media-breakpoint-down(md) {
   .specimen-sidebar {
     position: static;
-    height: auto;
+    height: auto !important;
+    overflow: visible;
   }
 }

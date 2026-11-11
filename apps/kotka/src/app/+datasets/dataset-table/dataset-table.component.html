@@ -1,6 +1,11 @@
-<kui-main-content pageTitle="Tags" containerClass="container-fluid">
+<kui-main-content
+  pageTitle="Tags"
+  containerClass="container-fluid"
+  [fillHeight]="true"
+  [hasBottomPadding]="true"
+>
   <kui-document-datatable
-    style="height: calc(100vh - 190px)"
+    class="datatable"
     [dataType]="dataType"
     [columns]="columns"
   >

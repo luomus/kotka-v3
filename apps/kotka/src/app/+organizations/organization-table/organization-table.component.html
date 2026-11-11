@@ -1,4 +1,9 @@
-<kui-main-content pageTitle="Organizations" containerClass="container-fluid">
+<kui-main-content
+  pageTitle="Organizations"
+  containerClass="container-fluid"
+  [fillHeight]="true"
+  [hasBottomPadding]="true"
+>
   <div class="col-sm-6 mb-2">
     <label for="nameFilter"><strong>Filter by any name field:</strong></label>
     <input
@@ -10,7 +15,7 @@
     >
   </div>
   <kui-document-datatable
-    style="height: calc(100vh - 255px)"
+    class="datatable"
     [dataType]="dataType"
     [columns]="columns"
     [defaultFilterModel]="defaultFilterModel"

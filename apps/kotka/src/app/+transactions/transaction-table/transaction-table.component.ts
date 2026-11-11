@@ -13,7 +13,7 @@ import {
 import { FormService } from '@kotka/ui/core';
 import { KotkaDocumentType, LajiForm } from '@kotka/shared/models';
 import { globals } from '../../../environments/globals';
-import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
+import { MainContentComponent } from '@kotka/ui/components';
 
 
 @Component({
@@ -23,7 +23,6 @@ import { MainContentComponent, SpinnerComponent } from '@kotka/ui/components';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MainContentComponent,
-    SpinnerComponent,
     DocumentDatatableComponent
 ],
 })
