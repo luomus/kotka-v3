@@ -63,16 +63,18 @@ export const baseConfig = {
         'format': 'date',
         'fields': {'raw': {'type': 'keyword'}}
       },
+      /**
       'branchLocationTree': {
         'type': 'text',
       },
       'branchLocationID': {
         'type': 'keyword'
       },
-      'accessionLocationID': {
+      'branchID': {
         'type': 'keyword'
       },
-      'branchID': {
+      */
+      'accessionLocationID': {
         'type': 'keyword'
       },
       'sampleExists': {

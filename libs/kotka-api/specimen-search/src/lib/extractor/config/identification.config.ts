@@ -48,7 +48,7 @@ export const identificationConfig: ExtractorConfig = {
       label: 'Identification notes',
       level: 'identification',
     },
-    taxa: {
+    taxonTree: {
       label: 'Taxon tree',
       level: 'identification',
     },

@@ -89,11 +89,12 @@ export class SpecimenExtractorService extends BaseExtractorService {
             unit.sampleExists = !!unit.samples?.length;
 
             const unitRow: ElasticBaseUnit = await this.createSpecimenRow(bulk, id, document, gathering, unit);
+            const baseUnitRow = { ...unitRow };
 
             await this.autocompleteExtractorService.addToBulk(unitRow, bulk, this.config.autocompleteFields);
 
             if (identifications?.length) {
-              const identificationsRows = await this.identificationExtractor.addToBulk({ ...unitRow, identifications }, bulk);
+              const identificationsRows = await this.identificationExtractor.addToBulk({ ...baseUnitRow, identifications }, bulk);
 
               if (identificationsRows?.length) {
                 this.mergeToUnitRow(unitRow, identificationsRows[0]);
@@ -101,7 +102,7 @@ export class SpecimenExtractorService extends BaseExtractorService {
             }
 
             if (typeSpecimens?.length) {
-              const typeRows = await this.typeSpecimenExtractor.addToBulk({...unitRow, typeSpecimens}, bulk);
+              const typeRows = await this.typeSpecimenExtractor.addToBulk({...baseUnitRow, typeSpecimens}, bulk);
 
               if (typeRows?.length) {
                 const flattenedTypes = this.flattenObjectArray<Omit<ElasticType, 'id'>>(typeRows);
@@ -111,7 +112,7 @@ export class SpecimenExtractorService extends BaseExtractorService {
             }
 
             if (samples?.length) {
-              const sampleRows = await this.sampleExtractor.addToBulk({...unitRow, samples}, bulk);
+              const sampleRows = await this.sampleExtractor.addToBulk({...baseUnitRow, samples}, bulk);
 
               if (sampleRows?.length) {
                 const flattenedSamples = this.flattenObjectArray<Omit<ElasticSample, 'id'>>(sampleRows);

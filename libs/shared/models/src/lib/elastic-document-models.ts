@@ -72,7 +72,7 @@ export interface ElasticIdentification
   taxonAndInfra: string;
   accepted: boolean;
   identificationNotes?: string;
-  taxa?: string[];
+  taxonTree?: string[];
   acceptedTaxon?: string;
   endangeredStatus?: string;
   synonyms?: string[];

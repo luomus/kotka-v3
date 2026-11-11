@@ -68,7 +68,7 @@ export class IdentificationExtractorService extends BaseExtractorService {
 
       if (taxon && taxon.length === 1) {
         row.acceptedTaxon = taxon[0].scientificName;
-        row.taxa = taxon[0].names;
+        row.taxonTree = taxon[0].names;
         row.initialLetterOfGenus = taxon[0].scientificName.charAt(0).toUpperCase();
 
         if (taxon[0].synonyms?.length) {
