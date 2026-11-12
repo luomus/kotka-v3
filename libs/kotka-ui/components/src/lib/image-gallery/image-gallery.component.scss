@@ -2,9 +2,9 @@
 
 :host {
   display: grid;
-  grid-template-columns: repeat(auto-fill, var(--gallery-thumbnail-size, 170px));
-  gap: var(--gallery-thumbnail-gap, 4px);
-  padding: var(--gallery-thumbnail-gap, 4px);
+  grid-template-columns: repeat(auto-fill, var(--kotka-gallery-thumbnail-size, 170px));
+  gap: var(--kotka-gallery-thumbnail-gap, 4px);
+  padding: var(--kotka-gallery-thumbnail-gap, 4px);
   background-color: $gray-100;
   border-radius: $border-radius;
 }
