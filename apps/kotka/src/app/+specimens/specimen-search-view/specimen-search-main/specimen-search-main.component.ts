@@ -28,6 +28,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { AggregateBy, WINDOW } from '@kotka/ui/core';
 import {
+  AggregateSettings,
   FieldData,
   SpecimenSearchFilters,
 } from '../models/models';
@@ -63,8 +64,7 @@ export class SpecimenSearchMainComponent implements OnDestroy {
   dataType: KotkaDocumentType.specimen = KotkaDocumentType.specimen;
 
   index = model.required<IndexType>();
-  aggregateFields = model.required<string[]>();
-  aggregateSize = model.required<number>();
+  aggregateSettings = model.required<AggregateSettings | undefined>();
   filters = model.required<SpecimenSearchFilters>();
   idSearchValue = model.required<SpecimenIdSearchValue>();
   textSearchQuery = model.required<string>();
@@ -102,15 +102,15 @@ export class SpecimenSearchMainComponent implements OnDestroy {
       ),
     );
 
-    this.aggregateBy = computed(() =>
-      this.aggregateFields().map((field) => ({
+    this.aggregateBy = computed(() => (
+      this.aggregateSettings()?.selected || []).map((field) => ({
         field,
         aggregateField: this.fieldData().fieldMap?.[field]?.hasRaw
           ? `${field}.raw`
           : field,
-        aggregateSize: this.aggregateSize(),
-      })),
-    );
+        aggregateSize: this.aggregateSettings()?.size,
+      })
+    ));
 
     afterNextRender(() => this.onResize());
   }

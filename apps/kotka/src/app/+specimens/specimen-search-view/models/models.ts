@@ -2,7 +2,11 @@ import {
   AggregationBucketKey,
   SearchField,
 } from '@kotka/shared/models';
-import { DatatableColumn } from '@kotka/ui/datatable';
+import { ColumnSettings, DatatableColumn } from '@kotka/ui/datatable';
+
+export interface AggregateSettings extends ColumnSettings {
+  size: number;
+}
 
 export interface LocationFilter {
   latitude: number;

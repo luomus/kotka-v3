@@ -5,10 +5,7 @@ import {
 import { ColDefWithExtra, ColumnSettings, ColumnSettingsModalComponent } from '@kotka/ui/datatable';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
-
-export interface AggregationsSettings extends ColumnSettings {
-  filterSize: number;
-}
+import { AggregateSettings } from '../models/models';
 
 @Component({
   selector: 'kotka-aggregations-settings-modal',
@@ -60,7 +57,8 @@ export class AggregationsSettingsModalComponent {
     if (filterSize === null || filterSize < this.minFilterSize() || filterSize > this.maxFilterSize()) {
       filterSize = this.defaultFilterSize();
     }
-    this.modal.close({...columnSettings, filterSize});
+    const settings: AggregateSettings = { ...columnSettings, size: filterSize };
+    this.modal.close(settings);
   }
 
   onReset() {

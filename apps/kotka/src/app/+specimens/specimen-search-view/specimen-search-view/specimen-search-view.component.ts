@@ -7,7 +7,6 @@ import {
   model,
   Signal,
   signal,
-  untracked,
 } from '@angular/core';
 import {
   ColDefWithExtra,
@@ -16,7 +15,6 @@ import {
   DatatableLoadedData,
   DatatableSort,
   getBooleanColumnOptions,
-  getColId,
   getDateColumnOptions,
   getGeoPointColumnOptions,
   getUriColumnOptions,
@@ -25,7 +23,6 @@ import {
   BOOLEAN_TYPES,
   DATE_TYPES,
   Document,
-  FieldAggregate,
   GEO_POINT_TYPES,
   IndexType,
   KotkaDocumentType,
@@ -48,13 +45,12 @@ import {
   UserService,
 } from '@kotka/ui/core';
 import { SpecimenLabelDesignerComponent } from '../../specimen-label-designer/specimen-label-designer.component';
-import { FieldData, SpecimenSearchFilters } from '../models/models';
+import { AggregateSettings, FieldData, SpecimenSearchFilters } from '../models/models';
 import { SpecimenLinkService } from '../service/specimen-link.service';
 import { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { map, startWith, switchMap } from 'rxjs/operators';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { isEqual } from 'lodash';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SpecimenSearchMainComponent } from '../specimen-search-main/specimen-search-main.component';
 import { SpecimenSearchHeaderComponent } from '../specimen-search-header/specimen-search-header.component';
@@ -63,8 +59,7 @@ import { LocalStorageService } from 'ngx-webstorage';
 
 interface SpecimenSearchState {
   index: IndexType;
-  aggregateFields: string[];
-  aggregateSize: number;
+  aggregateSettings?: AggregateSettings;
   filters: SpecimenSearchFilters;
   idSearchValue: SpecimenIdSearchValue;
   textSearchQuery: string;
@@ -120,10 +115,7 @@ export class SpecimenSearchViewComponent {
   showLabelDesigner = signal(false);
 
   index = signal<IndexType>('unit');
-  aggregateFields = signal<string[]>(DEFAULT_AGGREGATE_FIELDS, {
-    equal: isEqual,
-  });
-  aggregateSize = signal<number>(DEFAULT_AGGREGATE_SIZE);
+  aggregateSettings = model<AggregateSettings | undefined>(undefined);
   filters = signal<SpecimenSearchFilters>({ fieldValues: [] });
   idSearchValue = signal<SpecimenIdSearchValue>({
     text: '',
@@ -190,32 +182,29 @@ export class SpecimenSearchViewComponent {
       { initialValue: INITIAL_FIELD_DATA },
     );
 
-    this.searchLink = computed(() =>
-      this.specimenLinkService.getSearchLink(
+    this.searchLink = computed(() => {
+      const aggregateSettings = this.aggregateSettings();
+      const columnSettings = this.columnSettings();
+
+      if (!aggregateSettings || !columnSettings) {
+        return '';
+      }
+
+      return this.specimenLinkService.getSearchLink(
         this.index(),
-        this.aggregateFields(),
-        this.aggregateSize(),
+        aggregateSettings.selected,
+        aggregateSettings.size,
         this.filters(),
         this.idSearchValue(),
         this.textSearchQuery(),
-        this.columnSettings()?.selected || [],
+        columnSettings.selected,
         this.sortModel(),
-      ),
-    );
+      );
+    });
 
     this.searchStateStorageKey = computed(
       () => `specimen-search-state-${this.userService.user()?.id}`,
     );
-
-    effect(() => {
-      this.onFieldDataChange(
-        this.fieldData(),
-        untracked(this.aggregateFields),
-        untracked(this.filters),
-        untracked(this.columnSettings),
-        untracked(this.sortModel),
-      );
-    });
 
     effect(() => {
       if (this.showLabelDesigner()) {
@@ -235,15 +224,22 @@ export class SpecimenSearchViewComponent {
     effect(() => {
       const state: SpecimenSearchState = {
         index: this.index(),
-        aggregateFields: this.aggregateFields(),
-        aggregateSize: this.aggregateSize(),
         filters: this.filters(),
         idSearchValue: this.idSearchValue(),
         textSearchQuery: this.textSearchQuery(),
-        columnSettings: this.columnSettings(),
         sort: this.sortModel(),
       };
       this.storage.store(this.searchStateStorageKey(), state);
+    });
+
+    let firstIndexChange = true;
+    effect(() => {
+      this.index();
+      if (firstIndexChange) {
+        firstIndexChange = false;
+        return;
+      }
+      this.onIndexChange();
     });
 
     this.initState();
@@ -265,11 +261,10 @@ export class SpecimenSearchViewComponent {
       KotkaDocumentType.specimen,
       searchParams,
     );
-
-    this.onAggregatesChange(data.result.aggregates);
   }
 
   onIndexChange() {
+    this.aggregateSettings.set(undefined);
     this.columnSettings.set(undefined);
   }
 
@@ -350,9 +345,18 @@ export class SpecimenSearchViewComponent {
     }
 
     const parsedParams = this.specimenLinkService.parseSearchLinkParams(queryParams);
+    const { aggregateFields, aggregateSize } = parsedParams;
 
     this.applyState({
       ...parsedParams,
+      aggregateSettings:
+        aggregateFields || aggregateSize !== undefined
+          ? {
+            selected: aggregateFields || DEFAULT_AGGREGATE_FIELDS,
+            order: aggregateFields || [],
+            size: aggregateSize ?? DEFAULT_AGGREGATE_SIZE,
+          }
+          : undefined,
       columnSettings: parsedParams.selectedColumns
         ? {
           selected: parsedParams.selectedColumns,
@@ -372,15 +376,8 @@ export class SpecimenSearchViewComponent {
     if (state.index) {
       this.index.set(state.index);
     }
-    if (state.aggregateFields) {
-      this.aggregateFields.set(state.aggregateFields);
-    }
-    if (
-      state.aggregateSize !== undefined &&
-      state.aggregateSize >= this.minAggregateSize &&
-      state.aggregateSize <= this.maxAggregateSize
-    ) {
-      this.aggregateSize.set(state.aggregateSize);
+    if (state.aggregateSettings) {
+      this.aggregateSettings.set(state.aggregateSettings);
     }
     if (state.filters) {
       this.filters.set(state.filters);
@@ -396,79 +393,6 @@ export class SpecimenSearchViewComponent {
     }
     if (state.sort) {
       this.sortModel.set(state.sort);
-    }
-  }
-
-  private onFieldDataChange(
-    fieldData: FieldData,
-    aggregateFields: string[],
-    filters: SpecimenSearchFilters,
-    columnSettings: ColumnSettings | undefined,
-    sortModel: DatatableSort,
-  ) {
-    if (fieldData.fieldsLoading) {
-      return;
-    }
-
-    const colIds = fieldData.columns?.map((col) => getColId(col)) || [];
-
-    const newAggregateFields = aggregateFields.filter((field) =>
-      fieldData.allAggregateFields?.includes(field),
-    );
-    if (newAggregateFields.length !== aggregateFields.length) {
-      this.aggregateFields.set(newAggregateFields);
-    }
-
-    const fieldValues = filters.fieldValues.filter(
-      (filter) => fieldData.fieldMap?.[filter.field],
-    );
-    if (fieldValues.length !== filters.fieldValues.length) {
-      this.filters.update((filters) => ({
-        ...filters,
-        fieldValues,
-      }));
-    }
-
-    let selected: string[] = [];
-    if (columnSettings) {
-      selected = columnSettings.selected.filter((field) =>
-        colIds.includes(field),
-      );
-      const order = columnSettings.order.filter((field) =>
-        colIds.includes(field),
-      );
-      if (
-        selected.length !== columnSettings.selected.length ||
-        order.length !== columnSettings.order.length
-      ) {
-        this.columnSettings.set({
-          selected,
-          order,
-        });
-      }
-    }
-
-    const newSortModel = sortModel.filter((sort) =>
-      selected.includes(sort.colId),
-    );
-    if (newSortModel.length !== sortModel.length) {
-      this.sortModel.set(newSortModel);
-    }
-  }
-
-  private onAggregatesChange(aggregates: FieldAggregate[]) {
-    const aggregateMap = toMap(aggregates, 'field');
-
-    const fieldValues = this.filters().fieldValues.filter((filter) =>
-      aggregateMap[filter.field]?.values.some(
-        (value) => value.value === filter.value,
-      ),
-    );
-    if (fieldValues.length !== this.filters().fieldValues.length) {
-      this.filters.update((filters) => ({
-        ...filters,
-        fieldValues,
-      }));
     }
   }
 

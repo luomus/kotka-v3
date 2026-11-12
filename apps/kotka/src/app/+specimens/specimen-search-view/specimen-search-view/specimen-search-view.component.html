@@ -10,8 +10,7 @@
     ></kotka-specimen-search-header>
     <kotka-specimen-search-main
       [(index)]="index"
-      [(aggregateFields)]="aggregateFields"
-      [(aggregateSize)]="aggregateSize"
+      [(aggregateSettings)]="aggregateSettings"
       [(filters)]="filters"
       [(idSearchValue)]="idSearchValue"
       [(textSearchQuery)]="textSearchQuery"
@@ -23,7 +22,6 @@
       [minAggregateSize]="minAggregateSize"
       [maxAggregateSize]="maxAggregateSize"
       [extraSortModel]="extraSortModel"
-      (indexChange)="onIndexChange()"
       (loadData)="onDataLoad($event)"
     ></kotka-specimen-search-main>
   </kui-main-content>

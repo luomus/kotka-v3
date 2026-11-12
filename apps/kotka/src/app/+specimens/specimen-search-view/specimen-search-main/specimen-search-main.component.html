@@ -3,9 +3,8 @@
     <aside #sidebar class="specimen-sidebar" [style.height]="sidebarHeight()">
       <kotka-specimen-search-filters
         [(index)]="index"
-        [(aggregateFields)]="aggregateFields"
-        [(aggregateSize)]="aggregateSize"
         [(filters)]="filters"
+        [(aggregateSettings)]="aggregateSettings"
         [aggregateResults]="aggregateResults()"
         [fieldData]="fieldData()"
         [defaultAggregateFields]="defaultAggregateFields()"

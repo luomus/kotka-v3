@@ -297,6 +297,10 @@ export class DatatableComponent implements OnDestroy {
 
   private initEffects() {
     effect(() => {
+      this.cleanSettings();
+    });
+
+    effect(() => {
       this.gridApi()?.setGridOption('defaultColDef', this.defaultColDef());
     });
 
@@ -343,17 +347,7 @@ export class DatatableComponent implements OnDestroy {
     effect(() => {
       const columnSettings = this.columnSettings();
 
-      if (columnSettings) {
-        const cleanedSettings = getCleanedColumnSettings(
-          columnSettings,
-          this.defaultColumnSettings(),
-          this.lockedColIds(),
-        );
-
-        if (!isEqual(cleanedSettings, columnSettings)) {
-          this.columnSettings.set(cleanedSettings);
-        }
-      } else {
+      if (!columnSettings) {
         let storedSettings: ColumnSettings | undefined;
         if (this.enableColumnSelection()) {
           storedSettings = this.settingsStoreService.getStoredColumnSettings(
@@ -463,5 +457,47 @@ export class DatatableComponent implements OnDestroy {
       return [];
     }
     return gridApi.getAllDisplayedColumns().map((c) => c.getColId());
+  }
+
+  private cleanSettings() {
+    const columnSettings = this.columnSettings();
+    const sortModel = this.sortModel();
+    const filterModel = this.filterModel();
+
+    if (!columnSettings) {
+      return;
+    }
+
+    const cleanedSettings = getCleanedColumnSettings(
+      columnSettings,
+      this.defaultColumnSettings(),
+      this.lockedColIds(),
+    );
+
+    if (!isEqual(cleanedSettings, columnSettings)) {
+      this.columnSettings.set(cleanedSettings);
+    }
+
+    if (sortModel) {
+      const newSortModel = sortModel.filter((sort) =>
+        cleanedSettings.selected.includes(sort.colId),
+      );
+      if (newSortModel.length !== sortModel.length) {
+        this.sortModel.set(newSortModel);
+      }
+    }
+
+    if (filterModel) {
+      const newFilterModel = Object.keys(filterModel).reduce((acc, colId) => {
+        if (cleanedSettings.selected.includes(colId)) {
+          acc[colId] = filterModel[colId];
+        }
+        return acc;
+      }, <DatatableFilter>{});
+
+      if (!isEqual(newFilterModel, filterModel)) {
+        this.filterModel.set(newFilterModel);
+      }
+    }
   }
 }

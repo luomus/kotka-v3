@@ -1,30 +1,35 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
+  effect,
   inject,
   input,
   model,
   OnDestroy,
-  signal,
+  Signal,
 } from '@angular/core';
 import {
   KotkaDocumentType, IndexType, FieldAggregate
 } from '@kotka/shared/models';
 import { FormsModule } from '@angular/forms';
 import {
-  DataTypeNamePipePipe
+  DataTypeNamePipePipe,
+  toMap,
+  UserService,
 } from '@kotka/ui/core';
+import { getCleanedColumnSettings } from '@kotka/ui/datatable';
+import { LocalStorageService } from 'ngx-webstorage';
+import { isEqual } from 'lodash';
 import { AggregationsComponent } from './aggregations.component';
-import {
-  AggregationsSettings,
-  AggregationsSettingsModalComponent,
-} from './aggregations-settings-modal.component';
+import { AggregationsSettingsModalComponent } from './aggregations-settings-modal.component';
 import { from } from 'rxjs';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import {
   LocationFilterModalComponent,
 } from './location-filter-modal.component';
 import {
+  AggregateSettings,
   FieldData,
   FieldValue,
   LocationFilter,
@@ -53,13 +58,14 @@ export const INDEX_OPTIONS: IndexType[] = [
 })
 export class SpecimenSearchFiltersComponent implements OnDestroy {
   private modalService = inject(NgbModal);
+  private storage = inject(LocalStorageService);
+  private userService = inject(UserService);
 
   dataType: KotkaDocumentType.specimen = KotkaDocumentType.specimen;
 
   index = model.required<IndexType>();
-  aggregateFields = model.required<string[]>();
-  aggregateSize = model.required<number>();
   filters = model.required<SpecimenSearchFilters>();
+  aggregateSettings = model.required<AggregateSettings | undefined>();
 
   aggregateResults = input<FieldAggregate[]>();
   fieldData = input.required<FieldData>();
@@ -69,11 +75,64 @@ export class SpecimenSearchFiltersComponent implements OnDestroy {
   minAggregateSize = input.required<number>();
   maxAggregateSize = input.required<number>();
 
-  aggregateFieldOrder = signal<string[] | undefined>(undefined);
-
   indexOptions = INDEX_OPTIONS;
 
   private modalRef?: NgbModalRef;
+
+  private settingsKey: Signal<string>;
+  private defaultAggregateSettings: Signal<AggregateSettings | undefined>;
+
+  constructor() {
+    this.settingsKey = computed(
+      () =>
+        `${this.dataType}-${this.index()}-aggregates-${this.userService.user()?.id}`,
+    );
+
+    this.defaultAggregateSettings = computed(() => {
+      const allAggregateFields = this.fieldData().allAggregateFields;
+      if (!allAggregateFields) {
+        return undefined;
+      }
+
+      return {
+        selected: this.defaultAggregateFields().filter((field) =>
+          allAggregateFields.includes(field),
+        ),
+        order: allAggregateFields,
+        size: this.defaultAggregateSize(),
+      };
+    });
+
+    effect(() => {
+      this.cleanAggregateSettings();
+    });
+
+    effect(() => {
+      this.cleanFilterFields();
+    });
+
+    effect(() => {
+      this.cleanFilterFieldValues();
+    });
+
+    effect(() => {
+      const aggregateSettings = this.aggregateSettings();
+      const defaultSettings = this.defaultAggregateSettings();
+
+      if (!aggregateSettings && defaultSettings) {
+        const storedSettings = this.storage.retrieve(this.settingsKey());
+        this.aggregateSettings.set(storedSettings || defaultSettings);
+      }
+    });
+
+    effect(() => {
+      const aggregateSettings = this.aggregateSettings();
+
+      if (aggregateSettings) {
+        this.storage.store(this.settingsKey(), aggregateSettings);
+      }
+    });
+  }
 
   ngOnDestroy() {
     this.modalRef?.close();
@@ -114,6 +173,17 @@ export class SpecimenSearchFiltersComponent implements OnDestroy {
   }
 
   openAggregateSettingsModal() {
+    const aggregateSettings = this.aggregateSettings();
+    const defaultSettings = this.defaultAggregateSettings();
+
+    if (!aggregateSettings || !defaultSettings) {
+      return;
+    }
+
+    const { size: filterSize, ...columnSettings } = aggregateSettings;
+    const { size: defaultFilterSize, ...defaultColumnSettings } =
+      defaultSettings;
+
     this.modalRef = this.modalService.open(AggregationsSettingsModalComponent, {
       backdrop: 'static',
       size: 'md',
@@ -123,28 +193,79 @@ export class SpecimenSearchFiltersComponent implements OnDestroy {
     this.modalRef.componentInstance.columns.set(
       this.fieldData().allAggregateColumns,
     );
-    this.modalRef.componentInstance.columnSettings.set({
-      selected: this.aggregateFields(),
-      order: this.aggregateFieldOrder() || this.fieldData().allAggregateFields,
-    });
-    this.modalRef.componentInstance.defaultColumnSettings.set({
-      selected: this.defaultAggregateFields(),
-      order: this.fieldData().allAggregateFields,
-    });
-    this.modalRef.componentInstance.filterSize.set(this.aggregateSize());
-    this.modalRef.componentInstance.defaultFilterSize.set(
-      this.defaultAggregateSize(),
+    this.modalRef.componentInstance.columnSettings.set(columnSettings);
+    this.modalRef.componentInstance.defaultColumnSettings.set(
+      defaultColumnSettings,
     );
+    this.modalRef.componentInstance.filterSize.set(filterSize);
+    this.modalRef.componentInstance.defaultFilterSize.set(defaultFilterSize);
     this.modalRef.componentInstance.minFilterSize.set(this.minAggregateSize());
     this.modalRef.componentInstance.maxFilterSize.set(this.maxAggregateSize());
 
     from(this.modalRef.result).subscribe({
-      next: (settings: AggregationsSettings) => {
-        this.aggregateFields.set(settings.selected);
-        this.aggregateFieldOrder.set(settings.order);
-        this.aggregateSize.set(settings.filterSize);
+      next: (settings: AggregateSettings) => {
+        this.aggregateSettings.set(settings);
       },
       error: () => undefined,
     });
+  }
+
+  private cleanAggregateSettings() {
+    const settings = this.aggregateSettings();
+    const defaultSettings = this.defaultAggregateSettings();
+
+    if (!settings || !defaultSettings) {
+      return;
+    }
+
+    const columnSettings = getCleanedColumnSettings(
+      settings,
+      defaultSettings,
+      [],
+    );
+
+    const size =
+      settings?.size !== undefined &&
+      settings.size >= this.minAggregateSize() &&
+      settings.size <= this.maxAggregateSize()
+        ? settings.size
+        : defaultSettings.size;
+
+    const cleanedSettings: AggregateSettings = { ...columnSettings, size };
+
+    if (!isEqual(cleanedSettings, this.aggregateSettings())) {
+      this.aggregateSettings.set(cleanedSettings);
+    }
+  }
+
+  private cleanFilterFields() {
+    if (this.fieldData().fieldsLoading) {
+      return;
+    }
+
+    const fieldValues = this.filters().fieldValues.filter(
+      (filter) => this.fieldData().fieldMap?.[filter.field],
+    );
+    if (fieldValues.length !== this.filters().fieldValues.length) {
+      this.filters.set({ ...this.filters(), fieldValues });
+    }
+  }
+
+  private cleanFilterFieldValues() {
+    const aggregates = this.aggregateResults();
+    if (!aggregates) {
+      return;
+    }
+
+    const aggregateMap = toMap(aggregates, 'field');
+
+    const fieldValues = this.filters().fieldValues.filter((filter) =>
+      aggregateMap[filter.field]?.values.some(
+        (value) => value.value === filter.value,
+      ),
+    );
+    if (fieldValues.length !== this.filters().fieldValues.length) {
+      this.filters.set({ ...this.filters(), fieldValues });
+    }
   }
 }
