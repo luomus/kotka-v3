@@ -2,10 +2,22 @@
   display: block;
 }
 
+:host.fill-height {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
+
+  main {
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 auto;
+  }
+}
+
 .header-container:empty {
   display: none;
 }
 
-.with-bottom-margin {
-  margin-bottom: 80px;
+.with-bottom-padding {
+  padding-bottom: var(--kotka-page-bottom-padding);
 }

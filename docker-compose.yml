@@ -8,6 +8,11 @@ services:
       - 9200:9200
     volumes:
       - elastic:/usr/share/elasticsearch/data
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --silent --fail http://localhost:9200 || exit 1" ]
+      interval: 10s
+      timeout: 10s
+      retries: 7
   redis:
     image: redis
     environment:
@@ -16,6 +21,9 @@ services:
     volumes:
       - redis:/data
   kotka-api:
+    depends_on:
+      elastic:
+        condition: service_healthy
     env_file:
       - .env
     build:

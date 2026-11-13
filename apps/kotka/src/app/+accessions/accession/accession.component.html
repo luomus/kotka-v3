@@ -1,6 +1,6 @@
 @if (uri$ | async; as uri) {
   @if (vm$ | async; as vm) {
-    <kui-main-content [pageTitle]="vm.title || uri" containerClass="container" [hasBottomMargin]="true">
+    <kui-main-content [pageTitle]="vm.title || uri" containerClass="container" [hasBottomPadding]="true">
       <div kuiMainContentHeader class="header-layout">
         <div class="header-left-group">
           <h1 data-cy="main-header">

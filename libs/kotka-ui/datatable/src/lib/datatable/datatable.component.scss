@@ -1,5 +1,14 @@
+@import "styles/bootstrap";
+
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
+}
+
+.grid {
+  flex: 1 1 0;
+  min-height: min(var(--kotka-datatable-min-height, 300px), calc(100vh - 2 * var(--kotka-page-bottom-padding)));
+  width: 100%;
 }
 
 button + button {

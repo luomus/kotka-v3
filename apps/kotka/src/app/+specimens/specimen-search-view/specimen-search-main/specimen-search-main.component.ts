@@ -1,11 +1,18 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   computed,
-  input, model,
-  OnDestroy, output,
+  ElementRef,
+  HostListener,
+  inject,
+  input,
+  model,
+  OnDestroy,
+  output,
   Signal,
   signal,
+  viewChild,
 } from '@angular/core';
 import {
   ColumnSettings,
@@ -19,9 +26,7 @@ import {
   ElasticsearchQuery,
 } from '@kotka/shared/models';
 import { FormsModule } from '@angular/forms';
-import {
-  AggregateBy,
-} from '@kotka/ui/core';
+import { AggregateBy, WINDOW } from '@kotka/ui/core';
 import {
   FieldData,
   SpecimenSearchFilters,
@@ -53,6 +58,8 @@ export const INDEX_OPTIONS: IndexType[] = [
   ],
 })
 export class SpecimenSearchMainComponent implements OnDestroy {
+  private window = inject(WINDOW);
+
   dataType: KotkaDocumentType.specimen = KotkaDocumentType.specimen;
 
   index = model.required<IndexType>();
@@ -79,7 +86,12 @@ export class SpecimenSearchMainComponent implements OnDestroy {
   aggregateResults = signal<FieldAggregate[] | undefined>(undefined);
   searchError = signal<string | undefined>(undefined);
 
+  sidebarHeight = signal<string | undefined>(undefined);
+
   private modalRef?: NgbModalRef;
+  private resizeRafId?: number;
+
+  private sidebar = viewChild.required<ElementRef<HTMLElement>>('sidebar');
 
   constructor() {
     this.searchQuery = computed(() =>
@@ -99,10 +111,27 @@ export class SpecimenSearchMainComponent implements OnDestroy {
         aggregateSize: this.aggregateSize(),
       })),
     );
+
+    afterNextRender(() => this.onResize());
+  }
+
+  @HostListener('window:resize', [])
+  @HostListener('window:scroll', [])
+  onResize() {
+    if (this.resizeRafId === undefined) {
+      this.resizeRafId = requestAnimationFrame(() => {
+        this.resizeRafId = undefined;
+        this.updateSidebarHeight();
+      });
+    }
   }
 
   ngOnDestroy() {
     this.modalRef?.close();
+
+    if (this.resizeRafId !== undefined) {
+      cancelAnimationFrame(this.resizeRafId);
+    }
   }
 
   onSearch(searchQuery: SpecimenSearchQuery) {
@@ -123,5 +152,15 @@ export class SpecimenSearchMainComponent implements OnDestroy {
     this.searchError.set(undefined);
     this.aggregateResults.set(data.result.aggregates);
     this.loadData.emit(data);
+  }
+
+  private updateSidebarHeight() {
+    const sidebarElem = this.sidebar().nativeElement;
+
+    const top = Math.max(sidebarElem.getBoundingClientRect().top, 0);
+    const bottom = parseFloat(getComputedStyle(sidebarElem).top) || 0;
+    const height = `${this.window.innerHeight - top - bottom}px`;
+
+    this.sidebarHeight.set(height);
   }
 }

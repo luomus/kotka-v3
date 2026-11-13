@@ -80,4 +80,6 @@ $input-btn-padding-x-sm:      .25rem;
   @each $name, $value in $grid-breakpoints {
     --kotka-breakpoint-#{$name}: #{$value};
   }
+
+  --kotka-page-bottom-padding: clamp(#{$spacer * 2}, 5vh, #{$spacer * 4});
 }
