@@ -37,6 +37,7 @@ import { SpecimenIdSearchValue, SpecimenSearchQuery, SpecimenSearchComponent
 import { NgbAlert, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { SpecimenSearchFiltersComponent } from '../specimen-search-filters/specimen-search-filters.component';
 import { getSpecimenSearchQuery } from '../service/specimen-search-query-utils';
+import { isEqual } from 'lodash';
 
 export const INDEX_OPTIONS: IndexType[] = [
   'unit',
@@ -102,15 +103,15 @@ export class SpecimenSearchMainComponent implements OnDestroy {
       ),
     );
 
-    this.aggregateBy = computed(() => (
-      this.aggregateSettings()?.selected || []).map((field) => ({
+    this.aggregateBy = computed(() =>
+      (this.aggregateSettings()?.selected || []).map((field) => ({
         field,
         aggregateField: this.fieldData().fieldMap?.[field]?.hasRaw
           ? `${field}.raw`
           : field,
         aggregateSize: this.aggregateSettings()?.size,
       })
-    ));
+    ), { equal: isEqual });
 
     afterNextRender(() => this.onResize());
   }
