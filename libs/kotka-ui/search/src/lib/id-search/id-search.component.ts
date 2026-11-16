@@ -17,6 +17,8 @@ export class IdSearchComponent {
   idSearchText = model<string>('');
   idSearchTextParseError = input<string>('');
 
+  disabled = input<boolean>(false);
+
   enterSubmit = output<void>();
 
   onEnter(event: Event) {

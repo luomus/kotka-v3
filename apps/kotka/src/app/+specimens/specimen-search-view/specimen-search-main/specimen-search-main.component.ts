@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   ElementRef,
   HostListener,
   inject,
@@ -112,6 +113,12 @@ export class SpecimenSearchMainComponent implements OnDestroy {
         aggregateSize: this.aggregateSettings()?.size,
       })
     ), { equal: isEqual });
+
+    effect(() => {
+      this.index();
+      this.aggregateBy();
+      this.aggregateResults.set(undefined);
+    });
 
     afterNextRender(() => this.onResize());
   }

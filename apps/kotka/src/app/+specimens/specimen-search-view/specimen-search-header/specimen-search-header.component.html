@@ -8,12 +8,14 @@
         type="text"
         class="form-control"
         [ngModel]="searchLink()"
+        [disabled]="!searchLink()"
         readonly
       />
       <button
         class="btn btn-outline-secondary"
         type="button"
         title="Copy search link to clipboard"
+        [disabled]="!searchLink()"
         (click)="copySearchLinkToClipboard()"
       >
         <i class="fa fa-link"></i>

@@ -36,16 +36,20 @@
 
 <button
   class="btn btn-sm btn-outline-secondary w-100 mb-2"
-  [disabled]="!aggregateResults()"
+  [disabled]="fieldData().fieldsLoading"
   (click)="openAggregateSettingsModal()"
   data-cy="select-aggregate-fields"
 >
   <i class="fa-solid fa-gear"></i> Select fields
 </button>
 
-<kotka-aggregations
-  [fieldValues]="filters().fieldValues"
-  [aggregates]="aggregateResults() || []"
-  [fieldData]="fieldData()"
-  (fieldValuesChange)="onFieldValuesChange($event)"
-></kotka-aggregations>
+@if (!fieldData().fieldsLoading && aggregateResults()) {
+  <kotka-aggregations
+    [fieldValues]="filters().fieldValues"
+    [aggregates]="aggregateResults() || []"
+    [fieldData]="fieldData()"
+    (fieldValuesChange)="onFieldValuesChange($event)"
+  ></kotka-aggregations>
+} @else {
+  <kui-spinner></kui-spinner>
+}

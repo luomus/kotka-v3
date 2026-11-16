@@ -36,6 +36,7 @@ import {
   SpecimenSearchFilters,
 } from '../models/models';
 import { DecimalPipe } from '@angular/common';
+import { SpinnerComponent } from '@kotka/ui/components';
 
 export const INDEX_OPTIONS: IndexType[] = [
   'unit',
@@ -54,6 +55,7 @@ export const INDEX_OPTIONS: IndexType[] = [
     AggregationsComponent,
     DataTypeNamePipePipe,
     DecimalPipe,
+    SpinnerComponent,
   ],
 })
 export class SpecimenSearchFiltersComponent implements OnDestroy {

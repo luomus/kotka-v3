@@ -1,6 +1,7 @@
 <kui-id-search
   [(idSearchText)]="idSearchText"
   [idSearchTextParseError]="idSearchTextParseError()"
+  [disabled]="!fields()"
   (enterSubmit)="searchComponent.onSearchClick()"
 ></kui-id-search>
 <kui-search
@@ -15,6 +16,7 @@
   <button
     kuiSearchHeaderActions
     class="btn btn-link text-decoration-none"
+    [disabled]="!fields()"
     (click)="onMyNewSpecimensClick()"
   >
     <i class="fa fa-arrow-down"></i>
