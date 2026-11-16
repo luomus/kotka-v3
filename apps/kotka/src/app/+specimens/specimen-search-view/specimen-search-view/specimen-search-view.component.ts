@@ -9,24 +9,14 @@ import {
   signal,
 } from '@angular/core';
 import {
-  ColDefWithExtra,
   ColumnSettings,
-  DatatableColumn,
   DatatableLoadedData,
   DatatableSort,
-  getBooleanColumnOptions,
-  getDateColumnOptions,
-  getGeoPointColumnOptions,
-  getUriColumnOptions,
 } from '@kotka/ui/datatable';
 import {
-  BOOLEAN_TYPES,
-  DATE_TYPES,
   Document,
-  GEO_POINT_TYPES,
   IndexType,
   KotkaDocumentType,
-  SearchField,
   SearchResult,
   SearchResultKey,
 } from '@kotka/shared/models';
@@ -37,19 +27,18 @@ import {
 } from '@kotka/ui/components';
 import { FormsModule } from '@angular/forms';
 import {
-  ApiClient,
   DocumentSortData,
   IteratorSearchParams,
   SearchResultIteratorService,
-  toMap,
   UserService,
 } from '@kotka/ui/core';
 import { SpecimenLabelDesignerComponent } from '../../specimen-label-designer/specimen-label-designer.component';
 import { AggregateSettings, FieldData, SpecimenSearchFilters } from '../models/models';
+import { FieldDataService } from '../service/field-data.service';
 import { SpecimenLinkService } from '../service/specimen-link.service';
 import { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
-import { map, startWith, switchMap } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SpecimenSearchMainComponent } from '../specimen-search-main/specimen-search-main.component';
@@ -66,10 +55,6 @@ interface SpecimenSearchState {
   columnSettings?: ColumnSettings;
   sort: DatatableSort;
 }
-
-const INITIAL_FIELD_DATA: FieldData = {
-  fieldsLoading: true,
-};
 
 const DEFAULT_SELECTED_FIELDS: Record<IndexType, SearchResultKey[]> = {
   unit: ['documentURI', 'locality', 'taxon'],
@@ -104,7 +89,7 @@ const DEFAULT_AGGREGATE_SIZE = 10;
   ],
 })
 export class SpecimenSearchViewComponent {
-  private apiClient = inject(ApiClient);
+  private fieldDataService = inject(FieldDataService);
   private searchResultIteratorService = inject(SearchResultIteratorService);
   private specimenLinkService = inject(SpecimenLinkService);
   private route = inject(ActivatedRoute);
@@ -149,37 +134,14 @@ export class SpecimenSearchViewComponent {
 
   private activeSearchParams?: IteratorSearchParams;
 
-  private specialColumns: Partial<Record<SearchResultKey, DatatableColumn>> = {
-    documentURI: {
-      ...getUriColumnOptions({
-        editRouterLink: ['..', 'edit'],
-        showViewLink: true,
-        getEditRouterQueryParams: (data: SearchResult) => ({
-          uri: data.documentURI,
-          sortId: data.id,
-        }),
-        getViewRouterQueryParams: (data: SearchResult) => ({
-          uri: data.documentURI,
-          sortId: data.id,
-        }),
-        onRowSelect: this.onRowSelect.bind(this),
-      }),
-      lockPosition: 'left',
-    },
-    dateCreated: {
-      ...getDateColumnOptions(true, true),
-    },
-    dateEdited: {
-      ...getDateColumnOptions(true, true),
-    },
-  };
-
   constructor() {
     this.fieldData = toSignal(
       toObservable(this.index).pipe(
-        switchMap((index) => this.getFieldData(index)),
+        switchMap((index) =>
+          this.fieldDataService.getFieldData(index, DEFAULT_SELECTED_FIELDS[index], this.onRowSelect.bind(this))
+        ),
       ),
-      { initialValue: INITIAL_FIELD_DATA },
+      { initialValue: { fieldsLoading: true } },
     );
 
     this.searchLink = computed(() => {
@@ -206,7 +168,7 @@ export class SpecimenSearchViewComponent {
       () => `specimen-search-state-${this.userService.user()?.id}`,
     );
 
-    effect(() => {
+    /*effect(() => {
       if (this.showLabelDesigner()) {
         const searchParams = this.activeSearchParams;
         this.labelDesignerData$ = this.apiClient.getAllDocuments(
@@ -219,7 +181,7 @@ export class SpecimenSearchViewComponent {
       } else {
         this.labelDesignerData$ = undefined;
       }
-    });
+    });*/
 
     effect(() => {
       const state: SpecimenSearchState = {
@@ -266,61 +228,6 @@ export class SpecimenSearchViewComponent {
   onIndexChange() {
     this.aggregateSettings.set(undefined);
     this.columnSettings.set(undefined);
-  }
-
-  private getFieldData(index: IndexType): Observable<FieldData> {
-    const defaultSelectedFields: string[] = DEFAULT_SELECTED_FIELDS[index];
-    const specialColumns: Record<string, DatatableColumn> = this.specialColumns;
-
-    return this.apiClient
-      .getSearchFields(KotkaDocumentType.specimen, index)
-      .pipe(
-        map((fields) => {
-          const fieldMap: Record<string, SearchField> = toMap(fields, 'field');
-
-          const columns: DatatableColumn[] = fields.map((field) => {
-            let baseColumn: Partial<DatatableColumn> = {};
-            if (DATE_TYPES.includes(field.type)) {
-              baseColumn = getDateColumnOptions();
-            } else if (BOOLEAN_TYPES.includes(field.type)) {
-              baseColumn = getBooleanColumnOptions();
-            } else if (GEO_POINT_TYPES.includes(field.type)) {
-              baseColumn = getGeoPointColumnOptions();
-            }
-
-            return {
-              headerName: field.label || field.field,
-              field: field.field,
-              sortField: field.hasRaw ? `${field.field}.raw` : field.field,
-              ...baseColumn,
-              ...(specialColumns[field.field] || {}),
-              defaultSelected: defaultSelectedFields.includes(field.field),
-            };
-          });
-
-          const allAggregateColumns: ColDefWithExtra[] = fields
-            .filter((field) => field.hasRaw || field.type === 'keyword')
-            .map((field) => ({
-              colId: field.field,
-              headerName: field.label || field.field,
-              field: field.field,
-            }));
-
-          const allAggregateFields: string[] = allAggregateColumns.map(
-            (col) => col.colId,
-          );
-
-          return {
-            fields,
-            fieldMap,
-            columns,
-            allAggregateColumns,
-            allAggregateFields,
-            fieldsLoading: false,
-          };
-        }),
-        startWith(INITIAL_FIELD_DATA),
-      );
   }
 
   private initState() {
