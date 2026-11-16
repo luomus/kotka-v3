@@ -5,7 +5,7 @@ import {
   model, output,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { FieldTypeaheadComponent } from '../field-typeahead/field-typeahead.component';
+import { FieldSelectComponent } from '../field-select/field-select.component';
 import {
   BuilderQuery,
   MultiSearchField,
@@ -37,7 +37,7 @@ export function createBuilderQuery(): BuilderQuery {
   selector: 'kui-search-builder',
   imports: [
     FormsModule,
-    FieldTypeaheadComponent,
+    FieldSelectComponent,
     SearchValueInputComponent,
     CriteriaCanHaveValuePipe,
     OperatorsForFieldPipe,

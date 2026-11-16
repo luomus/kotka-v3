@@ -1,3 +1,5 @@
+@import "styles/bootstrap";
+
 .ag-floating-filter-full-body {
   overflow: initial;
 }
@@ -6,6 +8,15 @@
   width: 100%;
   display: flex;
   align-items: center;
+}
+
+.ag-select select {
+  padding-right: $form-select-indicator-padding !important;
+  background-image: escape-svg($form-select-indicator);
+  background-repeat: no-repeat;
+  background-position: $form-select-bg-position;
+  background-size: $form-select-bg-size;
+  appearance: none;
 }
 
 .headerless-table .ag-header {

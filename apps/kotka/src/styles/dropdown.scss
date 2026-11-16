@@ -1,0 +1,5 @@
+.dropdown-item:has(.non-selectable-option) {
+  pointer-events: none;
+  color: var(--bs-secondary-color);
+  background-color: transparent;
+}

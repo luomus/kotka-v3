@@ -26,14 +26,14 @@
         @for (criteria of group.criteria; track $index; let critIdx = $index; let last = $last) {
           <div class="row g-2 mb-2">
             <div class="col">
-              <kui-field-typeahead
+              <kui-field-select
                 placeholder="Any field"
                 [fields]="fields()"
                 [multiFields]="multiFields()"
                 [value]="criteria.field"
                 (valueChange)="setField(groupIdx, critIdx, $event)"
                 (keydown.enter)="enterSubmit.emit()"
-              ></kui-field-typeahead>
+              ></kui-field-select>
             </div>
 
             <div class="col">

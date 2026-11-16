@@ -1,0 +1,57 @@
+@import "styles/bootstrap";
+
+$clear-btn-width: 0.625rem;
+$control-gap: 0.25rem;
+
+:host {
+  position: relative;
+  display: block;
+}
+
+input {
+  cursor: default;
+
+  padding-right: $form-select-indicator-padding;
+  background-image: escape-svg($form-select-indicator);
+  background-repeat: no-repeat;
+  background-position: $form-select-bg-position;
+  background-size: $form-select-bg-size;
+
+  &.has-clear {
+    padding-right: $form-select-indicator-padding + $clear-btn-width +  2 * $control-gap;
+  }
+
+  &.has-spinner {
+    padding-right: $form-select-indicator-padding + $spinner-width-sm + 2 * $control-gap;
+  }
+
+  &.has-clear.has-spinner {
+    padding-right: $form-select-indicator-padding + $clear-btn-width + $spinner-width-sm + 3 * $control-gap;
+  }
+
+  &.has-selection::placeholder {
+    color: inherit;
+    opacity: 1;
+  }
+}
+
+.clear-all-btn {
+  position: absolute;
+  top: 50%;
+  right: $form-select-indicator-padding + $control-gap;
+  transform: translateY(-50%);
+  font-size: $clear-btn-width;
+  background-size: $clear-btn-width;
+}
+
+.suggestions-loading {
+  position: absolute;
+  top: 50%;
+  margin-top: -($spinner-height-sm / 2);
+  right: $form-select-indicator-padding + $control-gap;
+  pointer-events: none;
+
+  &.has-clear {
+    right: $form-select-indicator-padding + $control-gap + $clear-btn-width + $control-gap;
+  }
+}

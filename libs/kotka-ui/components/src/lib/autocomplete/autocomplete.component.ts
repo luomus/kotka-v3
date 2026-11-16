@@ -1,53 +1,43 @@
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
-  effect,
-  inject,
-  input,
-  model,
-  signal,
-  TemplateRef
 } from '@angular/core';
 import { AutocompleteResult } from '@kotka/shared/models';
 import {
   debounceTime,
   distinctUntilChanged,
+  map,
   merge,
   Observable,
-  of,
   OperatorFunction,
   Subject,
   switchMap,
-  tap
 } from 'rxjs';
 import { NgbTypeahead, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
+import { AutocompleteBaseComponent } from '../autocomplete-base/autocomplete-base';
 
-export type FetchAutocompleteResultsFunc = (
-  term: string,
-) => Observable<AutocompleteResult[]>;
+export type { FetchAutocompleteResultsFunc } from '../autocomplete-base/autocomplete-base';
 
 @Component({
   selector: 'kui-autocomplete',
   template: `
     <input
+      class="form-control"
       type="text"
       [placeholder]="placeholder()"
-      [className]="inputClassName()"
       [(ngModel)]="typeaheadValue"
-      [disabled]="loading"
+      [disabled]="loading()"
       [ngbTypeahead]="search"
       [inputFormatter]="inputFormatter"
       [resultFormatter]="resultFormatter"
       [resultTemplate]="resultTemplate()!"
       [container]="'body'"
       (selectItem)="onSelectItem($event)"
-      (blur)="onBlur()"
       (ngModelChange)="onChange()"
       (focus)="onFocus($event)"
     />
-    @if (suggestionsLoading() && showSuggestionsLoadingSpinner()){
+    @if (suggestionsLoading() && showSuggestionsLoadingSpinner()) {
       <div class="suggestions-loading">
         <span
           class="spinner-border spinner-border-sm text-secondary"
@@ -59,94 +49,26 @@ export type FetchAutocompleteResultsFunc = (
       </div>
     }
   `,
-  styles: `
-    :host {
-      position: relative;
-      display: block;
-    }
-    .suggestions-loading {
-      position: absolute;
-      top: 0.35rem;
-      right: 0.6rem;
-      pointer-events: none;
-    }
-  `,
+  styleUrls: ['./autocomplete.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, NgbTypeahead],
 })
-export class AutocompleteComponent {
-  private cdr = inject(ChangeDetectorRef);
-
-  value = model<string>();
-  fetchResultsFunc = input.required<FetchAutocompleteResultsFunc>();
-  placeholder = input('Search...');
-  inputClassName = input('form-control');
-  minCharacters = input(1);
-  resultTemplate = input<TemplateRef<any>>();
-  allowFreeText = input(false);
-  showSuggestionsLoadingSpinner = input(true);
-
-  loading = false;
-  suggestionsLoading = signal(false);
+export class AutocompleteComponent extends AutocompleteBaseComponent {
   typeaheadValue: string | AutocompleteResult = '';
 
   private focus$ = new Subject<string>();
 
-  constructor() {
-    effect(() => {
-      const value = this.value();
-
-      if (this.allowFreeText()) {
-        this.typeaheadValue = value ?? '';
-      } else if (!value) {
-        this.typeaheadValue = '';
-      } else if (
-        typeof this.typeaheadValue !== 'object' ||
-        this.typeaheadValue.key !== value
-      ) {
-        this.loading = true;
-
-        this.fetchResultsFunc()(value).subscribe((results) => {
-          const typeaheadValue = results.filter(r => r.key === value)[0];
-          if (typeaheadValue) {
-            this.typeaheadValue = typeaheadValue;
-          } else {
-            this.typeaheadValue = '';
-            this.value.set(undefined);
-          }
-
-          this.loading = false;
-          this.cdr.markForCheck();
-        });
-      }
-    });
+  protected onValueChange(value?: string) {
+    this.typeaheadValue = value ?? '';
   }
 
   onSelectItem(value: NgbTypeaheadSelectItemEvent<AutocompleteResult>) {
     this.value.set(value.item.key);
   }
 
-  onBlur() {
-    if (this.allowFreeText()) {
-      return;
-    }
-
-    if (typeof this.typeaheadValue !== 'object') {
-      this.typeaheadValue = '';
-      this.value.set(undefined);
-    }
-  }
-
   onChange() {
-    if (this.allowFreeText()) {
-      if (typeof this.typeaheadValue === 'string') {
-        this.value.set(this.typeaheadValue);
-      }
-      return;
-    }
-
-    if (this.typeaheadValue === '') {
-      this.value.set(undefined);
+    if (typeof this.typeaheadValue === 'string') {
+      this.value.set(this.typeaheadValue);
     }
   }
 
@@ -163,18 +85,10 @@ export class AutocompleteComponent {
 
   search: OperatorFunction<string, readonly AutocompleteResult[]> = (
     text$: Observable<string>,
-  ) => {
-    const debouncedText$ = text$.pipe(
-      tap((term) => (this.suggestionsLoading.set(term.length >= this.minCharacters()))),
-      debounceTime(200),
+  ) =>
+    merge(this.focus$, text$.pipe(debounceTime(200))).pipe(
+      map((term) => term ?? ''),
       distinctUntilChanged(),
+      switchMap((term) => this.fetchSuggestions(term)),
     );
-    return merge(debouncedText$, this.focus$).pipe(
-      tap((term) => this.suggestionsLoading.set(term.length >= this.minCharacters())),
-      switchMap((term) =>
-        term.length < this.minCharacters() ? of([]) : this.fetchResultsFunc()(term),
-      ),
-      tap(() => this.suggestionsLoading.set(false)),
-    );
-  };
 }

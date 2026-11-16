@@ -1,5 +1,6 @@
 export * from './lib/autocomplete/autocomplete.component';
 export * from './lib/autocomplete-textarea/autocomplete-textarea.component';
+export * from './lib/select/select.component';
 export * from './lib/datepicker/datepicker.component';
 export * from './lib/datepicker/date-format';
 export * from './lib/with-leave-confirm/with-leave-confirm.component';

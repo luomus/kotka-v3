@@ -1,0 +1,17 @@
+@import "styles/bootstrap";
+
+:host {
+  position: relative;
+  display: block;
+}
+
+input {
+  padding-right: $spinner-width-sm + 0.5rem;
+}
+
+.suggestions-loading {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.25rem;
+  pointer-events: none;
+}

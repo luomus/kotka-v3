@@ -4,7 +4,7 @@ import {
   input,
   model, Signal,
 } from '@angular/core';
-import { AutocompleteComponent } from '@kotka/ui/components';
+import { SelectComponent } from '@kotka/ui/components';
 import { Observable, of } from 'rxjs';
 import { AutocompleteResult, SearchField } from '@kotka/shared/models';
 import { HighlightMatchPipe } from '@kotka/ui/core';
@@ -15,9 +15,9 @@ interface FieldTypeaheadOption extends AutocompleteResult {
 }
 
 @Component({
-  selector: 'kui-field-typeahead',
+  selector: 'kui-field-select',
   template: `
-    <kui-autocomplete
+    <kui-select
       [value]="value()"
       [placeholder]="placeholder()"
       [minCharacters]="0"
@@ -25,11 +25,11 @@ interface FieldTypeaheadOption extends AutocompleteResult {
       [fetchResultsFunc]="fetchResultsFunc"
       [showSuggestionsLoadingSpinner]="false"
       (valueChange)="value.set($event || '')"
-    ></kui-autocomplete>
+    ></kui-select>
     <ng-template #resultTemplate let-option="result" let-term="term">
       <span>
         <span [innerHTML]="option.value | highlightMatch: term"></span>
-        @if (!option.hideKey) {
+        @if (!option.hideKey && option.key) {
           <small class="text-muted">
             (<span [innerHTML]="option.key | highlightMatch: term"></span>)
           </small>
@@ -45,9 +45,9 @@ interface FieldTypeaheadOption extends AutocompleteResult {
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AutocompleteComponent, HighlightMatchPipe],
+  imports: [SelectComponent, HighlightMatchPipe],
 })
-export class FieldTypeaheadComponent {
+export class FieldSelectComponent {
   fields = input.required<SearchField[]>();
   multiFields = input<MultiSearchField[]>([]);
   value = model<string>('');

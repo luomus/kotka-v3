@@ -7,8 +7,8 @@ import {
 import { IFloatingFilterAngularComp } from '@ag-grid-community/angular';
 import { ApiClient } from '@kotka/ui/core';
 import {
-  AutocompleteComponent,
   FetchAutocompleteResultsFunc,
+  SelectComponent,
 } from '@kotka/ui/components';
 import { KotkaDocumentType } from '@kotka/shared/models';
 
@@ -20,15 +20,15 @@ export interface AutocompleteFilterParams {
 }
 
 @Component({
-  imports: [AutocompleteComponent],
+  imports: [SelectComponent],
   template: `
     <div class="ag-floating-filter-input">
-      <kui-autocomplete
+      <kui-select
+        inputClassName="ag-input-field-input ag-text-field-input"
         [value]="currentFilter"
         [fetchResultsFunc]="fetchResultsFunc"
-        [inputClassName]="'ag-input-field-input ag-text-field-input'"
         (valueChange)="changeFilterValue($event)"
-      ></kui-autocomplete>
+      ></kui-select>
     </div>
   `,
 })
@@ -46,7 +46,9 @@ export class AutocompleteFloatingFilterComponent
     this.fetchResultsFunc = this.getAutocompleteResults.bind(this);
   }
 
-  agInit(params: IFloatingFilterParams<TextFilter> & AutocompleteFilterParams): void {
+  agInit(
+    params: IFloatingFilterParams<TextFilter> & AutocompleteFilterParams,
+  ): void {
     this.params = params;
   }
 
