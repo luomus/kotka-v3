@@ -25,7 +25,7 @@ RUN npm run ng -- build kotka-api \
   && npm run ng -- build kotka-cli \
   && npm run ng -- build kotka --configuration $CONFIGURATION
 
-FROM nginxinc/nginx-unprivileged as kotka
+FROM nginx/nginx-unprivileged as kotka
 
 USER nginx
 
